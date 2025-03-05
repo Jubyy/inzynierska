@@ -1,0 +1,14 @@
+<h2>Sprawdzenie składników dla: {{ recipe.name }}</h2>
+
+{% if missing_ingredients %}
+    <p>Brakuje lub jest niezgodność dla następujących składników:</p>
+    <ul>
+        {% for item in missing_ingredients %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Masz wszystkie składniki! Możesz zrobić ten przepis.</p>
+{% endif %}
+
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
