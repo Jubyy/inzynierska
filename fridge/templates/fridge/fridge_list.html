@@ -1,9 +1,11 @@
 <h2>Twoja lodówka</h2>
 <ul>
     {% for item in items %}
-        <li>{{ item.name }} - {{ item.quantity }} {{ item.unit }} (ważność do: {{ item.expiry_date|default:"brak" }})</li>
-    {% empty %}
-        <li>Brak produktów w lodówce.</li>
+        <<li>{{ item.name }} - {{ item.quantity }} {{ item.unit }} 
+            (ważność do: {{ item.expiry_date|default:"brak" }})
+            <a href="{% url 'edit_fridge_item' item.id %}">Edytuj</a> |
+            <a href="{% url 'delete_fridge_item' item.id %}">Usuń</a>
+        </li>
     {% endfor %}
 </ul>
 <a href="{% url 'add_fridge_item' %}">Dodaj produkt</a>

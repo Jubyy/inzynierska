@@ -1,11 +1,14 @@
 <h2>Twoje przepisy</h2>
 <ul>
     {% for recipe in recipes %}
-        <li>
-            {{ recipe.name }} - {{ recipe.category }} ({{ recipe.portions }} porcji)
-            <a href="{% url 'check_ingredients' recipe.id %}">Sprawdź składniki</a> |
-            <a href="{% url 'scale_recipe' recipe.id %}">Skaluj przepis</a>
-        </li>
+    <li>{{ recipe.name }} - {{ recipe.category }} ({{ recipe.portions }} porcji)
+        <a href="{% url 'check_ingredients' recipe.id %}">Sprawdź składniki</a> |
+        <a href="{% url 'scale_recipe' recipe.id %}">Skaluj</a> |
+        <a href="{% url 'generate_shopping_list' recipe.id %}">Lista zakupów</a> |
+        <a href="{% url 'edit_recipe' recipe.id %}">Edytuj</a> |
+        <a href="{% url 'delete_recipe' recipe.id %}">Usuń</a>
+    </li>
+    
     {% empty %}
         <li>Brak przepisów.</li>
     {% endfor %}

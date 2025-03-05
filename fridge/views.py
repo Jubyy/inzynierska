@@ -20,3 +20,27 @@ def add_fridge_item(request):
     else:
         form = FridgeItemForm()
     return render(request, 'fridge/add_item.html', {'form': form})
+
+@login_required
+def edit_fridge_item(request, item_id):
+    item = FridgeItem.objects.get(id=item_id, user=request.user)
+
+    if request.method == 'POST':
+        form = FridgeItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('fridge_list')
+    else:
+        form = FridgeItemForm(instance=item)
+
+    return render(request, 'fridge/edit_item.html', {'form': form})
+
+
+@login_required
+def delete_fridge_item(request, item_id):
+    item = FridgeItem.objects.get(id=item_id, user=request.user)
+    if request.method == 'POST':
+        item.delete()
+        return redirect('fridge_list')
+
+    return render(request, 'fridge/confirm_delete_item.html', {'item': item})
