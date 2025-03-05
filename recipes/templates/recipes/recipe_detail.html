@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if recipe.image %}
+    <img src="{{ recipe.image.url }}" alt="Zdjęcie potrawy" style="max-width: 400px; height: auto;">
+{% else %}
+    <p>Brak zdjęcia potrawy.</p>
+{% endif %}
 <h2>{{ recipe.name }}</h2>
 <p>{{ recipe.description }}</p>
 

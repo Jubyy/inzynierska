@@ -4,7 +4,8 @@ from .models import Recipe, RecipeIngredient, PreparationStep
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ['name', 'description', 'portions', 'category']
+        fields = ['name', 'description', 'portions', 'category', 'image']
+
 
 class RecipeIngredientForm(forms.ModelForm):
     class Meta:

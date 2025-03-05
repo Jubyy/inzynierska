@@ -18,6 +18,7 @@ from .utils import convert_units
 from django.forms import inlineformset_factory
 from .models import Recipe, RecipeIngredient, PreparationStep
 from .forms import RecipeForm, RecipeIngredientForm, PreparationStepForm
+from django.contrib import messages
 
 @login_required
 def recipe_list(request):
@@ -30,7 +31,7 @@ def add_recipe(request):
     StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
 
     if request.method == 'POST':
-        form = RecipeForm(request.POST)
+        form = RecipeForm(request.POST, request.FILES)
         ingredient_formset = IngredientFormSet(request.POST)
         step_formset = StepFormSet(request.POST)
 
@@ -38,6 +39,7 @@ def add_recipe(request):
             recipe = form.save(commit=False)
             recipe.user = request.user
             recipe.save()
+            messages.success(request, 'Przepis został zapisany!')
 
             ingredients = ingredient_formset.save(commit=False)
             for ingredient in ingredients:
@@ -207,7 +209,7 @@ def edit_recipe(request, recipe_id):
     StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
 
     if request.method == 'POST':
-        form = RecipeForm(request.POST, instance=recipe)
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
         ingredient_formset = IngredientFormSet(request.POST, instance=recipe)
         step_formset = StepFormSet(request.POST, instance=recipe)
 
@@ -250,6 +252,7 @@ def delete_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id, user=request.user)
     if request.method == 'POST':
         recipe.delete()
+        messages.success(request, f'Przepis "{recipe.name}" został usunięty.')
         return redirect('recipe_list')
 
     return render(request, 'recipes/confirm_delete_recipe.html', {'recipe': recipe})
