@@ -34,6 +34,14 @@
     <a href="{% url 'dashboard' %}">Dashboard</a>
     <a href="{% url 'fridge_list' %}">Lodówka</a>
     <a href="{% url 'recipe_list' %}">Przepisy</a>
+    <form action="{% url 'search_recipes' %}" method="get" style="display:inline;">
+        <input type="text" name="q" placeholder="Szukaj po składniku" value="{{ query|default:'' }}">
+        <label>
+            <input type="checkbox" name="only_possible" {% if only_possible %}checked{% endif %}> Z tym co masz w lodówce
+        </label>
+        <button type="submit">Szukaj</button>
+    </form>
+    
     <a href="{% url 'logout' %}">Wyloguj</a>
 </nav>
 {% if messages %}

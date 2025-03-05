@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Wyniki wyszukiwania dla "{{ query }}"</h2>
+
+{% if recipes %}
+    <ul>
+    {% for recipe in recipes %}
+        <li>
+            <a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.name }}</a>
+            {% if recipe.is_vegan %}
+                [🌱 Wegan]
+            {% elif recipe.is_vegetarian %}
+                [🥗 Wegetariański]
+            {% else %}
+                [🍗 Mięsny]
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Brak przepisów spełniających kryteria.</p>
+{% endif %}
+
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+{% endblock %}

@@ -19,6 +19,7 @@ from django.forms import inlineformset_factory
 from .models import Recipe, RecipeIngredient, PreparationStep
 from .forms import RecipeForm, RecipeIngredientForm, PreparationStepForm
 from django.contrib import messages
+from django.db.models import Q
 
 @login_required
 def recipe_list(request):
@@ -262,3 +263,40 @@ def delete_recipe(request, recipe_id):
 def recipe_detail(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id, user=request.user)
     return render(request, 'recipes/recipe_detail.html', {'recipe': recipe})
+
+
+@login_required
+def search_recipes(request):
+    query = request.GET.get('q')
+    only_possible = request.GET.get('only_possible', 'off') == 'on'
+
+    recipes = Recipe.objects.filter(user=request.user)
+
+    if query:
+        recipes = recipes.filter(
+            Q(ingredients__name__icontains=query)
+        ).distinct()
+
+    if only_possible:
+        recipes = [recipe for recipe in recipes if can_be_made_from_fridge(recipe, request.user)]
+
+    return render(request, 'recipes/search_results.html', {'recipes': recipes, 'query': query, 'only_possible': only_possible})
+
+def can_be_made_from_fridge(recipe, user):
+    fridge_items = {item.name.lower(): item for item in FridgeItem.objects.filter(user=user)}
+
+    for ingredient in recipe.ingredients.all():
+        fridge_item = fridge_items.get(ingredient.name.lower())
+        if not fridge_item:
+            return False
+
+        if not units_match(ingredient.unit, fridge_item.unit):
+            return False
+
+        if fridge_item.quantity < ingredient.quantity:
+            return False
+
+    return True
+
+def units_match(recipe_unit, fridge_unit):
+    return recipe_unit == fridge_unit
