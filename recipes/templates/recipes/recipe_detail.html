@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ recipe.name }}</h2>
+<p>{{ recipe.description }}</p>
+
+<h3>Składniki:</h3>
+<ul>
+    {% for ingredient in recipe.ingredients.all %}
+        <li>{{ ingredient.quantity }} {{ ingredient.unit }} - {{ ingredient.name }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Kroki przygotowania:</h3>
+<ol>
+    {% for step in recipe.steps.all %}
+        <li>{{ step.description }}</li>
+    {% endfor %}
+</ol>
+
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+{% endblock %}

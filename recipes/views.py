@@ -202,21 +202,47 @@ def generate_shopping_list_pdf(request, recipe_id):
 @login_required
 def edit_recipe(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=0)
+
+    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=0, can_delete=True)
+    StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
 
     if request.method == 'POST':
         form = RecipeForm(request.POST, instance=recipe)
-        formset = IngredientFormSet(request.POST, instance=recipe)
+        ingredient_formset = IngredientFormSet(request.POST, instance=recipe)
+        step_formset = StepFormSet(request.POST, instance=recipe)
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             form.save()
-            formset.save()
+
+            ingredients = ingredient_formset.save(commit=False)
+            for ingredient in ingredients:
+                ingredient.recipe = recipe
+                ingredient.save()
+
+            for obj in ingredient_formset.deleted_objects:
+                obj.delete()
+
+            steps = step_formset.save(commit=False)
+            for index, step in enumerate(steps):
+                step.recipe = recipe
+                step.order = index + 1
+                step.save()
+
+            for obj in step_formset.deleted_objects:
+                obj.delete()
+
             return redirect('recipe_list')
     else:
         form = RecipeForm(instance=recipe)
-        formset = IngredientFormSet(instance=recipe)
+        ingredient_formset = IngredientFormSet(instance=recipe)
+        step_formset = StepFormSet(instance=recipe)
 
-    return render(request, 'recipes/edit_recipe.html', {'form': form, 'formset': formset, 'recipe': recipe})
+    return render(request, 'recipes/edit_recipe.html', {
+        'form': form,
+        'ingredient_formset': ingredient_formset,
+        'step_formset': step_formset,
+        'recipe': recipe,
+    })
 
 
 @login_required
@@ -227,3 +253,9 @@ def delete_recipe(request, recipe_id):
         return redirect('recipe_list')
 
     return render(request, 'recipes/confirm_delete_recipe.html', {'recipe': recipe})
+
+
+@login_required
+def recipe_detail(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
+    return render(request, 'recipes/recipe_detail.html', {'recipe': recipe})
