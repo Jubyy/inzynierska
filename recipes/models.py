@@ -32,3 +32,12 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return f'{self.name} - {self.quantity} {self.unit}'
+
+
+class PreparationStep(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='steps')
+    order = models.IntegerField()
+    description = models.TextField()
+
+    def __str__(self):
+        return f'Krok {self.order}: {self.description[:30]}...'

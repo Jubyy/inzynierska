@@ -15,6 +15,9 @@ import os
 from fridge.models import FridgeItem
 from .models import Recipe
 from .utils import convert_units
+from django.forms import inlineformset_factory
+from .models import Recipe, RecipeIngredient, PreparationStep
+from .forms import RecipeForm, RecipeIngredientForm, PreparationStepForm
 
 @login_required
 def recipe_list(request):
@@ -23,29 +26,41 @@ def recipe_list(request):
 
 @login_required
 def add_recipe(request):
-    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=3)
+    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=0, can_delete=True)
+    StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
 
     if request.method == 'POST':
         form = RecipeForm(request.POST)
-        formset = IngredientFormSet(request.POST)
+        ingredient_formset = IngredientFormSet(request.POST)
+        step_formset = StepFormSet(request.POST)
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
             recipe = form.save(commit=False)
             recipe.user = request.user
             recipe.save()
 
-            ingredients = formset.save(commit=False)
+            ingredients = ingredient_formset.save(commit=False)
             for ingredient in ingredients:
                 ingredient.recipe = recipe
                 ingredient.save()
 
+            steps = step_formset.save(commit=False)
+            for index, step in enumerate(steps):
+                step.recipe = recipe
+                step.order = index + 1
+                step.save()
+
             return redirect('recipe_list')
     else:
         form = RecipeForm()
-        formset = IngredientFormSet()
+        ingredient_formset = IngredientFormSet()
+        step_formset = StepFormSet()
 
-    return render(request, 'recipes/add_recipe.html', {'form': form, 'formset': formset})
-
+    return render(request, 'recipes/add_recipe.html', {
+        'form': form,
+        'ingredient_formset': ingredient_formset,
+        'step_formset': step_formset,
+    })
 
 def check_ingredients(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id, user=request.user)
