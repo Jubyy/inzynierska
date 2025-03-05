@@ -300,3 +300,35 @@ def can_be_made_from_fridge(recipe, user):
 
 def units_match(recipe_unit, fridge_unit):
     return recipe_unit == fridge_unit
+
+
+@login_required
+def prepare_meal(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
+    fridge_items = {item.name.lower(): item for item in FridgeItem.objects.filter(user=request.user)}
+
+    missing_ingredients = []
+    for ingredient in recipe.ingredients.all():
+        fridge_item = fridge_items.get(ingredient.name.lower())
+        if not fridge_item:
+            missing_ingredients.append(f'{ingredient.name} - brakuje całkowicie')
+        elif fridge_item.quantity < ingredient.quantity:
+            missing_ingredients.append(f'{ingredient.name} - potrzebujesz {ingredient.quantity}, a masz tylko {fridge_item.quantity}')
+
+    if missing_ingredients:
+        messages.error(request, "Nie możesz przygotować posiłku, brakuje składników:")
+        for missing in missing_ingredients:
+            messages.error(request, missing)
+        return redirect('recipe_detail', recipe_id=recipe_id)
+
+    # Aktualizacja lodówki - zmniejszenie ilości
+    for ingredient in recipe.ingredients.all():
+        fridge_item = fridge_items.get(ingredient.name.lower())
+        fridge_item.quantity -= ingredient.quantity
+        if fridge_item.quantity <= 0:
+            fridge_item.delete()
+        else:
+            fridge_item.save()
+
+    messages.success(request, f'Posiłek "{recipe.name}" został przygotowany, składniki zostały zużyte.')
+    return redirect('recipe_detail', recipe_id=recipe_id)

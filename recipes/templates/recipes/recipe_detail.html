@@ -31,6 +31,8 @@
         <li>{{ step.description }}</li>
     {% endfor %}
 </ol>
+<a href="{% url 'prepare_meal' recipe.id %}" onclick="return confirm('Czy na pewno chcesz przygotować ten posiłek? Składniki zostaną zdjęte z lodówki.')">Przygotuj posiłek</a>
+
 
 <a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
 {% endblock %}
