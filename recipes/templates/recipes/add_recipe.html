@@ -1,0 +1,14 @@
+<h2>Dodaj nowy przepis</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <h3>Składniki:</h3>
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form.as_p }}
+    {% endfor %}
+
+    <button type="submit">Zapisz przepis</button>
+</form>
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>

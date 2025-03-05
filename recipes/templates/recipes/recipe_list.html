@@ -1,0 +1,9 @@
+<h2>Twoje przepisy</h2>
+<ul>
+    {% for recipe in recipes %}
+        <li>{{ recipe.name }} - {{ recipe.category }} ({{ recipe.portions }} porcji)</li>
+    {% empty %}
+        <li>Brak przepisów.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_recipe' %}">Dodaj przepis</a>
