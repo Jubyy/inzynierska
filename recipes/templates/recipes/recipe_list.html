@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Twoje przepisy</h2>
 <ul>
     {% for recipe in recipes %}
@@ -14,3 +18,4 @@
     {% endfor %}
 </ul>
 <a href="{% url 'add_recipe' %}">Dodaj przepis</a>
+{% endblock %}

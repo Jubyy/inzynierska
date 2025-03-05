@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Sprawdzenie składników dla: {{ recipe.name }}</h2>
 
 {% if missing_ingredients %}
@@ -12,3 +16,4 @@
 {% endif %}
 
 <a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+{% endblock %}

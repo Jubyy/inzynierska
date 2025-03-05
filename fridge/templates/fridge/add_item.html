@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <h2>Dodaj produkt do lodówki</h2>
 <form method="post">
     {% csrf_token %}
@@ -5,3 +8,4 @@
     <button type="submit">Dodaj</button>
 </form>
 <a href="{% url 'fridge_list' %}">Wróć do lodówki</a>
+{% endblock %}

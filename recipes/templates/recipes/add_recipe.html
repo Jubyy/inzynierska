@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Dodaj nowy przepis</h2>
 <form method="post">
     {% csrf_token %}
@@ -12,3 +16,4 @@
     <button type="submit">Zapisz przepis</button>
 </form>
 <a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+{% endblock %}

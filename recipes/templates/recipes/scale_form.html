@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Skalowanie przepisu: {{ recipe.name }}</h2>
 <form method="post">
     {% csrf_token %}
@@ -6,3 +10,5 @@
     <button type="submit">Przelicz</button>
 </form>
 <a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+
+{% endblock %}

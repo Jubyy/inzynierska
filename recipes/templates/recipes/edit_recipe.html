@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Edytuj przepis: {{ recipe.name }}</h2>
 <form method="post">
     {% csrf_token %}
@@ -12,3 +16,4 @@
     <button type="submit">Zapisz zmiany</button>
 </form>
 <a href="{% url 'recipe_list' %}">Anuluj</a>
+{% endblock %}

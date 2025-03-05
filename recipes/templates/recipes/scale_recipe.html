@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Przepis: {{ recipe.name }} - {{ target_portions }} porcji</h2>
 
 <ul>
@@ -7,3 +11,6 @@
 </ul>
 
 <a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+
+
+{% endblock %}
