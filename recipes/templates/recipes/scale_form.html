@@ -1,0 +1,8 @@
+<h2>Skalowanie przepisu: {{ recipe.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="portions">Na ile porcji chcesz przeliczyć?</label>
+    <input type="number" name="portions" value="{{ recipe.portions }}" min="1">
+    <button type="submit">Przelicz</button>
+</form>
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>

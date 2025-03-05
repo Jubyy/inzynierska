@@ -66,3 +66,29 @@ def check_ingredients(request, recipe_id):
         'recipe': recipe,
         'missing_ingredients': missing_ingredients,
     })
+
+
+@login_required
+def scale_recipe(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
+
+    if request.method == 'POST':
+        target_portions = int(request.POST.get('portions', recipe.portions))
+
+        scaled_ingredients = []
+        scale_factor = target_portions / recipe.portions
+
+        for ingredient in recipe.ingredients.all():
+            scaled_ingredients.append({
+                'name': ingredient.name,
+                'quantity': round(ingredient.quantity * scale_factor, 2),
+                'unit': ingredient.unit,
+            })
+
+        return render(request, 'recipes/scale_recipe.html', {
+            'recipe': recipe,
+            'scaled_ingredients': scaled_ingredients,
+            'target_portions': target_portions,
+        })
+
+    return render(request, 'recipes/scale_form.html', {'recipe': recipe})

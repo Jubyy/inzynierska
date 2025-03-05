@@ -3,7 +3,8 @@
     {% for recipe in recipes %}
         <li>
             {{ recipe.name }} - {{ recipe.category }} ({{ recipe.portions }} porcji)
-            <a href="{% url 'check_ingredients' recipe.id %}">Sprawdź składniki</a>
+            <a href="{% url 'check_ingredients' recipe.id %}">Sprawdź składniki</a> |
+            <a href="{% url 'scale_recipe' recipe.id %}">Skaluj przepis</a>
         </li>
     {% empty %}
         <li>Brak przepisów.</li>

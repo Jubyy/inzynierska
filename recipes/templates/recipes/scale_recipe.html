@@ -1,0 +1,9 @@
+<h2>Przepis: {{ recipe.name }} - {{ target_portions }} porcji</h2>
+
+<ul>
+    {% for ingredient in scaled_ingredients %}
+        <li>{{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }}</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
