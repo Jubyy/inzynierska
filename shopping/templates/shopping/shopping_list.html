@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Twoja lista zakupów</h2>
+
+{% if items %}
+    <ul>
+        {% for item in items %}
+            <li>{{ item.name }} - {{ item.quantity }} {{ item.unit }} (do: {{ item.recipe_name }})</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'print_shopping_list' %}">🖨️ Drukuj listę zakupów</a>
+{% else %}
+    <p>Lista zakupów jest pusta.</p>
+{% endif %}
+
+<a href="{% url 'dashboard' %}">Powrót do dashboardu</a>
+{% endblock %}

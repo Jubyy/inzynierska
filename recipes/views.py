@@ -20,6 +20,7 @@ from .models import Recipe, RecipeIngredient, PreparationStep
 from .forms import RecipeForm, RecipeIngredientForm, PreparationStepForm
 from django.contrib import messages
 from django.db.models import Q
+from shopping.models import ShoppingListItem
 
 @login_required
 def recipe_list(request):
@@ -65,6 +66,7 @@ def add_recipe(request):
         'step_formset': step_formset,
     })
 
+@login_required
 def check_ingredients(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id, user=request.user)
     fridge_items = FridgeItem.objects.filter(user=request.user)
@@ -75,25 +77,27 @@ def check_ingredients(request, recipe_id):
         matching_item = fridge_items.filter(name__iexact=ingredient.name).first()
 
         if not matching_item:
-            # Brak całego składnika
             missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name}')
-        else:
-            # Składnik jest, sprawdzamy czy ilość się zgadza
-            if ingredient.unit != matching_item.unit:
-                converted_quantity = convert_units(matching_item.quantity, matching_item.unit, ingredient.unit)
-
-                if converted_quantity is None:
-                    missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name} (zła jednostka - masz {matching_item.quantity} {matching_item.unit})')
-                elif converted_quantity < ingredient.quantity:
-                     missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name} (masz za mało: {matching_item.quantity} {matching_item.unit}, czyli {converted_quantity:.2f} {ingredient.unit})')
-            else:
-                 if ingredient.quantity > matching_item.quantity:
-                      missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name} (masz za mało: {matching_item.quantity} {matching_item.unit})')
+            add_to_shopping_list(request.user, ingredient, recipe)
+        elif matching_item.quantity < ingredient.quantity:
+            missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name} (masz za mało: {matching_item.quantity} {matching_item.unit})')
+            add_to_shopping_list(request.user, ingredient, recipe)
 
     return render(request, 'recipes/check_ingredients.html', {
         'recipe': recipe,
         'missing_ingredients': missing_ingredients,
     })
+
+def add_to_shopping_list(user, ingredient, recipe):
+    item, created = ShoppingListItem.objects.get_or_create(
+        user=user,
+        name=ingredient.name,
+        unit=ingredient.unit,
+        recipe_name=recipe.name,
+        defaults={'quantity': 0}
+    )
+    item.quantity += ingredient.quantity
+    item.save()
 
 
 @login_required
@@ -152,55 +156,7 @@ def generate_shopping_list(request, recipe_id):
         'shopping_list': shopping_list,
     })
 
-@login_required
-def generate_shopping_list_pdf(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    fridge_items = FridgeItem.objects.filter(user=request.user)
 
-    shopping_list = []
-
-    for ingredient in recipe.ingredients.all():
-        matching_item = fridge_items.filter(name__iexact=ingredient.name).first()
-
-        if not matching_item:
-            shopping_list.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name}')
-        else:
-            if ingredient.unit != matching_item.unit:
-                converted_quantity = convert_units(matching_item.quantity, matching_item.unit, ingredient.unit)
-                if converted_quantity is None or converted_quantity < ingredient.quantity:
-                    needed_quantity = ingredient.quantity - (converted_quantity or 0)
-                    shopping_list.append(f'{needed_quantity:.2f} {ingredient.unit} {ingredient.name}')
-            elif ingredient.quantity > matching_item.quantity:
-                needed_quantity = ingredient.quantity - matching_item.quantity
-                shopping_list.append(f'{needed_quantity:.2f} {ingredient.unit} {ingredient.name}')
-
-    # Przygotowanie odpowiedzi PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="ListaZakupow-{recipe.name}.pdf"'
-
-    p = canvas.Canvas(response, pagesize=letter)
-
-    # Rejestracja czcionki DejaVuSans
-    font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'DejaVuSans.ttf')
-    pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
-    p.setFont('DejaVuSans', 12)
-
-    # Tworzenie treści PDF
-    width, height = letter
-    p.drawString(100, height - 40, f'Lista zakupów dla przepisu: {recipe.name}')
-
-    if shopping_list:
-        y = height - 60
-        for item in shopping_list:
-            p.drawString(100, y, item)
-            y -= 20
-    else:
-        p.drawString(100, height - 60, 'Masz wszystkie składniki! Nie musisz nic kupować.')
-
-    p.showPage()
-    p.save()
-
-    return response
 
 @login_required
 def edit_recipe(request, recipe_id):

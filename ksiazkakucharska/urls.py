@@ -14,6 +14,8 @@ urlpatterns = [
     path('fridge/', include('fridge.urls')),
     path('recipes/', include('recipes.urls')),
     path('accounts/', include('accounts.urls')),
+    path('shopping/', include('shopping.urls')),
+
 
 ]
 

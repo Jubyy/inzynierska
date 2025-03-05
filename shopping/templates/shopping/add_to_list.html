@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dodaj do listy zakupów</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="save">Dodaj do listy</button>
+    <button type="submit" name="print_now">Dodaj i drukuj</button>
+</form>
+{% endblock %}
