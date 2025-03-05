@@ -43,10 +43,17 @@ function addIngredient() {
                 <option value="ml">ml</option>
                 <option value="szklanka">szklanka</option>
             </select>
+            <label>Kategoria:</label>
+            <select name="ingredients-${count}-category">
+                <option value="plant">Roślinny</option>
+                <option value="animal">Pochodzenia zwierzęcego</option>
+                <option value="meat">Mięsny</option>
+            </select>
         </div>`;
     container.insertAdjacentHTML('beforeend', formHtml);
     document.getElementById('id_ingredients-TOTAL_FORMS').value = count + 1;
 }
+
 
 function addStep() {
     const container = document.getElementById('steps');

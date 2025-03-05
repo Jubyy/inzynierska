@@ -7,6 +7,15 @@
     <p>Brak zdjęcia potrawy.</p>
 {% endif %}
 <h2>{{ recipe.name }}</h2>
+<h3>Kategoria dania:</h3>
+{% if recipe.is_vegan %}
+    <p>🌱 Wegan</p>
+{% elif recipe.is_vegetarian %}
+    <p>🥗 Wegetariański</p>
+{% else %}
+    <p>🍗 Zawiera mięso</p>
+{% endif %}
+
 <p>{{ recipe.description }}</p>
 
 <h3>Składniki:</h3>

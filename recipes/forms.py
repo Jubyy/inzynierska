@@ -10,7 +10,7 @@ class RecipeForm(forms.ModelForm):
 class RecipeIngredientForm(forms.ModelForm):
     class Meta:
         model = RecipeIngredient
-        fields = ['name', 'quantity', 'unit']
+        fields = ['name', 'quantity', 'unit', 'category']
 
 class PreparationStepForm(forms.ModelForm):
     class Meta:

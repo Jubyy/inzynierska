@@ -13,6 +13,8 @@ urlpatterns = [
     path('logout/', accounts_views.custom_logout, name='logout'),
     path('fridge/', include('fridge.urls')),
     path('recipes/', include('recipes.urls')),
+    path('accounts/', include('accounts.urls')),
+
 ]
 
 # 🔥 DODAJ TO NA SAMYM DOLE:
