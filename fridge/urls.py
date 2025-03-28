@@ -1,9 +1,23 @@
 from django.urls import path
 from . import views
 
+app_name = 'fridge'
+
 urlpatterns = [
-    path('', views.fridge_list, name='fridge_list'),
-    path('add/', views.add_fridge_item, name='add_fridge_item'),
-    path('<int:item_id>/edit/', views.edit_fridge_item, name='edit_fridge_item'),
-path('<int:item_id>/delete/', views.delete_fridge_item, name='delete_fridge_item'),
+    # Widoki podstawowe lodówki
+    path('', views.fridge_dashboard, name='dashboard'),
+    path('list/', views.FridgeItemListView.as_view(), name='list'),
+    
+    # Zarządzanie produktami w lodówce
+    path('add/', views.FridgeItemCreateView.as_view(), name='add'),
+    path('<int:pk>/edit/', views.FridgeItemUpdateView.as_view(), name='edit'),
+    path('<int:pk>/delete/', views.FridgeItemDeleteView.as_view(), name='delete'),
+    
+    # Dodatkowe funkcje
+    path('bulk-add/', views.bulk_add_to_fridge, name='bulk_add'),
+    path('clean-expired/', views.clean_expired, name='clean_expired'),
+    path('available-recipes/', views.available_recipes, name='available_recipes'),
+    
+    # Widoki AJAX
+    path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
 ]

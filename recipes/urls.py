@@ -1,16 +1,22 @@
 from django.urls import path
 from . import views
 
+app_name = 'recipes'
+
 urlpatterns = [
-    path('', views.recipe_list, name='recipe_list'),
-    path('add/', views.add_recipe, name='add_recipe'),
-    path('<int:recipe_id>/check/', views.check_ingredients, name='check_ingredients'),
-    path('<int:recipe_id>/scale/', views.scale_recipe, name='scale_recipe'),
-    path('<int:recipe_id>/edit/', views.edit_recipe, name='edit_recipe'),
-    path('<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
-    path('<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
-    path('search/', views.search_recipes, name='search_recipes'),
-    path('<int:recipe_id>/prepare/', views.prepare_meal, name='prepare_meal'),
-
-
+    # Widoki podstawowe (wyświetlanie, dodawanie, edycja, usuwanie przepisów)
+    path('', views.RecipeListView.as_view(), name='list'),
+    path('<int:pk>/', views.RecipeDetailView.as_view(), name='detail'),
+    path('create/', views.RecipeCreateView.as_view(), name='create'),
+    path('<int:pk>/update/', views.RecipeUpdateView.as_view(), name='update'),
+    path('<int:pk>/delete/', views.RecipeDeleteView.as_view(), name='delete'),
+    
+    # Operacje na przepisach
+    path('<int:pk>/add-to-shopping-list/', views.add_to_shopping_list, name='add_to_shopping_list'),
+    path('<int:pk>/add-missing-to-shopping-list/', views.add_missing_to_shopping_list, name='add_missing_to_shopping_list'),
+    path('<int:pk>/prepare/', views.prepare_recipe, name='prepare'),
+    
+    # Widoki AJAX
+    path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
+    path('ajax/load-units/', views.ajax_load_units, name='ajax_load_units'),
 ]
