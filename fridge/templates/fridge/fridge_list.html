@@ -111,9 +111,8 @@
                         </tr>
                     </thead>
                     
-                    <!-- Najpierw sekcja z przeterminowanymi produktami -->
-                    {% with expired_items=fridge_items %}
-                    {% if expired_items %}
+                    {% if has_expired %}
+                    <!-- Sekcja przeterminowanych produktów -->
                     <tbody class="expired-section">
                         <tr>
                             <td colspan="5" class="section-title">
@@ -122,36 +121,34 @@
                         </tr>
                         
                         {% for item in expired_items %}
-                            {% if item.is_expired %}
-                            <tr class="expired">
-                                <td>{{ item.ingredient.name }}</td>
-                                <td>{{ item.amount }} {{ item.unit.name }}</td>
-                                <td>
-                                    {% if item.expiry_date %}
-                                        {{ item.expiry_date }}
-                                        <span class="badge bg-danger">Przeterminowane</span>
-                                    {% else %}
-                                        <span class="text-muted">Brak</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ item.purchase_date }}</td>
-                                <td class="text-center">
-                                    <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edytuj">
-                                        <i class="bi bi-pencil"></i> Edytuj
-                                    </a>
-                                    <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
-                                        <i class="bi bi-trash"></i> Usuń
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endif %}
+                        <tr class="expired">
+                            <td>{{ item.ingredient.name }}</td>
+                            <td>{{ item.amount }} {{ item.unit.name }}</td>
+                            <td>
+                                {% if item.expiry_date %}
+                                    {{ item.expiry_date }}
+                                    <span class="badge bg-danger">Przeterminowane</span>
+                                {% else %}
+                                    <span class="text-muted">Brak</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.purchase_date }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edytuj">
+                                    <i class="bi bi-pencil"></i> Edytuj
+                                </a>
+                                <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
+                                    <i class="bi bi-trash"></i> Usuń
+                                </a>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                     {% endif %}
                     
                     <!-- Sekcja aktualnych produktów -->
                     <tbody class="regular-section">
-                        {% if expired_items %}
+                        {% if has_expired %}
                         <tr>
                             <td colspan="5" class="section-title">
                                 <i class="bi bi-check-circle-fill me-2"></i> Produkty aktualne
@@ -184,8 +181,6 @@
                             {% endif %}
                         {% endfor %}
                     </tbody>
-                    
-                    {% endwith %}
                 </table>
             </div>
         {% else %}

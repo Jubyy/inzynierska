@@ -542,6 +542,17 @@ def add_missing_to_shopping_list(request, pk):
     """Dodaje brakujące składniki przepisu do listy zakupów"""
     recipe = get_object_or_404(Recipe, pk=pk)
     
+    # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
+    try:
+        from shopping.models import ShoppingList
+    except Exception:
+        context = {
+            'recipe': recipe,
+            'missing_ingredients': recipe.get_missing_ingredients(request.user),
+            'table_not_exists': True
+        }
+        return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+    
     if request.method == 'POST':
         # Pobierz lub utwórz listę zakupów
         shopping_list_id = request.POST.get('shopping_list')
@@ -564,7 +575,11 @@ def add_missing_to_shopping_list(request, pk):
         return redirect('shopping:detail', pk=shopping_list.pk)
     
     # Pobierz istniejące listy zakupów użytkownika
-    shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
+    try:
+        shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
+    except Exception:
+        shopping_lists = []
+        
     missing_ingredients = recipe.get_missing_ingredients(request.user)
     
     context = {

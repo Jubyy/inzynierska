@@ -19,7 +19,8 @@ class Ingredient(models.Model):
     category = models.ForeignKey(IngredientCategory, on_delete=models.CASCADE, related_name='ingredients', verbose_name="Kategoria")
     description = models.TextField(blank=True, null=True, verbose_name="Opis")
     barcode = models.CharField(max_length=30, blank=True, null=True, verbose_name="Kod kreskowy", unique=True)
-    # Domyślna jednostka zostanie dodana po zdefiniowaniu klasy MeasurementUnit
+    default_unit = models.ForeignKey('MeasurementUnit', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_for_ingredients', verbose_name="Domyślna jednostka")
+    compatible_units = models.ManyToManyField('MeasurementUnit', blank=True, related_name='compatible_ingredients', verbose_name="Kompatybilne jednostki")
     
     class Meta:
         verbose_name = "Składnik"
@@ -37,8 +38,13 @@ class Ingredient(models.Model):
     def is_vegan(self):
         return self.category.is_vegan
 
-    # Dodanie pola default_unit do modelu Ingredient
-    default_unit = models.ForeignKey('MeasurementUnit', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_for_ingredients', verbose_name="Domyślna jednostka")
+    def save(self, *args, **kwargs):
+        """Zapisz model i dodaj domyślną jednostkę do kompatybilnych"""
+        super().save(*args, **kwargs)
+        
+        # Dodaj domyślną jednostkę do kompatybilnych, jeśli istnieje
+        if self.default_unit and not self.compatible_units.filter(id=self.default_unit.id).exists():
+            self.compatible_units.add(self.default_unit)
 
 class MeasurementUnit(models.Model):
     name = models.CharField(max_length=50, verbose_name="Nazwa jednostki")

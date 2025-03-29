@@ -2,44 +2,208 @@
 
 {% block title %}{{ recipe.title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .recipe-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .ingredient-list li {
+        padding: 5px 0;
+    }
+    
+    .instructions {
+        white-space: pre-line;
+    }
+    
+    .missing-ingredient {
+        color: #dc3545;
+    }
+    
+    .action-buttons {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .badge-vegetarian {
+        background-color: #28a745;
+    }
+    
+    .badge-vegan {
+        background-color: #20c997;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h1>{{ recipe.title }}</h1>
-
-    {% if recipe.image %}
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 400px;">
-    {% endif %}
-
-    <div>
-        <p>{{ recipe.description }}</p>
-        <p>Autor: {{ recipe.author }}</p>
-        <p>Czas przygotowania: {{ recipe.preparation_time }} minut</p>
-        <p>Porcje: {{ recipe.servings }}</p>
-    </div>
-
-    <div>
-        <h2>Składniki:</h2>
-        <ul>
-        {% for ingredient in recipe.recipeingredient_set.all %}
-            <li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.ingredient }}</li>
-        {% endfor %}
-        </ul>
-    </div>
-
-    <div>
-        <h2>Sposób przygotowania:</h2>
-        <ol>
-        {% for step in recipe.preparationstep_set.all %}
-            <li>{{ step.description }}</li>
-        {% endfor %}
-        </ol>
-    </div>
-
-    {% if user == recipe.author %}
-        <div>
-            <a href="{% url 'recipes:update' recipe.pk %}">Edytuj przepis</a>
-            <a href="{% url 'recipes:delete' recipe.pk %}">Usuń przepis</a>
+<div class="container mt-4">
+    <!-- Nagłówek przepisu -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">{{ recipe.title }}</h1>
+            
+            <div class="mb-3">
+                {% if recipe.is_vegetarian %}
+                    <span class="badge badge-vegetarian">Wegetariańskie</span>
+                {% endif %}
+                
+                {% if recipe.is_vegan %}
+                    <span class="badge badge-vegan">Wegańskie</span>
+                {% endif %}
+            </div>
+            
+            <p class="lead">{{ recipe.description }}</p>
+            
+            <div class="row">
+                <div class="col-auto">
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i> {{ recipe.preparation_time }} minut
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small class="text-muted">
+                        <i class="bi bi-people me-1"></i> 
+                        {% if servings %}
+                            {{ servings }} porcji (oryginalnie {{ original_servings }})
+                        {% else %}
+                            {{ recipe.servings }} porcji
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="col-auto">
+                    <small class="text-muted">
+                        <i class="bi bi-calendar me-1"></i> Dodano: {{ recipe.created_at|date:"d.m.Y" }}
+                    </small>
+                </div>
+            </div>
         </div>
-    {% endif %}
-
-    <a href="{% url 'recipes:list' %}">Powrót do listy przepisów</a>
+        
+        <div class="col-md-4 text-end">
+            <!-- Przyciski akcji dla przepisu -->
+            <form method="get" class="mb-2">
+                <div class="input-group">
+                    <input type="number" name="servings" min="1" max="20" class="form-control" 
+                          placeholder="Liczba porcji" value="{{ servings|default:recipe.servings }}">
+                    <button type="submit" class="btn btn-outline-primary">Przelicz</button>
+                </div>
+            </form>
+            
+            {% if user.is_authenticated %}
+                <div class="btn-group" role="group">
+                    {% if can_be_prepared %}
+                        <a href="{% url 'recipes:prepare' recipe.pk %}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Przygotuj danie
+                        </a>
+                    {% else %}
+                        <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+                            <i class="bi bi-cart-plus"></i> Dodaj brakujące do zakupów
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Obraz przepisu i składniki -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image mb-4">
+            {% else %}
+                <div class="bg-light text-center py-5 mb-4 rounded">
+                    <i class="bi bi-camera text-muted" style="font-size: 5rem;"></i>
+                    <p class="text-muted">Brak zdjęcia</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Składniki</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled ingredient-list">
+                    {% if scaled_ingredients %}
+                        <!-- Wyświetl przeskalowane składniki -->
+                        {% for ingredient in scaled_ingredients %}
+                            <li>
+                                <strong>{{ ingredient.amount|floatformat:"-2" }} {{ ingredient.unit.symbol }}</strong> 
+                                {{ ingredient.ingredient.name }}
+                                
+                                {% for missing in missing_ingredients %}
+                                    {% if missing.ingredient.id == ingredient.ingredient.id %}
+                                        <span class="missing-ingredient">
+                                            (brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }})
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Wyświetl oryginalne składniki -->
+                        {% for ingredient in recipe.ingredients.all %}
+                            <li>
+                                <strong>{{ ingredient.amount|floatformat:"-2" }} {{ ingredient.unit.symbol }}</strong> 
+                                {{ ingredient.ingredient.name }}
+                                
+                                {% for missing in missing_ingredients %}
+                                    {% if missing.ingredient.id == ingredient.ingredient.id %}
+                                        <span class="missing-ingredient">
+                                            (brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }})
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                    </ul>
+                </div>
+                
+                {% if missing_ingredients and user.is_authenticated %}
+                    <div class="card-footer bg-danger bg-opacity-10">
+                        <p class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            Brakuje {{ missing_ingredients|length }} składników do przygotowania tego dania.
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="alert-link">
+                                Dodaj do listy zakupów
+                            </a>
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Instrukcje przygotowania -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Sposób przygotowania</h2>
+        </div>
+        <div class="card-body">
+            <div class="instructions">{{ recipe.instructions }}</div>
+        </div>
+    </div>
+    
+    <!-- Przyciski akcji -->
+    <div class="action-buttons d-flex justify-content-between">
+        <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Powrót do listy przepisów
+        </a>
+        
+        {% if user == recipe.author %}
+            <div>
+                <a href="{% url 'recipes:update' recipe.pk %}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Edytuj przepis
+                </a>
+                <a href="{% url 'recipes:delete' recipe.pk %}" class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i> Usuń przepis
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

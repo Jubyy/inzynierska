@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Przygotuj przepis - {{ recipe.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Przygotuj przepis: {{ recipe.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">
+                        Potwierdzasz przygotowanie tego przepisu? Składniki zostaną automatycznie odjęte z Twojej lodówki.
+                    </p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="mb-0">Składniki do wykorzystania</h3>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% for ingredient in recipe.ingredients.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ ingredient.ingredient.name }}
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ ingredient.amount }} {{ ingredient.unit.name }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="servings" class="form-label">Liczba porcji</label>
+                            <input type="number" name="servings" id="servings" class="form-control" 
+                                   value="{{ recipe.servings }}" min="1" max="20" required>
+                            <div class="form-text">
+                                Domyślna liczba porcji dla tego przepisu to {{ recipe.servings }}.
+                                Zmień wartość, jeśli przygotowujesz inną ilość.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Anuluj
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Potwierdzam przygotowanie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

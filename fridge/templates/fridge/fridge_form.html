@@ -103,6 +103,48 @@
             placeholder: "Wybierz jednostkę",
             allowClear: true
         });
+        
+        // Funkcja do ładowania kompatybilnych jednostek dla wybranego składnika
+        function loadCompatibleUnits(ingredientId) {
+            $.ajax({
+                url: '{% url "fridge:ajax_compatible_units" %}',
+                data: {'ingredient_id': ingredientId},
+                dataType: 'json',
+                success: function(data) {
+                    var unitSelect = $('#{{ form.unit.id_for_label }}');
+                    unitSelect.empty();
+                    
+                    // Dodaj pobrane jednostki do listy
+                    $.each(data.units, function(index, unit) {
+                        unitSelect.append($('<option></option>')
+                            .attr('value', unit.id)
+                            .text(unit.name));
+                    });
+                    
+                    // Jeśli jest domyślna jednostka, ustaw ją
+                    if (data.default_unit) {
+                        unitSelect.val(data.default_unit);
+                    }
+                    
+                    // Odśwież Select2
+                    unitSelect.trigger('change');
+                }
+            });
+        }
+        
+        // Przy zmianie składnika, załaduj kompatybilne jednostki
+        $('#{{ form.ingredient.id_for_label }}').change(function() {
+            var ingredientId = $(this).val();
+            if (ingredientId) {
+                loadCompatibleUnits(ingredientId);
+            }
+        });
+        
+        // Jeśli jest już wybrany składnik (np. przy edycji), załaduj kompatybilne jednostki
+        var ingredientId = $('#{{ form.ingredient.id_for_label }}').val();
+        if (ingredientId) {
+            loadCompatibleUnits(ingredientId);
+        }
     });
 </script>
 {% endblock %} 

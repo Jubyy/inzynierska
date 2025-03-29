@@ -18,12 +18,22 @@ class ShoppingListListView(LoginRequiredMixin, ListView):
     context_object_name = 'shopping_lists'
     
     def get_queryset(self):
-        return ShoppingList.objects.filter(user=self.request.user).order_by('-created_at')
+        try:
+            return ShoppingList.objects.filter(user=self.request.user).order_by('-created_at')
+        except Exception:
+            # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
+            return ShoppingList.objects.none()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_lists'] = self.get_queryset().filter(is_completed=False)
-        context['completed_lists'] = self.get_queryset().filter(is_completed=True)
+        try:
+            context['active_lists'] = self.get_queryset().filter(is_completed=False)
+            context['completed_lists'] = self.get_queryset().filter(is_completed=True)
+        except Exception:
+            # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
+            context['active_lists'] = []
+            context['completed_lists'] = []
+            context['table_not_exists'] = True
         return context
 
 class ShoppingListDetailView(LoginRequiredMixin, DetailView):

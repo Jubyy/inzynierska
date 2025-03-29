@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj brakujące składniki do listy zakupów{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Dodaj brakujące składniki do listy zakupów</h2>
+                </div>
+                <div class="card-body">
+                    <h3>Przepis: {{ recipe.title }}</h3>
+                    
+                    {% if table_not_exists %}
+                    <div class="alert alert-warning mt-3">
+                        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Uwaga!</h4>
+                        <p>Tabele dla listy zakupów nie zostały jeszcze utworzone w bazie danych. Aby korzystać z list zakupów, wykonaj migracje:</p>
+                        <pre class="bg-light p-2 mt-2">
+python manage.py makemigrations shopping
+python manage.py migrate</pre>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Wróć do przepisu
+                        </a>
+                    </div>
+                    {% elif missing_ingredients %}
+                        <div class="alert alert-info mt-3">
+                            <p><i class="bi bi-info-circle me-2"></i> Brakuje Ci następujących składników do przygotowania tego przepisu:</p>
+                        </div>
+                        
+                        <div class="table-responsive mb-4">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Składnik</th>
+                                        <th>Potrzebne</th>
+                                        <th>Dostępne</th>
+                                        <th>Brakuje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in missing_ingredients %}
+                                    <tr>
+                                        <td>{{ item.ingredient.name }}</td>
+                                        <td>{{ item.required|floatformat:"-2" }} {{ item.unit.symbol }}</td>
+                                        <td>{{ item.available|floatformat:"-2" }} {{ item.unit.symbol }}</td>
+                                        <td><strong>{{ item.missing|floatformat:"-2" }} {{ item.unit.symbol }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Wybierz listę zakupów:</label>
+                                
+                                {% if shopping_lists %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="create_new" id="create_new_list" value="true" checked>
+                                        <label class="form-check-label" for="create_new_list">
+                                            Utwórz nową listę zakupów
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="create_new" id="use_existing_list" value="false">
+                                        <label class="form-check-label" for="use_existing_list">
+                                            Dodaj do istniejącej listy
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="existing_lists" class="mb-3" style="display: none;">
+                                        <select name="shopping_list" class="form-select">
+                                            {% for list in shopping_lists %}
+                                                <option value="{{ list.id }}">{{ list.name }} ({{ list.created_at|date:"d.m.Y" }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <p class="mb-0">Nie masz żadnych aktywnych list zakupów. Zostanie utworzona nowa lista.</p>
+                                    </div>
+                                    <input type="hidden" name="create_new" value="true">
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Anuluj
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-cart-plus"></i> Dodaj do listy zakupów
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-success mt-3">
+                            <p class="mb-0"><i class="bi bi-check-circle me-2"></i> Masz wszystkie potrzebne składniki do przygotowania tego przepisu!</p>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="{% url 'recipes:prepare' recipe.pk %}" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Przygotuj przepis
+                            </a>
+                            <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Wróć do przepisu
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Obsługa przełączania między nową a istniejącą listą zakupów
+        $('input[name="create_new"]').change(function() {
+            if ($(this).val() === 'false') {
+                $('#existing_lists').show();
+            } else {
+                $('#existing_lists').hide();
+            }
+        });
+    });
+</script>
+{% endblock %} 

@@ -72,9 +72,15 @@ class FridgeItemListView(LoginRequiredMixin, ListView):
         context['query'] = self.request.GET.get('q', '')
         context['sort'] = self.request.GET.get('sort', 'ingredient__name')
         
-        # Oznacz przeterminowane produkty
+        # Znajdź przeterminowane produkty
+        expired_items = []
         for item in context['fridge_items']:
             item.expired = item.is_expired
+            if item.is_expired:
+                expired_items.append(item)
+        
+        context['expired_items'] = expired_items
+        context['has_expired'] = len(expired_items) > 0
             
         return context
 
@@ -222,6 +228,33 @@ def ajax_load_units(request):
     units = MeasurementUnit.objects.all()
     units_data = [{'id': u.id, 'name': u.name} for u in units]
     return JsonResponse({'units': units_data})
+
+def ajax_compatible_units(request):
+    """Pobieranie kompatybilnych jednostek miary dla składnika za pomocą AJAX"""
+    ingredient_id = request.GET.get('ingredient_id')
+    units = []
+    default_unit = None
+    
+    if ingredient_id:
+        ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+        
+        # Najpierw pobierz kompatybilne jednostki
+        compatible_units = ingredient.compatible_units.all()
+        
+        # Jeśli nie ma kompatybilnych jednostek, użyj wszystkich
+        if not compatible_units.exists():
+            units = MeasurementUnit.objects.all()
+        else:
+            units = compatible_units
+            
+        # Sprawdź, czy jest domyślna jednostka
+        default_unit = ingredient.default_unit.id if ingredient.default_unit else None
+    else:
+        # Jeśli nie podano składnika, zwróć wszystkie jednostki
+        units = MeasurementUnit.objects.all()
+    
+    units_data = [{'id': u.id, 'name': u.name} for u in units]
+    return JsonResponse({'units': units_data, 'default_unit': default_unit})
 
 @login_required
 def barcode_scan(request):

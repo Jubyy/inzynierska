@@ -108,7 +108,7 @@ def change_password(request):
             # Zachowaj sesję użytkownika po zmianie hasła
             update_session_auth_hash(request, user)
             messages.success(request, 'Hasło zostało zmienione pomyślnie!')
-            return redirect('profile')
+            return redirect('accounts:profile')
         else:
             messages.error(request, 'Popraw błędy w formularzu.')
     else:
@@ -147,7 +147,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     form_class = UserProfileForm
     template_name = 'accounts/profile_edit.html'
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('accounts:profile')
     
     def get_object(self):
         return self.request.user.profile

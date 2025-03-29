@@ -5,20 +5,30 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col">
             <h1 class="display-5">
-                <i class="bi bi-cart me-2 text-primary"></i> Twoje listy zakupów
+                <i class="bi bi-cart4 me-2"></i> Listy zakupów
             </h1>
         </div>
-        <div class="col-md-4 text-end d-flex justify-content-end align-items-center">
-            <a href="{% url 'shopping:create' %}" class="btn btn-primary me-2">
+        <div class="col-auto d-flex align-items-center">
+            <a href="{% url 'shopping:create' %}" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Nowa lista
             </a>
-            <a href="{% url 'shopping:create_from_recipe' %}" class="btn btn-outline-primary">
-                <i class="bi bi-book"></i> Z przepisu
+            <a href="{% url 'shopping:create_from_recipe' %}" class="btn btn-outline-primary ms-2">
+                <i class="bi bi-egg-fried"></i> Z przepisu
             </a>
         </div>
     </div>
+    
+    {% if table_not_exists %}
+    <div class="alert alert-warning">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i> Uwaga!</h4>
+        <p>Tabele dla listy zakupów nie zostały jeszcze utworzone w bazie danych. Aby korzystać z list zakupów, wykonaj migracje:</p>
+        <pre class="bg-light p-2 mt-2 mb-0">
+python manage.py makemigrations shopping
+python manage.py migrate</pre>
+    </div>
+    {% else %}
     
     <!-- Aktywne listy zakupów -->
     <div class="card mb-4">
@@ -38,7 +48,7 @@
                                 {% with item_count=list.items.count %}
                                     {% if item_count > 0 %}
                                         {{ item_count }} produktów
-                                        <small>({{ list.items.filter.is_purchased=True|length }} zakupionych)</small>
+                                        <small>({{ list.items.filter.is_purchased.True|length }} zakupionych)</small>
                                     {% else %}
                                         Lista jest pusta
                                     {% endif %}
@@ -85,5 +95,6 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %} 
