@@ -1,38 +1,45 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ recipe.title }}{% endblock %}
+
 {% block content %}
-{% if recipe.image %}
-    <img src="{{ recipe.image.url }}" alt="Zdjęcie potrawy" style="max-width: 400px; height: auto;">
-{% else %}
-    <p>Brak zdjęcia potrawy.</p>
-{% endif %}
-<h2>{{ recipe.name }}</h2>
-<h3>Kategoria dania:</h3>
-{% if recipe.is_vegan %}
-    <p>🌱 Wegan</p>
-{% elif recipe.is_vegetarian %}
-    <p>🥗 Wegetariański</p>
-{% else %}
-    <p>🍗 Zawiera mięso</p>
-{% endif %}
+    <h1>{{ recipe.title }}</h1>
 
-<p>{{ recipe.description }}</p>
+    {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 400px;">
+    {% endif %}
 
-<h3>Składniki:</h3>
-<ul>
-    {% for ingredient in recipe.ingredients.all %}
-        <li>{{ ingredient.quantity }} {{ ingredient.unit }} - {{ ingredient.name }}</li>
-    {% endfor %}
-</ul>
+    <div>
+        <p>{{ recipe.description }}</p>
+        <p>Autor: {{ recipe.author }}</p>
+        <p>Czas przygotowania: {{ recipe.preparation_time }} minut</p>
+        <p>Porcje: {{ recipe.servings }}</p>
+    </div>
 
-<h3>Kroki przygotowania:</h3>
-<ol>
-    {% for step in recipe.steps.all %}
-        <li>{{ step.description }}</li>
-    {% endfor %}
-</ol>
-<a href="{% url 'prepare_meal' recipe.id %}" onclick="return confirm('Czy na pewno chcesz przygotować ten posiłek? Składniki zostaną zdjęte z lodówki.')">Przygotuj posiłek</a>
+    <div>
+        <h2>Składniki:</h2>
+        <ul>
+        {% for ingredient in recipe.recipeingredient_set.all %}
+            <li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.ingredient }}</li>
+        {% endfor %}
+        </ul>
+    </div>
 
+    <div>
+        <h2>Sposób przygotowania:</h2>
+        <ol>
+        {% for step in recipe.preparationstep_set.all %}
+            <li>{{ step.description }}</li>
+        {% endfor %}
+        </ol>
+    </div>
 
-<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+    {% if user == recipe.author %}
+        <div>
+            <a href="{% url 'recipes:update' recipe.pk %}">Edytuj przepis</a>
+            <a href="{% url 'recipes:delete' recipe.pk %}">Usuń przepis</a>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'recipes:list' %}">Powrót do listy przepisów</a>
 {% endblock %}

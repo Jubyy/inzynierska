@@ -1,29 +1,37 @@
 {% extends 'base.html' %}
 
+{% block title %}Lista przepisów{% endblock %}
+
 {% block content %}
+    <h1>Lista przepisów</h1>
 
-<h2>Twoje przepisy</h2>
-<ul>
-    {% for recipe in recipes %}
-    <li>
-        {% if recipe.is_vegan %}
-    [🌱 Wegan]
-{% elif recipe.is_vegetarian %}
-    [🥗 Wegetariański]
-{% else %}
-    [🍗 Mięsny]
-{% endif %}
+    <form method="get">
+        <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Szukaj przepisu">
+        <button type="submit">Szukaj</button>
+    </form>
 
-        <a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.name }}</a> - {{ recipe.category }} ({{ recipe.portions }} porcji)
-        <a href="{% url 'check_ingredients' recipe.id %}">Sprawdź składniki</a> |
-        <a href="{% url 'scale_recipe' recipe.id %}">Skaluj</a> |
-        <a href="{% url 'edit_recipe' recipe.id %}">Edytuj</a> |
-        <a href="{% url 'delete_recipe' recipe.id %}">Usuń</a>
-    </li>
-    
-    {% empty %}
-        <li>Brak przepisów.</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'add_recipe' %}">Dodaj przepis</a>
+    {% if recipes %}
+        <ul>
+        {% for recipe in recipes %}
+            <li>
+                <h2>{{ recipe.title }}</h2>
+                {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
+                {% endif %}
+                <p>{{ recipe.description }}</p>
+                <p>Czas przygotowania: {{ recipe.preparation_time }} minut</p>
+                <p>Porcje: {{ recipe.servings }}</p>
+                <a href="{% url 'recipes:detail' recipe.pk %}">Zobacz szczegóły</a>
+                {% if user == recipe.author %}
+                    <a href="{% url 'recipes:update' recipe.pk %}">Edytuj</a>
+                    <a href="{% url 'recipes:delete' recipe.pk %}">Usuń</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Brak przepisów do wyświetlenia.</p>
+    {% endif %}
+
+    <a href="{% url 'recipes:create' %}">Dodaj nowy przepis</a>
 {% endblock %}

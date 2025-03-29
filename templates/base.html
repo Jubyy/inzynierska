@@ -1,74 +1,33 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Książka Kucharska</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        nav {
-            background-color: #ff8307;
-            color: white;
-            padding: 10px;
-        }
-        nav a {
-            color: white;
-            margin-right: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            padding: 20px;
-        }
-    </style>
+    <title>{% block title %}Książka Kucharska{% endblock %}</title>
 </head>
 <body>
+    <nav>
+        <a href="{% url 'recipes:list' %}">Przepisy</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'recipes:create' %}">Dodaj przepis</a>
+            <a href="{% url 'fridge:list' %}">Lodówka</a>
+            <a href="{% url 'shopping:list' %}">Lista zakupów</a>
+            <a href="{% url 'accounts:profile' %}">Profil</a>
+            <a href="{% url 'accounts:logout' %}">Wyloguj</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Zaloguj</a>
+            <a href="{% url 'accounts:register' %}">Zarejestruj</a>
+        {% endif %}
+    </nav>
 
-<nav>
-    <a href="{% url 'dashboard' %}">Dashboard</a>
-    <a href="{% url 'fridge_list' %}">Lodówka</a>
-    <a href="{% url 'recipe_list' %}">Przepisy</a>
-    <form action="{% url 'search_recipes' %}" method="get" style="display:inline;">
-        <input type="text" name="q" placeholder="Szukaj po składniku" value="{{ query|default:'' }}">
-        <label>
-            <input type="checkbox" name="only_possible" {% if only_possible %}checked{% endif %}> Z tym co masz w lodówce
-        </label>
-        <button type="submit">Szukaj</button>
-    </form>
-    <a href="{% url 'shopping_list' %}">🛒 Lista zakupów</a>
-    <a href="{% url 'logout' %}">Wyloguj</a>
-</nav>
-{% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-            <div class="alert {{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-<style>
-    .alert {
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
-    .alert-success { background-color: #d4edda; color: #155724; }
-    .alert-info { background-color: #cce5ff; color: #004085; }
-    .alert-warning { background-color: #fff3cd; color: #856404; }
-    .alert-danger { background-color: #f8d7da; color: #721c24; }
-</style>
-<div class="container">
     {% block content %}
     {% endblock %}
-</div>
-
 </body>
 </html>

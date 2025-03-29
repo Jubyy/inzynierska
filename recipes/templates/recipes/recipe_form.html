@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}{% endblock %}
+
+{% block content %}
+    <h1>{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}</h1>
+
+    {% if form.errors %}
+        <ul>
+            {% for error in form.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div>
+            <h2>Podstawowe informacje</h2>
+            {{ form.as_p }}
+        </div>
+        
+        <div>
+            <h2>Składniki</h2>
+            {{ ingredient_formset.management_form }}
+            {% for ingredient_form in ingredient_formset %}
+                {{ ingredient_form.as_p }}
+                {% if ingredient_form.instance.pk %}
+                    {{ ingredient_form.DELETE }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div>
+            <h2>Kroki przygotowania</h2>
+            {{ step_formset.management_form }}
+            {% for step_form in step_formset %}
+                {{ step_form.as_p }}
+                {% if step_form.instance.pk %}
+                    {{ step_form.DELETE }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <button type="submit">Zapisz przepis</button>
+    </form>
+{% endblock %} 
