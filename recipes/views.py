@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.http import JsonResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion
 from .utils import convert_units, get_common_units, get_common_conversions
 from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm
 from shopping.models import ShoppingItem, ShoppingList
@@ -595,26 +595,95 @@ def prepare_recipe(request, pk):
     """Usuwa składniki przepisu z lodówki po jego przygotowaniu"""
     recipe = get_object_or_404(Recipe, pk=pk)
     
-    if request.method == 'POST':
-        servings = request.POST.get('servings')
-        
+    # Pobierz liczbę porcji z URL (parametr GET) lub ustaw domyślną
+    servings_param = request.GET.get('servings')
+    servings = None
+    
+    if servings_param:
         try:
-            servings = int(servings)
+            servings = int(servings_param)
         except (ValueError, TypeError):
             servings = recipe.servings
+    else:
+        servings = recipe.servings
+    
+    # Przygotuj skalowane składniki, jeśli podano liczbę porcji
+    scaled_ingredients = None
+    missing_ingredients = None
+    
+    if servings and servings != recipe.servings:
+        scaled_ingredients = recipe.scale_to_servings(servings)
+        
+    # Sprawdź dostępność składników w lodówce
+    scale_factor = servings / recipe.servings
+    missing_ingredients = []
+    
+    for ingredient_entry in recipe.ingredients.all():
+        amount_needed = ingredient_entry.amount * scale_factor
+        unit = ingredient_entry.unit
+        ingredient = ingredient_entry.ingredient
+        
+        # Sprawdź dostępność
+        available = FridgeItem.check_ingredient_availability(
+            request.user, ingredient, amount_needed, unit
+        )
+        
+        if not available:
+            # Sprawdź dostępną ilość w lodówce
+            items = FridgeItem.objects.filter(
+                user=request.user,
+                ingredient=ingredient
+            )
+            
+            total_available = 0
+            for item in items:
+                if item.unit != unit:
+                    try:
+                        converted_amount = convert_units(item.amount, item.unit, unit)
+                        total_available += converted_amount
+                    except ValueError:
+                        pass
+                else:
+                    total_available += item.amount
+            
+            missing_ingredients.append({
+                'ingredient': ingredient,
+                'required': amount_needed,
+                'available': total_available,
+                'missing': amount_needed - total_available,
+                'unit': unit
+            })
+    
+    # Jeśli nie brakuje składników, ustaw na None
+    if not missing_ingredients:
+        missing_ingredients = None
+    
+    if request.method == 'POST':
+        post_servings = request.POST.get('servings')
+        
+        try:
+            post_servings = int(post_servings)
+        except (ValueError, TypeError):
+            post_servings = recipe.servings
             
         # Usuń składniki z lodówki
-        result = FridgeItem.use_recipe_ingredients(request.user, recipe, servings)
+        result = FridgeItem.use_recipe_ingredients(request.user, recipe, post_servings)
         
         if result['success']:
-            messages.success(request, f'Przygotowałeś przepis "{recipe.title}". Składniki zostały usunięte z lodówki.')
+            messages.success(request, f'Przygotowałeś przepis "{recipe.title}" ({post_servings} porcji). Składniki zostały usunięte z lodówki.')
+            return redirect('recipes:detail', pk=recipe.pk)
         else:
-            messages.warning(request, 'Nie możesz przygotować tego przepisu - brakuje niektórych składników.')
+            missing_text = ", ".join([f"{item['ingredient'].name}" for item in result['missing']])
+            messages.warning(request, f'Nie możesz przygotować tego przepisu - brakuje składników: {missing_text}')
             
-        return redirect('recipes:detail', pk=recipe.pk)
+            # Przekieruj do formularza dodawania brakujących składników do listy zakupów
+            return redirect('recipes:add_missing_to_shopping_list', pk=recipe.pk)
     
     context = {
-        'recipe': recipe
+        'recipe': recipe,
+        'servings': servings,
+        'scaled_ingredients': scaled_ingredients,
+        'missing_ingredients': missing_ingredients
     }
     
     return render(request, 'recipes/prepare_recipe.html', context)

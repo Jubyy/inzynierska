@@ -15,39 +15,67 @@
                         Potwierdzasz przygotowanie tego przepisu? Składniki zostaną automatycznie odjęte z Twojej lodówki.
                     </p>
                     
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h3 class="mb-0">Składniki do wykorzystania</h3>
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            {% for ingredient in recipe.ingredients.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                {{ ingredient.ingredient.name }}
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ ingredient.amount }} {{ ingredient.unit.name }}
-                                </span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    
-                    <form method="post">
+                    <form method="post" id="prepare-form">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="servings" class="form-label">Liczba porcji</label>
-                            <input type="number" name="servings" id="servings" class="form-control" 
-                                   value="{{ recipe.servings }}" min="1" max="20" required>
+                            <div class="input-group">
+                                <input type="number" name="servings" id="servings" class="form-control" 
+                                       value="{{ servings|default:recipe.servings }}" min="1" max="20" required>
+                                <button type="button" id="recalculate-btn" class="btn btn-outline-primary">Przelicz</button>
+                            </div>
                             <div class="form-text">
                                 Domyślna liczba porcji dla tego przepisu to {{ recipe.servings }}.
-                                Zmień wartość, jeśli przygotowujesz inną ilość.
+                                Zmień wartość i kliknij "Przelicz", aby zobaczyć zużycie składników.
                             </div>
                         </div>
+                    
+                        <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="mb-0">Składniki do wykorzystania</h3>
+                                <span id="scale-info" class="badge bg-info" style="display: none;">
+                                    Przeskalowano: {{ servings }}/{{ recipe.servings }}
+                                </span>
+                            </div>
+                            <div id="ingredients-container">
+                                <ul class="list-group list-group-flush">
+                                    {% for ingredient in scaled_ingredients|default:recipe.ingredients.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ ingredient.ingredient.name }}
+                                        <span class="badge bg-primary rounded-pill">
+                                            {% if scaled_ingredients %}
+                                                {{ ingredient.amount|floatformat:"-2" }} {{ ingredient.unit.symbol }}
+                                            {% else %}
+                                                {{ ingredient.amount }} {{ ingredient.unit.symbol }}
+                                            {% endif %}
+                                        </span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        {% if missing_ingredients %}
+                        <div class="alert alert-danger">
+                            <h4 class="alert-heading">Brakujące składniki!</h4>
+                            <p>Nie masz wystarczającej ilości składników, aby przygotować ten przepis:</p>
+                            <ul>
+                                {% for item in missing_ingredients %}
+                                <li>{{ item.ingredient.name }} - brakuje {{ item.missing|floatformat:"-2" }} {{ item.unit.symbol }}</li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+                                <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
+                            </a>
+                        </div>
+                        {% endif %}
                         
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left"></i> Anuluj
                             </a>
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-success" {% if missing_ingredients %}disabled{% endif %}>
                                 <i class="bi bi-check-circle"></i> Potwierdzam przygotowanie
                             </button>
                         </div>
@@ -57,4 +85,31 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Pokaż informację o skalowaniu jeśli są przeskalowane składniki
+        {% if servings and servings != recipe.servings %}
+            $("#scale-info").show();
+        {% endif %}
+        
+        // Obsługa przycisku przeliczenia składników
+        $("#recalculate-btn").click(function() {
+            var servings = $("#servings").val();
+            if (servings > 0) {
+                window.location.href = "{% url 'recipes:prepare' recipe.pk %}?servings=" + servings;
+            }
+        });
+        
+        // Obsługa zmiany liczby porcji przy naciśnięciu Enter
+        $("#servings").keypress(function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                $("#recalculate-btn").click();
+            }
+        });
+    });
+</script>
 {% endblock %} 
