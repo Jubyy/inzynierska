@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 
@@ -286,6 +286,7 @@ class RecipeListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
+        # Pobierz wszystkie przepisy, bez filtrowania po autorze na początek
         queryset = Recipe.objects.all()
         
         # Filtrowanie po kategorii
@@ -372,29 +373,72 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         
         if self.request.POST:
-            context['ingredients_formset'] = RecipeIngredientFormSet(self.request.POST)
+            context['ingredient_formset'] = RecipeIngredientFormSet(self.request.POST, prefix='ingredients')
+            print(f"POST data: {self.request.POST}")
+            print(f"Formset is valid: {context['ingredient_formset'].is_valid()}")
+            if not context['ingredient_formset'].is_valid():
+                print(f"Formset errors: {context['ingredient_formset'].errors}")
+                print(f"Formset non-form errors: {context['ingredient_formset'].non_form_errors()}")
+                print(f"Management form data: {self.request.POST.get('ingredients-TOTAL_FORMS')}, {self.request.POST.get('ingredients-INITIAL_FORMS')}, {self.request.POST.get('ingredients-MIN_NUM_FORMS')}")
+                
+                # Sprawdź, czy dane wchodzą prawidłowo
+                for i in range(int(self.request.POST.get('ingredients-TOTAL_FORMS', 0))):
+                    ingredient_id = self.request.POST.get(f'ingredients-{i}-ingredient')
+                    amount = self.request.POST.get(f'ingredients-{i}-amount')
+                    unit_id = self.request.POST.get(f'ingredients-{i}-unit')
+                    print(f"Ingredient {i}: ingredient_id={ingredient_id}, amount={amount}, unit_id={unit_id}")
         else:
-            context['ingredients_formset'] = RecipeIngredientFormSet()
+            context['ingredient_formset'] = RecipeIngredientFormSet(prefix='ingredients')
             
+        context['ingredient_categories'] = IngredientCategory.objects.all()
         return context
     
     def form_valid(self, form):
-        form.instance.author = self.request.user
         context = self.get_context_data()
-        ingredients_formset = context['ingredients_formset']
+        ingredient_formset = context['ingredient_formset']
         
-        if ingredients_formset.is_valid():
-            self.object = form.save()
-            ingredients_formset.instance = self.object
-            ingredients_formset.save()
+        print(f"Form valid, checking ingredient formset. Is valid: {ingredient_formset.is_valid()}")
+        
+        if ingredient_formset.is_valid():
+            self.object = form.save(commit=False)
+            self.object.author = self.request.user
+            self.object.save()
+            form.save_m2m()  # Zapisz relacje many-to-many
             
-            messages.success(self.request, f'Przepis "{self.object.title}" został utworzony.')
+            # Zapisz składniki
+            ingredient_forms = ingredient_formset.save(commit=False)
+            print(f"Number of ingredient forms: {len(ingredient_forms)}")
+            
+            # Usuń składniki oznaczone do usunięcia
+            for obj in ingredient_formset.deleted_objects:
+                print(f"Deleting ingredient: {obj}")
+                obj.delete()
+            
+            # Zapisz nowe i zaktualizowane składniki
+            for ingredient_form in ingredient_forms:
+                ingredient_form.recipe = self.object
+                ingredient_form.save()
+                print(f"Saved ingredient: {ingredient_form.ingredient.name}, {ingredient_form.amount} {ingredient_form.unit.name}")
+            
+            # Wyświetl komunikat z liczbą dodanych składników
+            messages.success(
+                self.request, 
+                f'Przepis "{self.object.title}" został dodany wraz z {len(ingredient_forms)} składnikami!'
+            )
+            
             return redirect(self.get_success_url())
         else:
+            # Jeśli formularz składników jest nieprawidłowy, pokaż błędy
+            for error in ingredient_formset.errors:
+                messages.error(self.request, f"Błąd składnika: {error}")
+            for error in ingredient_formset.non_form_errors():
+                messages.error(self.request, f"Ogólny błąd: {error}")
+                
             return self.render_to_response(self.get_context_data(form=form))
     
     def get_success_url(self):
-        return reverse('recipes:detail', kwargs={'pk': self.object.pk})
+        # Przekieruj na listę przepisów zamiast na szczegóły przepisu
+        return reverse_lazy('recipes:list')
 
 class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Recipe
@@ -403,32 +447,39 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
     def test_func(self):
         recipe = self.get_object()
-        return self.request.user == recipe.author
+        return recipe.author == self.request.user
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
         if self.request.POST:
-            context['ingredients_formset'] = RecipeIngredientFormSet(
-                self.request.POST, instance=self.object
+            context['ingredient_formset'] = RecipeIngredientFormSet(
+                self.request.POST, instance=self.object, prefix='ingredients'
             )
         else:
-            context['ingredients_formset'] = RecipeIngredientFormSet(instance=self.object)
-            
+            context['ingredient_formset'] = RecipeIngredientFormSet(instance=self.object, prefix='ingredients')
+        context['ingredient_categories'] = IngredientCategory.objects.all()
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
-        ingredients_formset = context['ingredients_formset']
+        ingredient_formset = context['ingredient_formset']
         
-        if ingredients_formset.is_valid():
+        print(f"Form valid, checking ingredient formset. Is valid: {ingredient_formset.is_valid()}")
+        
+        if ingredient_formset.is_valid():
             self.object = form.save()
-            ingredients_formset.instance = self.object
-            ingredients_formset.save()
+            ingredient_formset.instance = self.object
+            ingredient_formset.save()
             
-            messages.success(self.request, f'Przepis "{self.object.title}" został zaktualizowany.')
+            messages.success(self.request, 'Przepis został zaktualizowany!')
             return redirect(self.get_success_url())
         else:
+            # Jeśli formularz składników jest nieprawidłowy, pokaż błędy
+            for error in ingredient_formset.errors:
+                messages.error(self.request, f"Błąd składnika: {error}")
+            for error in ingredient_formset.non_form_errors():
+                messages.error(self.request, f"Ogólny błąd: {error}")
+                
             return self.render_to_response(self.get_context_data(form=form))
     
     def get_success_url(self):
@@ -555,20 +606,95 @@ def prepare_recipe(request, pk):
 
 def ajax_ingredient_search(request):
     """Wyszukiwanie składników za pomocą AJAX"""
-    query = request.GET.get('term', '')
-    if query:
-        ingredients = Ingredient.objects.filter(name__icontains=query)[:10]
-        results = [{'id': i.id, 'text': i.name} for i in ingredients]
-    else:
-        results = []
+    query = request.GET.get('q', '')
+    ingredients = Ingredient.objects.all()
     
+    if query:
+        ingredients = ingredients.filter(name__icontains=query)
+    
+    results = [{'id': i.id, 'text': i.name} for i in ingredients]
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
     """Pobieranie jednostek miary dla składnika za pomocą AJAX"""
-    ingredient_id = request.GET.get('ingredient_id')
-    
     units = MeasurementUnit.objects.all()
-    results = [{'id': u.id, 'text': u.name} for u in units]
+    units_data = [{'id': u.id, 'name': u.name} for u in units]
+    return JsonResponse({'units': units_data})
+
+class IngredientListView(LoginRequiredMixin, ListView):
+    model = Ingredient
+    template_name = 'recipes/ingredient_list.html'
+    context_object_name = 'ingredients'
+    paginate_by = 20
     
-    return JsonResponse({'results': results})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = IngredientCategory.objects.all()
+        return context
+
+class IngredientCreateView(LoginRequiredMixin, CreateView):
+    model = Ingredient
+    form_class = IngredientForm
+    template_name = 'recipes/ingredient_form.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Składnik został dodany!')
+        return super().form_valid(form)
+
+class IngredientUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ingredient
+    form_class = IngredientForm
+    template_name = 'recipes/ingredient_form.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Składnik został zaktualizowany!')
+        return super().form_valid(form)
+
+class IngredientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ingredient
+    template_name = 'recipes/ingredient_confirm_delete.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Składnik został usunięty!')
+        return super().delete(request, *args, **kwargs)
+
+@login_required
+def ajax_add_ingredient(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        category_id = request.POST.get('category')
+        description = request.POST.get('description', '')
+        
+        if not name or not category_id:
+            return JsonResponse({
+                'success': False,
+                'errors': {
+                    'name': ['To pole jest wymagane.'] if not name else [],
+                    'category': ['To pole jest wymagane.'] if not category_id else []
+                }
+            })
+        
+        try:
+            category = IngredientCategory.objects.get(pk=category_id)
+            ingredient = Ingredient.objects.create(
+                name=name,
+                category=category,
+                description=description
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'id': ingredient.id,
+                'name': ingredient.name,
+                'message': 'Składnik został dodany!'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'errors': {'server': [str(e)]}
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Nieprawidłowe żądanie'})

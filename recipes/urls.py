@@ -19,4 +19,11 @@ urlpatterns = [
     # Widoki AJAX
     path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
     path('ajax/load-units/', views.ajax_load_units, name='ajax_load_units'),
+    path('ajax/add-ingredient/', views.ajax_add_ingredient, name='ajax_add_ingredient'),
+    
+    # Zarządzanie składnikami
+    path('ingredients/', views.IngredientListView.as_view(), name='ingredient_list'),
+    path('ingredients/create/', views.IngredientCreateView.as_view(), name='ingredient_create'),
+    path('ingredients/<int:pk>/update/', views.IngredientUpdateView.as_view(), name='ingredient_update'),
+    path('ingredients/<int:pk>/delete/', views.IngredientDeleteView.as_view(), name='ingredient_delete'),
 ]

@@ -2,47 +2,519 @@
 
 {% block title %}{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .error-box {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px;
+        max-width: 400px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 9999;
+        font-family: monospace;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h1>{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}</h1>
+    <!-- Błędy JavaScript będą wyświetlane tutaj -->
+    <div id="js-errors" class="error-box d-none">
+        <h5>Błędy JavaScript:</h5>
+        <ul id="error-list"></ul>
+    </div>
 
-    {% if form.errors %}
-        <ul>
-            {% for error in form.errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <div class="container mt-4">
+        <h1>{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}</h1>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div>
-            <h2>Podstawowe informacje</h2>
-            {{ form.as_p }}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for error in form.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" id="recipe-form">
+            {% csrf_token %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Podstawowe informacje</h2>
+                </div>
+                <div class="card-body">
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Składniki</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Przycisk dodawania składnika -->
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ingredientModal">
+                            Dodaj składnik
+                        </button>
+                    </div>
+
+                    <!-- Lista dodanych składników -->
+                    <h4>Dodaj składnik do przepisu</h4>
+                    <div class="table-responsive">
+                        <table class="table" id="ingredients-table">
+                            <thead>
+                                <tr>
+                                    <th>Składnik</th>
+                                    <th>Ilość</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ingredients-list">
+                                <!-- Tutaj będą dynamicznie dodawane składniki -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Ukryty formset z faktycznymi danymi -->
+                    {{ ingredient_formset.management_form }}
+                    <div id="ingredient-formset" class="d-none">
+                        <!-- Tutaj będą umieszczane ukryte pola formularza składników -->
+                    </div>
+                    
+                    <!-- Szablon pustego formularza -->
+                    <div id="empty-form-template" class="d-none">
+                        <div class="ingredient-form-row">
+                            <input type="hidden" name="ingredients-__prefix__-id" id="id_ingredients-__prefix__-id">
+                            <input type="hidden" name="ingredients-__prefix__-recipe" id="id_ingredients-__prefix__-recipe">
+                            <input type="hidden" name="ingredients-__prefix__-ingredient" id="id_ingredients-__prefix__-ingredient">
+                            <input type="hidden" name="ingredients-__prefix__-amount" id="id_ingredients-__prefix__-amount">
+                            <input type="hidden" name="ingredients-__prefix__-unit" id="id_ingredients-__prefix__-unit">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary">Anuluj</a>
+                <button type="submit" class="btn btn-primary">Zapisz przepis</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal dla dodawania składnika do przepisu -->
+    <div class="modal fade" id="ingredientModal" tabindex="-1" aria-labelledby="ingredientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ingredientModalLabel">Dodaj składnik</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ingredient-select" class="form-label">Składnik</label>
+                        <div class="d-flex">
+                            <select id="ingredient-select" class="form-control me-2">
+                                <option value="">-- Wybierz składnik --</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addIngredientModal" data-bs-dismiss="modal">+</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ingredient-amount" class="form-label">Ilość</label>
+                        <input type="number" id="ingredient-amount" class="form-control" step="0.01" min="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ingredient-unit" class="form-label">Jednostka</label>
+                        <select id="ingredient-unit" class="form-control">
+                            <option value="">-- Wybierz jednostkę --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" id="add-ingredient-to-recipe">Dodaj</button>
+                </div>
+            </div>
         </div>
-        
-        <div>
-            <h2>Składniki</h2>
-            {{ ingredient_formset.management_form }}
-            {% for ingredient_form in ingredient_formset %}
-                {{ ingredient_form.as_p }}
-                {% if ingredient_form.instance.pk %}
-                    {{ ingredient_form.DELETE }}
-                {% endif %}
-            {% endfor %}
+    </div>
+
+    <!-- Modal dla dodawania nowego składnika -->
+    <div class="modal fade" id="addIngredientModal" tabindex="-1" aria-labelledby="addIngredientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addIngredientModalLabel">Dodaj nowy składnik</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-ingredient-form">
+                        <div class="mb-3">
+                            <label for="new-ingredient-name" class="form-label">Nazwa składnika</label>
+                            <input type="text" class="form-control" id="new-ingredient-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-ingredient-category" class="form-label">Kategoria</label>
+                            <select class="form-control" id="new-ingredient-category" required>
+                                {% for category in ingredient_categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-ingredient-description" class="form-label">Opis (opcjonalnie)</label>
+                            <textarea class="form-control" id="new-ingredient-description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="back-to-ingredient-modal">Wróć</button>
+                    <button type="button" class="btn btn-primary" id="save-new-ingredient">Zapisz</button>
+                </div>
+            </div>
         </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Utwórz handler błędów JavaScript
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("JavaScript error:", message, "at", source, "line", lineno);
+        const errorBox = document.getElementById('js-errors');
+        const errorList = document.getElementById('error-list');
         
-        <div>
-            <h2>Kroki przygotowania</h2>
-            {{ step_formset.management_form }}
-            {% for step_form in step_formset %}
-                {{ step_form.as_p }}
-                {% if step_form.instance.pk %}
-                    {{ step_form.DELETE }}
-                {% endif %}
-            {% endfor %}
-        </div>
+        const errorItem = document.createElement('li');
+        errorItem.textContent = message + ' at line ' + lineno;
         
-        <button type="submit">Zapisz przepis</button>
-    </form>
+        errorList.appendChild(errorItem);
+        errorBox.classList.remove('d-none');
+        
+        return false;
+    };
+
+    $(document).ready(function() {
+        console.log("Document ready");
+        
+        // Inicjalizacja Select2 dla dropdownów
+        try {
+            $('#ingredient-select, #ingredient-unit').select2({
+                width: '100%',
+                dropdownParent: $('#ingredientModal')
+            });
+            console.log("Select2 initialized");
+        } catch (e) {
+            console.error("Error initializing Select2:", e);
+        }
+        
+        // Ładowanie składników i jednostek przy starcie
+        loadIngredients();
+        loadUnits();
+        
+        // Licznik formularzy (do dodawania nowych formularzy do formset)
+        let formIndex = {{ ingredient_formset.total_form_count }};
+        const maxForms = parseInt($("#id_ingredients-MAX_NUM_FORMS").val() || "100");
+        console.log("formIndex:", formIndex, "maxForms:", maxForms);
+        
+        // Inicjalizacja - wyświetl komunikat, gdy nie ma jeszcze składników
+        if ($("#ingredients-list tr").length === 0) {
+            console.log("No ingredients found, adding placeholder");
+            $("#ingredients-list").append(
+                '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodaj przynajmniej jeden składnik.</td></tr>'
+            );
+        } else {
+            console.log("Found " + $("#ingredients-list tr").length + " ingredients at init");
+        }
+        
+        // Funkcja ładująca istniejące składniki z formset przy edycji przepisu
+        function loadExistingIngredients() {
+            {% if form.instance.pk %}
+                {% for ingredient in form.instance.ingredients.all %}
+                    // Dodaj wiersz do tabeli
+                    $("#ingredients-list").find(".no-ingredients").remove();
+                    $("#ingredients-list").append(
+                        '<tr data-index="0">' +
+                        '<td>{{ ingredient.ingredient.name }}</td>' +
+                        '<td>{{ ingredient.amount }} {{ ingredient.unit.name }}</td>' +
+                        '<td><button type="button" class="btn btn-sm btn-danger remove-row">Usuń</button></td>' +
+                        '</tr>'
+                    );
+                    
+                    // Dodaj do ukrytego formularza
+                    let formHtml = '<div class="ingredient-form-row">' +
+                        '<input type="hidden" name="ingredients-0-id" id="id_ingredients-0-id" value="{{ ingredient.id }}">' +
+                        '<input type="hidden" name="ingredients-0-recipe" id="id_ingredients-0-recipe" value="{{ ingredient.recipe.id }}">' +
+                        '<input type="hidden" name="ingredients-0-ingredient" id="id_ingredients-0-ingredient" value="{{ ingredient.ingredient.id }}">' +
+                        '<input type="hidden" name="ingredients-0-amount" id="id_ingredients-0-amount" value="{{ ingredient.amount }}">' +
+                        '<input type="hidden" name="ingredients-0-unit" id="id_ingredients-0-unit" value="{{ ingredient.unit.id }}">' +
+                        '</div>';
+                    
+                    $("#ingredient-formset").append(formHtml);
+                    
+                    // Ustaw licznik formularzy
+                    $("#id_ingredients-TOTAL_FORMS").val(1);
+                    formIndex = 1;
+                    break; // Na razie obsługujemy tylko jeden składnik
+                {% endfor %}
+            {% endif %}
+        }
+        
+        // Ładuj istniejące składniki przy edycji
+        loadExistingIngredients();
+        
+        // Dodanie walidacji przed wysłaniem formularza
+        $("#recipe-form").on("submit", function(e) {
+            console.log("Form submission");
+            
+            // Sprawdź, czy są składniki (usuń komunikat o braku składników przed sprawdzeniem)
+            $("#ingredients-list tr.no-ingredients").remove();
+            
+            // Sprawdź, czy po usunięciu komunikatu o braku składników nadal nie ma żadnych wierszy
+            if ($("#ingredients-list tr").length === 0) {
+                e.preventDefault();
+                alert("Musisz dodać przynajmniej jeden składnik do przepisu!");
+                
+                // Dodaj z powrotem komunikat o braku składników
+                $("#ingredients-list").append(
+                    '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodaj przynajmniej jeden składnik.</td></tr>'
+                );
+                return false;
+            }
+            
+            // Upewnij się, że TOTAL_FORMS jest ustawione na co najmniej 1
+            if (parseInt($("#id_ingredients-TOTAL_FORMS").val()) < 1) {
+                $("#id_ingredients-TOTAL_FORMS").val(1);
+            }
+            
+            console.log("Form submission - ingredients OK, found " + $("#ingredients-list tr").length + " ingredients");
+            return true;
+        });
+        
+        // Funkcja ładująca składniki przez AJAX
+        function loadIngredients() {
+            console.log("Loading ingredients");
+            $.ajax({
+                url: "{% url 'recipes:ajax_ingredient_search' %}",
+                type: "GET",
+                success: function(data) {
+                    console.log("Ingredients loaded:", data);
+                    let select = $("#ingredient-select");
+                    select.empty().append('<option value="">-- Wybierz składnik --</option>');
+                    
+                    if (data.results && Array.isArray(data.results)) {
+                        $.each(data.results, function(i, item) {
+                            select.append(new Option(item.text, item.id));
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading ingredients:", error);
+                }
+            });
+        }
+        
+        // Funkcja ładująca jednostki miary przez AJAX
+        function loadUnits() {
+            console.log("Loading units");
+            $.ajax({
+                url: "{% url 'recipes:ajax_load_units' %}",
+                type: "GET",
+                success: function(data) {
+                    console.log("Units loaded:", data);
+                    let select = $("#ingredient-unit");
+                    select.empty().append('<option value="">-- Wybierz jednostkę --</option>');
+                    
+                    if (data.units && Array.isArray(data.units)) {
+                        $.each(data.units, function(i, item) {
+                            select.append(new Option(item.name, item.id));
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading units:", error);
+                }
+            });
+        }
+        
+        // Obsługa dodawania składnika do przepisu z modalu
+        $("#add-ingredient-to-recipe").on("click", function() {
+            console.log("Add ingredient button clicked");
+            const ingredientId = $("#ingredient-select").val();
+            const ingredientName = $("#ingredient-select option:selected").text();
+            const amount = $("#ingredient-amount").val();
+            const unitId = $("#ingredient-unit").val();
+            const unitName = $("#ingredient-unit option:selected").text();
+            
+            console.log("Selected values:", {
+                ingredientId, ingredientName, amount, unitId, unitName
+            });
+            
+            // Walidacja
+            if (!ingredientId || !amount || !unitId) {
+                alert("Wszystkie pola są wymagane!");
+                return;
+            }
+            
+            if (formIndex >= maxForms) {
+                alert("Osiągnięto maksymalną liczbę składników!");
+                return;
+            }
+            
+            // Znajdź pierwszy dostępny indeks (bez względu na to, co pokazuje formIndex)
+            let firstEmptyIndex = 0;
+            
+            // Usuń komunikat o braku składników, jeśli istnieje
+            $("#ingredients-list tr.no-ingredients").remove();
+            
+            // Dodanie do tabeli
+            const formattedAmount = amount + " " + unitName;
+            const newRow = $('<tr data-index="' + firstEmptyIndex + '">' +
+                '<td>' + ingredientName + '</td>' +
+                '<td>' + formattedAmount + '</td>' +
+                '<td><button type="button" class="btn btn-sm btn-danger remove-row">Usuń</button></td>' +
+                '</tr>');
+            
+            $("#ingredients-list").append(newRow);
+            console.log("Row added to table");
+            
+            // Dodanie do formset - ZAWSZE używaj indeksu 0 dla pierwszego składnika
+            let formHtml = '<div class="ingredient-form-row">' +
+                '<input type="hidden" name="ingredients-' + firstEmptyIndex + '-id" id="id_ingredients-' + firstEmptyIndex + '-id">' +
+                '<input type="hidden" name="ingredients-' + firstEmptyIndex + '-recipe" id="id_ingredients-' + firstEmptyIndex + '-recipe">' +
+                '<input type="hidden" name="ingredients-' + firstEmptyIndex + '-ingredient" id="id_ingredients-' + firstEmptyIndex + '-ingredient" value="' + ingredientId + '">' +
+                '<input type="hidden" name="ingredients-' + firstEmptyIndex + '-amount" id="id_ingredients-' + firstEmptyIndex + '-amount" value="' + amount + '">' +
+                '<input type="hidden" name="ingredients-' + firstEmptyIndex + '-unit" id="id_ingredients-' + firstEmptyIndex + '-unit" value="' + unitId + '">' +
+                '</div>';
+                
+            // Usuń istniejący formularz i dodaj nowy
+            $("#ingredient-formset").empty();
+            $("#ingredient-formset").append(formHtml);
+            console.log("Form added to formset with values pre-filled");
+            
+            // Aktualizacja liczby formularzy w management form - ZAWSZE 1, bo mamy tylko jeden składnik
+            $("#id_ingredients-TOTAL_FORMS").val(1);
+            console.log("Updated TOTAL_FORMS to 1");
+            
+            // Czyszczenie formularza
+            $("#ingredient-select").val("").trigger("change");
+            $("#ingredient-amount").val("");
+            $("#ingredient-unit").val("").trigger("change");
+            
+            // Ustawienie indeksu na 1, bo już dodaliśmy jeden składnik
+            formIndex = 1;
+            console.log("formIndex reset to 1");
+            
+            // Zamknięcie modalu
+            $("#ingredientModal").modal("hide");
+        });
+        
+        // Obsługa usuwania składnika
+        $(document).on("click", ".remove-row", function() {
+            console.log("Remove button clicked");
+            // Usuń wiersz z tabeli
+            $(this).closest("tr").remove();
+            console.log("Row removed from table");
+            
+            // Usuń wszystkie formy z formset
+            $("#ingredient-formset").empty();
+            
+            // Zresetuj formset - nie ma składników
+            $("#id_ingredients-TOTAL_FORMS").val(0);
+            formIndex = 0;
+            
+            // Pokaż użytkownikowi, że lista jest pusta
+            if ($("#ingredients-list tr").length === 0) {
+                $("#ingredients-list").append(
+                    '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodaj przynajmniej jeden składnik.</td></tr>'
+                );
+            }
+        });
+        
+        // Obsługa dodawania nowego składnika przez modal
+        $("#save-new-ingredient").on("click", function() {
+            console.log("Save new ingredient button clicked");
+            const name = $("#new-ingredient-name").val();
+            const category = $("#new-ingredient-category").val();
+            const description = $("#new-ingredient-description").val();
+            
+            console.log("New ingredient data:", { name, category, description });
+            
+            if (!name || !category) {
+                alert("Nazwa i kategoria są wymagane!");
+                return;
+            }
+            
+            // Wysłanie przez AJAX
+            $.ajax({
+                url: "{% url 'recipes:ajax_add_ingredient' %}",
+                method: "POST",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    name: name,
+                    category: category,
+                    description: description
+                },
+                success: function(response) {
+                    console.log("AJAX response:", response);
+                    if (response.success) {
+                        // Zamknij modal
+                        $("#addIngredientModal").modal("hide");
+                        
+                        // Dodaj nowy składnik do dropdown'a i od razu go wybierz
+                        const newOption = new Option(response.name, response.id, true, true);
+                        $("#ingredient-select").append(newOption).trigger('change');
+                        console.log("New option added to select");
+                        
+                        // Wyczyść formularz
+                        $("#new-ingredient-name").val("");
+                        $("#new-ingredient-description").val("");
+                        
+                        // Otwórz ponownie modal składnika
+                        $("#ingredientModal").modal("show");
+                    } else {
+                        // Pokaż błędy
+                        let errorMessage = "Wystąpiły błędy:";
+                        for (const [field, errors] of Object.entries(response.errors)) {
+                            errorMessage += "\n" + field + ": " + errors.join(", ");
+                        }
+                        alert(errorMessage);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX error:", error);
+                    alert("Wystąpił błąd podczas zapisywania składnika: " + error);
+                }
+            });
+        });
+        
+        // Obsługa przycisku powrotu z modalu dodawania składnika
+        $("#back-to-ingredient-modal").on("click", function() {
+            console.log("Back button clicked");
+            $("#addIngredientModal").modal("hide");
+            setTimeout(function() {
+                $("#ingredientModal").modal("show");
+            }, 500);
+        });
+    });
+</script>
 {% endblock %} 

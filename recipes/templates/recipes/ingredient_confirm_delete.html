@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuń składnik{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Usuń składnik</h2>
+                    </div>
+                    <div class="card-body">
+                        <p>Czy na pewno chcesz usunąć składnik "{{ object.name }}"?</p>
+                        <p class="text-danger">Uwaga: Usunięcie składnika może wpłynąć na przepisy, które go wykorzystują!</p>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'recipes:ingredient_list' %}" class="btn btn-outline-secondary">Anuluj</a>
+                                <button type="submit" class="btn btn-danger">Usuń</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

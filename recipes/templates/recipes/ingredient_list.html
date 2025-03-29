@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Składniki{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h1>Składniki</h1>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{% url 'recipes:ingredient_create' %}" class="btn btn-primary">Dodaj nowy składnik</a>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="row mb-4">
+                <div class="col">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>{{ category.name }}</h3>
+                            <span class="badge {% if category.is_vegetarian %}bg-success{% else %}bg-danger{% endif %} me-1">
+                                {% if category.is_vegetarian %}Wegetariański{% else %}Niewegetariański{% endif %}
+                            </span>
+                            <span class="badge {% if category.is_vegan %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if category.is_vegan %}Wegański{% else %}Niewegański{% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nazwa</th>
+                                            <th>Opis</th>
+                                            <th>Akcje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ingredient in ingredients %}
+                                            {% if ingredient.category == category %}
+                                                <tr>
+                                                    <td>{{ ingredient.name }}</td>
+                                                    <td>{{ ingredient.description|default:"-" }}</td>
+                                                    <td>
+                                                        <a href="{% url 'recipes:ingredient_update' ingredient.pk %}" class="btn btn-sm btn-outline-primary">Edytuj</a>
+                                                        <a href="{% url 'recipes:ingredient_delete' ingredient.pk %}" class="btn btn-sm btn-outline-danger">Usuń</a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if category.ingredients.count == 0 %}
+                                            <tr>
+                                                <td colspan="3" class="text-center">Brak składników w tej kategorii</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; Pierwsza</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">Poprzednia</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}.
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Następna</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">Ostatnia &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %} 
