@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Moje przepisy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Moje przepisy</h2>
+                    <a href="{% url 'recipes:create' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-circle"></i> Dodaj nowy przepis
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recipes %}
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                            {% for recipe in recipes %}
+                                <div class="col">
+                                    <div class="card h-100">
+                                        {% if recipe.image %}
+                                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 180px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light text-center py-5">
+                                                <i class="bi bi-camera text-muted" style="font-size: 2rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ recipe.title }}</h5>
+                                            <p class="card-text small">{{ recipe.description|truncatechars:150 }}</p>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock"></i> {{ recipe.preparation_time }} min
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-people"></i> {{ recipe.servings }}
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar"></i> {{ recipe.created_at|date:"d.m.Y" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-between">
+                                            <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> Zobacz
+                                            </a>
+                                            <a href="{% url 'recipes:edit' recipe.id %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-pencil"></i> Edytuj
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center py-5">
+                            <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+                            <h4>Nie masz jeszcze żadnych przepisów</h4>
+                            <p class="mb-4">Dodaj swój pierwszy przepis, aby zacząć budować swoją kolekcję kulinarną!</p>
+                            <a href="{% url 'recipes:create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Dodaj pierwszy przepis
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

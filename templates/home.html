@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Książka Kucharska - Twoje Kulinarne Inspiracje{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Odkryj kulinarne inspiracje na każdą okazję</h1>
+            <p class="hero-subtitle">Planuj posiłki, zarządzaj swoją wirtualną lodówką i twórz listy zakupów - wszystko w jednym miejscu!</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{% url 'recipes:list' %}" class="btn btn-primary">
+                    <i class="bi bi-book me-2"></i>Zobacz przepisy
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'recipes:list' %}" class="btn btn-outline">
+                    <i class="bi bi-eye me-2"></i>Przeglądaj jako gość
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Polecane przepisy carousel -->
+<section class="carousel-section container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="carousel-title">Polecane przepisy</h2>
+        <a href="{% url 'recipes:list' %}" class="btn btn-sm btn-outline-secondary">Zobacz wszystkie</a>
+    </div>
+    
+    <div class="swiper featured-recipes">
+        <div class="swiper-wrapper">
+            <!-- Przykładowe karty przepisów do karuzeli -->
+            <div class="swiper-slide">
+                <div class="recipe-card">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" class="card-img-top" alt="Kolorowa sałatka">
+                        <span class="position-absolute top-0 end-0 bg-primary text-white px-3 py-1 m-2 rounded-pill">Wegetariańskie</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Kolorowa sałatka z komosą ryżową</h5>
+                        <p class="card-text">Pełna witamin sałatka na bazie komosy ryżowej z dodatkiem świeżych warzyw i aromatycznego dresingu.</p>
+                        <div class="d-flex justify-content-between recipe-stats mb-3">
+                            <span><i class="bi bi-clock"></i> 25 min</span>
+                            <span><i class="bi bi-people"></i> 4 porcje</span>
+                            <span><i class="bi bi-heart"></i> 24 polubienia</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary w-100">Zobacz przepis</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="recipe-card">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141" class="card-img-top" alt="Makaron z sosem pomidorowym">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Makaron z sosem pomidorowym i bazylią</h5>
+                        <p class="card-text">Klasyczny włoski makaron z sosem ze świeżych pomidorów, bazylią i parmezanem. Prosty i pyszny!</p>
+                        <div class="d-flex justify-content-between recipe-stats mb-3">
+                            <span><i class="bi bi-clock"></i> 30 min</span>
+                            <span><i class="bi bi-people"></i> 3 porcje</span>
+                            <span><i class="bi bi-heart"></i> 18 polubień</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary w-100">Zobacz przepis</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="recipe-card">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38" class="card-img-top" alt="Pizza domowa">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Domowa pizza margherita</h5>
+                        <p class="card-text">Klasyczna włoska pizza z cieniutkim ciastem, sosem pomidorowym, mozzarellą i świeżą bazylią.</p>
+                        <div class="d-flex justify-content-between recipe-stats mb-3">
+                            <span><i class="bi bi-clock"></i> 60 min</span>
+                            <span><i class="bi bi-people"></i> 4 porcje</span>
+                            <span><i class="bi bi-heart"></i> 32 polubienia</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary w-100">Zobacz przepis</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="recipe-card">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb" class="card-img-top" alt="Placki z owocami">
+                        <span class="position-absolute top-0 end-0 bg-primary text-white px-3 py-1 m-2 rounded-pill">Wegańskie</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Placki owsiane z owocami sezonowymi</h5>
+                        <p class="card-text">Puszyste placki na bazie płatków owsianych, podawane ze świeżymi owocami sezonowymi i syropem klonowym.</p>
+                        <div class="d-flex justify-content-between recipe-stats mb-3">
+                            <span><i class="bi bi-clock"></i> 20 min</span>
+                            <span><i class="bi bi-people"></i> 2 porcje</span>
+                            <span><i class="bi bi-heart"></i> 15 polubień</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary w-100">Zobacz przepis</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</section>
+
+<!-- Popularne przepisy -->
+<section class="container mt-5">
+    <div class="section-heading">
+        <h2 class="section-title">Popularne przepisy</h2>
+        <p class="section-subtitle">Odkryj najczęściej wybierane przepisy przez naszych użytkowników</p>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1548943487-a2e4e43b4853" class="card-img-top" alt="Kotlety schabowe">
+                <div class="card-body">
+                    <h5 class="card-title">Tradycyjne kotlety schabowe</h5>
+                    <p class="card-text">Pyszne, chrupiące kotlety schabowe z ziemniakami i surówką z kiszonej kapusty.</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div class="recipe-stats">
+                        <i class="bi bi-clock"></i> 45 min
+                    </div>
+                    <div class="recipe-stats">
+                        <i class="bi bi-people"></i> 4 porcje
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd" class="card-img-top" alt="Burger">
+                <div class="card-body">
+                    <h5 class="card-title">Soczyste burgery wołowe</h5>
+                    <p class="card-text">Domowe burgery z wołowiną, boczkiem, serem cheddar i domowym sosem.</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div class="recipe-stats">
+                        <i class="bi bi-clock"></i> 35 min
+                    </div>
+                    <div class="recipe-stats">
+                        <i class="bi bi-people"></i> 4 porcje
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d" class="card-img-top" alt="Zupa krem">
+                <div class="card-body">
+                    <h5 class="card-title">Zupa krem z dyni</h5>
+                    <p class="card-text">Aksamitna zupa krem z dyni z dodatkiem mleka kokosowego i prażonych pestek.</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div class="recipe-stats">
+                        <i class="bi bi-clock"></i> 40 min
+                    </div>
+                    <div class="recipe-stats">
+                        <i class="bi bi-people"></i> 6 porcji
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">
+            <div class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1556761223-4c4282c73f77" class="card-img-top" alt="Sałatka grecka">
+                <div class="card-body">
+                    <h5 class="card-title">Klasyczna sałatka grecka</h5>
+                    <p class="card-text">Orzeźwiająca sałatka z pomidorów, ogórków, oliwek, sera feta i czerwonej cebuli.</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div class="recipe-stats">
+                        <i class="bi bi-clock"></i> 15 min
+                    </div>
+                    <div class="recipe-stats">
+                        <i class="bi bi-people"></i> 2 porcje
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to action section -->
+<section class="container mt-5">
+    <div class="cta-section">
+        <h2 class="cta-title">Masz swój przepis?</h2>
+        <p class="cta-text">Podziel się swoimi kulinarnymi odkryciami z naszą społecznością</p>
+        <a href="{% url 'recipes:create' %}" class="btn btn-light btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>Dodaj swój przepis
+        </a>
+    </div>
+</section>
+
+<!-- Opinie użytkowników -->
+<section class="carousel-section container">
+    <div class="section-heading">
+        <h2 class="section-title">Co mówią nasi użytkownicy</h2>
+        <p class="section-subtitle">Opinie osób korzystających z naszej aplikacji</p>
+    </div>
+    
+    <div class="swiper testimonials">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Użytkownik">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="quote">"Ta aplikacja zmieniła sposób, w jaki planuję posiłki dla całej rodziny. Teraz zawsze wiem, jakie składniki mam w lodówce i co mogę z nich przygotować!"</p>
+                    <p class="author">Anna Kowalska</p>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="Użytkownik">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <p class="quote">"Wreszcie przestałem marnować jedzenie! Aplikacja przypomina mi o terminach ważności produktów i podpowiada, co mogę z nich zrobić przed upływem terminu."</p>
+                    <p class="author">Piotr Nowak</p>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Użytkownik">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <p class="quote">"Jako osoba pracująca na pełen etat, nie miałam czasu na planowanie posiłków. Dzięki tej aplikacji mogę łatwo zarządzać swoją lodówką i tworzyć listy zakupów - wszystko w jednym miejscu!"</p>
+                    <p class="author">Magdalena Wiśniewska</p>
+                </div>
+            </div>
+            
+            <div class="swiper-slide">
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Użytkownik">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="quote">"Odkryłem mnóstwo nowych przepisów i nauczyłem się gotować dzięki tej aplikacji. Instrukcje są proste i zrozumiałe, a skaner kodów kreskowych to prawdziwa rewolucja przy robieniu zakupów!"</p>
+                    <p class="author">Tomasz Jankowski</p>
+                </div>
+            </div>
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inicjalizacja karuzel Swiper
+    const featuredRecipesSwiper = new Swiper('.featured-recipes', {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      pagination: {
+        el: '.featured-recipes .swiper-pagination',
+        clickable: true
+      },
+      navigation: {
+        nextEl: '.featured-recipes .swiper-button-next',
+        prevEl: '.featured-recipes .swiper-button-prev',
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+        },
+        992: {
+          slidesPerView: 3,
+        },
+        1200: {
+          slidesPerView: 4,
+        }
+      }
+    });
+    
+    const testimonialsSwiper = new Swiper('.testimonials', {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      autoplay: {
+        delay: 5000,
+      },
+      pagination: {
+        el: '.testimonials .swiper-pagination',
+        clickable: true
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+        },
+        992: {
+          slidesPerView: 3,
+        }
+      }
+    });
+  });
+</script>
+{% endblock %} 

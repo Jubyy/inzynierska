@@ -6,11 +6,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.http import JsonResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe
 from .utils import convert_units, get_common_units, get_common_conversions
 from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
+from django.views.decorators.http import require_POST
 
 @login_required
 def recipe_list(request):
@@ -330,9 +331,15 @@ class RecipeListView(ListView):
         
         # Sprawdź, czy użytkownik jest zalogowany
         if self.request.user.is_authenticated:
-            # Przygotuj dane o dostępności przepisów
+            # Pobierz ID ulubionych przepisów użytkownika
+            favorite_ids = FavoriteRecipe.objects.filter(
+                user=self.request.user
+            ).values_list('recipe_id', flat=True)
+            
+            # Przygotuj dane o dostępności przepisów i ulubionych
             for recipe in context['recipes']:
                 recipe.is_available = recipe.can_be_prepared_with_available_ingredients(self.request.user)
+                recipe.is_favorite = recipe.id in favorite_ids
         
         return context
 
@@ -782,3 +789,29 @@ def ajax_add_ingredient(request):
             })
     
     return JsonResponse({'success': False, 'message': 'Nieprawidłowe żądanie'})
+
+@login_required
+@require_POST
+def toggle_favorite(request, pk):
+    """Dodaje lub usuwa przepis z ulubionych"""
+    try:
+        recipe = get_object_or_404(Recipe, pk=pk)
+        favorite, created = FavoriteRecipe.objects.get_or_create(user=request.user, recipe=recipe)
+        
+        if not created:
+            # Jeśli przepis był już w ulubionych, usuń go
+            favorite.delete()
+            is_favorite = False
+        else:
+            is_favorite = True
+        
+        return JsonResponse({
+            'status': 'success',
+            'is_favorite': is_favorite,
+            'message': 'Przepis dodany do ulubionych' if is_favorite else 'Przepis usunięty z ulubionych'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)

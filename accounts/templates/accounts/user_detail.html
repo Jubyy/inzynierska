@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil użytkownika {{ profile.user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Informacje o koncie</h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                                <i class="bi bi-person" style="font-size: 5rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="h4 text-center mb-3">{{ profile.user.first_name }} {{ profile.user.last_name }}</h3>
+                    <p class="text-center text-muted mb-4">{{ profile.user.username }}</p>
+                    
+                    <div class="mb-3">
+                        <strong>Data dołączenia:</strong> {{ profile.user.date_joined|date:"d.m.Y" }}
+                    </div>
+                    
+                    {% if profile.bio %}
+                        <div class="mb-3">
+                            <strong>O użytkowniku:</strong>
+                            <p>{{ profile.bio }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if profile.favorite_cuisine %}
+                        <div class="mb-3">
+                            <strong>Ulubiona kuchnia:</strong>
+                            <p>{{ profile.favorite_cuisine }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Przepisy użytkownika</h2>
+                </div>
+                <div class="card-body">
+                    {% if recipes %}
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for recipe in recipes %}
+                                <div class="col">
+                                    <div class="card h-100">
+                                        {% if recipe.image %}
+                                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 150px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light text-center py-5">
+                                                <i class="bi bi-camera text-muted" style="font-size: 2rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ recipe.title }}</h5>
+                                            <p class="card-text small">{{ recipe.description|truncatechars:100 }}</p>
+                                        </div>
+                                        <div class="card-footer">
+                                            <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-outline-primary">Zobacz przepis</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Ten użytkownik nie dodał jeszcze żadnych przepisów.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Statystyki</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="h1">{{ profile.recipe_count }}</h3>
+                                <p>Przepisów</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="h1">{{ profile.fridge_items_count }}</h3>
+                                <p>Produktów w lodówce</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

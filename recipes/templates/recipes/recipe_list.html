@@ -1,37 +1,368 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Lista przepisów{% endblock %}
+{% block title %}Przepisy - Książka Kucharska{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
 
 {% block content %}
-    <h1>Lista przepisów</h1>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="display-5 mb-4">Przepisy kulinarne</h1>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            {% if user.is_authenticated %}
+            <a href="{% url 'recipes:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Dodaj nowy przepis
+            </a>
+            {% endif %}
+        </div>
+    </div>
 
-    <form method="get">
-        <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Szukaj przepisu">
-        <button type="submit">Szukaj</button>
-    </form>
+    <!-- Filtry i wyszukiwanie -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Szukaj przepisu...">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">Wszystkie kategorie</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <select name="diet" class="form-select">
+                        <option value="">Wszystkie przepisy</option>
+                        <option value="vegetarian" {% if selected_diet == "vegetarian" %}selected{% endif %}>Wegetariańskie</option>
+                        <option value="vegan" {% if selected_diet == "vegan" %}selected{% endif %}>Wegańskie</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtruj</button>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="col-12 mt-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="available_only" name="available_only" {% if available_only %}checked{% endif %}>
+                        <label class="form-check-label" for="available_only">
+                            <i class="bi bi-refrigerator me-1"></i>Pokaż tylko przepisy możliwe do przygotowania z produktów w lodówce
+                        </label>
+                    </div>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
 
+    <!-- Lista przepisów -->
     {% if recipes %}
-        <ul>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for recipe in recipes %}
-            <li>
-                <h2>{{ recipe.title }}</h2>
-                {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 200px;">
-                {% endif %}
-                <p>{{ recipe.description }}</p>
-                <p>Czas przygotowania: {{ recipe.preparation_time }} minut</p>
-                <p>Porcje: {{ recipe.servings }}</p>
-                <a href="{% url 'recipes:detail' recipe.pk %}">Zobacz szczegóły</a>
-                {% if user == recipe.author %}
-                    <a href="{% url 'recipes:update' recipe.pk %}">Edytuj</a>
-                    <a href="{% url 'recipes:delete' recipe.pk %}">Usuń</a>
-                {% endif %}
-            </li>
+        <div class="col">
+            <div class="recipe-card h-100">
+                <div class="position-relative">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 220px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                            <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Etykiety diet -->
+                    <div class="position-absolute top-0 start-0 p-2">
+                        {% if recipe.is_vegan %}
+                            <span class="badge bg-success me-1 mb-1 d-inline-block">Wegańskie</span>
+                        {% elif recipe.is_vegetarian %}
+                            <span class="badge bg-success-light me-1 mb-1 d-inline-block">Wegetariańskie</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Indykator dostępności -->
+                    {% if user.is_authenticated %}
+                        <div class="position-absolute top-0 end-0 p-2">
+                            {% if recipe.is_available %}
+                                <span class="badge bg-primary" title="Masz wszystkie składniki">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Gotowe do przygotowania
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Przycisk dodania do ulubionych -->
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-favorite position-absolute bottom-0 end-0 m-2" 
+                                title="{% if recipe.is_favorite %}Usuń z ulubionych{% else %}Dodaj do ulubionych{% endif %}"
+                                data-recipe-id="{{ recipe.id }}"
+                                {% if recipe.is_favorite %}data-is-favorite="true"{% endif %}>
+                            <i class="bi {% if recipe.is_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <p class="card-text text-muted small">{{ recipe.description|truncatechars:80 }}</p>
+                    
+                    <div class="d-flex justify-content-between recipe-stats mb-3">
+                        <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
+                        <span><i class="bi bi-people"></i> {{ recipe.servings }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>Zobacz przepis
+                        </a>
+                        
+                        {% if user == recipe.author %}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Opcje
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a href="{% url 'recipes:update' recipe.pk %}" class="dropdown-item">
+                                            <i class="bi bi-pencil me-1"></i>Edytuj
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'recipes:delete' recipe.pk %}" class="dropdown-item text-danger">
+                                            <i class="bi bi-trash me-1"></i>Usuń
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">
+                        <i class="bi bi-person"></i> {{ recipe.author.username }}
+                        <span class="ms-2"><i class="bi bi-calendar"></i> {{ recipe.created_at|date:"d.m.Y" }}</span>
+                    </small>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-        </ul>
-    {% else %}
-        <p>Brak przepisów do wyświetlenia.</p>
-    {% endif %}
+    </div>
+    
+    <!-- Paginacja -->
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            {% endif %}
 
-    <a href="{% url 'recipes:create' %}">Dodaj nowy przepis</a>
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="alert alert-info text-center py-5">
+        <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+        <h4>Brak przepisów do wyświetlenia</h4>
+        <p class="mb-4">Nie znaleziono przepisów spełniających podane kryteria.</p>
+        <a href="{% url 'recipes:list' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>Pokaż wszystkie przepisy
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'recipes:create' %}" class="btn btn-success ms-2">
+            <i class="bi bi-plus-circle me-2"></i>Dodaj nowy przepis
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Dodatkowe style -->
+<style>
+    .bg-success-light {
+        background-color: #8bc34a;
+    }
+    
+    .btn-favorite {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        color: #aaa;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-favorite:hover, .btn-favorite.active {
+        color: var(--primary-color);
+        transform: scale(1.1);
+    }
+    
+    .btn-favorite.active i::before {
+        content: "\F415"; /* Filled heart icon */
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+</style>
+
+<!-- JavaScript dla funkcji dodawania do ulubionych -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obsługa przycisku dodawania do ulubionych
+    const favoriteButtons = document.querySelectorAll('.btn-favorite');
+    
+    favoriteButtons.forEach(button => {
+        // Ustaw klasę active dla ulubionych przepisów
+        if (button.getAttribute('data-is-favorite') === 'true') {
+            button.classList.add('active');
+        }
+        
+        button.addEventListener('click', function() {
+            const recipeId = this.getAttribute('data-recipe-id');
+            
+            // Wyślij żądanie AJAX
+            fetch(`/recipes/${recipeId}/toggle-favorite/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Aktualizuj wygląd przycisku
+                    this.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (data.is_favorite) {
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill');
+                        this.setAttribute('title', 'Usuń z ulubionych');
+                    } else {
+                        icon.classList.remove('bi-heart-fill');
+                        icon.classList.add('bi-heart');
+                        this.setAttribute('title', 'Dodaj do ulubionych');
+                    }
+                    
+                    // Opcjonalnie: pokaż powiadomienie
+                    showNotification(data.message);
+                } else {
+                    console.error('Błąd:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Błąd:', error);
+            });
+        });
+    });
+    
+    // Automatycznie odświeżaj formularz po zmianie checkboxa
+    const availableOnlyCheckbox = document.getElementById('available_only');
+    if (availableOnlyCheckbox) {
+        availableOnlyCheckbox.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    }
+    
+    // Funkcja do pobierania tokenu CSRF
+    function getCSRFToken() {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith('csrftoken=')) {
+                return cookie.substring('csrftoken='.length);
+            }
+        }
+        return null;
+    }
+    
+    // Funkcja do wyświetlania powiadomień
+    function showNotification(message) {
+        // Sprawdź, czy kontener powiadomień istnieje
+        let notificationContainer = document.getElementById('notification-container');
+        
+        // Jeśli nie, utwórz go
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notification-container';
+            notificationContainer.style.position = 'fixed';
+            notificationContainer.style.bottom = '20px';
+            notificationContainer.style.right = '20px';
+            notificationContainer.style.zIndex = '1000';
+            document.body.appendChild(notificationContainer);
+        }
+        
+        // Utwórz powiadomienie
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-primary alert-dismissible fade show';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Dodaj do kontenera
+        notificationContainer.appendChild(notification);
+        
+        // Usuń po 3 sekundach
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+});
+</script>
 {% endblock %}

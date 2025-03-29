@@ -90,10 +90,21 @@ def profile(request):
         user_form = CustomUserCreationForm(instance=request.user)
         profile_form = UserProfileForm(instance=request.user.profile)
     
+    # Pobierz przepisy użytkownika
+    user_recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')[:5]
+    
+    # Pobierz statystyki
+    recipes_count = Recipe.objects.filter(author=request.user).count()
+    fridge_count = FridgeItem.objects.filter(user=request.user).count()
+    shopping_lists_count = ShoppingList.objects.filter(user=request.user).count()
+    
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'user_recipes': Recipe.objects.filter(author=request.user).order_by('-created_at')[:5]
+        'recipes': user_recipes,
+        'recipes_count': recipes_count,
+        'fridge_count': fridge_count,
+        'shopping_lists_count': shopping_lists_count
     }
     
     return render(request, 'accounts/profile.html', context)

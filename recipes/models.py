@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class IngredientCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa kategorii")
@@ -183,4 +185,18 @@ class RecipeIngredient(models.Model):
         unique_together = ('recipe', 'ingredient')
 
     def __str__(self):
-        return f"{self.amount} {self.unit.symbol if self.unit else ''} {self.ingredient.name}" 
+        return f"{self.amount} {self.unit.symbol if self.unit else ''} {self.ingredient.name}"
+
+class FavoriteRecipe(models.Model):
+    """Model do przechowywania ulubionych przepisów użytkownika"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_recipes', verbose_name="Użytkownik")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorited_by', verbose_name="Przepis")
+    added_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
+    
+    class Meta:
+        verbose_name = "Ulubiony przepis"
+        verbose_name_plural = "Ulubione przepisy"
+        unique_together = ('user', 'recipe')  # Użytkownik może dodać przepis do ulubionych tylko raz
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.recipe.title}" 
