@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuń produkt z listy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">Usuń produkt z listy zakupów</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Czy na pewno chcesz usunąć <strong>{{ item.ingredient.name }}</strong> z listy zakupów "{{ item.shopping_list.name }}"?</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'shopping:detail' item.shopping_list.id %}" class="btn btn-outline-secondary">Anuluj</a>
+                            <button type="submit" class="btn btn-danger">Usuń</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

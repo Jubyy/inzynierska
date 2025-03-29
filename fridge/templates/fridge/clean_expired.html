@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuń przeterminowane produkty{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">Usuń przeterminowane produkty</h2>
+                </div>
+                <div class="card-body">
+                    {% if expired_items %}
+                        <p class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Znaleziono {{ expired_items|length }} przeterminowanych produktów w twojej lodówce.
+                        </p>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produkt</th>
+                                        <th>Ilość</th>
+                                        <th>Data ważności</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in expired_items %}
+                                        <tr>
+                                            <td>{{ item.ingredient.name }}</td>
+                                            <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                            <td class="text-danger">{{ item.expiry_date }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'fridge:list' %}" class="btn btn-secondary">Anuluj</a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash me-2"></i>Usuń wszystkie przeterminowane
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Brak przeterminowanych produktów w twojej lodówce.
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'fridge:list' %}" class="btn btn-primary">Wróć do listy</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

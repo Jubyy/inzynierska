@@ -6,9 +6,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 from django.db.models import Q
+import json
+import requests
+from datetime import datetime, timedelta
 
 from .models import FridgeItem
-from recipes.models import Ingredient, MeasurementUnit, Recipe
+from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
 from .forms import FridgeItemForm, BulkAddForm
 
 @login_required
@@ -213,3 +216,149 @@ def ajax_ingredient_search(request):
         results = []
     
     return JsonResponse({'results': results})
+
+def ajax_load_units(request):
+    """Pobieranie jednostek miary za pomocą AJAX"""
+    units = MeasurementUnit.objects.all()
+    units_data = [{'id': u.id, 'name': u.name} for u in units]
+    return JsonResponse({'units': units_data})
+
+@login_required
+def barcode_scan(request):
+    """Widok do skanowania kodów kreskowych produktów"""
+    return render(request, 'fridge/barcode_scan.html')
+
+def ajax_barcode_lookup(request):
+    """
+    Wyszukiwanie informacji o produkcie na podstawie kodu kreskowego.
+    W tym przykładzie używamy Open Food Facts API do pobierania danych o produktach.
+    """
+    barcode = request.GET.get('barcode', '')
+    
+    if not barcode:
+        return JsonResponse({
+            'success': False,
+            'error': 'Nie podano kodu kreskowego'
+        })
+    
+    try:
+        # Najpierw sprawdź, czy mamy już taki produkt w bazie
+        ingredient = Ingredient.objects.filter(barcode=barcode).first()
+        
+        # Jeśli produkt nie istnieje z takim kodem, ale może być tylko numerem ID
+        if not ingredient and barcode.isdigit():
+            ingredient = Ingredient.objects.filter(id=barcode).first()
+        
+        if ingredient:
+            # Jeśli produkt istnieje w bazie, zwróć jego dane
+            return JsonResponse({
+                'success': True,
+                'exists': True,
+                'product': {
+                    'id': ingredient.id,
+                    'name': ingredient.name,
+                    'unit': ingredient.default_unit.id if ingredient.default_unit else None,
+                    'unit_name': ingredient.default_unit.name if ingredient.default_unit else None,
+                }
+            })
+        
+        # Jeśli produktu nie ma w bazie, spróbuj pobrać dane z Open Food Facts
+        # API URL: https://world.openfoodfacts.org/api/v0/product/[barcode].json
+        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json', timeout=5)
+        data = response.json()
+        
+        if data.get('status') == 1:  # Produkt znaleziony w bazie
+            product_data = data.get('product', {})
+            product_name = product_data.get('product_name', '') or product_data.get('generic_name', '')
+            
+            if not product_name:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Nie znaleziono nazwy produktu'
+                })
+            
+            # Zwracamy dane do formularza
+            return JsonResponse({
+                'success': True,
+                'exists': False,
+                'product': {
+                    'name': product_name,
+                    'quantity': product_data.get('quantity', ''),
+                    'image_url': product_data.get('image_url', ''),
+                    'categories': product_data.get('categories', ''),
+                }
+            })
+        else:
+            # Jeśli nie znaleziono w Open Food Facts, próbujemy utworzyć przykładowy produkt
+            sample_name = f"Produkt {barcode[:4]}-{barcode[-4:]}"
+            return JsonResponse({
+                'success': True,
+                'exists': False,
+                'product': {
+                    'name': sample_name,
+                    'quantity': '',
+                    'image_url': '',
+                    'categories': '',
+                }
+            })
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Wystąpił błąd podczas wyszukiwania: {str(e)}'
+        })
+
+@login_required
+def add_scanned_product(request):
+    """Dodawanie produktu zeskanowanego lub wyszukanego po kodzie kreskowym"""
+    if request.method == 'POST':
+        try:
+            # Pobierz dane z formularza
+            product_name = request.POST.get('ingredient')
+            amount = float(request.POST.get('amount'))
+            unit_id = request.POST.get('unit')
+            expiry_date = request.POST.get('expiry_date') or None
+            barcode = request.POST.get('barcode')
+            
+            # Pobierz lub utwórz składnik
+            unit = get_object_or_404(MeasurementUnit, pk=unit_id)
+            
+            # Sprawdź, czy składnik istnieje w bazie
+            ingredient = Ingredient.objects.filter(name=product_name).first()
+            
+            if not ingredient:
+                # Jeśli składnik nie istnieje, utwórz nowy
+                # Najpierw pobierz kategorię domyślną
+                default_category = IngredientCategory.objects.first()
+                if not default_category:
+                    # Jeśli nie ma kategorii, utwórz domyślną
+                    default_category = IngredientCategory.objects.create(
+                        name="Inne", 
+                        is_vegetarian=True,
+                        is_vegan=False
+                    )
+                
+                # Utwórz nowy składnik
+                ingredient = Ingredient.objects.create(
+                    name=product_name,
+                    category=default_category,
+                    barcode=barcode if barcode != product_name else None,
+                    default_unit=unit
+                )
+            
+            # Dodaj produkt do lodówki
+            FridgeItem.add_to_fridge(
+                user=request.user,
+                ingredient=ingredient,
+                amount=amount,
+                unit=unit,
+                expiry_date=expiry_date
+            )
+            
+            messages.success(request, f'Dodano {product_name} do lodówki.')
+            return JsonResponse({'success': True, 'redirect': reverse('fridge:list')})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Nieprawidłowe żądanie'})

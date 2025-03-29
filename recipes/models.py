@@ -18,6 +18,8 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa składnika")
     category = models.ForeignKey(IngredientCategory, on_delete=models.CASCADE, related_name='ingredients', verbose_name="Kategoria")
     description = models.TextField(blank=True, null=True, verbose_name="Opis")
+    barcode = models.CharField(max_length=30, blank=True, null=True, verbose_name="Kod kreskowy", unique=True)
+    # Domyślna jednostka zostanie dodana po zdefiniowaniu klasy MeasurementUnit
     
     class Meta:
         verbose_name = "Składnik"
@@ -34,6 +36,9 @@ class Ingredient(models.Model):
     @property
     def is_vegan(self):
         return self.category.is_vegan
+
+    # Dodanie pola default_unit do modelu Ingredient
+    default_unit = models.ForeignKey('MeasurementUnit', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_for_ingredients', verbose_name="Domyślna jednostka")
 
 class MeasurementUnit(models.Model):
     name = models.CharField(max_length=50, verbose_name="Nazwa jednostki")

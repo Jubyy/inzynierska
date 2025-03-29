@@ -1,16 +1,263 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block title %}Twoja lodówka{% endblock %}
 
-<h2>Twoja lodówka</h2>
-<ul>
-    {% for item in items %}
-        <li>{{ item.name }} - {{ item.quantity }} {{ item.unit }} 
-            (ważność do: {{ item.expiry_date|default:"brak" }})
-            <a href="{% url 'fridge:edit' item.id %}">Edytuj</a> |
-            <a href="{% url 'fridge:delete' item.id %}">Usuń</a>
-        </li>
-    {% endfor %}
-</ul>
-<a href="{% url 'fridge:add' %}">Dodaj produkt</a>
+{% block extra_css %}
+<style>
+    .expired {
+        background-color: rgba(255, 0, 0, 0.1);
+    }
+    
+    .almost-expired {
+        background-color: rgba(255, 165, 0, 0.1);
+    }
+    
+    .fridge-icon {
+        font-size: 3rem;
+        color: #0d6efd;
+    }
+    
+    .expired-section {
+        background-color: #ffeae9;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .expired-section .section-title {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .regular-section {
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .section-title {
+        padding: 10px 15px;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="display-5">
+                <i class="bi bi-thermometer-snow me-2 fridge-icon"></i> Twoja lodówka
+            </h1>
+        </div>
+        <div class="col-md-6 text-md-end d-flex justify-content-md-end align-items-center">
+            <a href="{% url 'fridge:barcode_scan' %}" class="btn btn-success me-2">
+                <i class="bi bi-upc-scan"></i> Skanuj kody
+            </a>
+            <a href="{% url 'fridge:add' %}" class="btn btn-primary me-2">
+                <i class="bi bi-plus-circle"></i> Dodaj produkt
+            </a>
+            <a href="{% url 'fridge:bulk_add' %}" class="btn btn-outline-primary me-2">
+                <i class="bi bi-list-check"></i> Dodaj wiele
+            </a>
+            <a href="{% url 'fridge:clean_expired' %}" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i> Usuń przeterminowane
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtrowanie i wyszukiwanie -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="q" placeholder="Szukaj składnika..." value="{{ query }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="sort" id="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="ingredient__name" {% if sort == 'ingredient__name' %}selected{% endif %}>Nazwa (A-Z)</option>
+                        <option value="-ingredient__name" {% if sort == '-ingredient__name' %}selected{% endif %}>Nazwa (Z-A)</option>
+                        <option value="expiry" {% if sort == 'expiry' %}selected{% endif %}>Data ważności (rosnąco)</option>
+                        <option value="-expiry" {% if sort == '-expiry' %}selected{% endif %}>Data ważności (malejąco)</option>
+                        <option value="amount" {% if sort == 'amount' %}selected{% endif %}>Ilość (rosnąco)</option>
+                        <option value="-amount" {% if sort == '-amount' %}selected{% endif %}>Ilość (malejąco)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary w-100">Resetuj</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista produktów -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Lista produktów</h2>
+        </div>
+        
+        {% if fridge_items %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Składnik</th>
+                            <th>Ilość</th>
+                            <th>Data ważności</th>
+                            <th>Data zakupu</th>
+                            <th class="text-center">Akcje</th>
+                        </tr>
+                    </thead>
+                    
+                    <!-- Najpierw sekcja z przeterminowanymi produktami -->
+                    {% with expired_items=fridge_items %}
+                    {% if expired_items %}
+                    <tbody class="expired-section">
+                        <tr>
+                            <td colspan="5" class="section-title">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> Produkty przeterminowane - do wyrzucenia
+                            </td>
+                        </tr>
+                        
+                        {% for item in expired_items %}
+                            {% if item.is_expired %}
+                            <tr class="expired">
+                                <td>{{ item.ingredient.name }}</td>
+                                <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                <td>
+                                    {% if item.expiry_date %}
+                                        {{ item.expiry_date }}
+                                        <span class="badge bg-danger">Przeterminowane</span>
+                                    {% else %}
+                                        <span class="text-muted">Brak</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.purchase_date }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edytuj">
+                                        <i class="bi bi-pencil"></i> Edytuj
+                                    </a>
+                                    <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
+                                        <i class="bi bi-trash"></i> Usuń
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+                    
+                    <!-- Sekcja aktualnych produktów -->
+                    <tbody class="regular-section">
+                        {% if expired_items %}
+                        <tr>
+                            <td colspan="5" class="section-title">
+                                <i class="bi bi-check-circle-fill me-2"></i> Produkty aktualne
+                            </td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% for item in fridge_items %}
+                            {% if not item.is_expired %}
+                            <tr>
+                                <td>{{ item.ingredient.name }}</td>
+                                <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                <td>
+                                    {% if item.expiry_date %}
+                                        {{ item.expiry_date }}
+                                    {% else %}
+                                        <span class="text-muted">Brak</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.purchase_date }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edytuj">
+                                        <i class="bi bi-pencil"></i> Edytuj
+                                    </a>
+                                    <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
+                                        <i class="bi bi-trash"></i> Usuń
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    
+                    {% endwith %}
+                </table>
+            </div>
+        {% else %}
+            <div class="card-body">
+                <div class="alert alert-info m-3">
+                    <i class="bi bi-info-circle me-2"></i> Twoja lodówka jest pusta. <a href="{% url 'fridge:add' %}" class="alert-link">Dodaj produkt</a>.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Paginacja -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
 {% endblock %}

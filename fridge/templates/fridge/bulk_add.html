@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj wiele produktów do lodówki{% endblock %}
+
+{% block extra_css %}
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+    .ingredient-row {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+    }
+    .ingredient-row:hover {
+        border-color: #adb5bd;
+    }
+    .js-errors {
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Dodaj wiele produktów do lodówki</h2>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Blok na komunikaty o błędach JavaScript -->
+                    <div id="js-errors" class="alert alert-danger d-none">
+                        <h5>Wystąpiły błędy JavaScript:</h5>
+                        <ul id="error-list"></ul>
+                    </div>
+
+                    <form method="post" id="bulk-add-form">
+                        {% csrf_token %}
+                        <div id="ingredients-container">
+                            <!-- Pierwszy wiersz template -->
+                            <div class="ingredient-row">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Składnik</label>
+                                        <select name="ingredients" class="form-control ingredient-select" required>
+                                            <option value="">-- Wybierz składnik --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label">Ilość</label>
+                                        <input type="number" name="amounts" class="form-control" step="0.01" min="0.01" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">Jednostka</label>
+                                        <select name="units" class="form-control unit-select" required>
+                                            <option value="">-- Wybierz jednostkę --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label">Data ważności</label>
+                                        <input type="date" name="expiry_dates" class="form-control">
+                                    </div>
+                                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn btn-outline-danger remove-row mt-3">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 text-center">
+                            <button type="button" id="add-row" class="btn btn-outline-primary">
+                                <i class="bi bi-plus-circle"></i> Dodaj kolejny produkt
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">Anuluj</a>
+                            <button type="submit" class="btn btn-primary">Zapisz wszystkie</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Utwórz handler błędów JavaScript
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("JavaScript error:", message, "at", source, "line", lineno);
+        const errorBox = document.getElementById('js-errors');
+        const errorList = document.getElementById('error-list');
+        
+        const errorItem = document.createElement('li');
+        errorItem.textContent = message + ' at line ' + lineno;
+        
+        errorList.appendChild(errorItem);
+        errorBox.classList.remove('d-none');
+        
+        return false;
+    };
+
+    $(document).ready(function() {
+        console.log("Document ready - inicjalizacja funkcji zbiorczego dodawania");
+        
+        // Pobierz dostępne składniki
+        function loadIngredients() {
+            console.log("Ładowanie składników...");
+            $.ajax({
+                url: "{% url 'fridge:ajax_ingredient_search' %}",
+                type: "GET",
+                success: function(data) {
+                    console.log("Składniki załadowane:", data);
+                    let options = '<option value="">-- Wybierz składnik --</option>';
+                    if (data.results && Array.isArray(data.results)) {
+                        $.each(data.results, function(i, item) {
+                            options += '<option value="' + item.id + '">' + item.text + '</option>';
+                        });
+                    }
+                    $('.ingredient-select').each(function() {
+                        // Zachowaj aktualnie wybraną wartość
+                        const currentValue = $(this).val();
+                        $(this).html(options);
+                        if (currentValue) {
+                            $(this).val(currentValue);
+                        }
+                        $(this).select2({
+                            placeholder: "Wybierz składnik",
+                            allowClear: true
+                        });
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Błąd ładowania składników:", error);
+                    alert("Wystąpił błąd podczas ładowania składników: " + error);
+                }
+            });
+        }
+
+        // Pobierz dostępne jednostki
+        function loadUnits() {
+            console.log("Ładowanie jednostek...");
+            $.ajax({
+                url: "{% url 'fridge:ajax_load_units' %}",
+                type: "GET",
+                success: function(data) {
+                    console.log("Jednostki załadowane:", data);
+                    let options = '<option value="">-- Wybierz jednostkę --</option>';
+                    if (data.units && Array.isArray(data.units)) {
+                        $.each(data.units, function(i, item) {
+                            options += '<option value="' + item.id + '">' + item.name + '</option>';
+                        });
+                    }
+                    $('.unit-select').each(function() {
+                        // Zachowaj aktualnie wybraną wartość
+                        const currentValue = $(this).val();
+                        $(this).html(options);
+                        if (currentValue) {
+                            $(this).val(currentValue);
+                        }
+                        $(this).select2({
+                            placeholder: "Wybierz jednostkę",
+                            allowClear: true
+                        });
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Błąd ładowania jednostek:", error);
+                    alert("Wystąpił błąd podczas ładowania jednostek: " + error);
+                }
+            });
+        }
+
+        // Inicjalizacja pierwszego wiersza
+        loadIngredients();
+        loadUnits();
+
+        // Dodaj nowy wiersz
+        $('#add-row').on('click', function() {
+            console.log("Dodawanie nowego wiersza...");
+            
+            // Klonowanie pierwszego wiersza
+            const newRow = $('.ingredient-row:first').clone();
+            
+            // Czyszczenie wartości w nowym wierszu
+            newRow.find('input').val('');
+            newRow.find('select').val('').trigger('change');
+            
+            // Dodawanie nowego wiersza do kontenera
+            newRow.appendTo('#ingredients-container');
+            
+            // Zainicjalizuj Select2 dla nowego wiersza
+            newRow.find('.ingredient-select, .unit-select').each(function() {
+                $(this).select2({
+                    placeholder: $(this).find('option:first').text(),
+                    allowClear: true
+                });
+            });
+            
+            console.log("Nowy wiersz dodany pomyślnie");
+        });
+
+        // Usuń wiersz
+        $(document).on('click', '.remove-row', function() {
+            console.log("Usuwanie wiersza...");
+            
+            // Nie usuwaj jeśli to ostatni wiersz
+            if ($('.ingredient-row').length > 1) {
+                $(this).closest('.ingredient-row').remove();
+                console.log("Wiersz usunięty");
+            } else {
+                // Wyczyść pola jeśli to ostatni wiersz
+                const row = $(this).closest('.ingredient-row');
+                row.find('input').val('');
+                row.find('select').val('').trigger('change');
+                console.log("Ostatni wiersz - pola wyczyszczone");
+            }
+        });
+
+        // Walidacja formularza
+        $('#bulk-add-form').on('submit', function(e) {
+            console.log("Walidacja formularza przed wysłaniem...");
+            let valid = false;
+
+            // Sprawdź czy przynajmniej jeden wiersz jest wypełniony
+            $('.ingredient-row').each(function() {
+                const ingredient = $(this).find('[name="ingredients"]').val();
+                const amount = $(this).find('[name="amounts"]').val();
+                const unit = $(this).find('[name="units"]').val();
+                
+                if (ingredient && amount && unit) {
+                    valid = true;
+                    return false; // Break the loop
+                }
+            });
+
+            if (!valid) {
+                e.preventDefault();
+                alert('Dodaj przynajmniej jeden produkt z wypełnionymi polami: składnik, ilość i jednostka.');
+                console.log("Walidacja nieudana - brak wypełnionych pól");
+            } else {
+                console.log("Formularz przesłany - walidacja przeszła pomyślnie");
+            }
+        });
+    });
+</script>
+{% endblock %} 

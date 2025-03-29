@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+
+{% block title %}Skanowanie kodów kreskowych{% endblock %}
+
+{% block extra_css %}
+<style>
+    #barcode-scanner {
+        width: 100%;
+        height: 300px;
+        border: 2px solid #0d6efd;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    #scanner-message {
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        z-index: 10;
+    }
+    
+    #scanner-container {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(to right, transparent, #0d6efd, transparent);
+        animation: scan 2s linear infinite;
+        top: 50%;
+        z-index: 9;
+    }
+    
+    @keyframes scan {
+        0% { top: 0; }
+        50% { top: 100%; }
+        100% { top: 0; }
+    }
+    
+    .product-image {
+        max-height: 200px;
+        object-fit: contain;
+    }
+    
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Skanowanie kodów kreskowych</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="lead">Możesz dodać produkty do lodówki poprzez:</p>
+                            <ul class="list-group mb-4">
+                                <li class="list-group-item">
+                                    <i class="bi bi-upc-scan me-2"></i> Skanowanie kodu kreskowego przy użyciu kamery
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-keyboard me-2"></i> Ręczne wprowadzenie kodu kreskowego
+                                </li>
+                            </ul>
+                            
+                            <div class="form-group mb-3">
+                                <label for="manual-barcode" class="form-label">Ręczne wprowadzenie kodu:</label>
+                                <div class="input-group">
+                                    <input type="text" id="manual-barcode" class="form-control" placeholder="np. 5900512300105">
+                                    <button id="manual-search" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Szukaj
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Wprowadź kod kreskowy produktu i kliknij "Szukaj"</small>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button id="start-scanner" class="btn btn-success">
+                                    <i class="bi bi-camera"></i> Uruchom skaner kamery
+                                </button>
+                                <button id="stop-scanner" class="btn btn-danger" style="display: none;">
+                                    <i class="bi bi-camera-video-off"></i> Zatrzymaj skaner
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div id="scanner-container">
+                                <div id="barcode-scanner">
+                                    <div id="scanner-message">
+                                        <p>Naciśnij "Uruchom skaner kamery", aby rozpocząć skanowanie</p>
+                                    </div>
+                                </div>
+                                <div class="scan-line"></div>
+                            </div>
+                            
+                            <div class="text-center mb-3">
+                                <small class="text-muted">Skieruj kod kreskowy w stronę kamery, aby go zeskanować</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="loading-spinner" id="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Ładowanie...</span>
+                        </div>
+                        <p class="mt-2">Wyszukiwanie produktu...</p>
+                    </div>
+                    
+                    <!-- Wynik wyszukiwania produktu -->
+                    <div id="product-result" class="mt-4" style="display: none;">
+                        <hr>
+                        <h3>Znaleziony produkt</h3>
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <img id="product-image" src="" alt="Zdjęcie produktu" class="product-image img-fluid mb-3">
+                            </div>
+                            <div class="col-md-8">
+                                <h4 id="product-name" class="mb-3"></h4>
+                                <p id="product-barcode" class="mb-2"></p>
+                                <p id="product-quantity" class="mb-2"></p>
+                                <p id="product-categories" class="mb-3"></p>
+                                
+                                <form id="add-to-fridge-form">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="product-amount" class="form-label">Ilość</label>
+                                            <input type="number" id="product-amount" class="form-control" value="1" min="0.01" step="0.01" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="product-unit" class="form-label">Jednostka</label>
+                                            <select id="product-unit" class="form-select" required>
+                                                <option value="">Wybierz jednostkę</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="product-expiry" class="form-label">Data ważności</label>
+                                            <input type="date" id="product-expiry" class="form-control">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Dodaj do lodówki
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Komunikat o błędzie -->
+                    <div id="error-message" class="alert alert-danger mt-4" style="display: none;"></div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Wróć do listy produktów
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Dodanie biblioteki do skanowania kodów kreskowych -->
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let scanner = null;
+        
+        // Pobierz dostępne jednostki
+        function loadUnits() {
+            $.ajax({
+                url: "{% url 'fridge:ajax_load_units' %}",
+                type: "GET",
+                success: function(data) {
+                    let select = $("#product-unit");
+                    select.empty().append('<option value="">Wybierz jednostkę</option>');
+                    
+                    if (data.units && Array.isArray(data.units)) {
+                        $.each(data.units, function(i, unit) {
+                            select.append(new Option(unit.name, unit.id));
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showError("Błąd podczas ładowania jednostek: " + error);
+                }
+            });
+        }
+        
+        // Wczytaj jednostki przy starcie
+        loadUnits();
+        
+        // Funkcja inicjalizująca skaner kodów kreskowych
+        function initBarcodeScanner() {
+            if (scanner) {
+                scanner.stop();
+            }
+            
+            try {
+                // Sprawdź, czy przeglądarka obsługuje API kamery
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showError("Twoja przeglądarka nie obsługuje dostępu do kamery. Użyj nowszej przeglądarki lub wprowadź kod ręcznie.");
+                    $("#start-scanner").prop('disabled', true);
+                    return;
+                }
+                
+                // Przed inicjalizacją skanera, sprawdź uprawnienia kamery
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        // Zamknij strumień, bo QuaggaJS i tak utworzy własny
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        scanner = Quagga.init({
+                            inputStream: {
+                                name: "Live",
+                                type: "LiveStream",
+                                target: document.querySelector("#barcode-scanner"),
+                                constraints: {
+                                    width: 640,
+                                    height: 480,
+                                    facingMode: "environment" // Użyj tylnej kamery na urządzeniach mobilnych
+                                }
+                            },
+                            decoder: {
+                                readers: [
+                                    "ean_reader",
+                                    "ean_8_reader",
+                                    "code_128_reader",
+                                    "code_39_reader",
+                                    "upc_reader"
+                                ],
+                                multiple: false
+                            },
+                            locate: true
+                        }, function(err) {
+                            if (err) {
+                                console.error("Error initializing scanner:", err);
+                                showError("Nie udało się uruchomić skanera: " + err);
+                                return;
+                            }
+                            
+                            Quagga.start();
+                            $("#scanner-message").hide();
+                            $("#stop-scanner").show();
+                            $("#start-scanner").hide();
+                            
+                            // Domyślnie ustaw debug na false w produkcji
+                            Quagga.CameraAccess.disableTorch();
+                        });
+                        
+                        // Obsługa zdarzenia skanowania kodu
+                        Quagga.onDetected(function(result) {
+                            if (result && result.codeResult && result.codeResult.code) {
+                                const barcode = result.codeResult.code;
+                                console.log("Barcode detected:", barcode);
+                                
+                                // Zatrzymaj skaner po wykryciu kodu
+                                Quagga.stop();
+                                scanner = null;
+                                
+                                $("#stop-scanner").hide();
+                                $("#start-scanner").show();
+                                $("#scanner-message").html("<p>Kod kreskowy wykryty: " + barcode + "</p>").show();
+                                
+                                // Wyszukaj produkt po kodzie kreskowym
+                                searchProductByBarcode(barcode);
+                            }
+                        });
+                    })
+                    .catch(function(err) {
+                        showError("Nie można uzyskać dostępu do kamery: " + err.message);
+                        $("#start-scanner").prop('disabled', true);
+                    });
+            } catch (error) {
+                showError("Błąd inicjalizacji skanera: " + error.message);
+                $("#start-scanner").prop('disabled', true);
+            }
+        }
+        
+        // Uruchom skaner po kliknięciu przycisku
+        $("#start-scanner").on("click", function() {
+            initBarcodeScanner();
+        });
+        
+        // Zatrzymaj skaner po kliknięciu przycisku
+        $("#stop-scanner").on("click", function() {
+            if (scanner) {
+                Quagga.stop();
+                scanner = null;
+            }
+            
+            $("#stop-scanner").hide();
+            $("#start-scanner").show();
+            $("#scanner-message").html("<p>Skaner zatrzymany. Kliknij 'Uruchom skaner kamery', aby rozpocząć skanowanie.</p>").show();
+        });
+        
+        // Wyszukaj produkt po ręcznie wprowadzonym kodzie
+        $("#manual-search").on("click", function() {
+            const barcode = $("#manual-barcode").val().trim();
+            
+            if (barcode) {
+                searchProductByBarcode(barcode);
+            } else {
+                showError("Wprowadź kod kreskowy produktu");
+            }
+        });
+
+        // Obsługa naciśnięcia Enter w polu ręcznego wprowadzania kodu
+        $("#manual-barcode").on("keypress", function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $("#manual-search").click();
+            }
+        });
+        
+        // Funkcja wysyłająca zapytanie AJAX o produkt na podstawie kodu kreskowego
+        function searchProductByBarcode(barcode) {
+            $("#loading-spinner").show();
+            $("#product-result").hide();
+            $("#error-message").hide();
+            
+            $.ajax({
+                url: "{% url 'fridge:ajax_barcode_lookup' %}",
+                type: "GET",
+                data: { barcode: barcode },
+                success: function(data) {
+                    $("#loading-spinner").hide();
+                    
+                    if (data.success) {
+                        // Wypełnij dane produktu
+                        if (data.exists) {
+                            // Produkt istnieje w bazie
+                            $("#product-name").text(data.product.name);
+                            $("#product-barcode").text("Kod kreskowy: " + barcode);
+                            $("#product-quantity").text("");
+                            $("#product-categories").text("");
+                            
+                            // Ustaw domyślną jednostkę jeśli jest dostępna
+                            if (data.product.unit) {
+                                $("#product-unit").val(data.product.unit);
+                            }
+                            
+                            $("#product-image").attr("src", "/static/images/product_placeholder.png");
+                        } else {
+                            // Produkt z zewnętrznej bazy danych
+                            $("#product-name").text(data.product.name);
+                            $("#product-barcode").text("Kod kreskowy: " + barcode);
+                            $("#product-quantity").text("Ilość: " + (data.product.quantity || "Brak danych"));
+                            $("#product-categories").text("Kategorie: " + (data.product.categories || "Brak danych"));
+                            
+                            // Ustaw zdjęcie produktu lub domyślne zdjęcie
+                            if (data.product.image_url) {
+                                $("#product-image").attr("src", data.product.image_url);
+                            } else {
+                                $("#product-image").attr("src", "/static/images/product_placeholder.png");
+                            }
+                        }
+                        
+                        // Pokaż formularz dodawania do lodówki
+                        $("#product-result").show();
+                    } else {
+                        // Pokaż komunikat o błędzie
+                        showError(data.error || "Nie znaleziono produktu");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $("#loading-spinner").hide();
+                    showError("Wystąpił błąd podczas wyszukiwania produktu: " + error);
+                }
+            });
+        }
+        
+        // Obsługa formularza dodawania produktu do lodówki
+        $("#add-to-fridge-form").on("submit", function(e) {
+            e.preventDefault();
+            
+            const amount = $("#product-amount").val();
+            const unit = $("#product-unit").val();
+            const expiryDate = $("#product-expiry").val();
+            const productName = $("#product-name").text();
+            const barcode = $("#product-barcode").text().replace("Kod kreskowy: ", "");
+            
+            if (!amount || !unit) {
+                showError("Wypełnij wszystkie wymagane pola formularza");
+                return;
+            }
+            
+            // Dodaj produkt do lodówki
+            $.ajax({
+                url: "{% url 'fridge:add_scanned_product' %}",
+                type: "POST",
+                data: {
+                    ingredient: productName,
+                    amount: amount,
+                    unit: unit,
+                    expiry_date: expiryDate,
+                    barcode: barcode,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Przekieruj do listy produktów
+                        window.location.href = response.redirect || "{% url 'fridge:list' %}";
+                    } else {
+                        showError(response.error || "Wystąpił błąd podczas dodawania produktu do lodówki");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showError("Wystąpił błąd podczas dodawania produktu do lodówki: " + error);
+                }
+            });
+        });
+        
+        // Funkcja wyświetlająca komunikat o błędzie
+        function showError(message) {
+            $("#error-message").text(message).show();
+        }
+    });
+</script>
+{% endblock %} 

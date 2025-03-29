@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Lodówki{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        transition: transform 0.3s;
+        height: 100%;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .expired-warning {
+        color: #dc3545;
+    }
+    
+    .dashboard-counter {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    
+    .ingredient-tag {
+        background-color: #e9ecef;
+        border-radius: 15px;
+        padding: 5px 10px;
+        margin: 3px;
+        display: inline-block;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">Panel Lodówki</h1>
+            <p class="lead">Zarządzaj zawartością swojej lodówki i sprawdź, co możesz przygotować</p>
+        </div>
+    </div>
+    
+    <!-- Karty z podsumowaniem -->
+    <div class="row mb-4">
+        <!-- Liczba produktów -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-box-seam card-icon text-primary"></i>
+                    <h5 class="card-title">Wszystkie Produkty</h5>
+                    <p class="dashboard-counter">{{ item_count }}</p>
+                    <p class="card-text">Łączna liczba produktów w twojej lodówce</p>
+                    <a href="{% url 'fridge:list' %}" class="btn btn-outline-primary btn-sm">Zobacz listę</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Przeterminowane produkty -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-triangle card-icon {% if expired_count > 0 %}text-danger{% else %}text-success{% endif %}"></i>
+                    <h5 class="card-title">Przeterminowane</h5>
+                    <p class="dashboard-counter {% if expired_count > 0 %}expired-warning{% endif %}">{{ expired_count }}</p>
+                    <p class="card-text">
+                        {% if expired_count > 0 %}
+                            Masz przeterminowane produkty do usunięcia
+                        {% else %}
+                            Brak przeterminowanych produktów
+                        {% endif %}
+                    </p>
+                    {% if expired_count > 0 %}
+                        <a href="{% url 'fridge:clean_expired' %}" class="btn btn-danger btn-sm">Usuń przeterminowane</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Możliwe przepisy -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-journal-check card-icon text-success"></i>
+                    <h5 class="card-title">Gotowe do ugotowania</h5>
+                    <p class="dashboard-counter">{{ available_recipes|length }}</p>
+                    <p class="card-text">Liczba przepisów, które możesz przygotować</p>
+                    <a href="{% url 'fridge:available_recipes' %}" class="btn btn-outline-success btn-sm">Zobacz przepisy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Najnowsze produkty -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Ostatnio dodane produkty</h5>
+                </div>
+                <div class="card-body">
+                    {% if fridge_items %}
+                        <div class="list-group">
+                            {% for item in fridge_items|dictsortreversed:"purchase_date"|slice:":5" %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ item.ingredient.name }}</h6>
+                                        <small>{{ item.purchase_date }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ item.amount }} {{ item.unit.name }}</p>
+                                    {% if item.expiry_date %}
+                                        <small class="{% if item.is_expired %}text-danger{% endif %}">
+                                            Ważne do: {{ item.expiry_date }}
+                                            {% if item.is_expired %}
+                                                <span class="badge bg-danger">Przeterminowane</span>
+                                            {% endif %}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Twoja lodówka jest pusta. <a href="{% url 'fridge:add' %}">Dodaj produkty</a>.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'fridge:list' %}" class="btn btn-primary btn-sm">Zobacz wszystkie</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dostępne przepisy -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Przepisy do przygotowania</h5>
+                </div>
+                <div class="card-body">
+                    {% if available_recipes %}
+                        <div class="list-group">
+                            {% for recipe_info in available_recipes %}
+                                <a href="{% url 'recipes:detail' recipe_info.recipe.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ recipe_info.recipe.title }}</h6>
+                                        <small>{{ recipe_info.recipe.servings }} porcji</small>
+                                    </div>
+                                    <p class="mb-1">{{ recipe_info.recipe.description|truncatechars:100 }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Nie masz wystarczającej ilości składników aby przygotować dostępne przepisy.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'fridge:available_recipes' %}" class="btn btn-success btn-sm">Zobacz wszystkie możliwe przepisy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Akcje szybkiego dostępu -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Szybkie akcje</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-around">
+                        <a href="{% url 'fridge:add' %}" class="btn btn-outline-primary m-2">
+                            <i class="bi bi-plus-circle"></i> Dodaj produkt
+                        </a>
+                        <a href="{% url 'fridge:bulk_add' %}" class="btn btn-outline-primary m-2">
+                            <i class="bi bi-list-check"></i> Dodaj wiele produktów
+                        </a>
+                        <a href="{% url 'fridge:list' %}" class="btn btn-outline-primary m-2">
+                            <i class="bi bi-list"></i> Lista produktów
+                        </a>
+                        <a href="{% url 'fridge:clean_expired' %}" class="btn btn-outline-danger m-2">
+                            <i class="bi bi-trash"></i> Usuń przeterminowane
+                        </a>
+                        <a href="{% url 'fridge:available_recipes' %}" class="btn btn-outline-success m-2">
+                            <i class="bi bi-journal-check"></i> Dostępne przepisy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

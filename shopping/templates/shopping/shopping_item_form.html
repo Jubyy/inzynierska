@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if form.instance.pk %}Edytuj produkt w lodówce{% else %}Dodaj produkt do lodówki{% endif %}{% endblock %}
+{% block title %}{% if item %}Edytuj produkt{% else %}Dodaj produkt{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -16,7 +16,13 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">{% if form.instance.pk %}Edytuj produkt w lodówce{% else %}Dodaj produkt do lodówki{% endif %}</h2>
+                    <h2 class="mb-0">
+                        {% if item %}
+                            Edytuj produkt
+                        {% else %}
+                            Dodaj produkt do listy "{{ shopping_list.name }}"
+                        {% endif %}
+                    </h2>
                 </div>
                 <div class="card-body">
                     {% if form.errors %}
@@ -30,7 +36,7 @@
                             </ul>
                         </div>
                     {% endif %}
-
+                    
                     <form method="post">
                         {% csrf_token %}
                         
@@ -66,19 +72,11 @@
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="{{ form.expiry_date.id_for_label }}" class="form-label">{{ form.expiry_date.label }}</label>
-                            {{ form.expiry_date }}
-                            <small class="form-text text-muted">Opcjonalne. Pozostaw puste, jeśli nie dotyczy.</small>
-                            {% if form.expiry_date.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.expiry_date.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
+                        <!-- Ukryte pole dla listy zakupów -->
+                        {{ form.shopping_list.as_hidden }}
                         
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">Anuluj</a>
+                            <a href="{% url 'shopping:detail' shopping_list.id %}" class="btn btn-outline-secondary">Anuluj</a>
                             <button type="submit" class="btn btn-primary">Zapisz</button>
                         </div>
                     </form>
@@ -95,7 +93,28 @@
         // Inicjalizacja Select2 dla dropdown składników
         $('#{{ form.ingredient.id_for_label }}').select2({
             placeholder: "Wybierz składnik",
-            allowClear: true
+            allowClear: true,
+            ajax: {
+                url: "{% url 'shopping:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: false
+                        }
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2
         });
         
         // Inicjalizacja Select2 dla dropdown jednostek

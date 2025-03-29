@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Utwórz listę zakupów z przepisu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+    .recipe-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .recipe-card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+    .recipe-card.selected {
+        border-color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Utwórz listę zakupów z przepisu</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Wybierz przepis, na podstawie którego chcesz utworzyć listę zakupów.</p>
+                    
+                    <form method="post" id="recipe-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="recipe-select" class="form-label">Wybierz przepis</label>
+                            <select id="recipe-select" name="recipe" class="form-control select2" required>
+                                <option value="">-- Wybierz przepis --</option>
+                                {% for recipe in recipes %}
+                                    <option value="{{ recipe.id }}">{{ recipe.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{% url 'shopping:list' %}" class="btn btn-outline-secondary me-2">Anuluj</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-list-check me-1"></i> Utwórz listę zakupów
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Alternatywny wybór przez kafelki z przepisami -->
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                {% for recipe in recipes %}
+                    <div class="col">
+                        <div class="card h-100 recipe-card" data-recipe-id="{{ recipe.id }}">
+                            {% if recipe.image %}
+                                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="card-img-top bg-light text-center py-5">
+                                    <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ recipe.title }}</h5>
+                                <p class="card-text small">{{ recipe.description|truncatechars:100 }}</p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i> {{ recipe.preparation_time }} min
+                                        <i class="bi bi-people ms-2 me-1"></i> {{ recipe.servings }} porcji
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicjalizacja Select2
+        $('#recipe-select').select2({
+            placeholder: "Wybierz przepis",
+            allowClear: true
+        });
+        
+        // Obsługa kliknięcia w kafelek przepisu
+        $('.recipe-card').on('click', function() {
+            const recipeId = $(this).data('recipe-id');
+            
+            // Odznacz wszystkie kafelki
+            $('.recipe-card').removeClass('selected');
+            
+            // Zaznacz kliknięty kafelek
+            $(this).addClass('selected');
+            
+            // Ustaw wartość w select
+            $('#recipe-select').val(recipeId).trigger('change');
+            
+            // Przewiń do przycisku submit
+            $('html, body').animate({
+                scrollTop: $("#recipe-form").offset().top - 100
+            }, 500);
+        });
+    });
+</script>
+{% endblock %} 

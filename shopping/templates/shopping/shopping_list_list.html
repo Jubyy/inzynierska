@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Listy zakupów{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">
+                <i class="bi bi-cart me-2 text-primary"></i> Twoje listy zakupów
+            </h1>
+        </div>
+        <div class="col-md-4 text-end d-flex justify-content-end align-items-center">
+            <a href="{% url 'shopping:create' %}" class="btn btn-primary me-2">
+                <i class="bi bi-plus-circle"></i> Nowa lista
+            </a>
+            <a href="{% url 'shopping:create_from_recipe' %}" class="btn btn-outline-primary">
+                <i class="bi bi-book"></i> Z przepisu
+            </a>
+        </div>
+    </div>
+    
+    <!-- Aktywne listy zakupów -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Aktywne listy zakupów</h2>
+        </div>
+        <div class="card-body">
+            {% if active_lists %}
+                <div class="list-group">
+                    {% for list in active_lists %}
+                        <a href="{% url 'shopping:detail' list.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ list.name }}</h5>
+                                <small>Utworzona: {{ list.created_at|date:"d.m.Y" }}</small>
+                            </div>
+                            <p class="mb-1">
+                                {% with item_count=list.items.count %}
+                                    {% if item_count > 0 %}
+                                        {{ item_count }} produktów
+                                        <small>({{ list.items.filter.is_purchased=True|length }} zakupionych)</small>
+                                    {% else %}
+                                        Lista jest pusta
+                                    {% endif %}
+                                {% endwith %}
+                            </p>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i> Nie masz aktywnych list zakupów. 
+                    <a href="{% url 'shopping:create' %}" class="alert-link">Utwórz nową listę</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Zakończone listy zakupów -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2 class="h5 mb-0">Zakończone listy zakupów</h2>
+        </div>
+        <div class="card-body">
+            {% if completed_lists %}
+                <div class="list-group">
+                    {% for list in completed_lists %}
+                        <a href="{% url 'shopping:detail' list.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ list.name }}</h5>
+                                <small>Ukończona: {{ list.completed_at|date:"d.m.Y" }}</small>
+                            </div>
+                            <p class="mb-1">
+                                {% with item_count=list.items.count %}
+                                    {{ item_count }} produktów
+                                {% endwith %}
+                            </p>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i> Nie masz zakończonych list zakupów.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

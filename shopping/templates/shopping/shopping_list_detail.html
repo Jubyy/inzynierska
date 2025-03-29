@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ shopping_list.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">
+                {{ shopping_list.name }}
+                {% if shopping_list.is_completed %}
+                    <span class="badge bg-success">Zakończona</span>
+                {% endif %}
+            </h1>
+            <p class="text-muted">
+                Utworzona: {{ shopping_list.created_at|date:"d.m.Y H:i" }}
+                {% if shopping_list.is_completed %}
+                    | Zakończona: {{ shopping_list.completed_at|date:"d.m.Y H:i" }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="col-md-4 text-end d-flex justify-content-end align-items-center">
+            <a href="{% url 'shopping:add_item' shopping_list.id %}" class="btn btn-primary me-2">
+                <i class="bi bi-plus-circle"></i> Dodaj produkt
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="{% url 'shopping:update' shopping_list.id %}">
+                        <i class="bi bi-pencil me-2"></i> Edytuj listę
+                    </a></li>
+                    {% if not shopping_list.is_completed %}
+                        <li><a class="dropdown-item" href="{% url 'shopping:complete' shopping_list.id %}">
+                            <i class="bi bi-check-circle me-2"></i> Zakończ zakupy
+                        </a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'shopping:delete' shopping_list.id %}">
+                        <i class="bi bi-trash me-2"></i> Usuń listę
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    {% if unpurchased_items or purchased_items %}
+        <!-- Produkty do kupienia -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Produkty do kupienia</h2>
+            </div>
+            <div class="card-body p-0">
+                {% if unpurchased_items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Produkt</th>
+                                    <th>Ilość</th>
+                                    <th class="text-center">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in unpurchased_items %}
+                                    <tr>
+                                        <td>{{ item.ingredient.name }}</td>
+                                        <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                        <td class="text-center">
+                                            <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Oznacz jako kupione">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            </form>
+                                            <a href="{% url 'shopping:edit_item' item.id %}" class="btn btn-sm btn-outline-primary" title="Edytuj">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'shopping:delete_item' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success m-3">
+                        <i class="bi bi-check-circle me-2"></i> Wszystkie produkty zostały zakupione!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Zakupione produkty -->
+        {% if purchased_items %}
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Zakupione produkty</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Produkt</th>
+                                    <th>Ilość</th>
+                                    <th>Data zakupu</th>
+                                    <th class="text-center">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in purchased_items %}
+                                    <tr>
+                                        <td>{{ item.ingredient.name }}</td>
+                                        <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                        <td>{{ item.purchase_date|date:"d.m.Y H:i" }}</td>
+                                        <td class="text-center">
+                                            <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Oznacz jako niezakupione">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i> Ta lista zakupów jest pusta. 
+            <a href="{% url 'shopping:add_item' shopping_list.id %}" class="alert-link">Dodaj produkty</a>.
+        </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{% url 'shopping:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Powrót do list
+        </a>
+    </div>
+</div>
+{% endblock %} 
