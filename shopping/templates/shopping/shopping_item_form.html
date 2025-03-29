@@ -7,6 +7,37 @@
     .select2-container {
         width: 100% !important;
     }
+    .select2-container--default .select2-results__group {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        padding: 6px 12px;
+        border-bottom: 1px solid #dee2e6;
+        clear: both;
+        display: block;
+    }
+    .select2-results__option {
+        padding-left: 20px !important;
+    }
+    .select2-results__options .select2-results__option {
+        white-space: normal;
+        word-break: break-word;
+    }
+    .category-heading {
+        font-weight: bold;
+        padding: 8px 15px;
+        margin-top: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #2b5797;
+        display: block;
+        width: 100%;
+    }
+    .select2-container--default .select2-results > .select2-results__options {
+        max-height: 400px;
+    }
+    .select2-results__option--highlighted .category-heading {
+        background-color: #f0f0f0;
+    }
 </style>
 {% endblock %}
 
@@ -43,6 +74,7 @@
                         <div class="mb-3">
                             <label for="{{ form.ingredient.id_for_label }}" class="form-label">{{ form.ingredient.label }}</label>
                             {{ form.ingredient }}
+                            <small class="form-text text-muted">Wybierz składnik z listy kategorii lub wyszukaj</small>
                             {% if form.ingredient.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.ingredient.errors }}
@@ -72,6 +104,16 @@
                             </div>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="{{ form.note.id_for_label }}" class="form-label">{{ form.note.label }}</label>
+                            {{ form.note }}
+                            {% if form.note.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.note.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
                         <!-- Ukryte pole dla listy zakupów -->
                         {{ form.shopping_list.as_hidden }}
                         
@@ -90,10 +132,14 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Inicjalizacja Select2 dla dropdown składników
+        // Inicjalizacja Select2 dla dropdown składników z grupowaniem
         $('#{{ form.ingredient.id_for_label }}').select2({
-            placeholder: "Wybierz składnik",
+            placeholder: "Wybierz składnik lub wyszukaj...",
             allowClear: true,
+            theme: "bootstrap4",
+            width: '100%',
+            templateResult: formatIngredient,
+            escapeMarkup: function(m) { return m; },
             ajax: {
                 url: "{% url 'shopping:ajax_ingredient_search' %}",
                 dataType: 'json',
@@ -101,7 +147,8 @@
                 data: function(params) {
                     return {
                         term: params.term || '',
-                        page: params.page || 1
+                        page: params.page || 1,
+                        include_categories: true
                     };
                 },
                 processResults: function(data, params) {
@@ -114,13 +161,62 @@
                 },
                 cache: true
             },
-            minimumInputLength: 2
+            minimumInputLength: 0,
+            dropdownParent: $('body')
         });
         
         // Inicjalizacja Select2 dla dropdown jednostek
         $('#{{ form.unit.id_for_label }}').select2({
             placeholder: "Wybierz jednostkę",
-            allowClear: true
+            allowClear: true,
+            theme: "bootstrap4",
+            dropdownParent: $('body')
+        });
+        
+        // Funkcja do formatowania opcji w Select2
+        function formatIngredient(ingredient) {
+            if (!ingredient.id) {
+                return ingredient.text;
+            }
+            
+            // Jeśli to element z dziećmi (kategoria)
+            if (ingredient.children) {
+                return '<div class="category-heading">' + ingredient.text + '</div>';
+            }
+            
+            // Zwykły składnik
+            return '<div class="ingredient-item">' + ingredient.text + '</div>';
+        }
+        
+        // Funkcja do ładowania kompatybilnych jednostek dla wybranego składnika
+        $('#{{ form.ingredient.id_for_label }}').on('change', function() {
+            var ingredientId = $(this).val();
+            if (ingredientId) {
+                $.ajax({
+                    url: '{% url "fridge:ajax_compatible_units" %}',
+                    data: {'ingredient_id': ingredientId},
+                    dataType: 'json',
+                    success: function(data) {
+                        var unitSelect = $('#{{ form.unit.id_for_label }}');
+                        unitSelect.empty();
+                        
+                        // Dodaj pobrane jednostki do listy
+                        $.each(data.units, function(index, unit) {
+                            unitSelect.append($('<option></option>')
+                                .attr('value', unit.id)
+                                .text(unit.name));
+                        });
+                        
+                        // Jeśli jest domyślna jednostka, ustaw ją
+                        if (data.default_unit) {
+                            unitSelect.val(data.default_unit);
+                        }
+                        
+                        // Odśwież Select2
+                        unitSelect.trigger('change');
+                    }
+                });
+            }
         });
     });
 </script>

@@ -10,8 +10,8 @@ import json
 import requests
 from datetime import datetime, timedelta
 
-from .models import FridgeItem
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
+from .models import FridgeItem
 from .forms import FridgeItemForm, BulkAddForm
 
 @login_required
@@ -215,11 +215,55 @@ def available_recipes(request):
 def ajax_ingredient_search(request):
     """Wyszukiwanie składników za pomocą AJAX"""
     query = request.GET.get('term', '')
+    include_categories = request.GET.get('include_categories', 'true') == 'true'
+    
     if query:
-        ingredients = Ingredient.objects.filter(name__icontains=query)[:10]
-        results = [{'id': i.id, 'text': i.name} for i in ingredients]
+        # Wyszukiwanie według zapytania
+        ingredients = Ingredient.objects.filter(name__icontains=query).order_by('category__name', 'name')
+        
+        if include_categories:
+            # Grupowanie według kategorii
+            results = []
+            categories = {}
+            
+            for ingredient in ingredients:
+                category_name = ingredient.category.name
+                if category_name not in categories:
+                    categories[category_name] = {
+                        'text': category_name,
+                        'children': []
+                    }
+                
+                categories[category_name]['children'].append({
+                    'id': ingredient.id,
+                    'text': ingredient.name
+                })
+            
+            # Konwersja słownika kategorii na listę
+            for category_name, category_data in categories.items():
+                results.append(category_data)
+        else:
+            # Prosty format bez kategorii
+            results = [{'id': i.id, 'text': i.name} for i in ingredients]
     else:
-        results = []
+        # Gdy brak zapytania, zwróć pogrupowane składniki
+        if include_categories:
+            results = []
+            categories = IngredientCategory.objects.all().order_by('name')
+            
+            for category in categories:
+                # Pobierz wszystkie składniki z danej kategorii
+                category_ingredients = Ingredient.objects.filter(category=category).order_by('name')
+                if category_ingredients:
+                    children = [{'id': i.id, 'text': i.name} for i in category_ingredients]
+                    results.append({
+                        'text': category.name,
+                        'children': children
+                    })
+        else:
+            # Zwróć wszystkie składniki alfabetycznie
+            ingredients = Ingredient.objects.all().order_by('name')
+            results = [{'id': i.id, 'text': i.name} for i in ingredients]
     
     return JsonResponse({'results': results})
 

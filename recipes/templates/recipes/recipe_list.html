@@ -29,7 +29,7 @@
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Szukaj przepisu...">
+                        <input type="text" name="q" value="{% if query and query != 'None' %}{{ query }}{% endif %}" class="form-control" placeholder="Szukaj przepisu...">
                     </div>
                 </div>
                 
@@ -58,7 +58,7 @@
                 {% if user.is_authenticated %}
                 <div class="col-12 mt-3">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="available_only" name="available_only" {% if available_only %}checked{% endif %}>
+                        <input class="form-check-input" type="checkbox" id="available_only" name="available_only" {% if available_only and available_only != 'None' %}checked{% endif %}>
                         <label class="form-check-label" for="available_only">
                             <i class="bi bi-refrigerator me-1"></i>Pokaż tylko przepisy możliwe do przygotowania z produktów w lodówce
                         </label>

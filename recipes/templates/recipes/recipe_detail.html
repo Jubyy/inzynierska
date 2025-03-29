@@ -188,6 +188,172 @@
         </div>
     </div>
     
+    <!-- Sekcja z przyciskami akcji (lubię/komentuj) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <!-- Przycisk polubienia -->
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'recipes:toggle_like' recipe.id %}" class="d-inline" id="like-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if is_liked %}btn-primary{% else %}btn-outline-primary{% endif %}" title="Polub przepis">
+                                <i class="bi bi-hand-thumbs-up{% if is_liked %}-fill{% endif %}"></i>
+                                <span id="likes-count">{{ recipe.likes_count }}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <button class="btn btn-outline-primary" disabled title="Zaloguj się, aby polubić przepis">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                            <span>{{ recipe.likes_count }}</span>
+                        </button>
+                    {% endif %}
+                    
+                    <!-- Przycisk dodania do ulubionych -->
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'recipes:toggle_favorite' recipe.id %}" class="d-inline ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if is_favorite %}Usuń z ulubionych{% else %}Dodaj do ulubionych{% endif %}">
+                                <i class="bi bi-star{% if is_favorite %}-fill{% endif %}"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <!-- Inne przyciski akcji -->
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Jeśli autor to aktualny użytkownik, pokaż przyciski edycji i usunięcia -->
+                    {% if recipe.author == user %}
+                        <a href="{% url 'recipes:update' recipe.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Edytuj
+                        </a>
+                        <a href="{% url 'recipes:delete' recipe.id %}" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Usuń
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sekcja komentarzy -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">Komentarze ({{ recipe.comments_count }})</h3>
+        </div>
+        <div class="card-body">
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'recipes:detail' recipe.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ comment_form.content }}
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Dodaj komentarz</button>
+                    </div>
+                </form>
+                <hr>
+            {% else %}
+                <div class="alert alert-info">
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">Zaloguj się</a> aby dodać komentarz.
+                </div>
+            {% endif %}
+            
+            <!-- Lista komentarzy -->
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment mb-4" id="comment-{{ comment.id }}">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ comment.user.username }}&background=random" width="50" height="50" alt="{{ comment.user.username }}">
+                            </div>
+                            <div class="ms-3 flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-1">{{ comment.user.username }}</h5>
+                                    <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1">{{ comment.content }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button class="btn btn-sm btn-link p-0 reply-btn" data-comment-id="{{ comment.id }}">
+                                            <i class="bi bi-reply"></i> Odpowiedz
+                                        </button>
+                                    </div>
+                                    {% if comment.user == user or user.is_staff %}
+                                        <form method="post" action="{% url 'recipes:delete_comment' comment.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Czy na pewno chcesz usunąć ten komentarz?')">
+                                                <i class="bi bi-trash"></i> Usuń
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Formularz odpowiedzi (domyślnie ukryty) -->
+                                <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                    <form method="post" action="{% url 'recipes:detail' recipe.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                        <div class="mb-2">
+                                            <textarea name="content" class="form-control" rows="2" placeholder="Twoja odpowiedź..."></textarea>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-reply-btn" data-comment-id="{{ comment.id }}">Anuluj</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Odpowiedz</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Odpowiedzi do komentarza -->
+                                {% if comment.replies.exists %}
+                                    <div class="replies mt-3">
+                                        {% for reply in comment.replies.all %}
+                                            <div class="reply mb-3" id="comment-{{ reply.id }}">
+                                                <div class="d-flex">
+                                                    <div class="flex-shrink-0">
+                                                        <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ reply.user.username }}&background=random" width="40" height="40" alt="{{ reply.user.username }}">
+                                                    </div>
+                                                    <div class="ms-2 flex-grow-1">
+                                                        <div class="d-flex justify-content-between">
+                                                            <h6 class="mb-1">{{ reply.user.username }}</h6>
+                                                            <small class="text-muted">{{ reply.created_at|date:"d.m.Y H:i" }}</small>
+                                                        </div>
+                                                        <p class="mb-1">{{ reply.content }}</p>
+                                                        
+                                                        {% if reply.user == user or user.is_staff %}
+                                                            <div class="d-flex justify-content-end">
+                                                                <form method="post" action="{% url 'recipes:delete_comment' reply.id %}">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Czy na pewno chcesz usunąć tę odpowiedź?')">
+                                                                        <i class="bi bi-trash"></i> Usuń
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center my-4">
+                    <p class="text-muted">Brak komentarzy. Bądź pierwszy!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- Przyciski akcji -->
     <div class="action-buttons d-flex justify-content-between">
         <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary">
@@ -206,4 +372,69 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obsługa formularza polubienia przez AJAX
+        const likeForm = document.getElementById('like-form');
+        if (likeForm) {
+            likeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const url = this.action;
+                const formData = new FormData(this);
+                
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Aktualizuj licznik polubień
+                    document.getElementById('likes-count').textContent = data.likes_count;
+                    
+                    // Zaktualizuj wygląd przycisku
+                    const likeBtn = likeForm.querySelector('button');
+                    const likeIcon = likeForm.querySelector('i');
+                    
+                    if (data.liked) {
+                        likeBtn.classList.remove('btn-outline-primary');
+                        likeBtn.classList.add('btn-primary');
+                        likeIcon.classList.remove('bi-hand-thumbs-up');
+                        likeIcon.classList.add('bi-hand-thumbs-up-fill');
+                    } else {
+                        likeBtn.classList.remove('btn-primary');
+                        likeBtn.classList.add('btn-outline-primary');
+                        likeIcon.classList.remove('bi-hand-thumbs-up-fill');
+                        likeIcon.classList.add('bi-hand-thumbs-up');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Obsługa przycisków odpowiedzi na komentarze
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        const cancelButtons = document.querySelectorAll('.cancel-reply-btn');
+        
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+            });
+        });
+        
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+            });
+        });
+    });
+</script>
 {% endblock %}

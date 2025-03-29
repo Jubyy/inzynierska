@@ -4,14 +4,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
-from recipes.views import RecipeListView
+from recipes.views import RecipeListView, home_view
 from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Strona główna
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    # Strona główna z popularnymi przepisami
+    path('', home_view, name='home'),
     
     # Aplikacje
     path('accounts/', include('accounts.urls')),

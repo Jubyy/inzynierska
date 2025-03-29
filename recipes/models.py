@@ -95,6 +95,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Autor")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data utworzenia")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Data aktualizacji")
+    is_public = models.BooleanField(default=True, verbose_name="Publiczny")
     
     class Meta:
         verbose_name = "Przepis"
@@ -119,6 +120,35 @@ class Recipe(models.Model):
     def is_meat(self):
         """Zwraca True, jeśli przepis nie jest wegetariański (zawiera mięso)"""
         return not self.is_vegetarian
+    
+    @property
+    def likes_count(self):
+        """Zwraca liczbę polubień przepisu"""
+        return self.likes.count()
+    
+    @property
+    def comments_count(self):
+        """Zwraca liczbę komentarzy do przepisu (tylko komentarze główne, bez odpowiedzi)"""
+        return self.comments.filter(parent=None).count()
+    
+    def is_liked_by(self, user):
+        """Sprawdza, czy przepis jest polubiony przez danego użytkownika"""
+        if not user.is_authenticated:
+            return False
+        return self.likes.filter(user=user).exists()
+    
+    def toggle_like(self, user):
+        """Przełącza polubienie przepisu przez użytkownika (dodaje/usuwa)"""
+        if not user.is_authenticated:
+            return False
+        
+        like = self.likes.filter(user=user).first()
+        if like:
+            like.delete()
+            return False
+        else:
+            RecipeLike.objects.create(user=user, recipe=self)
+            return True
     
     def get_missing_ingredients(self, user):
         from fridge.models import FridgeItem
@@ -204,4 +234,72 @@ class FavoriteRecipe(models.Model):
         unique_together = ('user', 'recipe')  # Użytkownik może dodać przepis do ulubionych tylko raz
         
     def __str__(self):
-        return f"{self.user.username} - {self.recipe.title}" 
+        return f"{self.user.username} - {self.recipe.title}"
+
+class RecipeLike(models.Model):
+    """Model do przechowywania polubień (łapek w górę) dla przepisów"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipe_likes', verbose_name="Użytkownik")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='likes', verbose_name="Przepis")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
+    
+    class Meta:
+        verbose_name = "Polubienie przepisu"
+        verbose_name_plural = "Polubienia przepisów"
+        unique_together = ('user', 'recipe')  # Użytkownik może polubić przepis tylko raz
+        
+    def __str__(self):
+        return f"{self.user.username} polubił {self.recipe.title}"
+
+class Comment(models.Model):
+    """Model do przechowywania komentarzy do przepisów"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipe_comments', verbose_name="Autor")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='comments', verbose_name="Przepis")
+    content = models.TextField(verbose_name="Treść komentarza")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Data aktualizacji")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies', verbose_name="Komentarz nadrzędny")
+    
+    class Meta:
+        verbose_name = "Komentarz"
+        verbose_name_plural = "Komentarze"
+        ordering = ['-created_at']
+        
+    def __str__(self):
+        return f"Komentarz od {self.user.username} do {self.recipe.title}"
+    
+    @property
+    def is_reply(self):
+        """Sprawdza, czy komentarz jest odpowiedzią na inny komentarz"""
+        return self.parent is not None
+
+class MealPlan(models.Model):
+    """Model do przechowywania planów posiłków"""
+    MEAL_TYPES = [
+        ('breakfast', 'Śniadanie'),
+        ('lunch', 'Drugie śniadanie'),
+        ('dinner', 'Obiad'),
+        ('snack', 'Przekąska'),
+        ('supper', 'Kolacja'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='meal_plans', verbose_name="Użytkownik")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='meal_plans', verbose_name="Przepis")
+    date = models.DateField(verbose_name="Data")
+    meal_type = models.CharField(max_length=20, choices=MEAL_TYPES, verbose_name="Rodzaj posiłku")
+    servings = models.PositiveIntegerField(default=1, verbose_name="Liczba porcji")
+    notes = models.TextField(blank=True, null=True, verbose_name="Notatki")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data utworzenia")
+    
+    class Meta:
+        verbose_name = "Plan posiłku"
+        verbose_name_plural = "Plany posiłków"
+        ordering = ['date', 'meal_type']
+        # Jeden przepis na dany typ posiłku i datę dla użytkownika
+        unique_together = ('user', 'date', 'meal_type', 'recipe')
+        
+    def __str__(self):
+        return f"{self.get_meal_type_display()} - {self.recipe.title} ({self.date})"
+    
+    def get_ingredients_for_shopping(self):
+        """Zwraca składniki potrzebne do przygotowania posiłku, dostosowane do liczby porcji"""
+        return self.recipe.scale_to_servings(self.servings) 

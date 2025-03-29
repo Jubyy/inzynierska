@@ -1,6 +1,6 @@
 from django import forms
 from .models import ShoppingList, ShoppingItem
-from recipes.models import Ingredient, MeasurementUnit, Recipe
+from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
 from django.forms import formset_factory
 
 class ShoppingListForm(forms.ModelForm):
@@ -21,7 +21,6 @@ class ShoppingItemForm(forms.ModelForm):
         model = ShoppingItem
         fields = ['ingredient', 'amount', 'unit', 'note']
         widgets = {
-            'ingredient': forms.Select(attrs={'class': 'form-control select2'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
             'unit': forms.Select(attrs={'class': 'form-control'}),
             'note': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opcjonalna notatka'})
@@ -36,8 +35,23 @@ class ShoppingItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Sortowanie składników alfabetycznie
-        self.fields['ingredient'].queryset = Ingredient.objects.all().order_by('name')
+        # Usuwamy standardowy widget dla składnika, będziemy używać Select2 z grupowaniem
+        self.fields['ingredient'].widget = forms.Select(attrs={'class': 'form-control select2-ingredient'})
+        
+        # Przygotowanie pogrupowanych opcji składników według kategorii
+        ingredient_choices = []
+        
+        # Pobierz wszystkie kategorie składników
+        categories = IngredientCategory.objects.all().order_by('name')
+        
+        # Dla każdej kategorii, pobierz jej składniki
+        for category in categories:
+            category_ingredients = [(i.id, i.name) for i in Ingredient.objects.filter(category=category).order_by('name')]
+            if category_ingredients:  # Dodaj tylko jeśli kategoria ma składniki
+                ingredient_choices.append((category.name, category_ingredients))
+        
+        # Ustaw pogrupowane opcje dla pola ingredient
+        self.fields['ingredient'].choices = ingredient_choices
 
 # Formset do dodawania wielu pozycji jednocześnie
 ShoppingItemFormSet = formset_factory(

@@ -1,101 +1,121 @@
 {% extends 'base.html' %}
 
-{% block title %}Dodaj wiele produktów do lodówki{% endblock %}
+{% block title %}Zbiorcze dodawanie produktów do lodówki{% endblock %}
 
 {% block extra_css %}
 <style>
     .select2-container {
         width: 100% !important;
     }
-    .ingredient-row {
+    
+    .select2-container--default .select2-results__group {
         background-color: #f8f9fa;
-        border-radius: 5px;
-        padding: 15px;
-        margin-bottom: 15px;
-        border: 1px solid #dee2e6;
+        font-weight: bold;
+        padding: 6px 12px;
+        border-bottom: 1px solid #dee2e6;
     }
+    
+    .select2-results__option {
+        padding-left: 20px;
+    }
+    
+    .category-heading {
+        font-weight: bold;
+        padding: 8px 15px;
+        margin-top: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #2b5797;
+    }
+    
+    .ingredient-row {
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    
     .ingredient-row:hover {
-        border-color: #adb5bd;
+        background-color: #f8f9fa;
     }
-    .js-errors {
-        margin-bottom: 15px;
+    
+    .ingredient-row .form-label {
+        font-weight: 500;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">Dodaj wiele produktów do lodówki</h2>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Zbiorcze dodawanie produktów do lodówki</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" id="bulk-add-form">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                <div class="card-body">
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Blok na komunikaty o błędach JavaScript -->
-                    <div id="js-errors" class="alert alert-danger d-none">
-                        <h5>Wystąpiły błędy JavaScript:</h5>
-                        <ul id="error-list"></ul>
-                    </div>
-
-                    <form method="post" id="bulk-add-form">
-                        {% csrf_token %}
-                        <div id="ingredients-container">
-                            <!-- Pierwszy wiersz template -->
-                            <div class="ingredient-row">
+                {% endif %}
+                
+                {{ formset.management_form }}
+                
+                <div id="formset-container">
+                    {% for form in formset %}
+                    <div class="ingredient-row card mb-3 p-3">
+                        <button type="button" class="btn btn-outline-danger btn-sm position-absolute end-0 top-0 m-2 delete-row" title="Usuń wiersz">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="id_form-{{ forloop.counter0 }}-ingredient" class="form-label">Składnik:</label>
+                                {{ form.ingredient }}
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
                                 <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Składnik</label>
-                                        <select name="ingredients" class="form-control ingredient-select" required>
-                                            <option value="">-- Wybierz składnik --</option>
-                                        </select>
+                                    <div class="col-6">
+                                        <label for="id_form-{{ forloop.counter0 }}-amount" class="form-label">Ilość:</label>
+                                        {{ form.amount }}
                                     </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label class="form-label">Ilość</label>
-                                        <input type="number" name="amounts" class="form-control" step="0.01" min="0.01" required>
-                                    </div>
-                                    <div class="col-md-3 mb-3">
-                                        <label class="form-label">Jednostka</label>
-                                        <select name="units" class="form-control unit-select" required>
-                                            <option value="">-- Wybierz jednostkę --</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label class="form-label">Data ważności</label>
-                                        <input type="date" name="expiry_dates" class="form-control">
-                                    </div>
-                                    <div class="col-md-1 d-flex align-items-center justify-content-center">
-                                        <button type="button" class="btn btn-outline-danger remove-row mt-3">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                    <div class="col-6">
+                                        <label for="id_form-{{ forloop.counter0 }}-unit" class="form-label">Jednostka:</label>
+                                        {{ form.unit }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mb-3 text-center">
-                            <button type="button" id="add-row" class="btn btn-outline-primary">
-                                <i class="bi bi-plus-circle"></i> Dodaj kolejny produkt
-                            </button>
+                        
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <label for="id_form-{{ forloop.counter0 }}-expiry_date" class="form-label">Data ważności:</label>
+                                {{ form.expiry_date }}
+                            </div>
                         </div>
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">Anuluj</a>
-                            <button type="submit" class="btn btn-primary">Zapisz wszystkie</button>
-                        </div>
-                    </form>
+                    </div>
+                    {% endfor %}
                 </div>
-            </div>
+                
+                <div class="mt-3 d-flex justify-content-between">
+                    <button type="button" id="add-more" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>Dodaj więcej produktów
+                    </button>
+                    
+                    <div>
+                        <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary me-2">Anuluj</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>Zapisz wszystkie produkty
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -103,163 +123,159 @@
 
 {% block extra_js %}
 <script>
-    // Utwórz handler błędów JavaScript
-    window.onerror = function(message, source, lineno, colno, error) {
-        console.error("JavaScript error:", message, "at", source, "line", lineno);
-        const errorBox = document.getElementById('js-errors');
-        const errorList = document.getElementById('error-list');
-        
-        const errorItem = document.createElement('li');
-        errorItem.textContent = message + ' at line ' + lineno;
-        
-        errorList.appendChild(errorItem);
-        errorBox.classList.remove('d-none');
-        
-        return false;
-    };
-
     $(document).ready(function() {
-        console.log("Document ready - inicjalizacja funkcji zbiorczego dodawania");
+        var formsetPrefix = 'form';
+        var totalFormsInput = $('#id_' + formsetPrefix + '-TOTAL_FORMS');
+        var formCount = parseInt(totalFormsInput.val());
         
-        // Pobierz dostępne składniki
-        function loadIngredients() {
-            console.log("Ładowanie składników...");
-            $.ajax({
-                url: "{% url 'fridge:ajax_ingredient_search' %}",
-                type: "GET",
-                success: function(data) {
-                    console.log("Składniki załadowane:", data);
-                    let options = '<option value="">-- Wybierz składnik --</option>';
-                    if (data.results && Array.isArray(data.results)) {
-                        $.each(data.results, function(i, item) {
-                            options += '<option value="' + item.id + '">' + item.text + '</option>';
-                        });
-                    }
-                    $('.ingredient-select').each(function() {
-                        // Zachowaj aktualnie wybraną wartość
-                        const currentValue = $(this).val();
-                        $(this).html(options);
-                        if (currentValue) {
-                            $(this).val(currentValue);
-                        }
-                        $(this).select2({
-                            placeholder: "Wybierz składnik",
-                            allowClear: true
-                        });
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("Błąd ładowania składników:", error);
-                    alert("Wystąpił błąd podczas ładowania składników: " + error);
-                }
-            });
-        }
-
-        // Pobierz dostępne jednostki
-        function loadUnits() {
-            console.log("Ładowanie jednostek...");
-            $.ajax({
-                url: "{% url 'fridge:ajax_load_units' %}",
-                type: "GET",
-                success: function(data) {
-                    console.log("Jednostki załadowane:", data);
-                    let options = '<option value="">-- Wybierz jednostkę --</option>';
-                    if (data.units && Array.isArray(data.units)) {
-                        $.each(data.units, function(i, item) {
-                            options += '<option value="' + item.id + '">' + item.name + '</option>';
-                        });
-                    }
-                    $('.unit-select').each(function() {
-                        // Zachowaj aktualnie wybraną wartość
-                        const currentValue = $(this).val();
-                        $(this).html(options);
-                        if (currentValue) {
-                            $(this).val(currentValue);
-                        }
-                        $(this).select2({
-                            placeholder: "Wybierz jednostkę",
-                            allowClear: true
-                        });
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("Błąd ładowania jednostek:", error);
-                    alert("Wystąpił błąd podczas ładowania jednostek: " + error);
-                }
-            });
-        }
-
-        // Inicjalizacja pierwszego wiersza
-        loadIngredients();
-        loadUnits();
-
-        // Dodaj nowy wiersz
-        $('#add-row').on('click', function() {
-            console.log("Dodawanie nowego wiersza...");
+        // Inicjalizacja Select2 dla wszystkich rozwijanek składników
+        initializeSelect2();
+        
+        // Dodaj więcej produktów
+        $('#add-more').click(function() {
+            var newForm = $('.ingredient-row:first').clone(true);
             
-            // Klonowanie pierwszego wiersza
-            const newRow = $('.ingredient-row:first').clone();
+            // Zaktualizuj indeksy w nowym formularzu
+            updateElementIndex(newForm, formsetPrefix, formCount);
             
-            // Czyszczenie wartości w nowym wierszu
-            newRow.find('input').val('');
-            newRow.find('select').val('').trigger('change');
+            // Wyczyść wartości
+            newForm.find('input:not([type=hidden])').val('');
+            newForm.find('select').val(null);
             
-            // Dodawanie nowego wiersza do kontenera
-            newRow.appendTo('#ingredients-container');
+            // Dodaj nowy formularz do kontenera
+            $('#formset-container').append(newForm);
             
-            // Zainicjalizuj Select2 dla nowego wiersza
-            newRow.find('.ingredient-select, .unit-select').each(function() {
-                $(this).select2({
-                    placeholder: $(this).find('option:first').text(),
-                    allowClear: true
-                });
-            });
+            // Zwiększ licznik formularzy
+            formCount++;
+            totalFormsInput.val(formCount);
             
-            console.log("Nowy wiersz dodany pomyślnie");
+            // Zainicjalizuj Select2 dla nowego formularza
+            initializeSelect2ForElement(newForm);
         });
-
+        
         // Usuń wiersz
-        $(document).on('click', '.remove-row', function() {
-            console.log("Usuwanie wiersza...");
-            
-            // Nie usuwaj jeśli to ostatni wiersz
+        $('.delete-row').click(function() {
+            // Nie usuwaj, jeśli to jedyny wiersz
             if ($('.ingredient-row').length > 1) {
                 $(this).closest('.ingredient-row').remove();
-                console.log("Wiersz usunięty");
+                
+                // Zmniejsz licznik formularzy
+                formCount--;
+                totalFormsInput.val(formCount);
+                
+                // Zaktualizuj indeksy
+                $('.ingredient-row').each(function(index) {
+                    updateElementIndex($(this), formsetPrefix, index);
+                });
             } else {
-                // Wyczyść pola jeśli to ostatni wiersz
-                const row = $(this).closest('.ingredient-row');
-                row.find('input').val('');
-                row.find('select').val('').trigger('change');
-                console.log("Ostatni wiersz - pola wyczyszczone");
+                alert('Musi pozostać przynajmniej jeden wiersz.');
             }
         });
-
-        // Walidacja formularza
-        $('#bulk-add-form').on('submit', function(e) {
-            console.log("Walidacja formularza przed wysłaniem...");
-            let valid = false;
-
-            // Sprawdź czy przynajmniej jeden wiersz jest wypełniony
-            $('.ingredient-row').each(function() {
-                const ingredient = $(this).find('[name="ingredients"]').val();
-                const amount = $(this).find('[name="amounts"]').val();
-                const unit = $(this).find('[name="units"]').val();
+        
+        // Funkcja do aktualizacji indeksów w formularzach
+        function updateElementIndex(element, prefix, index) {
+            var idRegex = new RegExp('(' + prefix + '-(\\d+|__prefix__))');
+            var replacement = prefix + '-' + index;
+            
+            // Aktualizuj atrybuty name i id
+            element.find('*').each(function() {
+                var attr = $(this).attr('name');
+                if (attr) {
+                    attr = attr.replace(idRegex, replacement);
+                    $(this).attr('name', attr);
+                }
                 
-                if (ingredient && amount && unit) {
-                    valid = true;
-                    return false; // Break the loop
+                attr = $(this).attr('id');
+                if (attr) {
+                    attr = attr.replace(idRegex, replacement);
+                    $(this).attr('id', attr);
+                }
+                
+                attr = $(this).attr('for');
+                if (attr) {
+                    attr = attr.replace(idRegex, replacement);
+                    $(this).attr('for', attr);
                 }
             });
-
-            if (!valid) {
-                e.preventDefault();
-                alert('Dodaj przynajmniej jeden produkt z wypełnionymi polami: składnik, ilość i jednostka.');
-                console.log("Walidacja nieudana - brak wypełnionych pól");
-            } else {
-                console.log("Formularz przesłany - walidacja przeszła pomyślnie");
+        }
+        
+        // Inicjalizuj Select2 dla wszystkich formularzy
+        function initializeSelect2() {
+            $('.ingredient-row').each(function(index) {
+                initializeSelect2ForElement($(this));
+            });
+        }
+        
+        // Inicjalizuj Select2 dla konkretnego elementu
+        function initializeSelect2ForElement(element) {
+            // Inicjalizacja Select2 dla składników z grupowaniem
+            element.find('select[id$="-ingredient"]').select2({
+                placeholder: "Wybierz składnik lub wyszukaj...",
+                allowClear: true,
+                theme: "bootstrap4",
+                dropdownParent: element,
+                templateResult: formatIngredient,
+                escapeMarkup: function(m) { return m; }
+            }).on('change', function() {
+                // Przy zmianie składnika, załaduj kompatybilne jednostki
+                var ingredientId = $(this).val();
+                var unitSelect = $(this).closest('.ingredient-row').find('select[id$="-unit"]');
+                
+                if (ingredientId) {
+                    loadCompatibleUnits(ingredientId, unitSelect);
+                }
+            });
+            
+            // Inicjalizacja Select2 dla jednostek
+            element.find('select[id$="-unit"]').select2({
+                placeholder: "Wybierz jednostkę",
+                allowClear: true,
+                theme: "bootstrap4",
+                dropdownParent: element
+            });
+        }
+        
+        // Funkcja do formatowania opcji w Select2
+        function formatIngredient(ingredient) {
+            if (!ingredient.id) {
+                return ingredient.text;
             }
-        });
+            
+            // Jeśli to kategoria
+            if (ingredient.children) {
+                return '<div class="category-heading">' + ingredient.text + '</div>';
+            }
+            
+            // Zwykły składnik
+            return '<div>' + ingredient.text + '</div>';
+        }
+        
+        // Funkcja do ładowania kompatybilnych jednostek dla wybranego składnika
+        function loadCompatibleUnits(ingredientId, unitSelect) {
+            $.ajax({
+                url: '{% url "fridge:ajax_compatible_units" %}',
+                data: {'ingredient_id': ingredientId},
+                dataType: 'json',
+                success: function(data) {
+                    unitSelect.empty();
+                    
+                    // Dodaj pobrane jednostki do listy
+                    $.each(data.units, function(index, unit) {
+                        unitSelect.append($('<option></option>')
+                            .attr('value', unit.id)
+                            .text(unit.name));
+                    });
+                    
+                    // Jeśli jest domyślna jednostka, ustaw ją
+                    if (data.default_unit) {
+                        unitSelect.val(data.default_unit);
+                    }
+                    
+                    // Odśwież Select2
+                    unitSelect.trigger('change');
+                }
+            });
+        }
     });
 </script>
 {% endblock %} 

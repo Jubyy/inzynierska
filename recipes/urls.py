@@ -16,6 +16,10 @@ urlpatterns = [
     path('<int:pk>/add-missing-to-shopping-list/', views.add_missing_to_shopping_list, name='add_missing_to_shopping_list'),
     path('<int:pk>/prepare/', views.prepare_recipe, name='prepare'),
     path('<int:pk>/toggle-favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('<int:pk>/toggle-like/', views.toggle_like, name='toggle_like'),
+    
+    # Komentarze
+    path('comments/<int:pk>/delete/', views.delete_comment, name='delete_comment'),
     
     # Widoki AJAX
     path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),

@@ -1,6 +1,6 @@
 from django import forms
 from .models import FridgeItem
-from recipes.models import Ingredient, MeasurementUnit
+from recipes.models import Ingredient, MeasurementUnit, IngredientCategory
 from django.forms import formset_factory
 
 class FridgeItemForm(forms.ModelForm):
@@ -9,7 +9,6 @@ class FridgeItemForm(forms.ModelForm):
         model = FridgeItem
         fields = ['ingredient', 'amount', 'unit', 'expiry_date']
         widgets = {
-            'ingredient': forms.Select(attrs={'class': 'form-control select2'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
             'unit': forms.Select(attrs={'class': 'form-control'}),
             'expiry_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
@@ -26,8 +25,23 @@ class FridgeItemForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # Sortowanie składników alfabetycznie
-        self.fields['ingredient'].queryset = Ingredient.objects.all().order_by('name')
+        # Usuwamy standardowy widget dla składnika, będziemy używać Select2 z grupowaniem
+        self.fields['ingredient'].widget = forms.Select(attrs={'class': 'form-control select2-ingredient'})
+        
+        # Przygotowanie pogrupowanych opcji składników według kategorii
+        ingredient_choices = []
+        
+        # Pobierz wszystkie kategorie składników
+        categories = IngredientCategory.objects.all().order_by('name')
+        
+        # Dla każdej kategorii, pobierz jej składniki
+        for category in categories:
+            category_ingredients = [(i.id, i.name) for i in Ingredient.objects.filter(category=category).order_by('name')]
+            if category_ingredients:  # Dodaj tylko jeśli kategoria ma składniki
+                ingredient_choices.append((category.name, category_ingredients))
+        
+        # Ustaw pogrupowane opcje dla pola ingredient
+        self.fields['ingredient'].choices = ingredient_choices
 
 class FridgeSearchForm(forms.Form):
     """Formularz do wyszukiwania produktów w lodówce"""
@@ -55,10 +69,10 @@ class FridgeSearchForm(forms.Form):
 
 class BulkItemForm(forms.Form):
     """Formularz dla pojedynczego produktu w formularzu zbiorczym"""
-    ingredient = forms.ModelChoiceField(
-        queryset=Ingredient.objects.all(),
+    ingredient = forms.ChoiceField(
+        choices=[],
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control select2 ingredient-select'})
+        widget=forms.Select(attrs={'class': 'form-control select2-ingredient ingredient-select'})
     )
     
     amount = forms.FloatField(
@@ -76,6 +90,27 @@ class BulkItemForm(forms.Form):
         required=False,
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Przygotowanie pogrupowanych opcji składników według kategorii
+        ingredient_choices = []
+        
+        # Dodaj pustą opcję
+        ingredient_choices.append(('', '---------'))
+        
+        # Pobierz wszystkie kategorie składników
+        categories = IngredientCategory.objects.all().order_by('name')
+        
+        # Dla każdej kategorii, pobierz jej składniki
+        for category in categories:
+            category_ingredients = [(i.id, i.name) for i in Ingredient.objects.filter(category=category).order_by('name')]
+            if category_ingredients:  # Dodaj tylko jeśli kategoria ma składniki
+                ingredient_choices.append((category.name, category_ingredients))
+        
+        # Ustaw pogrupowane opcje dla pola ingredient
+        self.fields['ingredient'].choices = ingredient_choices
 
 # Formset do zbiorczego dodawania produktów
 BulkItemFormSet = formset_factory(

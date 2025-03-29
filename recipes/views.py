@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
-from django.db.models import Q
-from django.http import JsonResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe
+from django.db.models import Q, Count, F
+from django.http import JsonResponse, HttpResponseRedirect
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
@@ -292,12 +292,12 @@ class RecipeListView(ListView):
         
         # Filtrowanie po kategorii
         category = self.request.GET.get('category')
-        if category:
+        if category and category != 'None':
             queryset = queryset.filter(categories__id=category)
         
         # Filtrowanie po wyszukiwanej frazie - musi być przed konwersją do listy
         query = self.request.GET.get('q')
-        if query:
+        if query and query != 'None':
             queryset = queryset.filter(
                 Q(title__icontains=query) |
                 Q(description__icontains=query) |
@@ -305,7 +305,7 @@ class RecipeListView(ListView):
             ).distinct()
         
         # Filtrowanie po dostępnych składnikach - musi być przed konwersją do listy
-        if self.request.GET.get('available_only') and self.request.user.is_authenticated:
+        if self.request.GET.get('available_only') and self.request.GET.get('available_only') != 'None' and self.request.user.is_authenticated:
             available_recipes = []
             for recipe in queryset:
                 if recipe.can_be_prepared_with_available_ingredients(self.request.user):
@@ -314,7 +314,7 @@ class RecipeListView(ListView):
         
         # Filtrowanie po typie diety - używamy QuerySet.filter() zamiast list comprehension
         diet = self.request.GET.get('diet')
-        if diet:
+        if diet and diet != 'None':
             # Musimy przekonwertować QuerySet do listy, aby móc filtrować po właściwościach
             # Ale robimy to tak, żeby zachować ID przepisów
             recipe_ids = []
@@ -340,10 +340,19 @@ class RecipeListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = RecipeCategory.objects.all()
-        context['selected_category'] = self.request.GET.get('category')
-        context['selected_diet'] = self.request.GET.get('diet')
-        context['query'] = self.request.GET.get('q')
-        context['available_only'] = self.request.GET.get('available_only')
+        
+        # Pobierz parametry z URL i upewnij się, że 'None' nie jest przekazywane do szablonu
+        category = self.request.GET.get('category')
+        context['selected_category'] = category if category and category != 'None' else None
+        
+        diet = self.request.GET.get('diet')
+        context['selected_diet'] = diet if diet and diet != 'None' else None
+        
+        query = self.request.GET.get('q')
+        context['query'] = query if query and query != 'None' else None
+        
+        available_only = self.request.GET.get('available_only')
+        context['available_only'] = available_only if available_only and available_only != 'None' else None
         
         # Sprawdź, czy użytkownik jest zalogowany
         if self.request.user.is_authenticated:
@@ -380,12 +389,60 @@ class RecipeDetailView(DetailView):
             except ValueError:
                 pass
         
-        # Jeśli użytkownik jest zalogowany, dodaj informacje o brakujących składnikach
+        # Sprawdź czy użytkownik jest zalogowany
         if self.request.user.is_authenticated:
+            # Dodaj informację, czy przepis jest w ulubionych
+            context['is_favorite'] = FavoriteRecipe.objects.filter(
+                user=self.request.user, 
+                recipe=self.object
+            ).exists()
+            
+            # Dodaj informację, czy przepis jest polubiony przez użytkownika
+            context['is_liked'] = self.object.is_liked_by(self.request.user)
+        
+        # Dodaj drobne informacje o przepisie
+        context['can_be_prepared'] = False
+        if self.request.user.is_authenticated:
+            context['can_be_prepared'] = self.object.can_be_prepared_with_available_ingredients(self.request.user)
             context['missing_ingredients'] = self.object.get_missing_ingredients(self.request.user)
-            context['can_be_prepared'] = len(context['missing_ingredients']) == 0
+            
+        # Dodaj formularz do komentowania
+        context['comment_form'] = CommentForm()
+        
+        # Pobierz komentarze do przepisu (tylko główne, bez odpowiedzi)
+        context['comments'] = self.object.comments.filter(parent=None)
         
         return context
+        
+    def post(self, request, *args, **kwargs):
+        """Obsługa dodawania komentarzy przez POST"""
+        self.object = self.get_object()
+        
+        if not request.user.is_authenticated:
+            messages.error(request, "Musisz być zalogowany, aby dodawać komentarze.")
+            return HttpResponseRedirect(self.object.get_absolute_url())
+        
+        comment_form = CommentForm(request.POST)
+        
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.recipe = self.object
+            
+            # Sprawdź, czy to odpowiedź na komentarz
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                parent_comment = get_object_or_404(Comment, id=parent_id)
+                new_comment.parent = parent_comment
+            
+            new_comment.save()
+            messages.success(request, "Komentarz został dodany.")
+            return HttpResponseRedirect(self.object.get_absolute_url())
+        
+        # Jeśli formularz nie jest poprawny, renderuj stronę z błędami
+        context = self.get_context_data(object=self.object)
+        context['comment_form'] = comment_form
+        return self.render_to_response(context)
 
 class RecipeCreateView(LoginRequiredMixin, CreateView):
     model = Recipe
@@ -713,13 +770,57 @@ def prepare_recipe(request, pk):
 
 def ajax_ingredient_search(request):
     """Wyszukiwanie składników za pomocą AJAX"""
-    query = request.GET.get('q', '')
-    ingredients = Ingredient.objects.all()
+    query = request.GET.get('term', '')
+    include_categories = request.GET.get('include_categories', 'true') == 'true'
     
     if query:
-        ingredients = ingredients.filter(name__icontains=query)
+        # Wyszukiwanie według zapytania
+        ingredients = Ingredient.objects.filter(name__icontains=query).order_by('category__name', 'name')
+        
+        if include_categories:
+            # Grupowanie według kategorii
+            results = []
+            categories = {}
+            
+            for ingredient in ingredients:
+                category_name = ingredient.category.name
+                if category_name not in categories:
+                    categories[category_name] = {
+                        'text': category_name,
+                        'children': []
+                    }
+                
+                categories[category_name]['children'].append({
+                    'id': ingredient.id,
+                    'text': ingredient.name
+                })
+            
+            # Konwersja słownika kategorii na listę
+            for category_name, category_data in categories.items():
+                results.append(category_data)
+        else:
+            # Prosty format bez kategorii
+            results = [{'id': i.id, 'text': i.name} for i in ingredients]
+    else:
+        # Gdy brak zapytania, zwróć pogrupowane składniki
+        if include_categories:
+            results = []
+            categories = IngredientCategory.objects.all().order_by('name')
+            
+            for category in categories:
+                # Pobierz wszystkie składniki z danej kategorii
+                category_ingredients = Ingredient.objects.filter(category=category).order_by('name')
+                if category_ingredients:
+                    children = [{'id': i.id, 'text': i.name} for i in category_ingredients]
+                    results.append({
+                        'text': category.name,
+                        'children': children
+                    })
+        else:
+            # Zwróć wszystkie składniki alfabetycznie
+            ingredients = Ingredient.objects.all().order_by('name')
+            results = [{'id': i.id, 'text': i.name} for i in ingredients]
     
-    results = [{'id': i.id, 'text': i.name} for i in ingredients]
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
@@ -831,3 +932,53 @@ def toggle_favorite(request, pk):
             'status': 'error',
             'message': str(e)
         }, status=400)
+
+@login_required
+@require_POST
+def toggle_like(request, pk):
+    """Przełącza polubienie przepisu (dodaje/usuwa)"""
+    recipe = get_object_or_404(Recipe, pk=pk)
+    
+    # Przełącz polubienie
+    liked = recipe.toggle_like(request.user)
+    
+    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': recipe.likes_count
+        })
+    
+    # W przeciwnym razie, przekieruj z powrotem do strony przepisu
+    return HttpResponseRedirect(reverse('recipes:detail', args=[pk]))
+
+@login_required
+@require_POST
+def delete_comment(request, pk):
+    """Usuwa komentarz"""
+    comment = get_object_or_404(Comment, pk=pk)
+    
+    # Sprawdź, czy użytkownik ma uprawnienia do usunięcia komentarza
+    if comment.user != request.user and not request.user.is_staff:
+        messages.error(request, "Nie masz uprawnień do usunięcia tego komentarza.")
+        return HttpResponseRedirect(comment.recipe.get_absolute_url())
+    
+    recipe_url = comment.recipe.get_absolute_url()
+    comment.delete()
+    
+    messages.success(request, "Komentarz został usunięty.")
+    return HttpResponseRedirect(recipe_url)
+
+def home_view(request):
+    """Widok strony głównej z najpopularniejszymi przepisami"""
+    # Pobierz przepisy z największą liczbą polubień (limit 8)
+    popular_recipes = Recipe.objects.annotate(
+        likes_total=Count('likes')
+    ).order_by('-likes_total', '-created_at')[:8]
+    
+    # Przekaż przepisy do szablonu
+    context = {
+        'popular_recipes': popular_recipes
+    }
+    
+    return render(request, 'home.html', context)

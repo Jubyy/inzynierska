@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit
+from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, MealPlan
+from datetime import date, timedelta
+from django.db import models
 
 class RecipeForm(forms.ModelForm):
     """Formularz do tworzenia i edycji przepisów"""
@@ -27,27 +29,33 @@ class RecipeForm(forms.ModelForm):
         }
 
 class RecipeIngredientForm(forms.ModelForm):
-    """Formularz do dodawania składników do przepisu"""
-    ingredient = forms.ModelChoiceField(
-        queryset=Ingredient.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control select2 ingredient-select'}),
-        label='Składnik'
-    )
-    
-    amount = forms.FloatField(
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
-        label='Ilość'
-    )
-    
-    unit = forms.ModelChoiceField(
-        queryset=MeasurementUnit.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control select2 unit-select'}),
-        label='Jednostka'
-    )
-    
+    """Formularz dla składnika przepisu"""
     class Meta:
         model = RecipeIngredient
         fields = ['ingredient', 'amount', 'unit']
+        widgets = {
+            'ingredient': forms.Select(attrs={'class': 'form-control select2-ingredient'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
+            'unit': forms.Select(attrs={'class': 'form-control'})
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Grupowanie składników według kategorii
+        ingredient_choices = []
+        
+        # Pobierz wszystkie kategorie składników
+        categories = IngredientCategory.objects.all().order_by('name')
+        
+        # Dla każdej kategorii, pobierz jej składniki
+        for category in categories:
+            category_ingredients = [(i.id, i.name) for i in Ingredient.objects.filter(category=category).order_by('name')]
+            if category_ingredients:  # Dodaj tylko jeśli kategoria ma składniki
+                ingredient_choices.append((category.name, category_ingredients))
+        
+        # Ustaw pogrupowane opcje dla pola ingredient
+        self.fields['ingredient'].choices = ingredient_choices
 
 # Formset do zarządzania wieloma składnikami dla przepisu
 RecipeIngredientFormSet = inlineformset_factory(
@@ -131,3 +139,70 @@ class ServingsForm(forms.Form):
         label='Liczba porcji',
         widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1})
     )
+
+class CommentForm(forms.ModelForm):
+    """Formularz do dodawania komentarzy do przepisów"""
+    content = forms.CharField(
+        label='',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Podziel się swoją opinią o tym przepisie...',
+            'rows': 3
+        })
+    )
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+
+class MealPlanForm(forms.ModelForm):
+    """Formularz do dodawania/edycji zaplanowanych posiłków"""
+    date = forms.DateField(
+        label="Data",
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date',
+            'min': date.today().strftime('%Y-%m-%d')
+        }),
+        initial=date.today
+    )
+    
+    class Meta:
+        model = MealPlan
+        fields = ['recipe', 'date', 'meal_type', 'servings', 'notes']
+        widgets = {
+            'recipe': forms.Select(attrs={'class': 'form-control select2'}),
+            'meal_type': forms.Select(attrs={'class': 'form-control'}),
+            'servings': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Opcjonalne notatki do posiłku...'}),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            # Ograniczenie wyboru przepisów do tych utworzonych przez użytkownika lub publicznych
+            self.fields['recipe'].queryset = Recipe.objects.filter(
+                models.Q(author=user) | models.Q(is_public=True)
+            ).order_by('title')
+
+class MealPlanWeekForm(forms.Form):
+    """Formularz do wyboru tygodnia do wyświetlenia planu posiłków"""
+    start_date = forms.DateField(
+        label="Tydzień rozpoczynający się od",
+        widget=forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        initial=date.today
+    )
+    
+    def clean_start_date(self):
+        """Upewnij się, że data rozpoczęcia to poniedziałek"""
+        start_date = self.cleaned_data['start_date']
+        # Jeśli nie jest poniedziałkiem, zaokrąglij do poprzedzającego poniedziałku
+        if start_date.weekday() != 0:  # 0 = poniedziałek
+            days_to_subtract = start_date.weekday()
+            start_date = start_date - timedelta(days=days_to_subtract)
+        return start_date
