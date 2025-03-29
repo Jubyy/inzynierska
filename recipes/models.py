@@ -115,6 +115,11 @@ class Recipe(models.Model):
     def is_vegan(self):
         return all(ing.ingredient.is_vegan for ing in self.ingredients.all())
     
+    @property
+    def is_meat(self):
+        """Zwraca True, jeśli przepis nie jest wegetariański (zawiera mięso)"""
+        return not self.is_vegetarian
+    
     def get_missing_ingredients(self, user):
         from fridge.models import FridgeItem
         from recipes.utils import convert_units

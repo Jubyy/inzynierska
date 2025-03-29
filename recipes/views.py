@@ -295,14 +295,7 @@ class RecipeListView(ListView):
         if category:
             queryset = queryset.filter(categories__id=category)
         
-        # Filtrowanie po typie diety
-        diet = self.request.GET.get('diet')
-        if diet == 'vegetarian':
-            queryset = [recipe for recipe in queryset if recipe.is_vegetarian]
-        elif diet == 'vegan':
-            queryset = [recipe for recipe in queryset if recipe.is_vegan]
-        
-        # Filtrowanie po wyszukiwanej frazie
+        # Filtrowanie po wyszukiwanej frazie - musi być przed konwersją do listy
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
@@ -311,13 +304,36 @@ class RecipeListView(ListView):
                 Q(ingredients__ingredient__name__icontains=query)
             ).distinct()
         
-        # Filtrowanie po dostępnych składnikach
+        # Filtrowanie po dostępnych składnikach - musi być przed konwersją do listy
         if self.request.GET.get('available_only') and self.request.user.is_authenticated:
             available_recipes = []
             for recipe in queryset:
                 if recipe.can_be_prepared_with_available_ingredients(self.request.user):
                     available_recipes.append(recipe.id)
             queryset = queryset.filter(id__in=available_recipes)
+        
+        # Filtrowanie po typie diety - używamy QuerySet.filter() zamiast list comprehension
+        diet = self.request.GET.get('diet')
+        if diet:
+            # Musimy przekonwertować QuerySet do listy, aby móc filtrować po właściwościach
+            # Ale robimy to tak, żeby zachować ID przepisów
+            recipe_ids = []
+            
+            if diet == 'vegetarian':
+                for recipe in queryset:
+                    if recipe.is_vegetarian:
+                        recipe_ids.append(recipe.id)
+            elif diet == 'vegan':
+                for recipe in queryset:
+                    if recipe.is_vegan:
+                        recipe_ids.append(recipe.id)
+            elif diet == 'meat':
+                for recipe in queryset:
+                    if recipe.is_meat:
+                        recipe_ids.append(recipe.id)
+            
+            # Teraz filtrujemy oryginalny QuerySet według ID
+            queryset = queryset.filter(id__in=recipe_ids)
         
         return queryset
     

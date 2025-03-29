@@ -28,7 +28,7 @@ def register(request):
             messages.error(request, 'Wystąpił błąd podczas rejestracji. Popraw błędy i spróbuj ponownie.')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form})
 
 @login_required
 def dashboard(request):

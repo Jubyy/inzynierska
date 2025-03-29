@@ -259,6 +259,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #8bc34a !important;
 }
 
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
 .btn-favorite {
   width: 40px;
   height: 40px;

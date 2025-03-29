@@ -45,6 +45,7 @@
                 <div class="col-md-3">
                     <select name="diet" class="form-select">
                         <option value="">Wszystkie przepisy</option>
+                        <option value="meat" {% if selected_diet == "meat" %}selected{% endif %}>Mięsne</option>
                         <option value="vegetarian" {% if selected_diet == "vegetarian" %}selected{% endif %}>Wegetariańskie</option>
                         <option value="vegan" {% if selected_diet == "vegan" %}selected{% endif %}>Wegańskie</option>
                     </select>
@@ -89,6 +90,8 @@
                             <span class="badge bg-success me-1 mb-1 d-inline-block">Wegańskie</span>
                         {% elif recipe.is_vegetarian %}
                             <span class="badge bg-success-light me-1 mb-1 d-inline-block">Wegetariańskie</span>
+                        {% else %}
+                            <span class="badge bg-danger me-1 mb-1 d-inline-block">Mięsne</span>
                         {% endif %}
                     </div>
                     

@@ -75,14 +75,14 @@
                                     <li><a class="dropdown-item" href="{% url 'accounts:user_recipes' %}">Moje przepisy</a></li>
                                     <li><a class="dropdown-item" href="{% url 'dashboard' %}">Panel</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Wyloguj</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Wyloguj</a></li>
                                 </ul>
                             </div>
                         {% else %}
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary me-2">
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">
                                 <i class="bi bi-box-arrow-in-right me-1"></i>Zaloguj
                             </a>
-                            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+                            <a href="{% url 'register' %}" class="btn btn-primary">
                                 <i class="bi bi-person-plus me-1"></i>Zarejestruj
                             </a>
                         {% endif %}
