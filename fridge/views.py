@@ -266,7 +266,7 @@ def ajax_barcode_lookup(request):
     Wyszukiwanie informacji o produkcie na podstawie kodu kreskowego.
     W tym przykładzie używamy Open Food Facts API do pobierania danych o produktach.
     """
-    barcode = request.GET.get('barcode', '')
+    barcode = request.GET.get('barcode', '').strip()
     
     if not barcode:
         return JsonResponse({
@@ -296,13 +296,38 @@ def ajax_barcode_lookup(request):
             })
         
         # Jeśli produktu nie ma w bazie, spróbuj pobrać dane z Open Food Facts
-        # API URL: https://world.openfoodfacts.org/api/v0/product/[barcode].json
-        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json', timeout=5)
-        data = response.json()
+        # Spróbuj najpierw z polskiej wersji API
+        apis_to_try = [
+            f'https://pl.openfoodfacts.org/api/v0/product/{barcode}.json',
+            f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json'
+        ]
         
-        if data.get('status') == 1:  # Produkt znaleziony w bazie
-            product_data = data.get('product', {})
-            product_name = product_data.get('product_name', '') or product_data.get('generic_name', '')
+        product_found = False
+        product_data = {}
+        
+        for api_url in apis_to_try:
+            try:
+                response = requests.get(api_url, timeout=7)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('status') == 1:
+                        product_data = data.get('product', {})
+                        product_found = True
+                        break
+            except Exception as e:
+                print(f"Błąd podczas próby pobierania z {api_url}: {str(e)}")
+                continue
+        
+        if product_found:
+            # Pobieranie nazwy produktu z różnych pól (w zależności od dostępności)
+            product_name = (
+                product_data.get('product_name_pl') or 
+                product_data.get('product_name') or 
+                product_data.get('generic_name_pl') or
+                product_data.get('generic_name') or
+                product_data.get('abbreviated_product_name') or
+                ''
+            )
             
             if not product_name:
                 return JsonResponse({
@@ -310,15 +335,37 @@ def ajax_barcode_lookup(request):
                     'error': 'Nie znaleziono nazwy produktu'
                 })
             
+            # Przygotuj dane dotyczące ilości
+            quantity = product_data.get('quantity', '')
+            
+            # Przygotuj dane dotyczące kategorii
+            categories = (
+                product_data.get('categories_tags', []) or 
+                product_data.get('categories_hierarchy', []) or
+                []
+            )
+            
+            categories_display = ', '.join([c.replace('en:', '').replace('pl:', '').replace('-', ' ') for c in categories[:3]]) if categories else ''
+            
+            # Pobierz obraz produktu (wybierz najlepsze dostępne zdjęcie)
+            image_url = (
+                product_data.get('image_front_url') or 
+                product_data.get('image_front_small_url') or
+                product_data.get('image_url') or
+                product_data.get('image_small_url') or
+                ''
+            )
+            
             # Zwracamy dane do formularza
             return JsonResponse({
                 'success': True,
                 'exists': False,
                 'product': {
                     'name': product_name,
-                    'quantity': product_data.get('quantity', ''),
-                    'image_url': product_data.get('image_url', ''),
-                    'categories': product_data.get('categories', ''),
+                    'quantity': quantity,
+                    'image_url': image_url,
+                    'categories': categories_display,
+                    'barcode': barcode
                 }
             })
         else:
@@ -332,6 +379,7 @@ def ajax_barcode_lookup(request):
                     'quantity': '',
                     'image_url': '',
                     'categories': '',
+                    'barcode': barcode
                 }
             })
     

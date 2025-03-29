@@ -57,6 +57,17 @@
         text-align: center;
         margin: 20px 0;
     }
+    
+    #debug-canvas {
+        width: 100%;
+        height: 300px;
+        display: none;
+    }
+    
+    #camera-permission-info {
+        display: none;
+        margin-top: 10px;
+    }
 </style>
 {% endblock %}
 
@@ -100,6 +111,17 @@
                                     <i class="bi bi-camera-video-off"></i> Zatrzymaj skaner
                                 </button>
                             </div>
+                            
+                            <div id="camera-permission-info" class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i> Aby skaner działał, musisz zezwolić na dostęp do kamery.
+                            </div>
+                            
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="enable-debug">
+                                <label class="form-check-label" for="enable-debug">
+                                    Włącz tryb debugowania (lokalizacja kodu)
+                                </label>
+                            </div>
                         </div>
                         
                         <div class="col-md-6">
@@ -110,10 +132,17 @@
                                     </div>
                                 </div>
                                 <div class="scan-line"></div>
+                                <canvas id="debug-canvas"></canvas>
                             </div>
                             
                             <div class="text-center mb-3">
                                 <small class="text-muted">Skieruj kod kreskowy w stronę kamery, aby go zeskanować</small>
+                            </div>
+                            
+                            <div class="d-flex justify-content-center mb-3">
+                                <select id="camera-select" class="form-select" style="display: none;">
+                                    <option value="">Wybierz kamerę...</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -187,6 +216,48 @@
 <script>
     $(document).ready(function() {
         let scanner = null;
+        let cameras = [];
+        let lastDetectedCode = null;
+        let detectionCount = 0;
+        
+        // Sprawdź możliwość dostępu do kamer
+        function checkCameraAccess() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showError("Twoja przeglądarka nie obsługuje dostępu do kamery. Użyj nowszej przeglądarki lub wprowadź kod ręcznie.");
+                $("#start-scanner").prop('disabled', true);
+                return false;
+            }
+            
+            // Sprawdź dostępne kamery
+            if (navigator.mediaDevices.enumerateDevices) {
+                navigator.mediaDevices.enumerateDevices()
+                    .then(function(devices) {
+                        cameras = devices.filter(device => device.kind === 'videoinput');
+                        console.log('Dostępne kamery:', cameras);
+                        
+                        if (cameras.length > 1) {
+                            // Wypełnij listę kamer
+                            const cameraSelect = $("#camera-select");
+                            cameraSelect.empty().append('<option value="">Wybierz kamerę...</option>');
+                            
+                            cameras.forEach((camera, index) => {
+                                const label = camera.label || `Kamera ${index + 1}`;
+                                cameraSelect.append(`<option value="${camera.deviceId}">${label}</option>`);
+                            });
+                            
+                            cameraSelect.show();
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Błąd pobierania listy kamer:', err);
+                    });
+            }
+            
+            return true;
+        }
+        
+        // Sprawdź dostęp do kamer na starcie
+        checkCameraAccess();
         
         // Pobierz dostępne jednostki
         function loadUnits() {
@@ -213,95 +284,176 @@
         loadUnits();
         
         // Funkcja inicjalizująca skaner kodów kreskowych
-        function initBarcodeScanner() {
+        function initBarcodeScanner(deviceId = null) {
             if (scanner) {
-                scanner.stop();
+                Quagga.stop();
+                scanner = null;
             }
             
+            $("#camera-permission-info").show();
+            
             try {
-                // Sprawdź, czy przeglądarka obsługuje API kamery
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    showError("Twoja przeglądarka nie obsługuje dostępu do kamery. Użyj nowszej przeglądarki lub wprowadź kod ręcznie.");
-                    $("#start-scanner").prop('disabled', true);
-                    return;
+                const constraints = {
+                    width: { min: 640 },
+                    height: { min: 480 },
+                    facingMode: "environment", // Preferuj tylną kamerę
+                    aspectRatio: { min: 1, max: 2 }
+                };
+                
+                // Jeśli wybrano konkretną kamerę, użyj jej
+                if (deviceId) {
+                    constraints.deviceId = { exact: deviceId };
+                    delete constraints.facingMode;
                 }
                 
-                // Przed inicjalizacją skanera, sprawdź uprawnienia kamery
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        // Zamknij strumień, bo QuaggaJS i tak utworzy własny
-                        stream.getTracks().forEach(track => track.stop());
+                // Konfiguracja skanera
+                const config = {
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector("#barcode-scanner"),
+                        constraints: constraints,
+                        area: { // Ogranicz obszar wyszukiwania kodów do środka obrazu
+                            top: "20%",
+                            right: "20%",
+                            left: "20%",
+                            bottom: "20%"
+                        }
+                    },
+                    locator: {
+                        patchSize: "medium", // x-small, small, medium, large, x-large
+                        halfSample: true
+                    },
+                    decoder: {
+                        readers: [
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_128_reader",
+                            "code_39_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "i2of5_reader"
+                        ],
+                        multiple: false,
+                        debug: {
+                            drawBoundingBox: $("#enable-debug").is(":checked"),
+                            showFrequency: $("#enable-debug").is(":checked"),
+                            drawScanline: $("#enable-debug").is(":checked"),
+                            showPattern: $("#enable-debug").is(":checked")
+                        }
+                    },
+                    locate: true,
+                    frequency: 10 // Częstotliwość skanowania (klatek na sekundę)
+                };
+                
+                // Użyj canvasa w trybie debug
+                if ($("#enable-debug").is(":checked")) {
+                    $("#debug-canvas").show();
+                    config.inputStream.target = document.querySelector("#debug-canvas");
+                } else {
+                    $("#debug-canvas").hide();
+                }
+                
+                // Inicjalizacja skanera
+                Quagga.init(config, function(err) {
+                    if (err) {
+                        console.error("Błąd inicjalizacji skanera:", err);
+                        showError("Nie udało się uruchomić skanera: " + err);
+                        $("#start-scanner").prop('disabled', false);
+                        return;
+                    }
+                    
+                    // Wszystko OK, uruchom skaner
+                    scanner = true;
+                    Quagga.start();
+                    $("#scanner-message").hide();
+                    $("#stop-scanner").show();
+                    $("#start-scanner").hide();
+                    $("#camera-permission-info").hide();
+                });
+                
+                // Obsługa wykrycia kodu
+                Quagga.onDetected(function(result) {
+                    if (!result || !result.codeResult || !result.codeResult.code) {
+                        return;
+                    }
+                    
+                    const barcode = result.codeResult.code;
+                    const confidence = result.codeResult.confidence;
+                    
+                    console.log(`Wykryto kod: ${barcode}, pewność: ${confidence}`);
+                    
+                    // Dodanie weryfikacji - kod musi być wykryty kilka razy z rzędu z dużą pewnością
+                    if (confidence < 0.7) {
+                        console.log("Zbyt niska pewność, ignorowanie...");
+                        return;
+                    }
+                    
+                    if (lastDetectedCode === barcode) {
+                        detectionCount++;
                         
-                        scanner = Quagga.init({
-                            inputStream: {
-                                name: "Live",
-                                type: "LiveStream",
-                                target: document.querySelector("#barcode-scanner"),
-                                constraints: {
-                                    width: 640,
-                                    height: 480,
-                                    facingMode: "environment" // Użyj tylnej kamery na urządzeniach mobilnych
-                                }
-                            },
-                            decoder: {
-                                readers: [
-                                    "ean_reader",
-                                    "ean_8_reader",
-                                    "code_128_reader",
-                                    "code_39_reader",
-                                    "upc_reader"
-                                ],
-                                multiple: false
-                            },
-                            locate: true
-                        }, function(err) {
-                            if (err) {
-                                console.error("Error initializing scanner:", err);
-                                showError("Nie udało się uruchomić skanera: " + err);
-                                return;
-                            }
+                        // Jeśli ten sam kod został wykryty co najmniej 3 razy, uznaj go za prawidłowy
+                        if (detectionCount >= 3) {
+                            // Zatrzymaj skaner po wykryciu kodu
+                            Quagga.stop();
+                            scanner = null;
                             
-                            Quagga.start();
-                            $("#scanner-message").hide();
-                            $("#stop-scanner").show();
-                            $("#start-scanner").hide();
+                            $("#stop-scanner").hide();
+                            $("#start-scanner").show();
+                            $("#scanner-message").html("<p>Kod kreskowy wykryty: " + barcode + "</p>").show();
                             
-                            // Domyślnie ustaw debug na false w produkcji
-                            Quagga.CameraAccess.disableTorch();
-                        });
-                        
-                        // Obsługa zdarzenia skanowania kodu
-                        Quagga.onDetected(function(result) {
-                            if (result && result.codeResult && result.codeResult.code) {
-                                const barcode = result.codeResult.code;
-                                console.log("Barcode detected:", barcode);
-                                
-                                // Zatrzymaj skaner po wykryciu kodu
-                                Quagga.stop();
-                                scanner = null;
-                                
-                                $("#stop-scanner").hide();
-                                $("#start-scanner").show();
-                                $("#scanner-message").html("<p>Kod kreskowy wykryty: " + barcode + "</p>").show();
-                                
-                                // Wyszukaj produkt po kodzie kreskowym
-                                searchProductByBarcode(barcode);
-                            }
-                        });
-                    })
-                    .catch(function(err) {
-                        showError("Nie można uzyskać dostępu do kamery: " + err.message);
-                        $("#start-scanner").prop('disabled', true);
-                    });
+                            // Wyszukaj produkt po kodzie kreskowym
+                            searchProductByBarcode(barcode);
+                            
+                            // Zresetuj licznik wykryć
+                            lastDetectedCode = null;
+                            detectionCount = 0;
+                        }
+                    } else {
+                        // Nowy kod, zresetuj licznik
+                        lastDetectedCode = barcode;
+                        detectionCount = 1;
+                    }
+                });
+                
+                // Obsługa zmiany rozmiaru
+                $(window).on('resize', function() {
+                    if (scanner) {
+                        Quagga.stop();
+                        scanner = null;
+                        setTimeout(() => initBarcodeScanner(deviceId), 500);
+                    }
+                });
             } catch (error) {
+                console.error("Błąd inicjalizacji skanera:", error);
                 showError("Błąd inicjalizacji skanera: " + error.message);
-                $("#start-scanner").prop('disabled', true);
+                $("#start-scanner").prop('disabled', false);
             }
         }
         
         // Uruchom skaner po kliknięciu przycisku
         $("#start-scanner").on("click", function() {
-            initBarcodeScanner();
+            $(this).prop('disabled', true);
+            
+            // Sprawdź uprawnienia do kamery
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    // Zatrzymaj strumień - Quagga i tak stworzy własny
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Pobierz wybrane ID kamery (jeśli wybrano)
+                    const selectedCameraId = $("#camera-select").val();
+                    
+                    // Inicjalizuj skaner z wybraną kamerą lub domyślną
+                    initBarcodeScanner(selectedCameraId || null);
+                    $("#start-scanner").prop('disabled', false);
+                })
+                .catch(function(err) {
+                    console.error("Błąd dostępu do kamery:", err);
+                    showError("Nie można uzyskać dostępu do kamery: " + err.message);
+                    $("#start-scanner").prop('disabled', false);
+                    $("#camera-permission-info").show();
+                });
         });
         
         // Zatrzymaj skaner po kliknięciu przycisku
@@ -314,6 +466,33 @@
             $("#stop-scanner").hide();
             $("#start-scanner").show();
             $("#scanner-message").html("<p>Skaner zatrzymany. Kliknij 'Uruchom skaner kamery', aby rozpocząć skanowanie.</p>").show();
+        });
+        
+        // Przełączenie trybu debugowania
+        $("#enable-debug").on("change", function() {
+            if (scanner) {
+                // Jeśli skaner jest uruchomiony, zrestartuj go z nowymi ustawieniami
+                const selectedCameraId = $("#camera-select").val();
+                Quagga.stop();
+                scanner = null;
+                setTimeout(() => initBarcodeScanner(selectedCameraId || null), 300);
+            }
+            
+            if ($(this).is(":checked")) {
+                $("#debug-canvas").show();
+            } else {
+                $("#debug-canvas").hide();
+            }
+        });
+        
+        // Obsługa zmiany kamery
+        $("#camera-select").on("change", function() {
+            if (scanner) {
+                const selectedCameraId = $(this).val();
+                Quagga.stop();
+                scanner = null;
+                setTimeout(() => initBarcodeScanner(selectedCameraId || null), 300);
+            }
         });
         
         // Wyszukaj produkt po ręcznie wprowadzonym kodzie
