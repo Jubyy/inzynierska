@@ -9,6 +9,7 @@ from django.db.models import Q
 import json
 import requests
 from datetime import datetime, timedelta
+from difflib import SequenceMatcher
 
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
 from .models import FridgeItem
@@ -379,6 +380,32 @@ def ajax_barcode_lookup(request):
                     'error': 'Nie znaleziono nazwy produktu'
                 })
             
+            # Szukamy podobnych składników w bazie danych
+            similar_ingredients = []
+            all_ingredients = Ingredient.objects.all()
+            
+            # Funkcja do obliczania podobieństwa nazw
+            def similarity_ratio(a, b):
+                return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+            
+            # Filtrowanie składników o podobnych nazwach
+            for db_ingredient in all_ingredients:
+                # Główne podobieństwo nazwy
+                similarity = similarity_ratio(product_name, db_ingredient.name)
+                
+                # Sprawdzamy, czy produkt jest podobny do istniejącego składnika
+                if similarity > 0.6:  # 60% podobieństwa
+                    similar_ingredients.append({
+                        'id': db_ingredient.id,
+                        'name': db_ingredient.name,
+                        'similarity': similarity,
+                        'unit': db_ingredient.default_unit.id if db_ingredient.default_unit else None,
+                        'unit_name': db_ingredient.default_unit.name if db_ingredient.default_unit else None,
+                    })
+            
+            # Sortuj podobne składniki według podobieństwa (od najwyższego)
+            similar_ingredients = sorted(similar_ingredients, key=lambda x: x['similarity'], reverse=True)
+            
             # Przygotuj dane dotyczące ilości
             quantity = product_data.get('quantity', '')
             
@@ -410,7 +437,8 @@ def ajax_barcode_lookup(request):
                     'image_url': image_url,
                     'categories': categories_display,
                     'barcode': barcode
-                }
+                },
+                'similar_ingredients': similar_ingredients[:5]  # Ograniczamy do 5 najlepszych wyników
             })
         else:
             # Jeśli nie znaleziono w Open Food Facts, próbujemy utworzyć przykładowy produkt
@@ -424,7 +452,8 @@ def ajax_barcode_lookup(request):
                     'image_url': '',
                     'categories': '',
                     'barcode': barcode
-                }
+                },
+                'similar_ingredients': []
             })
     
     except Exception as e:

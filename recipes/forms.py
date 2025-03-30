@@ -169,12 +169,14 @@ class MealPlanForm(forms.ModelForm):
     
     class Meta:
         model = MealPlan
-        fields = ['recipe', 'date', 'meal_type', 'servings', 'notes']
+        fields = ['recipe', 'custom_name', 'date', 'meal_type', 'servings', 'notes', 'completed']
         widgets = {
-            'recipe': forms.Select(attrs={'class': 'form-control select2'}),
+            'recipe': forms.Select(attrs={'class': 'form-control select2', 'required': False}),
+            'custom_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Własna nazwa posiłku'}),
             'meal_type': forms.Select(attrs={'class': 'form-control'}),
             'servings': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Opcjonalne notatki do posiłku...'}),
+            'completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         
     def __init__(self, *args, **kwargs):
@@ -186,6 +188,20 @@ class MealPlanForm(forms.ModelForm):
             self.fields['recipe'].queryset = Recipe.objects.filter(
                 models.Q(author=user) | models.Q(is_public=True)
             ).order_by('title')
+            
+        # Dodajemy pole recipe jako opcjonalne
+        self.fields['recipe'].required = False
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        recipe = cleaned_data.get('recipe')
+        custom_name = cleaned_data.get('custom_name')
+        
+        # Sprawdź, czy podano albo przepis, albo własną nazwę
+        if not recipe and not custom_name:
+            raise forms.ValidationError("Musisz podać przepis lub własną nazwę posiłku.")
+            
+        return cleaned_data
 
 class MealPlanWeekForm(forms.Form):
     """Formularz do wyboru tygodnia do wyświetlenia planu posiłków"""

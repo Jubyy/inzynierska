@@ -390,26 +390,30 @@
                 {% for recipe in popular_recipes %}
                     <div class="swiper-slide">
                         <div class="recipe-card">
-                            <div class="position-relative">
-                                {% if recipe.image %}
-                                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                                {% else %}
-                                    <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia" class="card-img-top" alt="{{ recipe.title }}">
-                                {% endif %}
-                                {% if recipe.is_vegetarian %}
-                                    <span class="position-absolute top-0 end-0 bg-primary text-white px-3 py-1 m-2 rounded-pill">Wegetariańskie</span>
-                                {% elif recipe.is_vegan %}
-                                    <span class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 m-2 rounded-pill">Wegańskie</span>
-                                {% endif %}
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ recipe.title }}</h5>
-                                <p class="card-text">{{ recipe.description|truncatechars:100 }}</p>
-                                <div class="d-flex justify-content-between recipe-stats mb-3">
-                                    <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
-                                    <span><i class="bi bi-people"></i> {{ recipe.servings }} porcje</span>
-                                    <span><i class="bi bi-hand-thumbs-up"></i> {{ recipe.likes_count }}</span>
+                            <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
+                                <div class="position-relative">
+                                    {% if recipe.image %}
+                                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia" class="card-img-top" alt="{{ recipe.title }}">
+                                    {% endif %}
+                                    {% if recipe.is_vegetarian %}
+                                        <span class="position-absolute top-0 end-0 bg-primary text-white px-3 py-1 m-2 rounded-pill">Wegetariańskie</span>
+                                    {% elif recipe.is_vegan %}
+                                        <span class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 m-2 rounded-pill">Wegańskie</span>
+                                    {% endif %}
                                 </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ recipe.title }}</h5>
+                                    <p class="card-text">{{ recipe.description|truncatechars:100 }}</p>
+                                    <div class="d-flex justify-content-between recipe-stats mb-3">
+                                        <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
+                                        <span><i class="bi bi-people"></i> {{ recipe.servings }} porcje</span>
+                                        <span><i class="bi bi-hand-thumbs-up"></i> {{ recipe.likes_count }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="card-footer bg-transparent border-0 p-0 pb-3 px-3">
                                 <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-primary w-100">Zobacz przepis</a>
                             </div>
                         </div>

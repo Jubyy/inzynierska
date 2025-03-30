@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Potwierdź usunięcie posiłku{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Potwierdź usunięcie posiłku</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Czy na pewno chcesz usunąć posiłek <strong>"{{ meal_plan.meal_name }}"</strong> z planera?</p>
+                    <p>Data: {{ meal_plan.date|date:"d.m.Y" }} ({{ meal_plan.get_meal_type_display }})</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Tej operacji nie można cofnąć.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'recipes:meal_planner' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Anuluj
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Tak, usuń posiłek
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -65,6 +65,33 @@
                     </div>
                 </div>
                 {% endif %}
+                
+                <!-- Popularne składniki -->
+                {% if popular_ingredients %}
+                <div class="col-12 mt-3">
+                    <h5>Popularne składniki:</h5>
+                    <div class="ingredient-tags">
+                        {% for ingredient in popular_ingredients %}
+                            <a href="?ingredient={{ ingredient.id }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}" 
+                               class="badge rounded-pill bg-light text-dark border {% if selected_ingredient == ingredient.id|stringformat:'i' %}bg-primary text-white{% endif %} m-1">
+                                {{ ingredient.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Wybrany składnik -->
+                {% if selected_ingredient and ingredient_name %}
+                <div class="col-12 mt-3">
+                    <div class="alert alert-info">
+                        <span>Filtrujesz przepisy ze składnikiem: <strong>{{ ingredient_name }}</strong></span>
+                        <a href="?{% if query %}q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}" class="btn btn-sm btn-outline-secondary ms-2">
+                            <i class="bi bi-x-circle"></i> Usuń filtr
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
             </form>
         </div>
     </div>
@@ -73,29 +100,39 @@
     {% if recipes %}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for recipe in recipes %}
-        <div class="col">
-            <div class="recipe-card h-100">
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+            <div class="card h-100 recipe-card">
                 <div class="position-relative">
-                    {% if recipe.image %}
-                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 220px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
-                            <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Etykiety diet -->
-                    <div class="position-absolute top-0 start-0 p-2">
-                        {% if recipe.is_vegan %}
-                            <span class="badge bg-success me-1 mb-1 d-inline-block">Wegańskie</span>
-                        {% elif recipe.is_vegetarian %}
-                            <span class="badge bg-success-light me-1 mb-1 d-inline-block">Wegetariańskie</span>
+                    <a href="{% url 'recipes:detail' recipe.pk %}" class="text-decoration-none">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
                         {% else %}
-                            <span class="badge bg-danger me-1 mb-1 d-inline-block">Mięsne</span>
+                            <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia" class="card-img-top" alt="{{ recipe.title }}">
+                        {% endif %}
+                    </a>
+                    
+                    <!-- Oznaczenia dla diet -->
+                    <div class="diet-tags position-absolute top-0 start-0 p-2">
+                        {% if recipe.is_vegetarian and not recipe.is_vegan %}
+                            <span class="badge bg-success-light mb-1 d-block" title="Przepis wegetariański">
+                                <i class="bi bi-egg-fried me-1"></i>Wegetariański
+                            </span>
+                        {% endif %}
+                        
+                        {% if recipe.is_vegan %}
+                            <span class="badge bg-success mb-1 d-block" title="Przepis wegański">
+                                <i class="bi bi-flower1 me-1"></i>Wegański
+                            </span>
+                        {% endif %}
+                        
+                        {% if recipe.is_meat %}
+                            <span class="badge bg-danger mb-1 d-block" title="Przepis mięsny">
+                                <i class="bi bi-slack me-1"></i>Mięsny
+                            </span>
                         {% endif %}
                     </div>
                     
-                    <!-- Indykator dostępności -->
+                    <!-- Informacja o dostępności składników -->
                     {% if user.is_authenticated %}
                         <div class="position-absolute top-0 end-0 p-2">
                             {% if recipe.is_available %}
@@ -117,15 +154,19 @@
                     {% endif %}
                 </div>
                 
-                <div class="card-body">
-                    <h5 class="card-title">{{ recipe.title }}</h5>
-                    <p class="card-text text-muted small">{{ recipe.description|truncatechars:80 }}</p>
-                    
-                    <div class="d-flex justify-content-between recipe-stats mb-3">
-                        <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
-                        <span><i class="bi bi-people"></i> {{ recipe.servings }}</span>
+                <a href="{% url 'recipes:detail' recipe.pk %}" class="text-decoration-none text-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <p class="card-text text-muted small">{{ recipe.description|truncatechars:80 }}</p>
+                        
+                        <div class="d-flex justify-content-between recipe-stats mb-3">
+                            <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
+                            <span><i class="bi bi-people"></i> {{ recipe.servings }}</span>
+                        </div>
                     </div>
-                    
+                </a>
+                
+                <div class="card-body border-top pt-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-eye me-1"></i>Zobacz przepis
@@ -170,12 +211,12 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
                         <i class="bi bi-chevron-double-left"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
@@ -186,19 +227,19 @@
                     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=on{% endif %}">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=on{% endif %}">
                         <i class="bi bi-chevron-double-right"></i>
                     </a>
                 </li>

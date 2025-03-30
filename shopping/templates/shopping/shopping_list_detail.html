@@ -20,6 +20,9 @@
             </p>
         </div>
         <div class="col-md-4 text-end d-flex justify-content-end align-items-center">
+            <a href="{% url 'shopping:export_pdf' shopping_list.id %}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-file-pdf"></i> Eksportuj do PDF
+            </a>
             <a href="{% url 'shopping:add_item' shopping_list.id %}" class="btn btn-primary me-2">
                 <i class="bi bi-plus-circle"></i> Dodaj produkt
             </a>

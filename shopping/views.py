@@ -4,8 +4,17 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.db.models import Q
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib import colors
+from django.utils.translation import gettext as _
 
 from .models import ShoppingList, ShoppingItem
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
@@ -274,3 +283,75 @@ def ajax_ingredient_search(request):
             results = [{'id': i.id, 'text': i.name} for i in ingredients]
     
     return JsonResponse({'results': results})
+
+@login_required
+def export_list_to_pdf(request, pk):
+    """Eksportuje listę zakupów do pliku PDF"""
+    shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
+    
+    # Utwórz bufor pamięci do zapisania PDF
+    buffer = io.BytesIO()
+    
+    # Utwórz obiekt canvas z bufforem
+    p = canvas.Canvas(buffer, pagesize=A4)
+    
+    # Ustaw czcionkę (możesz użyć wbudowanej czcionki)
+    p.setFont("Helvetica-Bold", 16)
+    
+    # Tytuł dokumentu
+    p.drawString(2*cm, 28*cm, f"Lista zakupów: {shopping_list.name}")
+    
+    # Informacje o liście
+    p.setFont("Helvetica", 12)
+    p.drawString(2*cm, 27*cm, f"Data utworzenia: {shopping_list.created_at.strftime('%d-%m-%Y')}")
+    p.drawString(2*cm, 26.5*cm, f"Użytkownik: {shopping_list.user.username}")
+    
+    # Nagłówki tabeli
+    headers = ["Składnik", "Ilość", "Jednostka", "Kupiono"]
+    data = [headers]
+    
+    # Dane tabeli
+    for item in shopping_list.items.all():
+        row = [
+            item.ingredient.name,
+            str(round(item.amount, 2)),
+            item.unit.symbol,
+            "✓" if item.is_purchased else ""
+        ]
+        data.append(row)
+    
+    # Utwórz tabelę
+    table = Table(data, colWidths=[8*cm, 3*cm, 3*cm, 2*cm])
+    
+    # Stylizacja tabeli
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+    
+    # Rysuj tabelę
+    table.wrapOn(p, 2*cm, 20*cm)
+    table.drawOn(p, 2*cm, 24*cm)
+    
+    # Dodaj informacje na końcu strony
+    p.setFont("Helvetica-Oblique", 10)
+    p.drawString(2*cm, 2*cm, "Wygenerowano z aplikacji Książka Kucharska")
+    
+    # Zakończ stronę
+    p.showPage()
+    p.save()
+    
+    # Zapisz PDF do bufora i zwróć jako odpowiedź
+    buffer.seek(0)
+    
+    # Przygotuj odpowiedź
+    filename = f"lista_zakupow_{shopping_list.id}.pdf"
+    response = FileResponse(buffer, as_attachment=True, filename=filename)
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response

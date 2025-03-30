@@ -283,23 +283,33 @@ class MealPlan(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='meal_plans', verbose_name="Użytkownik")
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='meal_plans', verbose_name="Przepis")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='meal_plans', verbose_name="Przepis", null=True, blank=True)
     date = models.DateField(verbose_name="Data")
     meal_type = models.CharField(max_length=20, choices=MEAL_TYPES, verbose_name="Rodzaj posiłku")
     servings = models.PositiveIntegerField(default=1, verbose_name="Liczba porcji")
     notes = models.TextField(blank=True, null=True, verbose_name="Notatki")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data utworzenia")
+    completed = models.BooleanField(default=False, verbose_name="Zrealizowano")
+    custom_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Własna nazwa posiłku")
     
     class Meta:
         verbose_name = "Plan posiłku"
         verbose_name_plural = "Plany posiłków"
         ordering = ['date', 'meal_type']
-        # Jeden przepis na dany typ posiłku i datę dla użytkownika
-        unique_together = ('user', 'date', 'meal_type', 'recipe')
+        # Już nie potrzebujemy recipe w unique_together, bo teraz może być null
+        unique_together = ('user', 'date', 'meal_type')
         
     def __str__(self):
-        return f"{self.get_meal_type_display()} - {self.recipe.title} ({self.date})"
+        meal_name = self.custom_name if self.custom_name else (self.recipe.title if self.recipe else "Własny posiłek")
+        return f"{self.get_meal_type_display()} - {meal_name} ({self.date})"
     
     def get_ingredients_for_shopping(self):
         """Zwraca składniki potrzebne do przygotowania posiłku, dostosowane do liczby porcji"""
-        return self.recipe.scale_to_servings(self.servings) 
+        if self.recipe:
+            return self.recipe.scale_to_servings(self.servings)
+        return []
+        
+    @property
+    def meal_name(self):
+        """Zwraca nazwę posiłku - własną lub z przepisu"""
+        return self.custom_name if self.custom_name else (self.recipe.title if self.recipe else "Własny posiłek") 

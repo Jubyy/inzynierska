@@ -156,6 +156,104 @@ class ShoppingList(models.Model):
         
         return added_count
 
+    def add_ingredient(self, ingredient, amount, unit):
+        """
+        Dodaje składnik do listy zakupów.
+        
+        Args:
+            ingredient (Ingredient): Składnik
+            amount (float): Ilość
+            unit (MeasurementUnit): Jednostka
+            
+        Returns:
+            ShoppingItem: Utworzona lub zaktualizowana pozycja
+        """
+        # Sprawdź, czy ten składnik już jest na liście
+        existing_item = self.items.filter(ingredient=ingredient, unit=unit).first()
+        
+        if existing_item:
+            # Jeśli tak, zwiększ ilość
+            existing_item.amount += amount
+            existing_item.save()
+            return existing_item
+        else:
+            # Jeśli nie, utwórz nową pozycję
+            item = ShoppingItem.objects.create(
+                shopping_list=self,
+                ingredient=ingredient,
+                amount=amount,
+                unit=unit
+            )
+            return item
+            
+    def optimize(self):
+        """
+        Optymalizuje listę zakupów, łącząc podobne składniki.
+        
+        Returns:
+            int: Liczba zoptymalizowanych pozycji
+        """
+        from recipes.utils import convert_units
+        
+        # Grupuj składniki według ID
+        ingredient_groups = {}
+        
+        # Zbierz wszystkie pozycje według składnika
+        for item in self.items.all():
+            if item.ingredient.id not in ingredient_groups:
+                ingredient_groups[item.ingredient.id] = []
+            ingredient_groups[item.ingredient.id].append(item)
+        
+        optimized_count = 0
+        
+        # Dla każdej grupy składników
+        for ingredient_id, items in ingredient_groups.items():
+            if len(items) <= 1:
+                continue  # Nie ma co optymalizować, jeśli jest tylko jeden element
+            
+            # Wybierz jednostkę, która najczęściej występuje
+            unit_count = {}
+            for item in items:
+                unit_id = item.unit.id
+                if unit_id not in unit_count:
+                    unit_count[unit_id] = 0
+                unit_count[unit_id] += 1
+            
+            # Sortuj według częstotliwości występowania (od najwyższej)
+            most_common_unit_id = sorted(unit_count.items(), key=lambda x: x[1], reverse=True)[0][0]
+            most_common_unit = items[0].unit.__class__.objects.get(id=most_common_unit_id)
+            
+            # Zbierz całkowitą ilość, konwertując jednostki
+            total_amount = 0
+            for item in items:
+                if item.unit.id == most_common_unit_id:
+                    total_amount += item.amount
+                else:
+                    try:
+                        # Spróbuj przekonwertować jednostkę
+                        converted_amount = convert_units(item.amount, item.unit, most_common_unit)
+                        if converted_amount is not None:
+                            total_amount += converted_amount
+                    except:
+                        # Jeśli konwersja się nie powiedzie, zachowaj oryginalną pozycję
+                        pass
+            
+            # Usuń wszystkie stare pozycje
+            for item in items:
+                item.delete()
+            
+            # Utwórz nową, zoptymalizowaną pozycję
+            ShoppingItem.objects.create(
+                shopping_list=self,
+                ingredient=items[0].ingredient,
+                amount=total_amount,
+                unit=most_common_unit
+            )
+            
+            optimized_count += 1
+        
+        return optimized_count
+
 class ShoppingItem(models.Model):
     shopping_list = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, related_name='items', verbose_name="Lista zakupów")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Składnik")

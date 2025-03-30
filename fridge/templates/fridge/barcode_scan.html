@@ -208,6 +208,72 @@
         </div>
     </div>
 </div>
+
+<div id="product-form" style="display: none;" class="mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Dodaj produkt do lodówki</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3 text-center">
+                    <img id="product-image" src="" alt="Zdjęcie produktu" style="max-width: 100%; max-height: 120px; display: none;">
+                </div>
+                <div class="col-md-9">
+                    <h5 id="product-name" class="mb-2"></h5>
+                    <p id="product-barcode" class="mb-2"></p>
+                    <p id="product-category" class="mb-2 text-muted small"></p>
+                </div>
+            </div>
+            
+            <!-- Podobne składniki -->
+            <div id="similar-ingredients-container" class="mb-4" style="display: none;">
+                <h5>Podobne składniki w bazie danych:</h5>
+                <div class="alert alert-info">
+                    <p>Znaleźliśmy podobne składniki w bazie danych. Wybierz jeden z nich lub dodaj nowy produkt.</p>
+                </div>
+                <div id="similar-ingredients" class="list-group mb-3">
+                    <!-- Tutaj będą dodawane dynamicznie podobne składniki -->
+                </div>
+                <div class="mb-3">
+                    <button id="use-new-product" class="btn btn-outline-primary">Dodaj jako nowy składnik</button>
+                </div>
+            </div>
+            
+            <form id="add-product-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ingredient" class="form-label">Nazwa produktu</label>
+                        <input type="text" id="ingredient" name="ingredient" class="form-control" required>
+                        <input type="hidden" id="ingredient-id" name="ingredient_id">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="amount" class="form-label">Ilość</label>
+                        <input type="number" id="amount" name="amount" class="form-control" min="0.01" step="0.01" value="1" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="unit" class="form-label">Jednostka</label>
+                        <select id="unit" name="unit" class="form-select" required>
+                            {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="expiry_date" class="form-label">Data ważności (opcjonalnie)</label>
+                    <input type="date" id="expiry_date" name="expiry_date" class="form-control">
+                </div>
+                <input type="hidden" id="barcode" name="barcode">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Dodaj do lodówki
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -524,62 +590,123 @@
                 url: "{% url 'fridge:ajax_barcode_lookup' %}",
                 type: "GET",
                 data: { barcode: barcode },
-                success: function(data) {
+                success: function(response) {
                     $("#loading-spinner").hide();
                     
-                    if (data.success) {
-                        // Wypełnij dane produktu
-                        if (data.exists) {
-                            // Produkt istnieje w bazie
-                            $("#product-name").text(data.product.name);
-                            $("#product-barcode").text("Kod kreskowy: " + barcode);
-                            $("#product-quantity").text("");
-                            $("#product-categories").text("");
+                    if (response.success) {
+                        // Wyświetl formularz dodawania produktu
+                        $("#search-status").hide();
+                        $("#product-form").show();
+                        
+                        if (response.exists) {
+                            // Jeśli produkt istnieje w bazie, wypełnij formularz jego danymi
+                            $("#ingredient").val(response.product.name);
+                            $("#ingredient-id").val(response.product.id);
+                            $("#barcode").val(barcode);
                             
-                            // Ustaw domyślną jednostkę jeśli jest dostępna
-                            if (data.product.unit) {
-                                $("#product-unit").val(data.product.unit);
+                            // Jeśli produkt ma domyślną jednostkę, ustaw ją
+                            if (response.product.unit) {
+                                $("#unit").val(response.product.unit);
+                            }
+                        } else {
+                            // Jeśli produkt nie istnieje w bazie, wypełnij formularz danymi z API
+                            $("#ingredient").val(response.product.name);
+                            $("#ingredient-id").val("");
+                            $("#barcode").val(barcode);
+                            $("#product-barcode").text("Kod kreskowy: " + barcode);
+                            
+                            // Pokaż kategorię, jeśli jest dostępna
+                            if (response.product.categories) {
+                                $("#product-category").text("Kategoria: " + response.product.categories).show();
+                            } else {
+                                $("#product-category").hide();
                             }
                             
-                            $("#product-image").attr("src", "/static/images/product_placeholder.png");
-                        } else {
-                            // Produkt z zewnętrznej bazy danych
-                            $("#product-name").text(data.product.name);
-                            $("#product-barcode").text("Kod kreskowy: " + barcode);
-                            $("#product-quantity").text("Ilość: " + (data.product.quantity || "Brak danych"));
-                            $("#product-categories").text("Kategorie: " + (data.product.categories || "Brak danych"));
-                            
-                            // Ustaw zdjęcie produktu lub domyślne zdjęcie
-                            if (data.product.image_url) {
-                                $("#product-image").attr("src", data.product.image_url);
+                            // Pokaż zdjęcie, jeśli jest dostępne
+                            if (response.product.image_url) {
+                                $("#product-image").attr("src", response.product.image_url).show();
                             } else {
-                                $("#product-image").attr("src", "/static/images/product_placeholder.png");
+                                $("#product-image").hide();
+                            }
+                            
+                            // Pokaż podobne składniki, jeśli są dostępne
+                            if (response.similar_ingredients && response.similar_ingredients.length > 0) {
+                                // Wyczyść kontener
+                                $("#similar-ingredients").empty();
+                                
+                                // Dodaj każdy podobny składnik do listy
+                                response.similar_ingredients.forEach(function(item) {
+                                    var similarity = Math.round(item.similarity * 100);
+                                    var unitText = item.unit_name ? ` (domyślna jednostka: ${item.unit_name})` : '';
+                                    
+                                    var listItem = $(`
+                                        <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" 
+                                               data-id="${item.id}" 
+                                               data-name="${item.name}" 
+                                               data-unit="${item.unit || ''}">
+                                            <div>
+                                                <strong>${item.name}</strong>
+                                                <small class="d-block text-muted">${unitText}</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">${similarity}% zgodności</span>
+                                        </button>
+                                    `);
+                                    
+                                    $("#similar-ingredients").append(listItem);
+                                });
+                                
+                                // Pokaż kontener z podobnymi składnikami
+                                $("#similar-ingredients-container").show();
+                            } else {
+                                $("#similar-ingredients-container").hide();
                             }
                         }
-                        
-                        // Pokaż formularz dodawania do lodówki
-                        $("#product-result").show();
                     } else {
-                        // Pokaż komunikat o błędzie
-                        showError(data.error || "Nie znaleziono produktu");
+                        // Wyświetl błąd
+                        $("#search-status").html("<p class='text-danger'>Błąd: " + response.error + "</p>").show();
                     }
                 },
-                error: function(xhr, status, error) {
-                    $("#loading-spinner").hide();
-                    showError("Wystąpił błąd podczas wyszukiwania produktu: " + error);
+                error: function() {
+                    $("#search-status").html("<p class='text-danger'>Wystąpił błąd podczas komunikacji z serwerem</p>").show();
                 }
             });
         }
         
+        // Obsługa kliknięcia na podobny składnik
+        $(document).on("click", "#similar-ingredients .list-group-item", function() {
+            var id = $(this).data("id");
+            var name = $(this).data("name");
+            var unit = $(this).data("unit");
+            
+            // Wypełnij formularz danymi wybranego składnika
+            $("#ingredient").val(name);
+            $("#ingredient-id").val(id);
+            
+            // Jeśli składnik ma domyślną jednostkę, ustaw ją
+            if (unit) {
+                $("#unit").val(unit);
+            }
+            
+            // Ukryj listę podobnych składników
+            $("#similar-ingredients-container").hide();
+        });
+        
+        // Obsługa przycisku "Dodaj jako nowy składnik"
+        $("#use-new-product").click(function() {
+            // Ukryj listę podobnych składników
+            $("#similar-ingredients-container").hide();
+        });
+        
         // Obsługa formularza dodawania produktu do lodówki
-        $("#add-to-fridge-form").on("submit", function(e) {
+        $("#add-product-form").on("submit", function(e) {
             e.preventDefault();
             
-            const amount = $("#product-amount").val();
-            const unit = $("#product-unit").val();
-            const expiryDate = $("#product-expiry").val();
-            const productName = $("#product-name").text();
-            const barcode = $("#product-barcode").text().replace("Kod kreskowy: ", "");
+            const amount = $("#amount").val();
+            const unit = $("#unit").val();
+            const expiryDate = $("#expiry_date").val();
+            const ingredient = $("#ingredient").val();
+            const ingredientId = $("#ingredient-id").val();
+            const barcode = $("#barcode").val();
             
             if (!amount || !unit) {
                 showError("Wypełnij wszystkie wymagane pola formularza");
@@ -591,11 +718,12 @@
                 url: "{% url 'fridge:add_scanned_product' %}",
                 type: "POST",
                 data: {
-                    ingredient: productName,
+                    ingredient: ingredient,
                     amount: amount,
                     unit: unit,
                     expiry_date: expiryDate,
                     barcode: barcode,
+                    ingredient_id: ingredientId,
                     csrfmiddlewaretoken: "{{ csrf_token }}"
                 },
                 success: function(response) {

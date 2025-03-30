@@ -23,4 +23,5 @@ urlpatterns = [
     
     # Widoki AJAX
     path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
+    path('list/<int:pk>/export-pdf/', views.export_list_to_pdf, name='export_pdf'),
 ]
