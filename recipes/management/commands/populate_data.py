@@ -489,13 +489,14 @@ class Command(BaseCommand):
                 
                 # Jeśli mamy składnik i jednostkę, dodajemy do przepisu
                 if ingredient and unit:
-                    RecipeIngredient.objects.create(
-                        recipe=recipe,
-                        ingredient=ingredient,
-                        amount=ingredient_data['amount'],
-                        unit=unit,
-                        order=i+1
-                    )
+                    # Sprawdź czy ten składnik już istnieje w przepisie (unikaj duplikatów)
+                    if not RecipeIngredient.objects.filter(recipe=recipe, ingredient=ingredient).exists():
+                        RecipeIngredient.objects.create(
+                            recipe=recipe,
+                            ingredient=ingredient,
+                            amount=ingredient_data['amount'],
+                            unit=unit
+                        )
             
             recipes.append(recipe)
         
@@ -556,13 +557,15 @@ class Command(BaseCommand):
                 else:
                     amount = random.randint(10, 500)
                 
-                RecipeIngredient.objects.create(
-                    recipe=recipe,
-                    ingredient=ingredient,
-                    amount=amount,
-                    unit=unit,
-                    order=i+1
-                )
+                # Jeśli mamy składnik i jednostkę, dodajemy do przepisu
+                # Upewnij się, że ten składnik jeszcze nie istnieje w przepisie
+                if not RecipeIngredient.objects.filter(recipe=recipe, ingredient=ingredient).exists():
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        amount=amount,
+                        unit=unit
+                    )
             
             recipes.append(recipe)
         
