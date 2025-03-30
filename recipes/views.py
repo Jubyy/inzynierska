@@ -6,9 +6,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, MealPlan
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, MealPlanForm, MealPlanWeekForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
@@ -1029,93 +1029,376 @@ def export_meal_plan_to_pdf(request):
         date__range=(dates[0], dates[6])
     ).order_by('date', 'meal_type')
     
-    # Przygotuj dane dla PDF
-    # Utwórz bufor pamięci do zapisania PDF
+    # Przygotuj dane dla widoku tygodniowego
+    week_data = {}
+    for day_date in dates:
+        day_name = day_date.strftime('%A')  # Nazwa dnia tygodnia
+        day_meals = {}
+        
+        # Dla każdego typu posiłku sprawdź, czy istnieje zaplanowany posiłek
+        for meal_code, meal_name in MealPlan.MEAL_TYPES:
+            day_meals[meal_code] = meal_plans.filter(date=day_date, meal_type=meal_code).first()
+        
+        week_data[day_date] = {
+            'name': day_name,
+            'date': day_date,
+            'meals': day_meals
+        }
+    
+    # Utwórz dokument PDF
     buffer = io.BytesIO()
     
-    # Utwórz obiekt canvas z bufforem (użyj widoku landscape)
+    # Używamy orientacji poziomej dla lepszego dopasowania do tygodniowego widoku
     p = canvas.Canvas(buffer, pagesize=landscape(A4))
+    width, height = landscape(A4)
     
-    # Ustaw czcionkę
+    # Ustaw tytuł dokumentu
+    p.setTitle(f"Planer posiłków {dates[0]} - {dates[6]}")
+    
+    # Nagłówek
     p.setFont("Helvetica-Bold", 16)
+    p.drawString(30, height - 30, f"Planer posiłków: {dates[0].strftime('%d.%m.%Y')} - {dates[6].strftime('%d.%m.%Y')}")
+    p.setFont("Helvetica", 10)
+    p.drawString(30, height - 45, f"Użytkownik: {request.user.username}")
+    p.drawString(30, height - 60, f"Wygenerowano: {datetime.now().strftime('%d.%m.%Y %H:%M')}")
     
-    # Tytuł dokumentu
-    p.drawString(2*cm, 19*cm, f"Plan posiłków od {dates[0].strftime('%d.%m.%Y')} do {dates[6].strftime('%d.%m.%Y')}")
+    # Narysuj linię pod nagłówkiem
+    p.line(30, height - 70, width - 30, height - 70)
     
-    # Wypisz informacje
-    p.setFont("Helvetica", 12)
-    p.drawString(2*cm, 18*cm, f"Użytkownik: {request.user.username}")
+    # Przygotuj dane dla tabeli
+    table_data = []
     
-    # Przygotuj dane do tabeli
-    meal_type_names = {meal_type: name for meal_type, name in MealPlan.MEAL_TYPES}
-    
-    # Nagłówki tabeli - dni tygodnia
-    headers = ["Posiłek"]
+    # Nagłówki kolumn: Pusta komórka + dni tygodnia
+    headers = ['']
     for day_date in dates:
-        headers.append(f"{day_date.strftime('%a %d.%m')}")
+        headers.append(f"{day_date.strftime('%A')}\n{day_date.strftime('%d.%m')}")
+    table_data.append(headers)
     
-    # Dane tabeli - rodzaje posiłków i ich zawartość
-    data = [headers]
-    
-    for meal_type, meal_name in MealPlan.MEAL_TYPES:
+    # Dodaj wiersze dla każdego typu posiłku
+    for meal_code, meal_name in MealPlan.MEAL_TYPES:
         row = [meal_name]
         
         for day_date in dates:
-            # Znajdź posiłek dla tego dnia i typu
-            meal = meal_plans.filter(date=day_date, meal_type=meal_type).first()
-            
+            meal = week_data[day_date]['meals'].get(meal_code)
             if meal:
-                if meal.recipe:
-                    cell_text = f"{meal.recipe.title} ({meal.servings} porcji)"
-                else:
-                    cell_text = f"{meal.custom_name or 'Własny posiłek'}"
-                
+                cell_text = f"{meal.meal_name}"
+                if meal.servings > 1:
+                    cell_text += f" ({meal.servings} porcji)"
                 if meal.completed:
-                    cell_text = f"✓ {cell_text}"
+                    cell_text += "\n✓ Zrealizowano"
             else:
-                cell_text = "-"
-                
+                cell_text = ""
             row.append(cell_text)
-            
-        data.append(row)
-    
-    # Ustaw szerokości kolumn (pierwsza kolumna szersza, reszta równa)
-    col_widths = [5*cm] + [3.5*cm] * 7
-    
-    # Utwórz tabelę
-    table = Table(data, colWidths=col_widths)
-    
-    # Stylizacja tabeli
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # Nagłówki kolumn
-        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),  # Nagłówki wierszy
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Pogrubione nagłówki kolumn
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Pogrubione nagłówki wierszy
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (1, 1), (-1, -1), colors.white),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
+        
+        table_data.append(row)
     
     # Rysuj tabelę
-    table.wrapOn(p, 2*cm, 2*cm)
-    table.drawOn(p, 2*cm, 5*cm)
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+    ])
     
-    # Dodaj informacje na końcu strony
-    p.setFont("Helvetica-Oblique", 10)
-    p.drawString(2*cm, 2*cm, "Wygenerowano z aplikacji Książka Kucharska")
+    # Dodaj różne kolory tła dla różnych typów posiłków
+    meal_colors = [
+        colors.Color(0.9, 0.9, 1),    # Śniadanie - jasnoniebieskie
+        colors.Color(1, 0.9, 0.9),    # Drugie śniadanie - jasnoróżowe
+        colors.Color(0.9, 1, 0.9),    # Obiad - jasnozielone
+        colors.Color(1, 1, 0.9),      # Przekąska - jasnożółte
+        colors.Color(0.9, 0.95, 1)    # Kolacja - jasnofioletowe
+    ]
     
-    # Zakończ stronę
+    # Zastosuj kolory dla odpowiednich wierszy
+    for i, (meal_code, meal_name) in enumerate(MealPlan.MEAL_TYPES):
+        table_style.add('BACKGROUND', (1, i+1), (-1, i+1), meal_colors[i % len(meal_colors)])
+    
+    # Utwórz tabelę i ustaw szerokości kolumn
+    col_widths = [80] + [(width - 110) / 7] * 7
+    table = Table(table_data, colWidths=col_widths, rowHeights=[40] + [60] * len(MealPlan.MEAL_TYPES))
+    table.setStyle(table_style)
+    
+    # Umieść tabelę na stronie
+    table.wrapOn(p, width - 60, height - 120)
+    table.drawOn(p, 30, height - 340)
+    
+    # Dodaj stopkę
+    p.setFont("Helvetica-Oblique", 8)
+    p.drawString(30, 30, "Wygenerowano z aplikacji Książka Kucharska")
+    
+    # Zakończ stronę i zapisz PDF
     p.showPage()
     p.save()
     
-    # Zapisz PDF do bufora i zwróć jako odpowiedź
+    # Ustaw bufor na początek
     buffer.seek(0)
     
-    # Przygotuj odpowiedź
-    filename = f"plan_posilkow_{dates[0].strftime('%Y%m%d')}.pdf"
-    response = FileResponse(buffer, as_attachment=True, filename=filename)
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    # Utwórz odpowiedź HTTP z załącznikiem PDF
+    return FileResponse(
+        buffer, 
+        as_attachment=True, 
+        filename=f'planer_posilkow_{dates[0]}_{dates[6]}.pdf',
+        content_type='application/pdf'
+    )
+
+@login_required
+def meal_planner(request):
+    """Widok tygodniowego planera posiłków"""
+    # Pobierz datę początkową (poniedziałek bieżącego tygodnia)
+    today = date.today()
+    start_date_param = request.GET.get('start_date')
     
-    return response
+    if start_date_param:
+        try:
+            start_date = datetime.strptime(start_date_param, '%Y-%m-%d').date()
+        except ValueError:
+            start_date = today - timedelta(days=today.weekday())
+    else:
+        # Jeśli nie podano daty, użyj poniedziałku bieżącego tygodnia
+        start_date = today - timedelta(days=today.weekday())
+    
+    # Generuj daty dla całego tygodnia (pon-niedz)
+    dates = [start_date + timedelta(days=i) for i in range(7)]
+    
+    # Pobierz wszystkie posiłki z tego okresu dla zalogowanego użytkownika
+    meal_plans = MealPlan.objects.filter(
+        user=request.user,
+        date__range=(dates[0], dates[6])
+    ).order_by('date', 'meal_type')
+    
+    # Przygotuj dane dla szablonu
+    week_data = {}
+    for day_date in dates:
+        day_name = day_date.strftime('%A')  # Nazwa dnia tygodnia
+        day_meals = {}
+        
+        # Dla każdego typu posiłku sprawdź, czy istnieje zaplanowany posiłek
+        for meal_code, meal_name in MealPlan.MEAL_TYPES:
+            day_meals[meal_code] = meal_plans.filter(date=day_date, meal_type=meal_code).first()
+        
+        week_data[day_date] = {
+            'name': day_name,
+            'date': day_date,
+            'meals': day_meals
+        }
+    
+    # Formularz do wyboru tygodnia
+    week_form = MealPlanWeekForm(initial={'start_date': start_date})
+    
+    # Wylicz daty poprzedniego i następnego tygodnia
+    prev_week = start_date - timedelta(days=7)
+    next_week = start_date + timedelta(days=7)
+    
+    context = {
+        'week_data': week_data,
+        'dates': dates,
+        'meal_types': MealPlan.MEAL_TYPES,
+        'week_form': week_form,
+        'prev_week': prev_week,
+        'next_week': next_week,
+        'current_week': start_date
+    }
+    
+    return render(request, 'recipes/meal_planner.html', context)
+
+@login_required
+def add_meal_plan(request, date_str=None, meal_type=None):
+    """Widok dodawania posiłku do planera"""
+    initial = {}
+    
+    # Jeśli przekazano datę i typ posiłku, użyj ich jako wartości początkowe
+    if date_str:
+        try:
+            parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            initial['date'] = parsed_date
+        except ValueError:
+            pass
+    
+    if meal_type:
+        initial['meal_type'] = meal_type
+    
+    if request.method == 'POST':
+        form = MealPlanForm(request.POST, user=request.user)
+        
+        if form.is_valid():
+            meal_plan = form.save(commit=False)
+            meal_plan.user = request.user
+            meal_plan.save()
+            
+            messages.success(request, 'Posiłek został dodany do planera!')
+            
+            # Przekieruj z powrotem do planera
+            return redirect('recipes:meal_planner')
+    else:
+        form = MealPlanForm(initial=initial, user=request.user)
+    
+    context = {
+        'form': form,
+        'title': 'Dodaj posiłek do planera'
+    }
+    
+    return render(request, 'recipes/meal_plan_form.html', context)
+
+@login_required
+def edit_meal_plan(request, pk):
+    """Widok edycji zaplanowanego posiłku"""
+    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        form = MealPlanForm(request.POST, instance=meal_plan, user=request.user)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Posiłek został zaktualizowany!')
+            return redirect('recipes:meal_planner')
+    else:
+        form = MealPlanForm(instance=meal_plan, user=request.user)
+    
+    context = {
+        'form': form,
+        'title': 'Edytuj zaplanowany posiłek',
+        'meal_plan': meal_plan
+    }
+    
+    return render(request, 'recipes/meal_plan_form.html', context)
+
+@login_required
+def delete_meal_plan(request, pk):
+    """Widok usuwania zaplanowanego posiłku"""
+    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        meal_plan.delete()
+        messages.success(request, 'Zaplanowany posiłek został usunięty!')
+        return redirect('recipes:meal_planner')
+    
+    context = {
+        'meal_plan': meal_plan
+    }
+    
+    return render(request, 'recipes/meal_plan_confirm_delete.html', context)
+
+@login_required
+def toggle_meal_completed(request, pk):
+    """Przełączanie statusu zrealizowania posiłku (AJAX)"""
+    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
+    
+    # Przełącz status
+    meal_plan.completed = not meal_plan.completed
+    meal_plan.save()
+    
+    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'completed': meal_plan.completed,
+            'id': meal_plan.id
+        })
+    
+    # W przeciwnym razie, przekieruj do planera
+    return redirect('recipes:meal_planner')
+
+@login_required
+def copy_day_meals(request, from_date, to_date):
+    """Kopiowanie posiłków z jednego dnia na inny"""
+    if request.method == 'POST':
+        try:
+            from_date = datetime.strptime(from_date, '%Y-%m-%d').date()
+            to_date = datetime.strptime(to_date, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, 'Nieprawidłowy format daty!')
+            return redirect('recipes:meal_planner')
+        
+        # Pobierz wszystkie posiłki z dnia źródłowego
+        source_meals = MealPlan.objects.filter(user=request.user, date=from_date)
+        
+        if not source_meals.exists():
+            messages.warning(request, f'Brak posiłków do skopiowania z dnia {from_date}!')
+            return redirect('recipes:meal_planner')
+        
+        # Usuń wszystkie istniejące posiłki z dnia docelowego
+        MealPlan.objects.filter(user=request.user, date=to_date).delete()
+        
+        # Kopiuj posiłki
+        copied_count = 0
+        for meal in source_meals:
+            # Tworzymy kopię posiłku ze zmienioną datą
+            meal.pk = None  # Ustawienie None na ID tworzy nowy obiekt
+            meal.date = to_date
+            meal.save()
+            copied_count += 1
+        
+        messages.success(request, f'Skopiowano {copied_count} posiłków z {from_date} na {to_date}!')
+    
+    return redirect('recipes:meal_planner')
+
+@login_required
+def generate_shopping_list_from_plan(request):
+    """Generuje listę zakupów na podstawie zaplanowanych posiłków"""
+    if request.method == 'POST':
+        # Pobierz daty z formularza
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            messages.error(request, 'Nieprawidłowy format daty!')
+            return redirect('recipes:meal_planner')
+        
+        # Pobierz posiłki z wybranego zakresu dat
+        meal_plans = MealPlan.objects.filter(
+            user=request.user,
+            date__range=(start_date, end_date),
+            recipe__isnull=False  # Tylko posiłki z przypisanymi przepisami
+        )
+        
+        if not meal_plans.exists():
+            messages.warning(request, 'Brak przepisów do wygenerowania listy zakupów w wybranym okresie!')
+            return redirect('recipes:meal_planner')
+        
+        # Sprawdź czy istnieje moduł shopping - jeśli nie, pokaż błąd
+        try:
+            from shopping.models import ShoppingList
+        except ImportError:
+            messages.error(request, 'Moduł listy zakupów nie jest dostępny!')
+            return redirect('recipes:meal_planner')
+        
+        # Utwórz nową listę zakupów
+        shopping_list = ShoppingList.objects.create(
+            user=request.user,
+            name=f'Lista zakupów {start_date} - {end_date}'
+        )
+        
+        # Dodaj składniki z przepisów
+        total_ingredients = 0
+        for meal_plan in meal_plans:
+            if meal_plan.recipe:
+                # Użyj funkcji get_ingredients_for_shopping, która uwzględnia liczbę porcji
+                ingredients = meal_plan.get_ingredients_for_shopping()
+                for ingredient_data in ingredients:
+                    shopping_list.add_ingredient(
+                        ingredient_data['ingredient'],
+                        ingredient_data['amount'],
+                        ingredient_data['unit']
+                    )
+                    total_ingredients += 1
+        
+        # Optymalizuj listę składników (łączenie podobnych)
+        shopping_list.optimize()
+        
+        messages.success(
+            request, 
+            f'Utworzono listę zakupów z {total_ingredients} składnikami z {meal_plans.count()} posiłków!'
+        )
+        
+        # Przekieruj do szczegółów listy zakupów
+        return redirect('shopping:detail', pk=shopping_list.pk)
+    
+    # Jeśli żądanie GET, przekieruj do planera
+    return redirect('recipes:meal_planner')

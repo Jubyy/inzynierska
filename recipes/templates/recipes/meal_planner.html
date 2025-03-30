@@ -6,7 +6,176 @@
 
 {% block extra_css %}
 <style>
-  /* ... istniejące style ... */
+  .meal-cell {
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    position: relative;
+  }
+  
+  .meal-cell:hover {
+    background-color: rgba(0,0,0,0.05);
+  }
+  
+  .meal-cell.empty {
+    background-color: rgba(0,0,0,0.02);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .meal-cell .controls {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .meal-cell:hover .controls {
+    opacity: 1;
+  }
+  
+  .day-column {
+    min-width: 200px;
+  }
+  
+  .day-header {
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+  }
+  
+  .meal-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .meal-recipe {
+    font-size: 0.9rem;
+  }
+  
+  .meal-servings {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .meal-notes {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    font-style: italic;
+  }
+  
+  .meal-completed {
+    text-decoration: line-through;
+    opacity: 0.8;
+  }
+  
+  .meal-completed::after {
+    content: "✓";
+    color: #28a745;
+    margin-left: 5px;
+  }
+  
+  .add-meal-btn {
+    border: 2px dashed #dee2e6;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #6c757d;
+    transition: all 0.3s;
+  }
+  
+  .add-meal-btn:hover {
+    border-color: #adb5bd;
+    color: #495057;
+    text-decoration: none;
+  }
+  
+  /* Kolorystyka dla różnych typów posiłków */
+  .meal-breakfast {
+    background-color: rgba(230, 247, 255, 0.7);
+    border-left: 4px solid #0d6efd;
+  }
+  
+  .meal-lunch {
+    background-color: rgba(255, 238, 230, 0.7);
+    border-left: 4px solid #fd7e14;
+  }
+  
+  .meal-dinner {
+    background-color: rgba(230, 255, 230, 0.7);
+    border-left: 4px solid #198754;
+  }
+  
+  .meal-snack {
+    background-color: rgba(255, 255, 230, 0.7);
+    border-left: 4px solid #ffc107;
+  }
+  
+  .meal-supper {
+    background-color: rgba(242, 230, 255, 0.7);
+    border-left: 4px solid #6f42c1;
+  }
+  
+  /* Styl dla formularza */
+  .planner-sidebar {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .planner-title {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+  }
+  
+  .week-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .btn-week {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-decoration: none;
+  }
+  
+  .btn-week:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+    text-decoration: none;
+  }
+  
+  .current-week {
+    font-weight: bold;
+    color: #495057;
+  }
+  
+  .copy-day-form, .generate-shopping-list-form {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .form-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
 </style>
 {% endblock %}
 

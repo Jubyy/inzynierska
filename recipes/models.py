@@ -85,11 +85,18 @@ class RecipeCategory(models.Model):
         return self.name
 
 class Recipe(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Łatwy'),
+        ('medium', 'Średni'),
+        ('hard', 'Trudny'),
+    ]
+    
     title = models.CharField(max_length=200, verbose_name="Tytuł")
     description = models.TextField(verbose_name="Opis")
     instructions = models.TextField(verbose_name="Instrukcje przygotowania")
     servings = models.PositiveIntegerField(default=4, verbose_name="Liczba porcji")
     preparation_time = models.PositiveIntegerField(help_text="Czas przygotowania w minutach", verbose_name="Czas przygotowania")
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium', verbose_name="Poziom trudności")
     image = models.ImageField(upload_to='recipes/', blank=True, null=True, verbose_name="Zdjęcie")
     categories = models.ManyToManyField(RecipeCategory, related_name='recipes', verbose_name="Kategorie")
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Autor")
@@ -296,7 +303,6 @@ class MealPlan(models.Model):
         verbose_name = "Plan posiłku"
         verbose_name_plural = "Plany posiłków"
         ordering = ['date', 'meal_type']
-        # Już nie potrzebujemy recipe w unique_together, bo teraz może być null
         unique_together = ('user', 'date', 'meal_type')
         
     def __str__(self):

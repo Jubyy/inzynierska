@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 import json
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from difflib import SequenceMatcher
 
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
@@ -17,30 +17,39 @@ from .forms import FridgeItemForm, BulkAddForm
 
 @login_required
 def fridge_dashboard(request):
-    """Główny widok lodówki z podsumowaniem produktów"""
-    # Pobierz wszystkie produkty w lodówce użytkownika
-    fridge_items = FridgeItem.objects.filter(user=request.user).order_by('ingredient__name')
+    """
+    Dashboard lodówki - pokazuje statystyki i informacje o produktach
+    """
+    # Pobierz wszystkie produkty z lodówki użytkownika
+    fridge_items = FridgeItem.objects.filter(user=request.user)
     
-    # Sprawdź przeterminowane produkty
-    expired_items = [item for item in fridge_items if item.is_expired]
+    # Liczba produktów w lodówce
+    total_items = fridge_items.count()
     
-    # Pobierz przepisy, które można przygotować z dostępnych składników
-    available_recipes = []
-    recipes = Recipe.objects.all()
+    # Liczba produktów przeterminowanych
+    expired_items = fridge_items.filter(expiry_date__lt=date.today()).count()
     
-    for recipe in recipes:
-        if recipe.can_be_prepared_with_available_ingredients(request.user):
-            available_recipes.append(recipe)
+    # Liczba produktów, które niedługo się przeterminują (w ciągu 3 dni)
+    soon_expiring = fridge_items.filter(
+        expiry_date__gte=date.today(),
+        expiry_date__lte=date.today() + timedelta(days=3)
+    ).count()
+    
+    # Ostatnio dodane produkty (5 najnowszych)
+    recent_items = fridge_items.order_by('-added_date')[:5]
+    
+    # Przepisy, które można przygotować z produktów w lodówce
+    available_recipes_count = Recipe.objects.filter(user=request.user).count()
     
     context = {
-        'fridge_items': fridge_items,
+        'total_items': total_items,
         'expired_items': expired_items,
-        'available_recipes': available_recipes[:5],  # Tylko 5 najnowszych przepisów
-        'item_count': fridge_items.count(),
-        'expired_count': len(expired_items)
+        'soon_expiring': soon_expiring,
+        'recent_items': recent_items,
+        'available_recipes_count': available_recipes_count
     }
     
-    return render(request, 'fridge/dashboard.html', context)
+    return render(request, 'fridge/fridge_dashboard.html', context)
 
 class FridgeItemListView(LoginRequiredMixin, ListView):
     """Lista wszystkich produktów w lodówce"""
@@ -52,37 +61,36 @@ class FridgeItemListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = FridgeItem.objects.filter(user=self.request.user)
         
-        # Filtrowanie po składniku
+        # Filtrowanie po wyszukiwanej frazie
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
-                Q(ingredient__name__icontains=query)
+                Q(ingredient__name__icontains=query) |
+                Q(notes__icontains=query)
             )
         
-        # Sortowanie
-        sort_by = self.request.GET.get('sort', 'ingredient__name')
-        if sort_by == 'expiry':
-            queryset = queryset.order_by('expiry_date', 'ingredient__name')
-        else:
-            queryset = queryset.order_by(sort_by)
-            
-        return queryset
+        # Filtrowanie po przeterminowaniu
+        expired = self.request.GET.get('expired')
+        if expired == 'yes':
+            queryset = queryset.filter(expiry_date__lt=date.today())
+        elif expired == 'no':
+            queryset = queryset.filter(Q(expiry_date__gte=date.today()) | Q(expiry_date__isnull=True))
+        
+        return queryset.order_by('expiry_date', 'ingredient__name')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Dodaj parametry filtrowania do kontekstu
         context['query'] = self.request.GET.get('q', '')
-        context['sort'] = self.request.GET.get('sort', 'ingredient__name')
+        context['expired'] = self.request.GET.get('expired', '')
         
-        # Znajdź przeterminowane produkty
-        expired_items = []
-        for item in context['fridge_items']:
-            item.expired = item.is_expired
-            if item.is_expired:
-                expired_items.append(item)
+        # Zlicz przeterminowane produkty
+        context['expired_count'] = FridgeItem.objects.filter(
+            user=self.request.user,
+            expiry_date__lt=date.today()
+        ).count()
         
-        context['expired_items'] = expired_items
-        context['has_expired'] = len(expired_items) > 0
-            
         return context
 
 class FridgeItemCreateView(LoginRequiredMixin, CreateView):
@@ -99,7 +107,6 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.user = self.request.user
-        messages.success(self.request, f'Dodano {form.instance.ingredient.name} do lodówki.')
         return super().form_valid(form)
 
 class FridgeItemUpdateView(LoginRequiredMixin, UpdateView):
@@ -118,7 +125,6 @@ class FridgeItemUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
     
     def form_valid(self, form):
-        messages.success(self.request, f'Zaktualizowano {form.instance.ingredient.name} w lodówce.')
         return super().form_valid(form)
 
 class FridgeItemDeleteView(LoginRequiredMixin, DeleteView):
@@ -131,388 +137,178 @@ class FridgeItemDeleteView(LoginRequiredMixin, DeleteView):
         return FridgeItem.objects.filter(user=self.request.user)
     
     def delete(self, request, *args, **kwargs):
-        fridge_item = self.get_object()
-        messages.success(request, f'Usunięto {fridge_item.ingredient.name} z lodówki.')
+        messages.success(request, f'Usunięto produkt z lodówki.')
         return super().delete(request, *args, **kwargs)
 
 @login_required
 def bulk_add_to_fridge(request):
-    """Dodawanie wielu produktów jednocześnie do lodówki"""
+    """Dodawanie wielu produktów naraz do lodówki"""
     if request.method == 'POST':
         form = BulkAddForm(request.POST)
         
         if form.is_valid():
-            ingredients = request.POST.getlist('ingredients')
-            amounts = request.POST.getlist('amounts')
-            units = request.POST.getlist('units')
-            expiry_dates = request.POST.getlist('expiry_dates')
-            
-            count = 0
-            
-            for i in range(len(ingredients)):
-                if ingredients[i] and amounts[i] and units[i]:
-                    ingredient = get_object_or_404(Ingredient, pk=ingredients[i])
-                    unit = get_object_or_404(MeasurementUnit, pk=units[i])
-                    amount = float(amounts[i])
-                    expiry_date = expiry_dates[i] if expiry_dates[i] else None
+            items_data = request.POST.get('items_data', '[]')
+            try:
+                items = json.loads(items_data)
+                
+                for item in items:
+                    ingredient_id = item.get('ingredient_id')
+                    amount = item.get('amount')
+                    unit_id = item.get('unit_id')
+                    expiry_date = item.get('expiry_date') or None
+                    
+                    ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+                    unit = get_object_or_404(MeasurementUnit, pk=unit_id)
                     
                     FridgeItem.add_to_fridge(
                         user=request.user,
                         ingredient=ingredient,
-                        amount=amount,
+                        amount=float(amount),
                         unit=unit,
                         expiry_date=expiry_date
                     )
-                    
-                    count += 1
+                
+                messages.success(request, f'Dodano {len(items)} produktów do lodówki.')
+                return redirect('fridge:list')
             
-            messages.success(request, f'Dodano {count} produktów do lodówki.')
-            return redirect('fridge:list')
+            except Exception as e:
+                messages.error(request, f'Wystąpił błąd podczas dodawania produktów: {str(e)}')
     else:
         form = BulkAddForm()
     
-    return render(request, 'fridge/bulk_add.html', {'form': form})
+    return render(request, 'fridge/bulk_add.html', {
+        'form': form,
+    })
 
 @login_required
 def clean_expired(request):
-    """Usuwanie przeterminowanych produktów z lodówki"""
+    """Usuwa wszystkie przeterminowane produkty z lodówki"""
     if request.method == 'POST':
-        expired_items = [item for item in FridgeItem.objects.filter(user=request.user) if item.is_expired]
-        count = len(expired_items)
+        expired_items = FridgeItem.objects.filter(
+            user=request.user,
+            expiry_date__lt=date.today()
+        )
         
-        for item in expired_items:
-            item.delete()
+        count = expired_items.count()
+        expired_items.delete()
         
-        messages.success(request, f'Usunięto {count} przeterminowanych produktów z lodówki.')
+        messages.success(request, f'Usunięto {count} przeterminowanych produktów.')
         return redirect('fridge:list')
     
-    # Pobierz przeterminowane produkty
-    expired_items = [item for item in FridgeItem.objects.filter(user=request.user) if item.is_expired]
-    
-    return render(request, 'fridge/clean_expired.html', {'expired_items': expired_items})
+    return render(request, 'fridge/clean_expired_confirm.html')
 
 @login_required
 def available_recipes(request):
-    """Przepisy, które można przygotować z dostępnych składników"""
-    recipes = Recipe.objects.all()
-    available_recipes = []
-    almost_available = []
+    """Pokazuje przepisy, które można przygotować z produktów w lodówce"""
+    # Pobierz wszystkie przepisy użytkownika
+    recipes = Recipe.objects.filter(user=request.user)
+    
+    # Pobierz produkty z lodówki
+    fridge_items = FridgeItem.objects.filter(user=request.user)
+    
+    # Przygotuj słownik dostępnych składników (id: [ilość, jednostka])
+    available_ingredients = {}
+    
+    for item in fridge_items:
+        if item.ingredient_id not in available_ingredients:
+            available_ingredients[item.ingredient_id] = []
+        
+        available_ingredients[item.ingredient_id].append({
+            'amount': item.amount,
+            'unit': item.unit
+        })
+    
+    # Sprawdź dla każdego przepisu, czy wszystkie składniki są dostępne
+    recipes_with_availability = []
     
     for recipe in recipes:
-        missing = recipe.get_missing_ingredients(request.user)
+        ingredients_needed = recipe.ingredients.all()
         
-        if not missing:
-            available_recipes.append({'recipe': recipe, 'missing': []})
-        elif len(missing) <= 3:  # Maksymalnie 3 brakujące składniki
-            almost_available.append({'recipe': recipe, 'missing': missing})
+        # Sprawdź każdy składnik
+        missing_ingredients = []
+        all_available = True
+        
+        for ingredient_entry in ingredients_needed:
+            ingredient_id = ingredient_entry.ingredient.id
+            
+            if ingredient_id not in available_ingredients:
+                # Brak tego składnika w lodówce
+                missing_ingredients.append(ingredient_entry.ingredient.name)
+                all_available = False
+                continue
+            
+            # TODO: W przyszłości można dodać sprawdzanie ilości i konwersji jednostek
+        
+        recipes_with_availability.append({
+            'recipe': recipe,
+            'available': all_available,
+            'missing': missing_ingredients
+        })
     
-    context = {
-        'available_recipes': available_recipes,
-        'almost_available': almost_available
-    }
-    
-    return render(request, 'fridge/available_recipes.html', context)
+    return render(request, 'fridge/available_recipes.html', {
+        'recipes': recipes_with_availability
+    })
 
 def ajax_ingredient_search(request):
-    """Wyszukiwanie składników za pomocą AJAX"""
-    query = request.GET.get('term', '')
-    include_categories = request.GET.get('include_categories', 'true') == 'true'
+    """Funkcja AJAX do wyszukiwania składników"""
+    search_term = request.GET.get('term', '')
     
-    if query:
-        # Wyszukiwanie według zapytania
-        ingredients = Ingredient.objects.filter(name__icontains=query).order_by('category__name', 'name')
+    if not search_term:
+        return JsonResponse({'results': []})
+    
+    # Wyszukiwanie składników z nazwą zawierającą wyszukiwane hasło
+    ingredients = Ingredient.objects.filter(name__icontains=search_term)[:10]
+    
+    results = []
+    for ingredient in ingredients:
+        default_unit = ingredient.default_unit
+        unit_name = default_unit.name if default_unit else "brak"
         
-        if include_categories:
-            # Grupowanie według kategorii
-            results = []
-            categories = {}
-            
-            for ingredient in ingredients:
-                category_name = ingredient.category.name
-                if category_name not in categories:
-                    categories[category_name] = {
-                        'text': category_name,
-                        'children': []
-                    }
-                
-                categories[category_name]['children'].append({
-                    'id': ingredient.id,
-                    'text': ingredient.name
-                })
-            
-            # Konwersja słownika kategorii na listę
-            for category_name, category_data in categories.items():
-                results.append(category_data)
-        else:
-            # Prosty format bez kategorii
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
-    else:
-        # Gdy brak zapytania, zwróć pogrupowane składniki
-        if include_categories:
-            results = []
-            categories = IngredientCategory.objects.all().order_by('name')
-            
-            for category in categories:
-                # Pobierz wszystkie składniki z danej kategorii
-                category_ingredients = Ingredient.objects.filter(category=category).order_by('name')
-                if category_ingredients:
-                    children = [{'id': i.id, 'text': i.name} for i in category_ingredients]
-                    results.append({
-                        'text': category.name,
-                        'children': children
-                    })
-        else:
-            # Zwróć wszystkie składniki alfabetycznie
-            ingredients = Ingredient.objects.all().order_by('name')
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
+        results.append({
+            'id': ingredient.id,
+            'text': f"{ingredient.name}",
+            'name': ingredient.name,
+            'category': ingredient.category.name if ingredient.category else "Inne",
+            'unit': default_unit.id if default_unit else None,
+            'unit_name': unit_name
+        })
+    
+    # Dodaj opcję stworzenia nowego składnika
+    if search_term:
+        results.append({
+            'id': 'new',
+            'text': f"+ Dodaj nowy składnik: {search_term}",
+            'name': search_term
+        })
     
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
-    """Pobieranie jednostek miary za pomocą AJAX"""
-    units = MeasurementUnit.objects.all()
-    units_data = [{'id': u.id, 'name': u.name} for u in units]
-    return JsonResponse({'units': units_data})
+    """Funkcja AJAX do pobierania jednostek miary dla składnika"""
+    ingredient_id = request.GET.get('ingredient_id', '')
+    
+    if not ingredient_id.isdigit():
+        # Zwracamy wszystkie jednostki, jeśli nie wybrano składnika lub wybrano nowy
+        units = MeasurementUnit.objects.all()
+    else:
+        # Pobieramy jednostki kompatybilne z domyślną jednostką składnika
+        ingredient = Ingredient.objects.get(id=ingredient_id)
+        units = ingredient.compatible_units.all() if ingredient.compatible_units.exists() else MeasurementUnit.objects.all()
+    
+    return JsonResponse({
+        'units': [{'id': unit.id, 'name': unit.name} for unit in units]
+    })
 
 def ajax_compatible_units(request):
-    """Pobieranie kompatybilnych jednostek miary dla składnika za pomocą AJAX"""
-    ingredient_id = request.GET.get('ingredient_id')
-    units = []
-    default_unit = None
+    """Funkcja AJAX do pobierania jednostek kompatybilnych z daną jednostką"""
+    unit_id = request.GET.get('unit_id', '')
     
-    if ingredient_id:
-        ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-        
-        # Najpierw pobierz kompatybilne jednostki
-        compatible_units = ingredient.compatible_units.all()
-        
-        # Jeśli nie ma kompatybilnych jednostek, użyj wszystkich
-        if not compatible_units.exists():
-            units = MeasurementUnit.objects.all()
-        else:
-            units = compatible_units
-            
-        # Sprawdź, czy jest domyślna jednostka
-        default_unit = ingredient.default_unit.id if ingredient.default_unit else None
-    else:
-        # Jeśli nie podano składnika, zwróć wszystkie jednostki
-        units = MeasurementUnit.objects.all()
+    if not unit_id.isdigit():
+        return JsonResponse({'units': []})
     
-    units_data = [{'id': u.id, 'name': u.name} for u in units]
-    return JsonResponse({'units': units_data, 'default_unit': default_unit})
-
-@login_required
-def barcode_scan(request):
-    """Widok do skanowania kodów kreskowych produktów"""
-    return render(request, 'fridge/barcode_scan.html')
-
-def ajax_barcode_lookup(request):
-    """
-    Wyszukiwanie informacji o produkcie na podstawie kodu kreskowego.
-    W tym przykładzie używamy Open Food Facts API do pobierania danych o produktach.
-    """
-    barcode = request.GET.get('barcode', '').strip()
+    unit = get_object_or_404(MeasurementUnit, pk=unit_id)
+    compatible_units = unit.get_compatible_units()
     
-    if not barcode:
-        return JsonResponse({
-            'success': False,
-            'error': 'Nie podano kodu kreskowego'
-        })
-    
-    try:
-        # Najpierw sprawdź, czy mamy już taki produkt w bazie
-        ingredient = Ingredient.objects.filter(barcode=barcode).first()
-        
-        # Jeśli produkt nie istnieje z takim kodem, ale może być tylko numerem ID
-        if not ingredient and barcode.isdigit():
-            ingredient = Ingredient.objects.filter(id=barcode).first()
-        
-        if ingredient:
-            # Jeśli produkt istnieje w bazie, zwróć jego dane
-            return JsonResponse({
-                'success': True,
-                'exists': True,
-                'product': {
-                    'id': ingredient.id,
-                    'name': ingredient.name,
-                    'unit': ingredient.default_unit.id if ingredient.default_unit else None,
-                    'unit_name': ingredient.default_unit.name if ingredient.default_unit else None,
-                }
-            })
-        
-        # Jeśli produktu nie ma w bazie, spróbuj pobrać dane z Open Food Facts
-        # Spróbuj najpierw z polskiej wersji API
-        apis_to_try = [
-            f'https://pl.openfoodfacts.org/api/v0/product/{barcode}.json',
-            f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json'
-        ]
-        
-        product_found = False
-        product_data = {}
-        
-        for api_url in apis_to_try:
-            try:
-                response = requests.get(api_url, timeout=7)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get('status') == 1:
-                        product_data = data.get('product', {})
-                        product_found = True
-                        break
-            except Exception as e:
-                print(f"Błąd podczas próby pobierania z {api_url}: {str(e)}")
-                continue
-        
-        if product_found:
-            # Pobieranie nazwy produktu z różnych pól (w zależności od dostępności)
-            product_name = (
-                product_data.get('product_name_pl') or 
-                product_data.get('product_name') or 
-                product_data.get('generic_name_pl') or
-                product_data.get('generic_name') or
-                product_data.get('abbreviated_product_name') or
-                ''
-            )
-            
-            if not product_name:
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Nie znaleziono nazwy produktu'
-                })
-            
-            # Szukamy podobnych składników w bazie danych
-            similar_ingredients = []
-            all_ingredients = Ingredient.objects.all()
-            
-            # Funkcja do obliczania podobieństwa nazw
-            def similarity_ratio(a, b):
-                return SequenceMatcher(None, a.lower(), b.lower()).ratio()
-            
-            # Filtrowanie składników o podobnych nazwach
-            for db_ingredient in all_ingredients:
-                # Główne podobieństwo nazwy
-                similarity = similarity_ratio(product_name, db_ingredient.name)
-                
-                # Sprawdzamy, czy produkt jest podobny do istniejącego składnika
-                if similarity > 0.6:  # 60% podobieństwa
-                    similar_ingredients.append({
-                        'id': db_ingredient.id,
-                        'name': db_ingredient.name,
-                        'similarity': similarity,
-                        'unit': db_ingredient.default_unit.id if db_ingredient.default_unit else None,
-                        'unit_name': db_ingredient.default_unit.name if db_ingredient.default_unit else None,
-                    })
-            
-            # Sortuj podobne składniki według podobieństwa (od najwyższego)
-            similar_ingredients = sorted(similar_ingredients, key=lambda x: x['similarity'], reverse=True)
-            
-            # Przygotuj dane dotyczące ilości
-            quantity = product_data.get('quantity', '')
-            
-            # Przygotuj dane dotyczące kategorii
-            categories = (
-                product_data.get('categories_tags', []) or 
-                product_data.get('categories_hierarchy', []) or
-                []
-            )
-            
-            categories_display = ', '.join([c.replace('en:', '').replace('pl:', '').replace('-', ' ') for c in categories[:3]]) if categories else ''
-            
-            # Pobierz obraz produktu (wybierz najlepsze dostępne zdjęcie)
-            image_url = (
-                product_data.get('image_front_url') or 
-                product_data.get('image_front_small_url') or
-                product_data.get('image_url') or
-                product_data.get('image_small_url') or
-                ''
-            )
-            
-            # Zwracamy dane do formularza
-            return JsonResponse({
-                'success': True,
-                'exists': False,
-                'product': {
-                    'name': product_name,
-                    'quantity': quantity,
-                    'image_url': image_url,
-                    'categories': categories_display,
-                    'barcode': barcode
-                },
-                'similar_ingredients': similar_ingredients[:5]  # Ograniczamy do 5 najlepszych wyników
-            })
-        else:
-            # Jeśli nie znaleziono w Open Food Facts, próbujemy utworzyć przykładowy produkt
-            sample_name = f"Produkt {barcode[:4]}-{barcode[-4:]}"
-            return JsonResponse({
-                'success': True,
-                'exists': False,
-                'product': {
-                    'name': sample_name,
-                    'quantity': '',
-                    'image_url': '',
-                    'categories': '',
-                    'barcode': barcode
-                },
-                'similar_ingredients': []
-            })
-    
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': f'Wystąpił błąd podczas wyszukiwania: {str(e)}'
-        })
-
-@login_required
-def add_scanned_product(request):
-    """Dodawanie produktu zeskanowanego lub wyszukanego po kodzie kreskowym"""
-    if request.method == 'POST':
-        try:
-            # Pobierz dane z formularza
-            product_name = request.POST.get('ingredient')
-            amount = float(request.POST.get('amount'))
-            unit_id = request.POST.get('unit')
-            expiry_date = request.POST.get('expiry_date') or None
-            barcode = request.POST.get('barcode')
-            
-            # Pobierz lub utwórz składnik
-            unit = get_object_or_404(MeasurementUnit, pk=unit_id)
-            
-            # Sprawdź, czy składnik istnieje w bazie
-            ingredient = Ingredient.objects.filter(name=product_name).first()
-            
-            if not ingredient:
-                # Jeśli składnik nie istnieje, utwórz nowy
-                # Najpierw pobierz kategorię domyślną
-                default_category = IngredientCategory.objects.first()
-                if not default_category:
-                    # Jeśli nie ma kategorii, utwórz domyślną
-                    default_category = IngredientCategory.objects.create(
-                        name="Inne", 
-                        is_vegetarian=True,
-                        is_vegan=False
-                    )
-                
-                # Utwórz nowy składnik
-                ingredient = Ingredient.objects.create(
-                    name=product_name,
-                    category=default_category,
-                    barcode=barcode if barcode != product_name else None,
-                    default_unit=unit
-                )
-            
-            # Dodaj produkt do lodówki
-            FridgeItem.add_to_fridge(
-                user=request.user,
-                ingredient=ingredient,
-                amount=amount,
-                unit=unit,
-                expiry_date=expiry_date
-            )
-            
-            messages.success(request, f'Dodano {product_name} do lodówki.')
-            return JsonResponse({'success': True, 'redirect': reverse('fridge:list')})
-            
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    
-    return JsonResponse({'success': False, 'error': 'Nieprawidłowe żądanie'})
+    return JsonResponse({
+        'units': [{'id': u.id, 'name': u.name} for u in compatible_units]
+    })
