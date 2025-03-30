@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuń przeterminowane produkty{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    .expired-list {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background-color: #fff3cd;
+        border-radius: 8px;
+    }
+    .expired-item {
+        padding: 0.5rem;
+        border-bottom: 1px solid #ffe5d0;
+    }
+    .expired-item:last-child {
+        border-bottom: none;
+    }
+    .warning-icon {
+        color: #dc3545;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="confirmation-card">
+        <div class="text-center">
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <h2 class="mb-4">Potwierdzenie usunięcia</h2>
+        </div>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            Czy na pewno chcesz usunąć wszystkie przeterminowane produkty z lodówki?
+        </div>
+
+        {% if expired_items %}
+        <div class="expired-list">
+            <h5 class="mb-3">Lista produktów do usunięcia:</h5>
+            {% for item in expired_items %}
+            <div class="expired-item">
+                <strong>{{ item.ingredient.name }}</strong>
+                <span class="text-muted">
+                    ({{ item.amount }} {{ item.unit.symbol }}, 
+                    termin ważności: {{ item.expiry_date|date:"d.m.Y" }})
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Anuluj
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Tak, usuń przeterminowane
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

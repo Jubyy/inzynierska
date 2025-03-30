@@ -66,15 +66,24 @@ class FridgeItemListView(LoginRequiredMixin, ListView):
         if query:
             queryset = queryset.filter(
                 Q(ingredient__name__icontains=query) |
-                Q(notes__icontains=query)
+                Q(ingredient__category__name__icontains=query)
             )
         
-        # Filtrowanie po przeterminowaniu
+        # Filtrowanie po statusie przeterminowania
         expired = self.request.GET.get('expired')
+        today = date.today()
+        
         if expired == 'yes':
-            queryset = queryset.filter(expiry_date__lt=date.today())
+            queryset = queryset.filter(expiry_date__lt=today)
         elif expired == 'no':
-            queryset = queryset.filter(Q(expiry_date__gte=date.today()) | Q(expiry_date__isnull=True))
+            queryset = queryset.filter(
+                Q(expiry_date__gte=today) | Q(expiry_date__isnull=True)
+            )
+        elif expired == 'soon':
+            queryset = queryset.filter(
+                expiry_date__gte=today,
+                expiry_date__lte=today + timedelta(days=7)
+            )
         
         return queryset.order_by('expiry_date', 'ingredient__name')
     
@@ -182,20 +191,24 @@ def bulk_add_to_fridge(request):
 
 @login_required
 def clean_expired(request):
-    """Usuwa wszystkie przeterminowane produkty z lodówki"""
+    """Widok do usuwania przeterminowanych produktów"""
+    # Pobierz wszystkie przeterminowane produkty
+    expired_items = FridgeItem.objects.filter(
+        user=request.user,
+        expiry_date__lt=date.today()
+    ).select_related('ingredient', 'unit')
+
     if request.method == 'POST':
-        expired_items = FridgeItem.objects.filter(
-            user=request.user,
-            expiry_date__lt=date.today()
-        )
-        
-        count = expired_items.count()
+        # Usuń przeterminowane produkty
         expired_items.delete()
-        
-        messages.success(request, f'Usunięto {count} przeterminowanych produktów.')
+        messages.success(request, 'Przeterminowane produkty zostały usunięte.')
         return redirect('fridge:list')
-    
-    return render(request, 'fridge/clean_expired_confirm.html')
+
+    # Przekaż listę przeterminowanych produktów do szablonu
+    context = {
+        'expired_items': expired_items,
+    }
+    return render(request, 'fridge/clean_expired_confirm.html', context)
 
 @login_required
 def available_recipes(request):
@@ -249,55 +262,74 @@ def available_recipes(request):
         'recipes': recipes_with_availability
     })
 
+@login_required
 def ajax_ingredient_search(request):
-    """Funkcja AJAX do wyszukiwania składników"""
-    search_term = request.GET.get('term', '')
+    """Widok AJAX do wyszukiwania składników"""
+    term = request.GET.get('term', '')
+    list_all = request.GET.get('list_all') == 'true'
     
-    if not search_term:
-        return JsonResponse({'results': []})
-    
-    # Wyszukiwanie składników z nazwą zawierającą wyszukiwane hasło
-    ingredients = Ingredient.objects.filter(name__icontains=search_term)[:10]
-    
+    # Pobierz wszystkie kategorie
+    categories = IngredientCategory.objects.all().order_by('name')
     results = []
-    for ingredient in ingredients:
-        default_unit = ingredient.default_unit
-        unit_name = default_unit.name if default_unit else "brak"
-        
-        results.append({
-            'id': ingredient.id,
-            'text': f"{ingredient.name}",
-            'name': ingredient.name,
-            'category': ingredient.category.name if ingredient.category else "Inne",
-            'unit': default_unit.id if default_unit else None,
-            'unit_name': unit_name
-        })
     
-    # Dodaj opcję stworzenia nowego składnika
-    if search_term:
-        results.append({
-            'id': 'new',
-            'text': f"+ Dodaj nowy składnik: {search_term}",
-            'name': search_term
-        })
+    if list_all:
+        # Jeśli nie ma wyszukiwanej frazy, zwróć wszystkie składniki pogrupowane według kategorii
+        for category in categories:
+            ingredients = Ingredient.objects.filter(category=category).order_by('name')
+            if ingredients.exists():
+                # Dodaj nagłówek kategorii
+                results.append({
+                    'id': f'cat_{category.id}',
+                    'name': category.name,
+                    'category': None,
+                    'disabled': True
+                })
+                # Dodaj składniki z tej kategorii
+                for ingredient in ingredients:
+                    results.append({
+                        'id': ingredient.id,
+                        'name': ingredient.name,
+                        'category': category.name
+                    })
+    else:
+        # Wyszukiwanie według wpisanej frazy
+        ingredients = Ingredient.objects.filter(name__icontains=term).order_by('name')
+        for ingredient in ingredients:
+            results.append({
+                'id': ingredient.id,
+                'name': ingredient.name,
+                'category': ingredient.category.name
+            })
     
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
-    """Funkcja AJAX do pobierania jednostek miary dla składnika"""
-    ingredient_id = request.GET.get('ingredient_id', '')
+    """Funkcja AJAX do pobierania jednostek dla wybranego składnika"""
+    ingredient_id = request.GET.get('ingredient_id')
     
-    if not ingredient_id.isdigit():
-        # Zwracamy wszystkie jednostki, jeśli nie wybrano składnika lub wybrano nowy
-        units = MeasurementUnit.objects.all()
-    else:
-        # Pobieramy jednostki kompatybilne z domyślną jednostką składnika
+    if not ingredient_id or not ingredient_id.isdigit():
+        return JsonResponse({'units': [], 'default_unit': None})
+    
+    try:
         ingredient = Ingredient.objects.get(id=ingredient_id)
-        units = ingredient.compatible_units.all() if ingredient.compatible_units.exists() else MeasurementUnit.objects.all()
-    
-    return JsonResponse({
-        'units': [{'id': unit.id, 'name': unit.name} for unit in units]
-    })
+        # Pobierz tylko kompatybilne jednostki dla składnika
+        units = ingredient.compatible_units.all()
+        
+        # Jeśli nie ma zdefiniowanych kompatybilnych jednostek, użyj domyślnej jednostki
+        if not units.exists() and ingredient.default_unit:
+            units = [ingredient.default_unit]
+        
+        # Przygotuj dane do odpowiedzi
+        units_data = [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
+        default_unit = ingredient.default_unit.id if ingredient.default_unit else None
+        
+        return JsonResponse({
+            'units': units_data,
+            'default_unit': default_unit
+        })
+        
+    except Ingredient.DoesNotExist:
+        return JsonResponse({'units': [], 'default_unit': None})
 
 def ajax_compatible_units(request):
     """Funkcja AJAX do pobierania jednostek kompatybilnych z daną jednostką"""

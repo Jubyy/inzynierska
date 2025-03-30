@@ -9,9 +9,24 @@ class FridgeItemForm(forms.ModelForm):
         model = FridgeItem
         fields = ['ingredient', 'amount', 'unit', 'expiry_date']
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
-            'unit': forms.Select(attrs={'class': 'form-control'}),
-            'expiry_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+            'ingredient': forms.Select(attrs={
+                'class': 'form-control select2-ingredient',
+                'data-placeholder': 'Wpisz lub wybierz składnik...'
+            }),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0.01',
+                'step': '0.01',
+                'placeholder': 'Podaj ilość'
+            }),
+            'unit': forms.Select(attrs={
+                'class': 'form-control select2-unit',
+                'data-placeholder': 'Wybierz jednostkę'
+            }),
+            'expiry_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            })
         }
         labels = {
             'ingredient': 'Składnik',
@@ -21,27 +36,37 @@ class FridgeItemForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
-        # Pobierz użytkownika z parametrów (opcjonalnie)
-        self.user = kwargs.pop('user', None)
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # Usuwamy standardowy widget dla składnika, będziemy używać Select2 z grupowaniem
-        self.fields['ingredient'].widget = forms.Select(attrs={'class': 'form-control select2-ingredient'})
+        # Pole składnika będzie wypełniane przez Select2 AJAX
+        self.fields['ingredient'].queryset = Ingredient.objects.all()
+        self.fields['ingredient'].widget.attrs['data-ajax--url'] = '/fridge/ajax/ingredient-search/'
         
-        # Przygotowanie pogrupowanych opcji składników według kategorii
-        ingredient_choices = []
+        # Pole jednostki będzie aktualizowane dynamicznie na podstawie wybranego składnika
+        self.fields['unit'].queryset = MeasurementUnit.objects.all()
         
-        # Pobierz wszystkie kategorie składników
-        categories = IngredientCategory.objects.all().order_by('name')
+        # Jeśli edytujemy istniejący obiekt, załaduj kompatybilne jednostki
+        if self.instance and self.instance.pk and self.instance.ingredient:
+            self.fields['unit'].queryset = self.instance.ingredient.compatible_units.all()
+            if not self.fields['unit'].queryset.exists() and self.instance.ingredient.default_unit:
+                self.fields['unit'].queryset = MeasurementUnit.objects.filter(pk=self.instance.ingredient.default_unit.pk)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ingredient = cleaned_data.get('ingredient')
+        unit = cleaned_data.get('unit')
         
-        # Dla każdej kategorii, pobierz jej składniki
-        for category in categories:
-            category_ingredients = [(i.id, i.name) for i in Ingredient.objects.filter(category=category).order_by('name')]
-            if category_ingredients:  # Dodaj tylko jeśli kategoria ma składniki
-                ingredient_choices.append((category.name, category_ingredients))
+        if ingredient and unit:
+            # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
+            compatible_units = ingredient.compatible_units.all()
+            if not compatible_units.exists() and ingredient.default_unit:
+                compatible_units = [ingredient.default_unit]
+            
+            if unit not in compatible_units:
+                self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
         
-        # Ustaw pogrupowane opcje dla pola ingredient
-        self.fields['ingredient'].choices = ingredient_choices
+        return cleaned_data
 
 class FridgeSearchForm(forms.Form):
     """Formularz do wyszukiwania produktów w lodówce"""

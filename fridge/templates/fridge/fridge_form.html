@@ -6,6 +6,43 @@
 <style>
     .select2-container {
         width: 100% !important;
+        margin-bottom: 4px;
+    }
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        padding: 0;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        position: relative;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding: 5px 50px 5px 12px;
+        line-height: 26px;
+        color: #495057;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        font-size: 18px;
+        color: #dc3545;
+        font-weight: bold;
+        z-index: 1;
+        padding: 0 3px;
+        background: white;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+        width: 20px;
+        right: 1px;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6c757d;
     }
     .select2-container--default .select2-results__group {
         background-color: #f8f9fa;
@@ -16,13 +53,27 @@
     .select2-results__option {
         padding-left: 20px;
     }
-    .category-heading {
-        font-weight: bold;
-        padding: 8px 15px;
-        margin-top: 10px;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-        border-left: 4px solid #2b5797;
+    .select2-container--default .select2-results > .select2-results__options {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+    .select2-search__field::placeholder {
+        color: #6c757d;
+        opacity: 0.7;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    .form-text.text-muted {
+        margin-top: 8px !important;
+        display: block;
+        clear: both;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+        color: #dc3545;
+        background: #f8f9fa;
+        border-radius: 3px;
     }
 </style>
 {% endblock %}
@@ -54,50 +105,53 @@
                         <div class="mb-3">
                             <label for="{{ form.ingredient.id_for_label }}" class="form-label">{{ form.ingredient.label }}</label>
                             {{ form.ingredient }}
-                            <small class="form-text text-muted">Wybierz składnik z listy kategorii lub wyszukaj</small>
+                            <div class="form-text text-muted mt-2">Wpisz nazwę składnika lub wybierz z listy</div>
                             {% if form.ingredient.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.ingredient.errors }}
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.amount.id_for_label }}" class="form-label">{{ form.amount.label }}</label>
-                                {{ form.amount }}
-                                {% if form.amount.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.amount.errors }}
-                                    </div>
-                                {% endif %}
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.amount.id_for_label }}" class="form-label">{{ form.amount.label }}</label>
+                                    {{ form.amount }}
+                                    {% if form.amount.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.amount.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.unit.id_for_label }}" class="form-label">{{ form.unit.label }}</label>
-                                {{ form.unit }}
-                                {% if form.unit.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.unit.errors }}
-                                    </div>
-                                {% endif %}
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.unit.id_for_label }}" class="form-label">{{ form.unit.label }}</label>
+                                    {{ form.unit }}
+                                    {% if form.unit.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.unit.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="{{ form.expiry_date.id_for_label }}" class="form-label">{{ form.expiry_date.label }}</label>
                             {{ form.expiry_date }}
-                            <small class="form-text text-muted">Opcjonalne. Pozostaw puste, jeśli nie dotyczy.</small>
+                            <div class="form-text text-muted">Opcjonalne. Pozostaw puste, jeśli nie dotyczy.</div>
                             {% if form.expiry_date.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.expiry_date.errors }}
                                 </div>
                             {% endif %}
                         </div>
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">Anuluj</a>
+
+                        <div class="mt-4">
                             <button type="submit" class="btn btn-primary">Zapisz</button>
+                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">Anuluj</a>
                         </div>
                     </form>
                 </div>
@@ -112,81 +166,96 @@
     $(document).ready(function() {
         // Inicjalizacja Select2 dla dropdown składników z grupowaniem
         $('#{{ form.ingredient.id_for_label }}').select2({
-            placeholder: "Wybierz składnik lub wyszukaj...",
-            allowClear: true,
             theme: "bootstrap4",
             width: '100%',
+            placeholder: "Wpisz lub wybierz składnik...",
+            allowClear: true,
+            minimumInputLength: 0,  // Pozwól na wyświetlenie wszystkich opcji bez wpisywania
+            ajax: {
+                url: "{% url 'fridge:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        list_all: !params.term  // Jeśli nie ma wyszukiwanej frazy, pobierz wszystkie
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: item.name,
+                                category: item.category
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
             templateResult: formatIngredient,
+            templateSelection: formatIngredientSelection,
             escapeMarkup: function(m) { return m; }
+        }).on('select2:select', function(e) {
+            var data = e.params.data;
+            loadCompatibleUnits(data.id);
         });
-        
+
         // Inicjalizacja Select2 dla dropdown jednostek
         $('#{{ form.unit.id_for_label }}').select2({
+            theme: "bootstrap4",
+            width: '100%',
             placeholder: "Wybierz jednostkę",
             allowClear: true,
-            theme: "bootstrap4"
+            language: {
+                noResults: function() {
+                    return "Nie znaleziono jednostek";
+                }
+            }
         });
-        
-        // Funkcja do formatowania opcji w Select2
+
         function formatIngredient(ingredient) {
-            if (!ingredient.id) {
-                return ingredient.text;
-            }
-            
-            // Jeśli to element z dziećmi (kategoria)
-            if (ingredient.element && ingredient.element.tagName === 'OPTGROUP') {
-                return '<div class="category-heading">' + ingredient.text + '</div>';
-            }
-            
-            // Jeśli to składnik w kategorii
-            if (ingredient.element && ingredient.element.parentElement && ingredient.element.parentElement.tagName === 'OPTGROUP') {
-                return '<div>' + ingredient.text + '</div>';
-            }
-            
-            // Zwykły składnik
-            return '<div>' + ingredient.text + '</div>';
+            if (!ingredient.id || ingredient.id === '') return ingredient.text;
+            return '<div class="ingredient-option">' +
+                   '<strong>' + ingredient.text + '</strong>' +
+                   (ingredient.category ? '<br><small class="text-muted">' + ingredient.category + '</small>' : '') +
+                   '</div>';
         }
-        
-        // Funkcja do ładowania kompatybilnych jednostek dla wybranego składnika
+
+        function formatIngredientSelection(ingredient) {
+            if (!ingredient.id || ingredient.id === '') return ingredient.text;
+            return ingredient.text;
+        }
+
         function loadCompatibleUnits(ingredientId) {
             $.ajax({
-                url: '{% url "fridge:ajax_compatible_units" %}',
-                data: {'ingredient_id': ingredientId},
-                dataType: 'json',
+                url: "{% url 'fridge:ajax_load_units' %}",
+                data: {
+                    'ingredient_id': ingredientId
+                },
                 success: function(data) {
                     var unitSelect = $('#{{ form.unit.id_for_label }}');
                     unitSelect.empty();
                     
-                    // Dodaj pobrane jednostki do listy
-                    $.each(data.units, function(index, unit) {
-                        unitSelect.append($('<option></option>')
-                            .attr('value', unit.id)
-                            .text(unit.name));
-                    });
+                    // Dodaj pustą opcję
+                    unitSelect.append(new Option('', '', false, false));
                     
-                    // Jeśli jest domyślna jednostka, ustaw ją
-                    if (data.default_unit) {
-                        unitSelect.val(data.default_unit);
-                    }
+                    // Dodaj dostępne jednostki
+                    data.units.forEach(function(unit) {
+                        var option = new Option(unit.name, unit.id, false, unit.id === data.default_unit);
+                        unitSelect.append(option);
+                    });
                     
                     // Odśwież Select2
                     unitSelect.trigger('change');
+                    
+                    // Ustaw domyślną jednostkę jeśli istnieje
+                    if (data.default_unit) {
+                        unitSelect.val(data.default_unit).trigger('change');
+                    }
                 }
             });
-        }
-        
-        // Przy zmianie składnika, załaduj kompatybilne jednostki
-        $('#{{ form.ingredient.id_for_label }}').change(function() {
-            var ingredientId = $(this).val();
-            if (ingredientId) {
-                loadCompatibleUnits(ingredientId);
-            }
-        });
-        
-        // Jeśli jest już wybrany składnik (np. przy edycji), załaduj kompatybilne jednostki
-        var ingredientId = $('#{{ form.ingredient.id_for_label }}').val();
-        if (ingredientId) {
-            loadCompatibleUnits(ingredientId);
         }
     });
 </script>

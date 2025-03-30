@@ -303,7 +303,7 @@ class MealPlan(models.Model):
         verbose_name = "Plan posiłku"
         verbose_name_plural = "Plany posiłków"
         ordering = ['date', 'meal_type']
-        unique_together = ('user', 'date', 'meal_type')
+        unique_together = ('user', 'date', 'meal_type', 'recipe')
         
     def __str__(self):
         meal_name = self.custom_name if self.custom_name else (self.recipe.title if self.recipe else "Własny posiłek")

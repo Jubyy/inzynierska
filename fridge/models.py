@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from recipes.models import Ingredient, MeasurementUnit
 from recipes.utils import convert_units
 from django.utils import timezone
+from datetime import date
 
 class FridgeItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fridge_items', verbose_name="Użytkownik")
@@ -11,11 +12,13 @@ class FridgeItem(models.Model):
     unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE, verbose_name="Jednostka")
     expiry_date = models.DateField(null=True, blank=True, verbose_name="Data ważności")
     purchase_date = models.DateField(default=timezone.now, verbose_name="Data zakupu")
+    added_date = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
     
     class Meta:
         verbose_name = "Produkt w lodówce"
         verbose_name_plural = "Produkty w lodówce"
         unique_together = ('user', 'ingredient', 'unit', 'expiry_date')
+        ordering = ['expiry_date', 'ingredient__name']
     
     def __str__(self):
         expiry_info = f" (ważne do {self.expiry_date})" if self.expiry_date else ""
@@ -24,9 +27,17 @@ class FridgeItem(models.Model):
     @property
     def is_expired(self):
         """Sprawdza, czy produkt jest przeterminowany"""
-        if not self.expiry_date:
-            return False
-        return self.expiry_date < timezone.now().date()
+        if self.expiry_date:
+            return self.expiry_date < date.today()
+        return False
+    
+    @property
+    def days_until_expiry(self):
+        """Zwraca liczbę dni do przeterminowania"""
+        if self.expiry_date:
+            delta = self.expiry_date - date.today()
+            return delta.days
+        return None
     
     def convert_to_unit(self, target_unit):
         """Konwertuje ilość produktu na inną jednostkę"""
