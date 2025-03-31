@@ -1,0 +1,52 @@
+[
+    {
+        "model": "recipes.ingredient",
+        "pk": 1,
+        "fields": {
+            "name": "Mleko",
+            "category": 1,
+            "default_unit": 5,
+            "description": "Mleko krowie"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 2,
+        "fields": {
+            "name": "Jajka",
+            "category": 1,
+            "default_unit": 6,
+            "description": "Jajka kurze"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 3,
+        "fields": {
+            "name": "Mąka pszenna",
+            "category": 5,
+            "default_unit": 2,
+            "description": "Mąka pszenna typu 450"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 4,
+        "fields": {
+            "name": "Cukier",
+            "category": 6,
+            "default_unit": 2,
+            "description": "Cukier biały"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 5,
+        "fields": {
+            "name": "Masło",
+            "category": 1,
+            "default_unit": 1,
+            "description": "Masło extra"
+        }
+    }
+] 

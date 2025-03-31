@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
@@ -13,7 +13,7 @@ from difflib import SequenceMatcher
 
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
 from .models import FridgeItem
-from .forms import FridgeItemForm, BulkAddForm
+from .forms import FridgeItemForm, BulkAddForm, FridgeSearchForm, BulkItemFormSet
 
 @login_required
 def fridge_dashboard(request):
@@ -106,7 +106,7 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
     """Dodawanie nowego produktu do lodówki"""
     model = FridgeItem
     form_class = FridgeItemForm
-    template_name = 'fridge/fridge_form.html'
+    template_name = 'fridge/fridge_wizard.html'
     success_url = reverse_lazy('fridge:list')
     
     def get_form_kwargs(self):
@@ -115,8 +115,19 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+        try:
+            FridgeItem.add_to_fridge(
+                user=self.request.user,
+                ingredient=form.cleaned_data['ingredient'],
+                amount=form.cleaned_data['amount'],
+                unit=form.cleaned_data['unit'],
+                expiry_date=form.cleaned_data['expiry_date']
+            )
+            messages.success(self.request, 'Produkt został dodany do lodówki.')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            messages.error(self.request, f'Wystąpił błąd podczas dodawania produktu: {str(e)}')
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 class FridgeItemUpdateView(LoginRequiredMixin, UpdateView):
     """Edycja produktu w lodówce"""
@@ -264,72 +275,61 @@ def available_recipes(request):
 
 @login_required
 def ajax_ingredient_search(request):
-    """Widok AJAX do wyszukiwania składników"""
+    """Widok do wyszukiwania składników przez AJAX"""
     term = request.GET.get('term', '')
     list_all = request.GET.get('list_all') == 'true'
     
-    # Pobierz wszystkie kategorie
-    categories = IngredientCategory.objects.all().order_by('name')
-    results = []
+    queryset = Ingredient.objects.all()
+    if not list_all and term:
+        queryset = queryset.filter(name__icontains=term)
     
-    if list_all:
-        # Jeśli nie ma wyszukiwanej frazy, zwróć wszystkie składniki pogrupowane według kategorii
-        for category in categories:
-            ingredients = Ingredient.objects.filter(category=category).order_by('name')
-            if ingredients.exists():
-                # Dodaj nagłówek kategorii
-                results.append({
-                    'id': f'cat_{category.id}',
-                    'name': category.name,
-                    'category': None,
-                    'disabled': True
-                })
-                # Dodaj składniki z tej kategorii
-                for ingredient in ingredients:
-                    results.append({
-                        'id': ingredient.id,
-                        'name': ingredient.name,
-                        'category': category.name
-                    })
-    else:
-        # Wyszukiwanie według wpisanej frazy
-        ingredients = Ingredient.objects.filter(name__icontains=term).order_by('name')
-        for ingredient in ingredients:
-            results.append({
-                'id': ingredient.id,
-                'name': ingredient.name,
-                'category': ingredient.category.name
-            })
+    results = []
+    for ingredient in queryset[:10]:  # Limit do 10 wyników
+        results.append({
+            'id': ingredient.id,
+            'name': ingredient.name,
+            'category': ingredient.category.name if ingredient.category else None
+        })
     
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
-    """Funkcja AJAX do pobierania jednostek dla wybranego składnika"""
+    """Widok do ładowania kompatybilnych jednostek dla wybranego składnika"""
     ingredient_id = request.GET.get('ingredient_id')
+    units = []
+    default_unit = None
     
-    if not ingredient_id or not ingredient_id.isdigit():
-        return JsonResponse({'units': [], 'default_unit': None})
-    
-    try:
-        ingredient = Ingredient.objects.get(id=ingredient_id)
-        # Pobierz tylko kompatybilne jednostki dla składnika
-        units = ingredient.compatible_units.all()
+    if ingredient_id:
+        ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+        # Pobierz kompatybilne jednostki dla składnika
+        compatible_units = ingredient.compatible_units.all()
         
-        # Jeśli nie ma zdefiniowanych kompatybilnych jednostek, użyj domyślnej jednostki
-        if not units.exists() and ingredient.default_unit:
-            units = [ingredient.default_unit]
+        # Jeśli nie ma kompatybilnych jednostek, użyj domyślnej jednostki
+        if not compatible_units.exists() and ingredient.default_unit:
+            compatible_units = [ingredient.default_unit]
         
-        # Przygotuj dane do odpowiedzi
-        units_data = [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
+        # Filtruj jednostki wagowe - zostaw tylko gramy i kilogramy
+        filtered_units = []
+        for unit in compatible_units:
+            if unit.type == 'weight':
+                if unit.symbol in ['g', 'kg']:  # tylko gramy i kilogramy
+                    filtered_units.append(unit)
+            else:
+                filtered_units.append(unit)
+            
+        units = [{
+            'id': unit.id, 
+            'name': unit.name, 
+            'type': unit.type,
+            'symbol': unit.symbol
+        } for unit in filtered_units]
+        
         default_unit = ingredient.default_unit.id if ingredient.default_unit else None
-        
-        return JsonResponse({
-            'units': units_data,
-            'default_unit': default_unit
-        })
-        
-    except Ingredient.DoesNotExist:
-        return JsonResponse({'units': [], 'default_unit': None})
+    
+    return JsonResponse({
+        'units': units,
+        'default_unit': default_unit
+    })
 
 def ajax_compatible_units(request):
     """Funkcja AJAX do pobierania jednostek kompatybilnych z daną jednostką"""

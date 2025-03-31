@@ -217,11 +217,6 @@
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="bi bi-calendar-week"></i> Planer posiłków
-                </a>
-            </li>
-            <li>
                 <a href="{% url 'accounts:profile' %}">
                     <i class="bi bi-person"></i> Mój profil
                 </a>
@@ -263,7 +258,7 @@
             </div>
             
             <div class="col">
-                <div class="stat-card meal-plan">
+                <div class="stat-card recipes">
                     <i class="bi bi-calendar-check stat-icon"></i>
                     <div class="stat-value">{{ available_recipes|length }}</div>
                     <div class="stat-label">Gotowych do przygotowania</div>

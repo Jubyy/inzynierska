@@ -1,0 +1,122 @@
+[
+    {
+        "model": "recipes.measurementunit",
+        "pk": 1,
+        "fields": {
+            "name": "gram",
+            "symbol": "g",
+            "type": "weight",
+            "base_ratio": 1.0,
+            "description": "Podstawowa jednostka wagi",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 2,
+        "fields": {
+            "name": "dekagram",
+            "symbol": "dag",
+            "type": "weight",
+            "base_ratio": 10.0,
+            "description": "1 dekagram = 10 gramów",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 3,
+        "fields": {
+            "name": "kilogram",
+            "symbol": "kg",
+            "type": "weight",
+            "base_ratio": 1000.0,
+            "description": "1 kilogram = 1000 gramów",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 4,
+        "fields": {
+            "name": "mililitr",
+            "symbol": "ml",
+            "type": "volume",
+            "base_ratio": 1.0,
+            "description": "Podstawowa jednostka objętości",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 5,
+        "fields": {
+            "name": "litr",
+            "symbol": "l",
+            "type": "volume",
+            "base_ratio": 1000.0,
+            "description": "1 litr = 1000 mililitrów",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 6,
+        "fields": {
+            "name": "łyżka",
+            "symbol": "łyżka",
+            "type": "spoon",
+            "base_ratio": 15.0,
+            "description": "1 łyżka ≈ 15 ml lub 15 g",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 7,
+        "fields": {
+            "name": "łyżeczka",
+            "symbol": "łyżeczka",
+            "type": "spoon",
+            "base_ratio": 5.0,
+            "description": "1 łyżeczka ≈ 5 ml lub 5 g",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 8,
+        "fields": {
+            "name": "szklanka",
+            "symbol": "szklanka",
+            "type": "volume",
+            "base_ratio": 250.0,
+            "description": "1 szklanka ≈ 250 ml",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 9,
+        "fields": {
+            "name": "sztuka",
+            "symbol": "szt.",
+            "type": "unit",
+            "base_ratio": 1.0,
+            "description": "Pojedyncza sztuka produktu",
+            "is_common": true
+        }
+    },
+    {
+        "model": "recipes.measurementunit",
+        "pk": 10,
+        "fields": {
+            "name": "opakowanie",
+            "symbol": "opak.",
+            "type": "unit",
+            "base_ratio": 1.0,
+            "description": "Całe opakowanie produktu",
+            "is_common": true
+        }
+    }
+] 

@@ -1,0 +1,83 @@
+[
+    {
+        "model": "recipes.unitconversion",
+        "pk": 1,
+        "fields": {
+            "from_unit": 1,
+            "to_unit": 2,
+            "ratio": 0.001
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 2,
+        "fields": {
+            "from_unit": 2,
+            "to_unit": 1,
+            "ratio": 1000.0
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 3,
+        "fields": {
+            "from_unit": 1,
+            "to_unit": 3,
+            "ratio": 0.1
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 4,
+        "fields": {
+            "from_unit": 3,
+            "to_unit": 1,
+            "ratio": 10.0
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 5,
+        "fields": {
+            "from_unit": 4,
+            "to_unit": 5,
+            "ratio": 0.001
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 6,
+        "fields": {
+            "from_unit": 5,
+            "to_unit": 4,
+            "ratio": 1000.0
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 7,
+        "fields": {
+            "from_unit": 8,
+            "to_unit": 4,
+            "ratio": 250.0
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 8,
+        "fields": {
+            "from_unit": 9,
+            "to_unit": 4,
+            "ratio": 15.0
+        }
+    },
+    {
+        "model": "recipes.unitconversion",
+        "pk": 9,
+        "fields": {
+            "from_unit": 10,
+            "to_unit": 4,
+            "ratio": 5.0
+        }
+    }
+] 

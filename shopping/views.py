@@ -5,7 +5,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse, FileResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -15,10 +15,13 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from django.utils.translation import gettext as _
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
 from .models import ShoppingList, ShoppingItem
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
 from .forms import ShoppingListForm, ShoppingItemForm, ShoppingItemFormSet
+from fridge.models import FridgeItem
 
 class ShoppingListListView(LoginRequiredMixin, ListView):
     """Lista wszystkich list zakupów użytkownika"""
@@ -118,18 +121,120 @@ def add_shopping_item(request, pk):
     shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
     
     if request.method == 'POST':
+        # Sprawdź czy to dodawanie wielu składników na raz
+        if 'ingredient_ids[]' in request.POST:
+            # Pobierz listę ID składników
+            ingredient_ids = request.POST.getlist('ingredient_ids[]')
+            amounts = request.POST.getlist('amounts[]')
+            unit_ids = request.POST.getlist('unit_ids[]')
+            
+            added_count = 0
+            errors = []
+            
+            for i, ingredient_id in enumerate(ingredient_ids):
+                try:
+                    ingredient = Ingredient.objects.get(pk=ingredient_id)
+                    
+                    # Sprawdź czy składnik jest już w liście
+                    existing_item = ShoppingItem.objects.filter(
+                        shopping_list=shopping_list,
+                        ingredient=ingredient
+                    ).first()
+                    
+                    if existing_item:
+                        # Jeśli element już istnieje, zaktualizuj go
+                        try:
+                            amount = float(amounts[i])
+                            unit = MeasurementUnit.objects.get(pk=unit_ids[i])
+                            
+                            if existing_item.unit == unit:
+                                # Ta sama jednostka - po prostu dodaj wartość
+                                existing_item.amount += amount
+                                existing_item.save()
+                            else:
+                                # Różne jednostki - próba konwersji
+                                try:
+                                    # Skonwertuj nową wartość do jednostki istniejącego elementu
+                                    from recipes.utils import convert_units
+                                    converted_amount = convert_units(amount, unit, existing_item.unit)
+                                    existing_item.amount += converted_amount
+                                    existing_item.save()
+                                except ValueError:
+                                    # Jeśli nie można przekonwertować, dodaj jako nową pozycję
+                                    ShoppingItem.objects.create(
+                                        shopping_list=shopping_list,
+                                        ingredient=ingredient,
+                                        amount=amount,
+                                        unit=unit
+                                    )
+                                    added_count += 1
+                            
+                        except (ValueError, IndexError):
+                            errors.append(f"Błąd podczas aktualizacji {ingredient.name}")
+                    else:
+                        # Dodaj nowy składnik
+                        try:
+                            amount = float(amounts[i]) if i < len(amounts) else 1
+                            unit = MeasurementUnit.objects.get(pk=unit_ids[i]) if i < len(unit_ids) else ingredient.default_unit
+                            
+                            ShoppingItem.objects.create(
+                                shopping_list=shopping_list,
+                                ingredient=ingredient,
+                                amount=amount,
+                                unit=unit
+                            )
+                            added_count += 1
+                            
+                        except (ValueError, IndexError, MeasurementUnit.DoesNotExist):
+                            errors.append(f"Błąd podczas dodawania {ingredient.name}")
+                    
+                except Ingredient.DoesNotExist:
+                    errors.append(f"Składnik o ID {ingredient_id} nie istnieje")
+            
+            if added_count > 0:
+                messages.success(request, f'Dodano {added_count} składników do listy zakupów.')
+            
+            if errors:
+                messages.warning(request, f'Wystąpiły błędy: {", ".join(errors)}')
+            
+            return redirect('shopping:detail', pk=shopping_list.pk)
+        
+        # Standardowe dodawanie pojedynczego składnika
         form = ShoppingItemForm(request.POST)
         if form.is_valid():
             item = form.save(commit=False)
             item.shopping_list = shopping_list
-            item.save()
             
-            messages.success(request, f'Dodano {item.ingredient.name} do listy zakupów.')
+            # Sprawdź czy składnik już istnieje na liście
+            existing_item = ShoppingItem.objects.filter(
+                shopping_list=shopping_list,
+                ingredient=item.ingredient
+            ).first()
+            
+            if existing_item and existing_item.unit == item.unit:
+                # Jeśli pozycja już istnieje z tą samą jednostką, zwiększ ilość
+                existing_item.amount += item.amount
+                existing_item.save()
+                messages.success(request, f'Zaktualizowano ilość {item.ingredient.name} na liście zakupów.')
+            else:
+                # W przeciwnym razie zapisz nową pozycję
+                item.save()
+                messages.success(request, f'Dodano {item.ingredient.name} do listy zakupów.')
+            
             return redirect('shopping:detail', pk=shopping_list.pk)
     else:
         form = ShoppingItemForm(initial={'shopping_list': shopping_list})
     
-    return render(request, 'shopping/shopping_item_form.html', {'form': form, 'shopping_list': shopping_list})
+    # Pobierz wszystkie składniki i kategorie do formularza
+    ingredients = Ingredient.objects.all().order_by('name')
+    categories = IngredientCategory.objects.all().order_by('name')
+    
+    return render(request, 'shopping/shopping_item_form.html', {
+        'form': form, 
+        'shopping_list': shopping_list,
+        'ingredients': ingredients,
+        'categories': categories
+    })
 
 @login_required
 def edit_shopping_item(request, pk):
@@ -229,60 +334,63 @@ def create_from_recipe(request):
     
     return render(request, 'shopping/create_from_recipe.html', {'recipes': recipes})
 
+@login_required
 def ajax_ingredient_search(request):
-    """Wyszukiwanie składników za pomocą AJAX"""
-    query = request.GET.get('term', '')
-    include_categories = request.GET.get('include_categories', 'true') == 'true'
+    """Widok AJAX do wyszukiwania składników z kategoriami"""
+    term = request.GET.get('term', '')
+    include_categories = request.GET.get('include_categories') == 'true'
     
-    if query:
-        # Wyszukiwanie według zapytania
-        ingredients = Ingredient.objects.filter(name__icontains=query).order_by('category__name', 'name')
+    results = []
+    
+    if include_categories:
+        # Pobierz wszystkie kategorie
+        categories = IngredientCategory.objects.all().order_by('name')
         
-        if include_categories:
-            # Grupowanie według kategorii
-            results = []
-            categories = {}
+        for category in categories:
+            ingredients = Ingredient.objects.filter(
+                category=category,
+                name__icontains=term if term else ''
+            ).order_by('name')
             
-            for ingredient in ingredients:
-                category_name = ingredient.category.name
-                if category_name not in categories:
-                    categories[category_name] = {
-                        'text': category_name,
-                        'children': []
-                    }
-                
-                categories[category_name]['children'].append({
-                    'id': ingredient.id,
-                    'text': ingredient.name
-                })
-            
-            # Konwersja słownika kategorii na listę
-            for category_name, category_data in categories.items():
-                results.append(category_data)
-        else:
-            # Prosty format bez kategorii
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
-    else:
-        # Gdy brak zapytania, zwróć pogrupowane składniki
-        if include_categories:
-            results = []
-            categories = IngredientCategory.objects.all().order_by('name')
-            
-            for category in categories:
-                # Pobierz wszystkie składniki z danej kategorii, nie tylko 10 pierwszych
-                category_ingredients = Ingredient.objects.filter(category=category).order_by('name')
-                if category_ingredients:
-                    children = [{'id': i.id, 'text': i.name} for i in category_ingredients]
+            if ingredients.exists():
+                # Dodaj składniki z tej kategorii
+                for ingredient in ingredients:
                     results.append({
-                        'text': category.name,
-                        'children': children
+                        'id': ingredient.id,
+                        'text': ingredient.name,
+                        'category': category.name
                     })
-        else:
-            # Zwróć wszystkie składniki alfabetycznie
-            ingredients = Ingredient.objects.all().order_by('name')
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
+    else:
+        # Proste wyszukiwanie bez kategorii
+        ingredients = Ingredient.objects.filter(
+            name__icontains=term
+        ).order_by('name')[:10]
+        
+        results = [{'id': i.id, 'text': i.name} for i in ingredients]
     
     return JsonResponse({'results': results})
+
+@login_required
+def ajax_load_units(request):
+    """Widok AJAX do ładowania jednostek dla wybranego składnika"""
+    ingredient_id = request.GET.get('ingredient_id')
+    
+    if not ingredient_id:
+        return JsonResponse({'units': [], 'default_unit': None})
+    
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    compatible_units = ingredient.compatible_units.all()
+    
+    if not compatible_units.exists() and ingredient.default_unit:
+        compatible_units = [ingredient.default_unit]
+    
+    units = [{'id': unit.id, 'name': unit.name} for unit in compatible_units]
+    default_unit = ingredient.default_unit.id if ingredient.default_unit else None
+    
+    return JsonResponse({
+        'units': units,
+        'default_unit': default_unit
+    })
 
 @login_required
 def export_list_to_pdf(request, pk):
@@ -292,35 +400,37 @@ def export_list_to_pdf(request, pk):
     # Utwórz bufor pamięci do zapisania PDF
     buffer = io.BytesIO()
     
-    # Utwórz obiekt canvas z bufforem
-    p = canvas.Canvas(buffer, pagesize=A4)
+    # Utwórz dokument PDF z obiegiem kodowania UTF-8
+    doc = SimpleDocTemplate(buffer, pagesize=A4, encoding='utf-8')
     
-    # Ustaw czcionkę (możesz użyć wbudowanej czcionki)
-    p.setFont("Helvetica-Bold", 16)
+    # Definiuj style
+    styles = getSampleStyleSheet()
     
-    # Tytuł dokumentu
-    p.drawString(2*cm, 28*cm, f"Lista zakupów: {shopping_list.name}")
+    # Lista elementów do dodania do dokumentu
+    elements = []
+    
+    # Tytuł dokumentu - używamy obiektu Paragraph zamiast bezpośredniego rysowania stringa
+    title_style = styles['Title']
+    elements.append(Paragraph(f"Lista zakupów: {shopping_list.name}", title_style))
     
     # Informacje o liście
-    p.setFont("Helvetica", 12)
-    p.drawString(2*cm, 27*cm, f"Data utworzenia: {shopping_list.created_at.strftime('%d-%m-%Y')}")
-    p.drawString(2*cm, 26.5*cm, f"Użytkownik: {shopping_list.user.username}")
+    elements.append(Spacer(1, 0.5*cm))
+    elements.append(Paragraph(f"Data utworzenia: {shopping_list.created_at.strftime('%d-%m-%Y')}", styles['Normal']))
+    elements.append(Paragraph(f"Użytkownik: {shopping_list.user.username}", styles['Normal']))
+    elements.append(Spacer(1, 0.5*cm))
     
-    # Nagłówki tabeli
-    headers = ["Składnik", "Ilość", "Jednostka", "Kupiono"]
-    data = [headers]
+    # Dane do tabeli
+    data = [["Składnik", "Ilość", "Jednostka", "Kupiono"]]
     
-    # Dane tabeli
     for item in shopping_list.items.all():
-        row = [
+        data.append([
             item.ingredient.name,
             str(round(item.amount, 2)),
             item.unit.symbol,
             "✓" if item.is_purchased else ""
-        ]
-        data.append(row)
+        ])
     
-    # Utwórz tabelę
+    # Tworzenie tabeli
     table = Table(data, colWidths=[8*cm, 3*cm, 3*cm, 2*cm])
     
     # Stylizacja tabeli
@@ -332,21 +442,19 @@ def export_list_to_pdf(request, pk):
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     
-    # Rysuj tabelę
-    table.wrapOn(p, 2*cm, 20*cm)
-    table.drawOn(p, 2*cm, 24*cm)
+    elements.append(table)
     
-    # Dodaj informacje na końcu strony
-    p.setFont("Helvetica-Oblique", 10)
-    p.drawString(2*cm, 2*cm, "Wygenerowano z aplikacji Książka Kucharska")
+    # Stopka
+    elements.append(Spacer(1, 1*cm))
+    elements.append(Paragraph("Wygenerowano z aplikacji Książka Kucharska", styles['Italic']))
     
-    # Zakończ stronę
-    p.showPage()
-    p.save()
+    # Zbuduj dokument
+    doc.build(elements)
     
-    # Zapisz PDF do bufora i zwróć jako odpowiedź
+    # Odczytaj zawartość bufora
     buffer.seek(0)
     
     # Przygotuj odpowiedź

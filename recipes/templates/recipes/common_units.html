@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Popularne miary kuchenne</h2>
+    <p class="lead">Poniżej znajdziesz tabelę z popularnymi miarami kuchennymi i ich przelicznikami na gramy lub mililitry.</p>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Miara</th>
+                        <th>Przelicznik</th>
+                        <th>Opis/Przykład</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit in common_units %}
+                    <tr>
+                        <td>{{ unit.name }}</td>
+                        <td>
+                            {% if unit.type == 'weight' or unit.type == 'spoon' %}
+                                {{ unit.base_ratio }}g
+                            {% elif unit.type == 'volume' %}
+                                {{ unit.base_ratio }}ml
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ unit.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h3>Przykładowe przeliczniki dla popularnych produktów</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4>Produkty sypkie</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li>1 szklanka mąki pszennej = 130g</li>
+                            <li>1 szklanka cukru = 200g</li>
+                            <li>1 łyżka mąki = 15g</li>
+                            <li>1 łyżka cukru = 15g</li>
+                            <li>1 łyżeczka soli = 5g</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4>Płyny</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li>1 szklanka wody = 250ml</li>
+                            <li>1 łyżka oleju = 15ml</li>
+                            <li>1 łyżeczka ekstraktu = 5ml</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <h4 class="alert-heading">Wskazówka</h4>
+        <p>Pamiętaj, że przeliczniki mogą się różnić w zależności od produktu i jego konsystencji. 
+           Na przykład, szklanka mąki będzie ważyć mniej niż szklanka cukru.</p>
+    </div>
+</div>
+{% endblock %} 

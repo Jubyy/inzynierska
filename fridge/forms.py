@@ -2,6 +2,7 @@ from django import forms
 from .models import FridgeItem
 from recipes.models import Ingredient, MeasurementUnit, IngredientCategory
 from django.forms import formset_factory
+from django.core.exceptions import ValidationError
 
 class FridgeItemForm(forms.ModelForm):
     """Formularz do dodawania i edycji produktów w lodówce"""
@@ -16,7 +17,7 @@ class FridgeItemForm(forms.ModelForm):
             'amount': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0.01',
-                'step': '0.01',
+                'step': 'any',
                 'placeholder': 'Podaj ilość'
             }),
             'unit': forms.Select(attrs={
@@ -56,8 +57,16 @@ class FridgeItemForm(forms.ModelForm):
         cleaned_data = super().clean()
         ingredient = cleaned_data.get('ingredient')
         unit = cleaned_data.get('unit')
+        amount = cleaned_data.get('amount')
         
-        if ingredient and unit:
+        if ingredient and unit and amount:
+            # Lista jednostek wymagających liczb całkowitych
+            whole_number_units = ['szt', 'sztuka', 'garść', 'opakowanie']
+            
+            # Sprawdź, czy dla jednostek wymagających liczb całkowitych podano liczbę całkowitą
+            if unit.symbol in whole_number_units and not float(amount).is_integer():
+                self.add_error('amount', 'Dla tej jednostki można podać tylko liczby całkowite.')
+            
             # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
             compatible_units = ingredient.compatible_units.all()
             if not compatible_units.exists() and ingredient.default_unit:

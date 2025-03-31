@@ -1,0 +1,72 @@
+[
+    {
+        "model": "recipes.recipecategory",
+        "pk": 1,
+        "fields": {
+            "name": "Śniadanie",
+            "description": "Przepisy na śniadanie"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 2,
+        "fields": {
+            "name": "Drugie śniadanie",
+            "description": "Przepisy na drugie śniadanie"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 3,
+        "fields": {
+            "name": "Obiad",
+            "description": "Przepisy na obiad"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 4,
+        "fields": {
+            "name": "Kolacja",
+            "description": "Przepisy na kolację"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 5,
+        "fields": {
+            "name": "Przekąska",
+            "description": "Przepisy na przekąski"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 6,
+        "fields": {
+            "name": "Deser",
+            "description": "Przepisy na desery"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 7,
+        "fields": {
+            "name": "Napoje",
+            "description": "Przepisy na napoje"
+        }
+    }
+] 
+        "fields": {
+            "name": "Deser",
+            "description": "Przepisy na desery"
+        }
+    },
+    {
+        "model": "recipes.recipecategory",
+        "pk": 7,
+        "fields": {
+            "name": "Napoje",
+            "description": "Przepisy na napoje"
+        }
+    }
+] 

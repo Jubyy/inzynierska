@@ -1,32 +1,37 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, MealPlan
-from datetime import date, timedelta
+from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment
 from django.db import models
 
 class RecipeForm(forms.ModelForm):
     """Formularz do tworzenia i edycji przepisów"""
     class Meta:
         model = Recipe
-        fields = ['title', 'description', 'instructions', 'servings', 
-                 'preparation_time', 'image', 'categories']
+        fields = ['title', 'categories', 'description', 'instructions', 'servings', 'preparation_time', 'image']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa przepisu'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Krótki opis przepisu'}),
-            'instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Instrukcje przygotowania'}),
-            'servings': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'preparation_time': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Czas w minutach'}),
-            'categories': forms.SelectMultiple(attrs={'class': 'form-control select2'})
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'categories': forms.SelectMultiple(attrs={
+                'class': 'form-control categories-select',
+                'data-placeholder': 'Wybierz kategorie'
+            }),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'instructions': forms.Textarea(attrs={'class': 'form-control'}),
+            'servings': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'preparation_time': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'})
         }
-        labels = {
-            'title': 'Tytuł',
-            'description': 'Opis',
-            'instructions': 'Instrukcje przygotowania',
-            'servings': 'Liczba porcji',
-            'preparation_time': 'Czas przygotowania (minuty)',
-            'image': 'Zdjęcie',
-            'categories': 'Kategorie'
-        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['categories'].queryset = RecipeCategory.objects.all().order_by('name')
+        self.fields['categories'].required = True
+        self.fields['title'].label = 'Tytuł'
+        self.fields['categories'].label = 'Kategorie'
+        self.fields['description'].label = 'Opis'
+        self.fields['instructions'].label = 'Instrukcje przygotowania'
+        self.fields['servings'].label = 'Liczba porcji'
+        self.fields['preparation_time'].label = 'Czas przygotowania (minuty)'
+        self.fields['image'].label = 'Zdjęcie'
 
 class RecipeIngredientForm(forms.ModelForm):
     """Formularz dla składnika przepisu"""
@@ -56,6 +61,30 @@ class RecipeIngredientForm(forms.ModelForm):
         
         # Ustaw pogrupowane opcje dla pola ingredient
         self.fields['ingredient'].choices = ingredient_choices
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        ingredient = cleaned_data.get('ingredient')
+        unit = cleaned_data.get('unit')
+        amount = cleaned_data.get('amount')
+        
+        if ingredient and unit and amount:
+            # Lista jednostek wymagających liczb całkowitych
+            whole_number_units = ['szt', 'sztuka', 'garść', 'opakowanie']
+            
+            # Sprawdź, czy dla jednostek wymagających liczb całkowitych podano liczbę całkowitą
+            if unit.symbol in whole_number_units and not float(amount).is_integer():
+                self.add_error('amount', 'Dla tej jednostki można podać tylko liczby całkowite.')
+            
+            # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
+            compatible_units = ingredient.compatible_units.all()
+            if not compatible_units.exists() and ingredient.default_unit:
+                compatible_units = [ingredient.default_unit]
+            
+            if unit not in compatible_units:
+                self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
+        
+        return cleaned_data
 
 # Formset do zarządzania wieloma składnikami dla przepisu
 RecipeIngredientFormSet = inlineformset_factory(
@@ -154,71 +183,3 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
-
-class MealPlanForm(forms.ModelForm):
-    """Formularz do dodawania/edycji zaplanowanych posiłków"""
-    date = forms.DateField(
-        label="Data",
-        widget=forms.DateInput(attrs={
-            'class': 'form-control',
-            'type': 'date',
-            'min': date.today().strftime('%Y-%m-%d')
-        }),
-        initial=date.today
-    )
-    
-    class Meta:
-        model = MealPlan
-        fields = ['recipe', 'custom_name', 'date', 'meal_type', 'servings', 'notes', 'completed']
-        widgets = {
-            'recipe': forms.Select(attrs={'class': 'form-control select2', 'required': False}),
-            'custom_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Własna nazwa posiłku'}),
-            'meal_type': forms.Select(attrs={'class': 'form-control'}),
-            'servings': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Opcjonalne notatki do posiłku...'}),
-            'completed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-        
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-        
-        if user:
-            # Ograniczenie wyboru przepisów do tych utworzonych przez użytkownika lub publicznych
-            self.fields['recipe'].queryset = Recipe.objects.filter(
-                models.Q(author=user) | models.Q(is_public=True)
-            ).order_by('title')
-            
-        # Dodajemy pole recipe jako opcjonalne
-        self.fields['recipe'].required = False
-        
-    def clean(self):
-        cleaned_data = super().clean()
-        recipe = cleaned_data.get('recipe')
-        custom_name = cleaned_data.get('custom_name')
-        
-        # Sprawdź, czy podano albo przepis, albo własną nazwę
-        if not recipe and not custom_name:
-            raise forms.ValidationError("Musisz podać przepis lub własną nazwę posiłku.")
-            
-        return cleaned_data
-
-class MealPlanWeekForm(forms.Form):
-    """Formularz do wyboru tygodnia do wyświetlenia planu posiłków"""
-    start_date = forms.DateField(
-        label="Tydzień rozpoczynający się od",
-        widget=forms.DateInput(attrs={
-            'class': 'form-control',
-            'type': 'date'
-        }),
-        initial=date.today
-    )
-    
-    def clean_start_date(self):
-        """Upewnij się, że data rozpoczęcia to poniedziałek"""
-        start_date = self.cleaned_data['start_date']
-        # Jeśli nie jest poniedziałkiem, zaokrąglij do poprzedzającego poniedziałku
-        if start_date.weekday() != 0:  # 0 = poniedziałek
-            days_to_subtract = start_date.weekday()
-            start_date = start_date - timedelta(days=days_to_subtract)
-        return start_date

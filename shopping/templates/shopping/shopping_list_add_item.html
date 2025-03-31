@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj produkt do listy zakupów{% endblock %}
+
+{% block extra_css %}
+<style>
+    .select2-container {
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 28px;
+        padding-left: 8px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        padding: 8px;
+        border: 1px solid #ced4da;
+    }
+    .select2-dropdown {
+        border: 1px solid #ced4da;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .invalid-feedback {
+        display: block;
+    }
+    /* Poprawka dla placeholdera */
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6c757d;
+        line-height: 28px;
+    }
+    /* Styl dla nagłówków kategorii */
+    .select2-results__group {
+        padding: 6px;
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+    /* Styl dla opcji w grupach */
+    .select2-results__option[role=group] .select2-results__option {
+        padding-left: 1em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Dodaj produkt do listy zakupów</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.ingredient.id_for_label }}">{{ form.ingredient.label }}</label>
+                            {{ form.ingredient }}
+                            <small class="form-text text-muted">Wybierz składnik z listy lub wyszukaj</small>
+                            {% if form.ingredient.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.ingredient.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
+                                    {{ form.amount }}
+                                    {% if form.amount.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form.amount.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>
+                                    {{ form.unit }}
+                                    {% if form.unit.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form.unit.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Dodaj do listy</button>
+                            <a href="{% url 'shopping:detail' shopping_list.id %}" class="btn btn-outline-secondary">Anuluj</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Funkcja formatująca wyświetlanie składnika
+        function formatIngredient(ingredient) {
+            if (!ingredient.id) return ingredient.text;
+            if (ingredient.category) {
+                return '<div>' + ingredient.text + '<br><small class="text-muted">' + ingredient.category + '</small></div>';
+            }
+            return ingredient.text;
+        }
+
+        // Inicjalizacja Select2 dla składników
+        $('#{{ form.ingredient.id_for_label }}').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wpisz lub wybierz składnik...",
+            allowClear: true,
+            ajax: {
+                url: "{% url 'shopping:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        include_categories: true
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            },
+            templateResult: formatIngredient,
+            escapeMarkup: function(m) { return m; }
+        }).on('select2:select', function(e) {
+            if (e.params.data.id) {
+                loadCompatibleUnits(e.params.data.id);
+            }
+        });
+
+        // Inicjalizacja Select2 dla jednostek
+        $('#{{ form.unit.id_for_label }}').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wybierz jednostkę",
+            allowClear: true,
+            dropdownParent: $('body')
+        });
+
+        // Funkcja ładująca kompatybilne jednostki
+        function loadCompatibleUnits(ingredientId) {
+            $.ajax({
+                url: "{% url 'shopping:ajax_load_units' %}",
+                data: {
+                    'ingredient_id': ingredientId
+                },
+                success: function(data) {
+                    var unitSelect = $('#{{ form.unit.id_for_label }}');
+                    unitSelect.empty();
+                    
+                    // Dodaj pustą opcję
+                    unitSelect.append(new Option('', '', false, false));
+                    
+                    // Dodaj dostępne jednostki
+                    data.units.forEach(function(unit) {
+                        unitSelect.append(new Option(unit.name, unit.id, false, unit.id === data.default_unit));
+                    });
+                    
+                    // Odśwież Select2
+                    unitSelect.trigger('change');
+                    
+                    // Ustaw domyślną jednostkę jeśli istnieje
+                    if (data.default_unit) {
+                        unitSelect.val(data.default_unit).trigger('change');
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

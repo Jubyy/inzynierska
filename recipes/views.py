@@ -6,286 +6,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, MealPlan
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, MealPlanForm, MealPlanWeekForm
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
-from datetime import date, datetime, timedelta
-import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import cm
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
-
-@login_required
-def recipe_list(request):
-    recipes = Recipe.objects.filter(user=request.user)
-    return render(request, 'recipes/recipe_list.html', {'recipes': recipes})
-
-@login_required
-def add_recipe(request):
-    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=0, can_delete=True)
-    StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
-
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)
-        ingredient_formset = IngredientFormSet(request.POST)
-        step_formset = StepFormSet(request.POST)
-
-        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
-            recipe = form.save(commit=False)
-            recipe.user = request.user
-            recipe.save()
-            messages.success(request, 'Przepis został zapisany!')
-
-            ingredients = ingredient_formset.save(commit=False)
-            for ingredient in ingredients:
-                ingredient.recipe = recipe
-                ingredient.save()
-
-            steps = step_formset.save(commit=False)
-            for index, step in enumerate(steps):
-                step.recipe = recipe
-                step.order = index + 1
-                step.save()
-
-            return redirect('recipe_list')
-    else:
-        form = RecipeForm()
-        ingredient_formset = IngredientFormSet()
-        step_formset = StepFormSet()
-
-    return render(request, 'recipes/add_recipe.html', {
-        'form': form,
-        'ingredient_formset': ingredient_formset,
-        'step_formset': step_formset,
-    })
-
-@login_required
-def check_ingredients(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    fridge_items = FridgeItem.objects.filter(user=request.user)
-
-    missing_ingredients = []
-
-    for ingredient in recipe.ingredients.all():
-        matching_item = fridge_items.filter(name__iexact=ingredient.name).first()
-
-        if not matching_item:
-            missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name}')
-            add_to_shopping_list(request.user, ingredient, recipe)
-        elif matching_item.quantity < ingredient.quantity:
-            missing_ingredients.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name} (masz za mało: {matching_item.quantity} {matching_item.unit})')
-            add_to_shopping_list(request.user, ingredient, recipe)
-
-    return render(request, 'recipes/check_ingredients.html', {
-        'recipe': recipe,
-        'missing_ingredients': missing_ingredients,
-    })
-
-def add_to_shopping_list(user, ingredient, recipe):
-    item, created = ShoppingItem.objects.get_or_create(
-        user=user,
-        name=ingredient.name,
-        unit=ingredient.unit,
-        recipe_name=recipe.name,
-        defaults={'quantity': 0}
-    )
-    item.quantity += ingredient.quantity
-    item.save()
-
-
-@login_required
-def scale_recipe(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-
-    if request.method == 'POST':
-        target_portions = int(request.POST.get('portions', recipe.portions))
-
-        scaled_ingredients = []
-        scale_factor = target_portions / recipe.portions
-
-        for ingredient in recipe.ingredients.all():
-            scaled_ingredients.append({
-                'name': ingredient.name,
-                'quantity': round(ingredient.quantity * scale_factor, 2),
-                'unit': ingredient.unit,
-            })
-
-        return render(request, 'recipes/scale_recipe.html', {
-            'recipe': recipe,
-            'scaled_ingredients': scaled_ingredients,
-            'target_portions': target_portions,
-        })
-
-    return render(request, 'recipes/scale_form.html', {'recipe': recipe})
-
-
-@login_required
-def generate_shopping_list(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    fridge_items = FridgeItem.objects.filter(user=request.user)
-
-    shopping_list = []
-
-    for ingredient in recipe.ingredients.all():
-        matching_item = fridge_items.filter(name__iexact=ingredient.name).first()
-
-        if not matching_item:
-            shopping_list.append(f'{ingredient.quantity} {ingredient.unit} {ingredient.name}')
-        else:
-            # Sprawdź czy mamy odpowiednią ilość, w razie potrzeby konwertuj
-            if ingredient.unit != matching_item.unit:
-                from .utils import convert_units
-                converted_quantity = convert_units(matching_item.quantity, matching_item.unit, ingredient.unit)
-
-                if converted_quantity is None or converted_quantity < ingredient.quantity:
-                    needed_quantity = ingredient.quantity - (converted_quantity or 0)
-                    shopping_list.append(f'{needed_quantity:.2f} {ingredient.unit} {ingredient.name}')
-            elif ingredient.quantity > matching_item.quantity:
-                needed_quantity = ingredient.quantity - matching_item.quantity
-                shopping_list.append(f'{needed_quantity:.2f} {ingredient.unit} {ingredient.name}')
-
-    return render(request, 'recipes/shopping_list.html', {
-        'recipe': recipe,
-        'shopping_list': shopping_list,
-    })
-
-
-
-@login_required
-def edit_recipe(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-
-    IngredientFormSet = inlineformset_factory(Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=0, can_delete=True)
-    StepFormSet = inlineformset_factory(Recipe, PreparationStep, form=PreparationStepForm, extra=0, can_delete=True)
-
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        ingredient_formset = IngredientFormSet(request.POST, instance=recipe)
-        step_formset = StepFormSet(request.POST, instance=recipe)
-
-        if form.is_valid() and ingredient_formset.is_valid() and step_formset.is_valid():
-            form.save()
-
-            ingredients = ingredient_formset.save(commit=False)
-            for ingredient in ingredients:
-                ingredient.recipe = recipe
-                ingredient.save()
-
-            for obj in ingredient_formset.deleted_objects:
-                obj.delete()
-
-            steps = step_formset.save(commit=False)
-            for index, step in enumerate(steps):
-                step.recipe = recipe
-                step.order = index + 1
-                step.save()
-
-            for obj in step_formset.deleted_objects:
-                obj.delete()
-
-            return redirect('recipe_list')
-    else:
-        form = RecipeForm(instance=recipe)
-        ingredient_formset = IngredientFormSet(instance=recipe)
-        step_formset = StepFormSet(instance=recipe)
-
-    return render(request, 'recipes/edit_recipe.html', {
-        'form': form,
-        'ingredient_formset': ingredient_formset,
-        'step_formset': step_formset,
-        'recipe': recipe,
-    })
-
-
-@login_required
-def delete_recipe(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    if request.method == 'POST':
-        recipe.delete()
-        messages.success(request, f'Przepis "{recipe.name}" został usunięty.')
-        return redirect('recipe_list')
-
-    return render(request, 'recipes/confirm_delete_recipe.html', {'recipe': recipe})
-
-
-@login_required
-def recipe_detail(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    return render(request, 'recipes/recipe_detail.html', {'recipe': recipe})
-
-
-@login_required
-def search_recipes(request):
-    query = request.GET.get('q')
-    only_possible = request.GET.get('only_possible', 'off') == 'on'
-
-    recipes = Recipe.objects.filter(user=request.user)
-
-    if query:
-        recipes = recipes.filter(
-            Q(ingredients__name__icontains=query)
-        ).distinct()
-
-    if only_possible:
-        recipes = [recipe for recipe in recipes if can_be_made_from_fridge(recipe, request.user)]
-
-    return render(request, 'recipes/search_results.html', {'recipes': recipes, 'query': query, 'only_possible': only_possible})
-
-def can_be_made_from_fridge(recipe, user):
-    fridge_items = {item.name.lower(): item for item in FridgeItem.objects.filter(user=user)}
-
-    for ingredient in recipe.ingredients.all():
-        fridge_item = fridge_items.get(ingredient.name.lower())
-        if not fridge_item:
-            return False
-
-        if not units_match(ingredient.unit, fridge_item.unit):
-            return False
-
-        if fridge_item.quantity < ingredient.quantity:
-            return False
-
-    return True
-
-def units_match(recipe_unit, fridge_unit):
-    return recipe_unit == fridge_unit
-
-
-@login_required
-def prepare_meal(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id, user=request.user)
-    fridge_items = {item.name.lower(): item for item in FridgeItem.objects.filter(user=request.user)}
-
-    missing_ingredients = []
-    for ingredient in recipe.ingredients.all():
-        fridge_item = fridge_items.get(ingredient.name.lower())
-        if not fridge_item:
-            missing_ingredients.append(f'{ingredient.name} - brakuje całkowicie')
-        elif fridge_item.quantity < ingredient.quantity:
-            missing_ingredients.append(f'{ingredient.name} - potrzebujesz {ingredient.quantity}, a masz tylko {fridge_item.quantity}')
-
-    if missing_ingredients:
-        messages.error(request, "Nie możesz przygotować posiłku, brakuje składników:")
-        for missing in missing_ingredients:
-            messages.error(request, missing)
-        return redirect('recipe_detail', recipe_id=recipe_id)
-
-    # Aktualizacja lodówki - zmniejszenie ilości
-    for ingredient in recipe.ingredients.all():
-        fridge_item = fridge_items.get(ingredient.name.lower())
-        fridge_item.quantity -= ingredient.quantity
-        if fridge_item.quantity <= 0:
-            fridge_item.delete()
-        else:
-            fridge_item.save()
-
-    messages.success(request, f'Posiłek "{recipe.name}" został przygotowany, składniki zostały zużyte.')
-    return redirect('recipe_detail', recipe_id=recipe_id)
+from decimal import Decimal
 
 class RecipeListView(ListView):
     model = Recipe
@@ -389,6 +116,166 @@ class RecipeListView(ListView):
         
         return context
 
+def home_view(request):
+    """Widok strony głównej z najpopularniejszymi przepisami"""
+    # Pobierz przepisy z największą liczbą polubień (limit 8)
+    popular_recipes = Recipe.objects.annotate(
+        likes_total=Count('likes')
+    ).order_by('-likes_total', '-created_at')[:8]
+    
+    # Przekaż przepisy do szablonu
+    context = {
+        'popular_recipes': popular_recipes
+    }
+    
+    return render(request, 'home.html', context)
+
+@login_required
+def add_to_shopping_list(request, pk):
+    """Dodaje składniki przepisu do listy zakupów"""
+    recipe = get_object_or_404(Recipe, pk=pk)
+    
+    if request.method == 'POST':
+        # Pobierz lub utwórz listę zakupów
+        shopping_list_id = request.POST.get('shopping_list')
+        servings = request.POST.get('servings')
+        
+        try:
+            servings = int(servings)
+        except (ValueError, TypeError):
+            servings = recipe.servings
+        
+        if shopping_list_id:
+            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
+        else:
+            # Utwórz nową listę zakupów
+            list_name = f"Zakupy dla: {recipe.title}"
+            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
+        
+        # Dodaj składniki do listy
+        created_items = shopping_list.add_recipe_ingredients(recipe, servings)
+        
+        messages.success(request, f'Dodano {len(created_items)} składników do listy zakupów "{shopping_list.name}".')
+        return redirect('shopping:detail', pk=shopping_list.pk)
+    
+    # Pobierz istniejące listy zakupów użytkownika
+    try:
+        shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
+    except Exception:
+        shopping_lists = []
+    
+    missing_ingredients = recipe.get_missing_ingredients(request.user)
+    
+    context = {
+        'recipe': recipe,
+        'shopping_lists': shopping_lists,
+        'missing_ingredients': missing_ingredients
+    }
+    
+    return render(request, 'recipes/add_to_shopping_list.html', context)
+
+@login_required
+def add_missing_to_shopping_list(request, pk):
+    """Dodaje brakujące składniki przepisu do listy zakupów"""
+    recipe = get_object_or_404(Recipe, pk=pk)
+    
+    # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
+    try:
+        from shopping.models import ShoppingList
+    except Exception:
+        context = {
+            'recipe': recipe,
+            'missing_ingredients': recipe.get_missing_ingredients(request.user),
+            'table_not_exists': True
+        }
+        return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+    
+    if request.method == 'POST':
+        # Pobierz lub utwórz listę zakupów
+        shopping_list_id = request.POST.get('shopping_list')
+        
+        if shopping_list_id:
+            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
+        else:
+            # Utwórz nową listę zakupów
+            list_name = f"Brakujące składniki: {recipe.title}"
+            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
+        
+        # Dodaj brakujące składniki do listy
+        created_items = shopping_list.add_missing_ingredients(recipe)
+        
+        if created_items:
+            messages.success(request, f'Dodano {len(created_items)} brakujących składników do listy zakupów.')
+        else:
+            messages.info(request, 'Wszystkie składniki do tego przepisu są już dostępne w Twojej lodówce.')
+            
+        return redirect('shopping:detail', pk=shopping_list.pk)
+    
+    # Pobierz istniejące listy zakupów użytkownika
+    try:
+        shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
+    except Exception:
+        shopping_lists = []
+        
+    missing_ingredients = recipe.get_missing_ingredients(request.user)
+    
+    context = {
+        'recipe': recipe,
+        'shopping_lists': shopping_lists,
+        'missing_ingredients': missing_ingredients
+    }
+    
+    return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+
+def ajax_ingredient_search(request):
+    """Widok AJAX do wyszukiwania składników"""
+    ingredients = Ingredient.objects.all().order_by('name')
+    categories = IngredientCategory.objects.all().order_by('name')
+    
+    results = []
+    for category in categories:
+        category_ingredients = ingredients.filter(category=category)
+        if category_ingredients:
+            results.append({
+                'text': category.name,
+                'children': [{'id': i.id, 'text': i.name} for i in category_ingredients]
+            })
+    
+    return JsonResponse({'results': results})
+
+@login_required
+def ajax_load_units(request):
+    """Widok AJAX do ładowania jednostek dla wybranego składnika"""
+    ingredient_id = request.GET.get('ingredient_id')
+    
+    if not ingredient_id:
+        return JsonResponse({'units': [], 'default_unit': None})
+    
+    try:
+        ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+        compatible_units = ingredient.compatible_units.all()
+        
+        if not compatible_units.exists() and ingredient.default_unit:
+            compatible_units = [ingredient.default_unit]
+        
+        units = [
+            {
+                'id': unit.id, 
+                'name': unit.name,
+                'symbol': unit.symbol
+            } 
+            for unit in compatible_units
+        ]
+        
+        default_unit = ingredient.default_unit.id if ingredient.default_unit else None
+        
+        return JsonResponse({
+            'units': units,
+            'default_unit': default_unit
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
 class RecipeDetailView(DetailView):
     model = Recipe
     template_name = 'recipes/recipe_detail.html'
@@ -398,10 +285,10 @@ class RecipeDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         
         # Dodaj informacje o skali przepisu
-        servings = self.request.GET.get('servings')
-        if servings:
+        servings_param = self.request.GET.get('servings')
+        if servings_param:
             try:
-                servings = int(servings)
+                servings = int(servings_param)
                 if servings > 0:
                     # Przekazanie oryginalnych i przeskalowanych składników
                     context['servings'] = servings
@@ -463,7 +350,7 @@ class RecipeDetailView(DetailView):
         # Jeśli formularz nie jest poprawny, renderuj stronę z błędami
         context = self.get_context_data(object=self.object)
         context['comment_form'] = comment_form
-        return self.render_to_response(context)
+        return self.render_to_response(context) 
 
 class RecipeCreateView(LoginRequiredMixin, CreateView):
     model = Recipe
@@ -475,19 +362,6 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
         
         if self.request.POST:
             context['ingredient_formset'] = RecipeIngredientFormSet(self.request.POST, prefix='ingredients')
-            print(f"POST data: {self.request.POST}")
-            print(f"Formset is valid: {context['ingredient_formset'].is_valid()}")
-            if not context['ingredient_formset'].is_valid():
-                print(f"Formset errors: {context['ingredient_formset'].errors}")
-                print(f"Formset non-form errors: {context['ingredient_formset'].non_form_errors()}")
-                print(f"Management form data: {self.request.POST.get('ingredients-TOTAL_FORMS')}, {self.request.POST.get('ingredients-INITIAL_FORMS')}, {self.request.POST.get('ingredients-MIN_NUM_FORMS')}")
-                
-                # Sprawdź, czy dane wchodzą prawidłowo
-                for i in range(int(self.request.POST.get('ingredients-TOTAL_FORMS', 0))):
-                    ingredient_id = self.request.POST.get(f'ingredients-{i}-ingredient')
-                    amount = self.request.POST.get(f'ingredients-{i}-amount')
-                    unit_id = self.request.POST.get(f'ingredients-{i}-unit')
-                    print(f"Ingredient {i}: ingredient_id={ingredient_id}, amount={amount}, unit_id={unit_id}")
         else:
             context['ingredient_formset'] = RecipeIngredientFormSet(prefix='ingredients')
             
@@ -498,8 +372,6 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
         context = self.get_context_data()
         ingredient_formset = context['ingredient_formset']
         
-        print(f"Form valid, checking ingredient formset. Is valid: {ingredient_formset.is_valid()}")
-        
         if ingredient_formset.is_valid():
             self.object = form.save(commit=False)
             self.object.author = self.request.user
@@ -508,18 +380,15 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
             
             # Zapisz składniki
             ingredient_forms = ingredient_formset.save(commit=False)
-            print(f"Number of ingredient forms: {len(ingredient_forms)}")
             
             # Usuń składniki oznaczone do usunięcia
             for obj in ingredient_formset.deleted_objects:
-                print(f"Deleting ingredient: {obj}")
                 obj.delete()
             
             # Zapisz nowe i zaktualizowane składniki
             for ingredient_form in ingredient_forms:
                 ingredient_form.recipe = self.object
                 ingredient_form.save()
-                print(f"Saved ingredient: {ingredient_form.ingredient.name}, {ingredient_form.amount} {ingredient_form.unit.name}")
             
             # Wyświetl komunikat z liczbą dodanych składników
             messages.success(
@@ -565,8 +434,6 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = self.get_context_data()
         ingredient_formset = context['ingredient_formset']
         
-        print(f"Form valid, checking ingredient formset. Is valid: {ingredient_formset.is_valid()}")
-        
         if ingredient_formset.is_valid():
             self.object = form.save()
             ingredient_formset.instance = self.object
@@ -601,95 +468,61 @@ class RecipeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 @login_required
-def add_to_shopping_list(request, pk):
-    """Dodaje składniki przepisu do listy zakupów"""
-    recipe = get_object_or_404(Recipe, pk=pk)
+@require_POST
+def delete_comment(request, pk):
+    """Usuwa komentarz"""
+    comment = get_object_or_404(Comment, pk=pk)
     
-    if request.method == 'POST':
-        # Pobierz lub utwórz listę zakupów
-        shopping_list_id = request.POST.get('shopping_list')
-        servings = request.POST.get('servings')
-        
-        try:
-            servings = int(servings)
-        except (ValueError, TypeError):
-            servings = recipe.servings
-        
-        if shopping_list_id:
-            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
-        else:
-            # Utwórz nową listę zakupów
-            list_name = f"Zakupy dla: {recipe.title}"
-            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
-        
-        # Dodaj składniki do listy
-        created_items = shopping_list.add_recipe_ingredients(recipe, servings)
-        
-        messages.success(request, f'Dodano {len(created_items)} składników do listy zakupów "{shopping_list.name}".')
-        return redirect('shopping:detail', pk=shopping_list.pk)
+    # Sprawdź, czy użytkownik ma uprawnienia do usunięcia komentarza
+    if comment.user != request.user and not request.user.is_staff:
+        messages.error(request, "Nie masz uprawnień do usunięcia tego komentarza.")
+        return HttpResponseRedirect(comment.recipe.get_absolute_url())
     
-    # Pobierz istniejące listy zakupów użytkownika
-    shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
+    recipe_url = comment.recipe.get_absolute_url()
+    comment.delete()
     
-    context = {
-        'recipe': recipe,
-        'shopping_lists': shopping_lists
-    }
-    
-    return render(request, 'recipes/add_to_shopping_list.html', context)
+    messages.success(request, "Komentarz został usunięty.")
+    return HttpResponseRedirect(recipe_url)
 
-@login_required
-def add_missing_to_shopping_list(request, pk):
-    """Dodaje brakujące składniki przepisu do listy zakupów"""
-    recipe = get_object_or_404(Recipe, pk=pk)
+class IngredientListView(LoginRequiredMixin, ListView):
+    model = Ingredient
+    template_name = 'recipes/ingredient_list.html'
+    context_object_name = 'ingredients'
+    paginate_by = 20
     
-    # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
-    try:
-        from shopping.models import ShoppingList
-    except Exception:
-        context = {
-            'recipe': recipe,
-            'missing_ingredients': recipe.get_missing_ingredients(request.user),
-            'table_not_exists': True
-        }
-        return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = IngredientCategory.objects.all()
+        return context
+
+class IngredientCreateView(LoginRequiredMixin, CreateView):
+    model = Ingredient
+    form_class = IngredientForm
+    template_name = 'recipes/ingredient_form.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
     
-    if request.method == 'POST':
-        # Pobierz lub utwórz listę zakupów
-        shopping_list_id = request.POST.get('shopping_list')
-        
-        if shopping_list_id:
-            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
-        else:
-            # Utwórz nową listę zakupów
-            list_name = f"Brakujące składniki: {recipe.title}"
-            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
-        
-        # Dodaj brakujące składniki do listy
-        created_items = shopping_list.add_missing_ingredients(recipe)
-        
-        if created_items:
-            messages.success(request, f'Dodano {len(created_items)} brakujących składników do listy zakupów.')
-        else:
-            messages.info(request, 'Wszystkie składniki do tego przepisu są już dostępne w Twojej lodówce.')
-            
-        return redirect('shopping:detail', pk=shopping_list.pk)
+    def form_valid(self, form):
+        messages.success(self.request, 'Składnik został dodany!')
+        return super().form_valid(form)
+
+class IngredientUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ingredient
+    form_class = IngredientForm
+    template_name = 'recipes/ingredient_form.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
     
-    # Pobierz istniejące listy zakupów użytkownika
-    try:
-        shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
-    except Exception:
-        shopping_lists = []
-        
-    missing_ingredients = recipe.get_missing_ingredients(request.user)
+    def form_valid(self, form):
+        messages.success(self.request, 'Składnik został zaktualizowany!')
+        return super().form_valid(form)
+
+class IngredientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ingredient
+    template_name = 'recipes/ingredient_confirm_delete.html'
+    success_url = reverse_lazy('recipes:ingredient_list')
     
-    context = {
-        'recipe': recipe,
-        'shopping_lists': shopping_lists,
-        'missing_ingredients': missing_ingredients
-    }
-    
-    return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Składnik został usunięty!')
+        return super().delete(request, *args, **kwargs)
 
 @login_required
 def prepare_recipe(request, pk):
@@ -714,7 +547,7 @@ def prepare_recipe(request, pk):
     
     if servings and servings != recipe.servings:
         scaled_ingredients = recipe.scale_to_servings(servings)
-        
+    
     # Sprawdź dostępność składników w lodówce
     scale_factor = servings / recipe.servings
     missing_ingredients = []
@@ -789,106 +622,50 @@ def prepare_recipe(request, pk):
     
     return render(request, 'recipes/prepare_recipe.html', context)
 
-def ajax_ingredient_search(request):
-    """Wyszukiwanie składników za pomocą AJAX"""
-    query = request.GET.get('term', '')
-    include_categories = request.GET.get('include_categories', 'true') == 'true'
-    
-    if query:
-        # Wyszukiwanie według zapytania
-        ingredients = Ingredient.objects.filter(name__icontains=query).order_by('category__name', 'name')
+@login_required
+@require_POST
+def toggle_favorite(request, pk):
+    """Dodaje lub usuwa przepis z ulubionych"""
+    try:
+        recipe = get_object_or_404(Recipe, pk=pk)
+        favorite, created = FavoriteRecipe.objects.get_or_create(user=request.user, recipe=recipe)
         
-        if include_categories:
-            # Grupowanie według kategorii
-            results = []
-            categories = {}
-            
-            for ingredient in ingredients:
-                category_name = ingredient.category.name
-                if category_name not in categories:
-                    categories[category_name] = {
-                        'text': category_name,
-                        'children': []
-                    }
-                
-                categories[category_name]['children'].append({
-                    'id': ingredient.id,
-                    'text': ingredient.name
-                })
-            
-            # Konwersja słownika kategorii na listę
-            for category_name, category_data in categories.items():
-                results.append(category_data)
+        if not created:
+            # Jeśli przepis był już w ulubionych, usuń go
+            favorite.delete()
+            is_favorite = False
         else:
-            # Prosty format bez kategorii
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
-    else:
-        # Gdy brak zapytania, zwróć pogrupowane składniki
-        if include_categories:
-            results = []
-            categories = IngredientCategory.objects.all().order_by('name')
-            
-            for category in categories:
-                # Pobierz wszystkie składniki z danej kategorii
-                category_ingredients = Ingredient.objects.filter(category=category).order_by('name')
-                if category_ingredients:
-                    children = [{'id': i.id, 'text': i.name} for i in category_ingredients]
-                    results.append({
-                        'text': category.name,
-                        'children': children
-                    })
-        else:
-            # Zwróć wszystkie składniki alfabetycznie
-            ingredients = Ingredient.objects.all().order_by('name')
-            results = [{'id': i.id, 'text': i.name} for i in ingredients]
-    
-    return JsonResponse({'results': results})
+            is_favorite = True
+        
+        return JsonResponse({
+            'status': 'success',
+            'is_favorite': is_favorite,
+            'message': 'Przepis dodany do ulubionych' if is_favorite else 'Przepis usunięty z ulubionych'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
 
-def ajax_load_units(request):
-    """Pobieranie jednostek miary dla składnika za pomocą AJAX"""
-    units = MeasurementUnit.objects.all()
-    units_data = [{'id': u.id, 'name': u.name} for u in units]
-    return JsonResponse({'units': units_data})
-
-class IngredientListView(LoginRequiredMixin, ListView):
-    model = Ingredient
-    template_name = 'recipes/ingredient_list.html'
-    context_object_name = 'ingredients'
-    paginate_by = 20
+@login_required
+@require_POST
+def toggle_like(request, pk):
+    """Przełączanie polubienia przepisu (dodaje/usuwa)"""
+    recipe = get_object_or_404(Recipe, pk=pk)
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categories'] = IngredientCategory.objects.all()
-        return context
-
-class IngredientCreateView(LoginRequiredMixin, CreateView):
-    model = Ingredient
-    form_class = IngredientForm
-    template_name = 'recipes/ingredient_form.html'
-    success_url = reverse_lazy('recipes:ingredient_list')
+    # Przełącz polubienie
+    liked = recipe.toggle_like(request.user)
     
-    def form_valid(self, form):
-        messages.success(self.request, 'Składnik został dodany!')
-        return super().form_valid(form)
-
-class IngredientUpdateView(LoginRequiredMixin, UpdateView):
-    model = Ingredient
-    form_class = IngredientForm
-    template_name = 'recipes/ingredient_form.html'
-    success_url = reverse_lazy('recipes:ingredient_list')
+    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'liked': liked,
+            'likes_count': recipe.likes_count
+        })
     
-    def form_valid(self, form):
-        messages.success(self.request, 'Składnik został zaktualizowany!')
-        return super().form_valid(form)
-
-class IngredientDeleteView(LoginRequiredMixin, DeleteView):
-    model = Ingredient
-    template_name = 'recipes/ingredient_confirm_delete.html'
-    success_url = reverse_lazy('recipes:ingredient_list')
-    
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Składnik został usunięty!')
-        return super().delete(request, *args, **kwargs)
+    # W przeciwnym razie, przekieruj z powrotem do strony przepisu
+    return HttpResponseRedirect(reverse('recipes:detail', args=[pk]))
 
 @login_required
 def ajax_add_ingredient(request):
@@ -928,477 +705,32 @@ def ajax_add_ingredient(request):
     
     return JsonResponse({'success': False, 'message': 'Nieprawidłowe żądanie'})
 
-@login_required
-@require_POST
-def toggle_favorite(request, pk):
-    """Dodaje lub usuwa przepis z ulubionych"""
+def ajax_unit_info(request):
+    """Widok AJAX do pobierania informacji o jednostce"""
+    unit_id = request.GET.get('unit_id')
+    amount = request.GET.get('amount', '1')
+    
     try:
-        recipe = get_object_or_404(Recipe, pk=pk)
-        favorite, created = FavoriteRecipe.objects.get_or_create(user=request.user, recipe=recipe)
+        unit = get_object_or_404(MeasurementUnit, pk=unit_id)
+        amount = float(amount)
         
-        if not created:
-            # Jeśli przepis był już w ulubionych, usuń go
-            favorite.delete()
-            is_favorite = False
-        else:
-            is_favorite = True
+        # Przygotuj opis jednostki i informację o konwersji
+        description = unit.description if unit.description else ''
+        
+        # Informacja o konwersji
+        conversion = ""
+        if unit.base_ratio and unit.type in ['weight', 'volume']:
+            base_amount = amount * unit.base_ratio
+            base_unit = "g" if unit.type == 'weight' else "ml"
+            conversion = f"{amount} {unit.name} ≈ {base_amount} {base_unit}"
         
         return JsonResponse({
-            'status': 'success',
-            'is_favorite': is_favorite,
-            'message': 'Przepis dodany do ulubionych' if is_favorite else 'Przepis usunięty z ulubionych'
+            'description': description,
+            'conversion': conversion
         })
     except Exception as e:
         return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=400)
-
-@login_required
-@require_POST
-def toggle_like(request, pk):
-    """Przełącza polubienie przepisu (dodaje/usuwa)"""
-    recipe = get_object_or_404(Recipe, pk=pk)
-    
-    # Przełącz polubienie
-    liked = recipe.toggle_like(request.user)
-    
-    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            'liked': liked,
-            'likes_count': recipe.likes_count
-        })
-    
-    # W przeciwnym razie, przekieruj z powrotem do strony przepisu
-    return HttpResponseRedirect(reverse('recipes:detail', args=[pk]))
-
-@login_required
-@require_POST
-def delete_comment(request, pk):
-    """Usuwa komentarz"""
-    comment = get_object_or_404(Comment, pk=pk)
-    
-    # Sprawdź, czy użytkownik ma uprawnienia do usunięcia komentarza
-    if comment.user != request.user and not request.user.is_staff:
-        messages.error(request, "Nie masz uprawnień do usunięcia tego komentarza.")
-        return HttpResponseRedirect(comment.recipe.get_absolute_url())
-    
-    recipe_url = comment.recipe.get_absolute_url()
-    comment.delete()
-    
-    messages.success(request, "Komentarz został usunięty.")
-    return HttpResponseRedirect(recipe_url)
-
-def home_view(request):
-    """Widok strony głównej z najpopularniejszymi przepisami"""
-    # Pobierz przepisy z największą liczbą polubień (limit 8)
-    popular_recipes = Recipe.objects.annotate(
-        likes_total=Count('likes')
-    ).order_by('-likes_total', '-created_at')[:8]
-    
-    # Przekaż przepisy do szablonu
-    context = {
-        'popular_recipes': popular_recipes
-    }
-    
-    return render(request, 'home.html', context)
-
-@login_required
-def export_meal_plan_to_pdf(request):
-    """Eksportuje aktualny widok planera posiłków do PDF"""
-    # Pobierz datę początkową (poniedziałek bieżącego tygodnia)
-    today = date.today()
-    start_date_param = request.GET.get('start_date')
-    
-    if start_date_param:
-        try:
-            start_date = datetime.strptime(start_date_param, '%Y-%m-%d').date()
-        except ValueError:
-            start_date = today - timedelta(days=today.weekday())
-    else:
-        # Jeśli nie podano daty, użyj poniedziałku bieżącego tygodnia
-        start_date = today - timedelta(days=today.weekday())
-    
-    # Generuj daty dla całego tygodnia (pon-niedz)
-    dates = [start_date + timedelta(days=i) for i in range(7)]
-    
-    # Pobierz wszystkie posiłki z tego okresu dla zalogowanego użytkownika
-    meal_plans = MealPlan.objects.filter(
-        user=request.user,
-        date__range=(dates[0], dates[6])
-    ).order_by('date', 'meal_type')
-    
-    # Przygotuj dane dla widoku tygodniowego
-    week_data = {}
-    for day_date in dates:
-        day_name = day_date.strftime('%A')  # Nazwa dnia tygodnia
-        day_meals = {}
-        
-        # Dla każdego typu posiłku sprawdź, czy istnieje zaplanowany posiłek
-        for meal_code, meal_name in MealPlan.MEAL_TYPES:
-            day_meals[meal_code] = meal_plans.filter(date=day_date, meal_type=meal_code).first()
-        
-        week_data[day_date] = {
-            'name': day_name,
-            'date': day_date,
-            'meals': day_meals
-        }
-    
-    # Utwórz dokument PDF
-    buffer = io.BytesIO()
-    
-    # Używamy orientacji poziomej dla lepszego dopasowania do tygodniowego widoku
-    p = canvas.Canvas(buffer, pagesize=landscape(A4))
-    width, height = landscape(A4)
-    
-    # Ustaw tytuł dokumentu
-    p.setTitle(f"Planer posiłków {dates[0]} - {dates[6]}")
-    
-    # Nagłówek
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(30, height - 30, f"Planer posiłków: {dates[0].strftime('%d.%m.%Y')} - {dates[6].strftime('%d.%m.%Y')}")
-    p.setFont("Helvetica", 10)
-    p.drawString(30, height - 45, f"Użytkownik: {request.user.username}")
-    p.drawString(30, height - 60, f"Wygenerowano: {datetime.now().strftime('%d.%m.%Y %H:%M')}")
-    
-    # Narysuj linię pod nagłówkiem
-    p.line(30, height - 70, width - 30, height - 70)
-    
-    # Przygotuj dane dla tabeli
-    table_data = []
-    
-    # Nagłówki kolumn: Pusta komórka + dni tygodnia
-    headers = ['']
-    for day_date in dates:
-        headers.append(f"{day_date.strftime('%A')}\n{day_date.strftime('%d.%m')}")
-    table_data.append(headers)
-    
-    # Dodaj wiersze dla każdego typu posiłku
-    for meal_code, meal_name in MealPlan.MEAL_TYPES:
-        row = [meal_name]
-        
-        for day_date in dates:
-            meal = week_data[day_date]['meals'].get(meal_code)
-            if meal:
-                cell_text = f"{meal.meal_name}"
-                if meal.servings > 1:
-                    cell_text += f" ({meal.servings} porcji)"
-                if meal.completed:
-                    cell_text += "\n✓ Zrealizowano"
-            else:
-                cell_text = ""
-            row.append(cell_text)
-        
-        table_data.append(row)
-    
-    # Rysuj tabelę
-    table_style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
-    ])
-    
-    # Dodaj różne kolory tła dla różnych typów posiłków
-    meal_colors = [
-        colors.Color(0.9, 0.9, 1),    # Śniadanie - jasnoniebieskie
-        colors.Color(1, 0.9, 0.9),    # Drugie śniadanie - jasnoróżowe
-        colors.Color(0.9, 1, 0.9),    # Obiad - jasnozielone
-        colors.Color(1, 1, 0.9),      # Przekąska - jasnożółte
-        colors.Color(0.9, 0.95, 1)    # Kolacja - jasnofioletowe
-    ]
-    
-    # Zastosuj kolory dla odpowiednich wierszy
-    for i, (meal_code, meal_name) in enumerate(MealPlan.MEAL_TYPES):
-        table_style.add('BACKGROUND', (1, i+1), (-1, i+1), meal_colors[i % len(meal_colors)])
-    
-    # Utwórz tabelę i ustaw szerokości kolumn
-    col_widths = [80] + [(width - 110) / 7] * 7
-    table = Table(table_data, colWidths=col_widths, rowHeights=[40] + [60] * len(MealPlan.MEAL_TYPES))
-    table.setStyle(table_style)
-    
-    # Umieść tabelę na stronie
-    table.wrapOn(p, width - 60, height - 120)
-    table.drawOn(p, 30, height - 340)
-    
-    # Dodaj stopkę
-    p.setFont("Helvetica-Oblique", 8)
-    p.drawString(30, 30, "Wygenerowano z aplikacji Książka Kucharska")
-    
-    # Zakończ stronę i zapisz PDF
-    p.showPage()
-    p.save()
-    
-    # Ustaw bufor na początek
-    buffer.seek(0)
-    
-    # Utwórz odpowiedź HTTP z załącznikiem PDF
-    return FileResponse(
-        buffer, 
-        as_attachment=True, 
-        filename=f'planer_posilkow_{dates[0]}_{dates[6]}.pdf',
-        content_type='application/pdf'
-    )
-
-@login_required
-def meal_planner(request):
-    """Widok tygodniowego planera posiłków"""
-    # Pobierz datę początkową (poniedziałek bieżącego tygodnia)
-    today = date.today()
-    start_date_param = request.GET.get('start_date')
-    
-    if start_date_param:
-        try:
-            start_date = datetime.strptime(start_date_param, '%Y-%m-%d').date()
-        except ValueError:
-            start_date = today - timedelta(days=today.weekday())
-    else:
-        # Jeśli nie podano daty, użyj poniedziałku bieżącego tygodnia
-        start_date = today - timedelta(days=today.weekday())
-    
-    # Generuj daty dla całego tygodnia (pon-niedz)
-    dates = [start_date + timedelta(days=i) for i in range(7)]
-    
-    # Pobierz wszystkie posiłki z tego okresu dla zalogowanego użytkownika
-    meal_plans = MealPlan.objects.filter(
-        user=request.user,
-        date__range=(dates[0], dates[6])
-    ).order_by('date', 'meal_type')
-    
-    # Przygotuj dane dla szablonu
-    week_data = {}
-    for day_date in dates:
-        day_name = day_date.strftime('%A')  # Nazwa dnia tygodnia
-        day_meals = {}
-        
-        # Dla każdego typu posiłku sprawdź, czy istnieje zaplanowany posiłek
-        for meal_code, meal_name in MealPlan.MEAL_TYPES:
-            day_meals[meal_code] = meal_plans.filter(date=day_date, meal_type=meal_code).first()
-        
-        week_data[day_date] = {
-            'name': day_name,
-            'date': day_date,
-            'meals': day_meals
-        }
-    
-    # Formularz do wyboru tygodnia
-    week_form = MealPlanWeekForm(initial={'start_date': start_date})
-    
-    # Wylicz daty poprzedniego i następnego tygodnia
-    prev_week = start_date - timedelta(days=7)
-    next_week = start_date + timedelta(days=7)
-    
-    context = {
-        'week_data': week_data,
-        'dates': dates,
-        'meal_types': MealPlan.MEAL_TYPES,
-        'week_form': week_form,
-        'prev_week': prev_week,
-        'next_week': next_week,
-        'current_week': start_date
-    }
-    
-    return render(request, 'recipes/meal_planner.html', context)
-
-@login_required
-def add_meal_plan(request, date_str=None, meal_type=None):
-    """Widok dodawania posiłku do planera"""
-    initial = {}
-    
-    # Jeśli przekazano datę i typ posiłku, użyj ich jako wartości początkowe
-    if date_str:
-        try:
-            parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            initial['date'] = parsed_date
-        except ValueError:
-            pass
-    
-    if meal_type:
-        initial['meal_type'] = meal_type
-    
-    if request.method == 'POST':
-        form = MealPlanForm(request.POST, user=request.user)
-        
-        if form.is_valid():
-            meal_plan = form.save(commit=False)
-            meal_plan.user = request.user
-            meal_plan.save()
-            
-            messages.success(request, 'Posiłek został dodany do planera!')
-            
-            # Przekieruj z powrotem do planera
-            return redirect('recipes:meal_planner')
-    else:
-        form = MealPlanForm(initial=initial, user=request.user)
-    
-    context = {
-        'form': form,
-        'title': 'Dodaj posiłek do planera'
-    }
-    
-    return render(request, 'recipes/meal_plan_form.html', context)
-
-@login_required
-def edit_meal_plan(request, pk):
-    """Widok edycji zaplanowanego posiłku"""
-    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-    
-    if request.method == 'POST':
-        form = MealPlanForm(request.POST, instance=meal_plan, user=request.user)
-        
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Posiłek został zaktualizowany!')
-            return redirect('recipes:meal_planner')
-    else:
-        form = MealPlanForm(instance=meal_plan, user=request.user)
-    
-    context = {
-        'form': form,
-        'title': 'Edytuj zaplanowany posiłek',
-        'meal_plan': meal_plan
-    }
-    
-    return render(request, 'recipes/meal_plan_form.html', context)
-
-@login_required
-def delete_meal_plan(request, pk):
-    """Widok usuwania zaplanowanego posiłku"""
-    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-    
-    if request.method == 'POST':
-        meal_plan.delete()
-        messages.success(request, 'Zaplanowany posiłek został usunięty!')
-        return redirect('recipes:meal_planner')
-    
-    context = {
-        'meal_plan': meal_plan
-    }
-    
-    return render(request, 'recipes/meal_plan_confirm_delete.html', context)
-
-@login_required
-def toggle_meal_completed(request, pk):
-    """Przełączanie statusu zrealizowania posiłku (AJAX)"""
-    meal_plan = get_object_or_404(MealPlan, pk=pk, user=request.user)
-    
-    # Przełącz status
-    meal_plan.completed = not meal_plan.completed
-    meal_plan.save()
-    
-    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            'completed': meal_plan.completed,
-            'id': meal_plan.id
-        })
-    
-    # W przeciwnym razie, przekieruj do planera
-    return redirect('recipes:meal_planner')
-
-@login_required
-def copy_day_meals(request, from_date, to_date):
-    """Kopiowanie posiłków z jednego dnia na inny"""
-    if request.method == 'POST':
-        try:
-            from_date = datetime.strptime(from_date, '%Y-%m-%d').date()
-            to_date = datetime.strptime(to_date, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, 'Nieprawidłowy format daty!')
-            return redirect('recipes:meal_planner')
-        
-        # Pobierz wszystkie posiłki z dnia źródłowego
-        source_meals = MealPlan.objects.filter(user=request.user, date=from_date)
-        
-        if not source_meals.exists():
-            messages.warning(request, f'Brak posiłków do skopiowania z dnia {from_date}!')
-            return redirect('recipes:meal_planner')
-        
-        # Usuń wszystkie istniejące posiłki z dnia docelowego
-        MealPlan.objects.filter(user=request.user, date=to_date).delete()
-        
-        # Kopiuj posiłki
-        copied_count = 0
-        for meal in source_meals:
-            # Tworzymy kopię posiłku ze zmienioną datą
-            meal.pk = None  # Ustawienie None na ID tworzy nowy obiekt
-            meal.date = to_date
-            meal.save()
-            copied_count += 1
-        
-        messages.success(request, f'Skopiowano {copied_count} posiłków z {from_date} na {to_date}!')
-    
-    return redirect('recipes:meal_planner')
-
-@login_required
-def generate_shopping_list_from_plan(request):
-    """Generuje listę zakupów na podstawie zaplanowanych posiłków"""
-    if request.method == 'POST':
-        # Pobierz daty z formularza
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        
-        try:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-        except (ValueError, TypeError):
-            messages.error(request, 'Nieprawidłowy format daty!')
-            return redirect('recipes:meal_planner')
-        
-        # Pobierz posiłki z wybranego zakresu dat
-        meal_plans = MealPlan.objects.filter(
-            user=request.user,
-            date__range=(start_date, end_date),
-            recipe__isnull=False  # Tylko posiłki z przypisanymi przepisami
-        )
-        
-        if not meal_plans.exists():
-            messages.warning(request, 'Brak przepisów do wygenerowania listy zakupów w wybranym okresie!')
-            return redirect('recipes:meal_planner')
-        
-        # Sprawdź czy istnieje moduł shopping - jeśli nie, pokaż błąd
-        try:
-            from shopping.models import ShoppingList
-        except ImportError:
-            messages.error(request, 'Moduł listy zakupów nie jest dostępny!')
-            return redirect('recipes:meal_planner')
-        
-        # Utwórz nową listę zakupów
-        shopping_list = ShoppingList.objects.create(
-            user=request.user,
-            name=f'Lista zakupów {start_date} - {end_date}'
-        )
-        
-        # Dodaj składniki z przepisów
-        total_ingredients = 0
-        for meal_plan in meal_plans:
-            if meal_plan.recipe:
-                # Użyj funkcji get_ingredients_for_shopping, która uwzględnia liczbę porcji
-                ingredients = meal_plan.get_ingredients_for_shopping()
-                for ingredient_data in ingredients:
-                    shopping_list.add_ingredient(
-                        ingredient_data['ingredient'],
-                        ingredient_data['amount'],
-                        ingredient_data['unit']
-                    )
-                    total_ingredients += 1
-        
-        # Optymalizuj listę składników (łączenie podobnych)
-        shopping_list.optimize()
-        
-        messages.success(
-            request, 
-            f'Utworzono listę zakupów z {total_ingredients} składnikami z {meal_plans.count()} posiłków!'
-        )
-        
-        # Przekieruj do szczegółów listy zakupów
-        return redirect('shopping:detail', pk=shopping_list.pk)
-    
-    # Jeśli żądanie GET, przekieruj do planera
-    return redirect('recipes:meal_planner')
+            'description': '',
+            'conversion': '',
+            'error': str(e)
+        }, status=400) 

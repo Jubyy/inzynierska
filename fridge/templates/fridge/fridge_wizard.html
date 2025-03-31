@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj produkt do lodówki{% endblock %}
+
+{% block extra_css %}
+<style>
+    .wizard-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .wizard-step {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        position: relative;
+        color: #6c757d;
+    }
+
+    .wizard-step.active {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .wizard-step.completed {
+        color: #28a745;
+    }
+
+    .wizard-content {
+        display: none;
+    }
+
+    .wizard-content.active {
+        display: block;
+    }
+
+    .amount-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .amount-controls button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .amount-controls input {
+        width: 100px;
+        text-align: center;
+        font-size: 1.2rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 0.5rem;
+    }
+
+    .amount-display {
+        font-size: 2rem;
+        text-align: center;
+        margin: 1rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Dodaj produkt do lodówki</h2>
+                </div>
+                <div class="card-body">
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" data-step="1">1. Wybierz produkt</div>
+                        <div class="wizard-step" data-step="2">2. Wybierz jednostkę</div>
+                        <div class="wizard-step" data-step="3">3. Podaj ilość</div>
+                        <div class="wizard-step" data-step="4">4. Data ważności</div>
+                    </div>
+
+                    <form id="addProductForm" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Krok 1: Wybór produktu -->
+                        <div class="wizard-content active" data-step="1">
+                            <div class="mb-3">
+                                <label class="form-label">Wybierz produkt</label>
+                                <select id="ingredient-select" class="form-control select2-ingredient" name="ingredient">
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="mt-4 text-end">
+                                <button type="button" class="btn btn-primary next-step" disabled>Dalej</button>
+                            </div>
+                        </div>
+
+                        <!-- Krok 2: Wybór jednostki -->
+                        <div class="wizard-content" data-step="2">
+                            <div class="mb-3">
+                                <label class="form-label">Wybierz jednostkę</label>
+                                <select id="unit-select" class="form-control select2-unit" name="unit">
+                                    <option></option>
+                                </select>
+                            </div>
+                            <div class="mt-4 text-end">
+                                <button type="button" class="btn btn-secondary prev-step">Wstecz</button>
+                                <button type="button" class="btn btn-primary next-step" disabled>Dalej</button>
+                            </div>
+                        </div>
+
+                        <!-- Krok 3: Podanie ilości -->
+                        <div class="wizard-content" data-step="3">
+                            <div class="mb-3">
+                                <label class="form-label">Podaj ilość</label>
+                                <div class="amount-display">
+                                    <span id="amount-value">1</span>
+                                    <span id="unit-symbol"></span>
+                                </div>
+                                <div class="amount-controls">
+                                    <button type="button" class="btn-decrease">-</button>
+                                    <input type="number" id="amount-input" name="amount" class="form-control" value="1" min="0.01" step="0.01">
+                                    <button type="button" class="btn-increase">+</button>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-end">
+                                <button type="button" class="btn btn-secondary prev-step">Wstecz</button>
+                                <button type="button" class="btn btn-primary next-step">Dalej</button>
+                            </div>
+                        </div>
+
+                        <!-- Krok 4: Data ważności -->
+                        <div class="wizard-content" data-step="4">
+                            <div class="mb-3">
+                                <label class="form-label">Data ważności (opcjonalna)</label>
+                                <input type="date" id="expiry-date" name="expiry_date" class="form-control">
+                            </div>
+                            <div class="mt-4 text-end">
+                                <button type="button" class="btn btn-secondary prev-step">Wstecz</button>
+                                <button type="submit" class="btn btn-success">Dodaj do lodówki</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        let currentStep = 1;
+        let selectedUnitType = null;
+
+        // Inicjalizacja Select2 dla składników
+        $('#ingredient-select').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wpisz lub wybierz składnik...",
+            allowClear: true,
+            ajax: {
+                url: "{% url 'fridge:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        list_all: !params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: item.name,
+                                category: item.category
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        }).on('select2:select', function() {
+            $('.wizard-content[data-step="1"] .next-step').prop('disabled', false);
+        }).on('select2:clear', function() {
+            $('.wizard-content[data-step="1"] .next-step').prop('disabled', true);
+        });
+
+        // Inicjalizacja Select2 dla jednostek
+        $('#unit-select').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wybierz jednostkę",
+            allowClear: true
+        }).on('select2:select', function(e) {
+            $('.wizard-content[data-step="2"] .next-step').prop('disabled', false);
+            selectedUnitType = $(e.target).find(':selected').data('type');
+            const unitSymbol = $(e.target).find(':selected').data('symbol');
+            $('#unit-symbol').text(unitSymbol);
+            
+            // Dostosuj kontrolki ilości w zależności od typu jednostki
+            const amountInput = $('#amount-input');
+            if (selectedUnitType === 'piece') {
+                amountInput.attr('step', '1').attr('min', '1');
+                amountInput.val(Math.max(1, Math.round(amountInput.val())));
+            } else {
+                amountInput.attr('step', '0.01').attr('min', '0.01');
+            }
+        }).on('select2:clear', function() {
+            $('.wizard-content[data-step="2"] .next-step').prop('disabled', true);
+        });
+
+        // Obsługa przycisków nawigacji
+        $('.next-step').click(function() {
+            if (currentStep < 4) {
+                $(`.wizard-step[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
+                $(`.wizard-content[data-step="${currentStep}"]`).removeClass('active');
+                currentStep++;
+                $(`.wizard-step[data-step="${currentStep}"]`).addClass('active');
+                $(`.wizard-content[data-step="${currentStep}"]`).addClass('active');
+
+                if (currentStep === 2) {
+                    loadCompatibleUnits($('#ingredient-select').val());
+                }
+            }
+        });
+
+        $('.prev-step').click(function() {
+            if (currentStep > 1) {
+                $(`.wizard-step[data-step="${currentStep}"]`).removeClass('active');
+                $(`.wizard-content[data-step="${currentStep}"]`).removeClass('active');
+                currentStep--;
+                $(`.wizard-step[data-step="${currentStep}"]`).removeClass('completed').addClass('active');
+                $(`.wizard-content[data-step="${currentStep}"]`).addClass('active');
+            }
+        });
+
+        // Obsługa kontrolek ilości
+        $('.btn-decrease').click(function() {
+            const input = $('#amount-input');
+            const currentValue = parseFloat(input.val());
+            const step = selectedUnitType === 'piece' ? 1 : 0.01;
+            const minValue = selectedUnitType === 'piece' ? 1 : 0.01;
+            
+            const newValue = Math.max(minValue, currentValue - step);
+            input.val(newValue);
+            $('#amount-value').text(newValue);
+        });
+
+        $('.btn-increase').click(function() {
+            const input = $('#amount-input');
+            const currentValue = parseFloat(input.val());
+            const step = selectedUnitType === 'piece' ? 1 : 0.01;
+            
+            const newValue = currentValue + step;
+            input.val(newValue);
+            $('#amount-value').text(newValue);
+        });
+
+        $('#amount-input').on('input', function() {
+            let value = $(this).val();
+            if (selectedUnitType === 'piece') {
+                value = Math.max(1, Math.round(parseFloat(value)));
+            }
+            $(this).val(value);
+            $('#amount-value').text(value);
+        });
+
+        // Funkcja ładowania kompatybilnych jednostek
+        function loadCompatibleUnits(ingredientId) {
+            $.ajax({
+                url: "{% url 'fridge:ajax_load_units' %}",
+                data: { 'ingredient_id': ingredientId },
+                success: function(data) {
+                    const unitSelect = $('#unit-select');
+                    unitSelect.empty();
+                    unitSelect.append(new Option('', '', false, false));
+                    
+                    data.units.forEach(function(unit) {
+                        const option = new Option(unit.name, unit.id, false, unit.id === data.default_unit);
+                        $(option).data('type', unit.type);
+                        $(option).data('symbol', unit.symbol);
+                        unitSelect.append(option);
+                    });
+                    
+                    unitSelect.trigger('change');
+                    
+                    if (data.default_unit) {
+                        unitSelect.val(data.default_unit).trigger('change');
+                    }
+                }
+            });
+        }
+
+        // Obsługa formularza
+        $('#addProductForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                ingredient: $('#ingredient-select').val(),
+                unit: $('#unit-select').val(),
+                amount: $('#amount-input').val(),
+                expiry_date: $('#expiry-date').val() || null
+            };
+
+            $.ajax({
+                url: "{% url 'fridge:add' %}",
+                method: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function() {
+                    window.location.href = "{% url 'fridge:list' %}";
+                },
+                error: function(xhr) {
+                    alert('Wystąpił błąd podczas dodawania produktu.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

@@ -164,70 +164,32 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Inicjalizacja Select2 dla dropdown składników z grupowaniem
-        $('#{{ form.ingredient.id_for_label }}').select2({
-            theme: "bootstrap4",
-            width: '100%',
-            placeholder: "Wpisz lub wybierz składnik...",
-            allowClear: true,
-            minimumInputLength: 0,  // Pozwól na wyświetlenie wszystkich opcji bez wpisywania
-            ajax: {
-                url: "{% url 'fridge:ajax_ingredient_search' %}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term || '',
-                        list_all: !params.term  // Jeśli nie ma wyszukiwanej frazy, pobierz wszystkie
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results.map(function(item) {
-                            return {
-                                id: item.id,
-                                text: item.name,
-                                category: item.category
-                            };
-                        })
-                    };
-                },
-                cache: true
-            },
-            templateResult: formatIngredient,
-            templateSelection: formatIngredientSelection,
-            escapeMarkup: function(m) { return m; }
-        }).on('select2:select', function(e) {
-            var data = e.params.data;
-            loadCompatibleUnits(data.id);
-        });
-
-        // Inicjalizacja Select2 dla dropdown jednostek
-        $('#{{ form.unit.id_for_label }}').select2({
-            theme: "bootstrap4",
-            width: '100%',
-            placeholder: "Wybierz jednostkę",
-            allowClear: true,
-            language: {
-                noResults: function() {
-                    return "Nie znaleziono jednostek";
+        // Funkcja do aktualizacji pola amount na podstawie typu jednostki
+        function updateAmountInput(unitType) {
+            const amountInput = $('#{{ form.amount.id_for_label }}');
+            
+            if (unitType === 'piece') {
+                // Dla jednostek typu piece (sztuki, opakowania)
+                amountInput.attr('type', 'number');
+                amountInput.attr('step', '1');
+                amountInput.attr('min', '1');
+                amountInput.attr('pattern', '[0-9]*');
+                
+                // Zaokrąglij aktualną wartość do liczby całkowitej
+                if (amountInput.val()) {
+                    const roundedValue = Math.max(1, Math.round(parseFloat(amountInput.val())));
+                    amountInput.val(roundedValue);
                 }
+            } else {
+                // Dla jednostek wagowych i objętościowych
+                amountInput.attr('type', 'number');
+                amountInput.attr('step', '0.01');
+                amountInput.attr('min', '0.01');
+                amountInput.removeAttr('pattern');
             }
-        });
-
-        function formatIngredient(ingredient) {
-            if (!ingredient.id || ingredient.id === '') return ingredient.text;
-            return '<div class="ingredient-option">' +
-                   '<strong>' + ingredient.text + '</strong>' +
-                   (ingredient.category ? '<br><small class="text-muted">' + ingredient.category + '</small>' : '') +
-                   '</div>';
         }
 
-        function formatIngredientSelection(ingredient) {
-            if (!ingredient.id || ingredient.id === '') return ingredient.text;
-            return ingredient.text;
-        }
-
+        // Funkcja do ładowania kompatybilnych jednostek
         function loadCompatibleUnits(ingredientId) {
             $.ajax({
                 url: "{% url 'fridge:ajax_load_units' %}",
@@ -244,6 +206,7 @@
                     // Dodaj dostępne jednostki
                     data.units.forEach(function(unit) {
                         var option = new Option(unit.name, unit.id, false, unit.id === data.default_unit);
+                        $(option).data('type', unit.type);  // Zapisz typ jednostki w danych opcji
                         unitSelect.append(option);
                     });
                     
@@ -256,6 +219,81 @@
                     }
                 }
             });
+        }
+        
+        // Inicjalizacja Select2 dla składników
+        $('#{{ form.ingredient.id_for_label }}').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wpisz lub wybierz składnik...",
+            allowClear: true,
+            minimumInputLength: 0,
+            ajax: {
+                url: "{% url 'fridge:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        list_all: !params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: item.name,
+                                category: item.category
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        }).on('select2:select', function(e) {
+            loadCompatibleUnits(e.params.data.id);
+        }).on('select2:clear', function() {
+            // Wyczyść listę jednostek gdy składnik zostanie wyczyszczony
+            var unitSelect = $('#{{ form.unit.id_for_label }}');
+            unitSelect.empty();
+            unitSelect.append(new Option('', '', false, false));
+            unitSelect.trigger('change');
+        });
+
+        // Inicjalizacja Select2 dla jednostek
+        $('#{{ form.unit.id_for_label }}').select2({
+            theme: "bootstrap4",
+            width: '100%',
+            placeholder: "Wybierz jednostkę",
+            allowClear: true
+        }).on('select2:select', function(e) {
+            // Pobierz typ jednostki z atrybutu data
+            const unitType = $(e.target).find(':selected').data('type');
+            updateAmountInput(unitType);
+        });
+
+        // Dodaj nasłuchiwanie na zmiany w polu amount
+        $('#{{ form.amount.id_for_label }}').on('input change', function() {
+            const selectedUnit = $('#{{ form.unit.id_for_label }}').find(':selected');
+            if (selectedUnit.length && selectedUnit.data('type') === 'piece') {
+                const value = $(this).val();
+                if (value) {
+                    $(this).val(Math.max(1, Math.round(parseFloat(value))));
+                }
+            }
+        });
+
+        // Aktualizacja pola amount przy załadowaniu strony
+        const selectedUnit = $('#{{ form.unit.id_for_label }}').find(':selected');
+        if (selectedUnit.length) {
+            updateAmountInput(selectedUnit.data('type'));
+        }
+
+        // Jeśli jest już wybrany składnik przy ładowaniu strony, załaduj jego jednostki
+        const selectedIngredient = $('#{{ form.ingredient.id_for_label }}').val();
+        if (selectedIngredient) {
+            loadCompatibleUnits(selectedIngredient);
         }
     });
 </script>
