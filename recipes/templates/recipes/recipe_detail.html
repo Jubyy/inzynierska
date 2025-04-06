@@ -166,7 +166,8 @@
             
             <div class="col-md-4 text-end">
                 <!-- Przyciski akcji dla przepisu -->
-                <form method="get" class="mb-2">
+                <form method="post" class="mb-2">
+                    {% csrf_token %}
                     <div class="input-group">
                         <input type="number" name="servings" min="1" max="20" class="form-control" 
                               placeholder="Liczba porcji" value="{{ servings|default:recipe.servings }}">
@@ -215,14 +216,34 @@
                         <!-- Wyświetl przeskalowane składniki -->
                         {% for ingredient in scaled_ingredients %}
                             <li>
-                                <strong>{{ ingredient.amount|floatformat:"-2" }} {{ ingredient.unit.symbol }}</strong> 
+                                <strong>
+                                {% if ingredient.amount < 0.1 %}
+                                    {{ ingredient.amount|floatformat:"-3" }}
+                                {% elif ingredient.amount < 1 %}
+                                    {{ ingredient.amount|floatformat:"-2" }}
+                                {% elif ingredient.amount == ingredient.amount|floatformat:"0"|add:"0" %}
+                                    {{ ingredient.amount|floatformat:"0" }}
+                                {% else %}
+                                    {{ ingredient.amount|floatformat:"-2" }}
+                                {% endif %}
+                                {{ ingredient.unit.symbol }}</strong> 
                                 {{ ingredient.ingredient.name }}
                                 
                                 {% for missing in missing_ingredients %}
                                     {% if missing.ingredient.id == ingredient.ingredient.id %}
                                         <span class="missing-ingredient">
                                             <i class="bi bi-exclamation-circle"></i>
-                                            Brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }}
+                                            Brakuje 
+                                            {% if missing.missing < 0.1 %}
+                                                {{ missing.missing|floatformat:"-3" }}
+                                            {% elif missing.missing < 1 %}
+                                                {{ missing.missing|floatformat:"-2" }}
+                                            {% elif missing.missing == missing.missing|floatformat:"0"|add:"0" %}
+                                                {{ missing.missing|floatformat:"0" }}
+                                            {% else %}
+                                                {{ missing.missing|floatformat:"-2" }}
+                                            {% endif %}
+                                            {{ missing.unit.symbol }}
                                         </span>
                                     {% endif %}
                                 {% endfor %}
@@ -232,14 +253,34 @@
                         <!-- Wyświetl oryginalne składniki -->
                         {% for ingredient in recipe.ingredients.all %}
                             <li>
-                                <strong>{{ ingredient.amount|floatformat:"-2" }} {{ ingredient.unit.symbol }}</strong> 
+                                <strong>
+                                {% if ingredient.amount < 0.1 %}
+                                    {{ ingredient.amount|floatformat:"-3" }}
+                                {% elif ingredient.amount < 1 %}
+                                    {{ ingredient.amount|floatformat:"-2" }}
+                                {% elif ingredient.amount == ingredient.amount|floatformat:"0"|add:"0" %}
+                                    {{ ingredient.amount|floatformat:"0" }}
+                                {% else %}
+                                    {{ ingredient.amount|floatformat:"-2" }}
+                                {% endif %}
+                                {{ ingredient.unit.symbol }}</strong> 
                                 {{ ingredient.ingredient.name }}
                                 
                                 {% for missing in missing_ingredients %}
                                     {% if missing.ingredient.id == ingredient.ingredient.id %}
                                         <span class="missing-ingredient">
                                             <i class="bi bi-exclamation-circle"></i>
-                                            Brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }}
+                                            Brakuje 
+                                            {% if missing.missing < 0.1 %}
+                                                {{ missing.missing|floatformat:"-3" }}
+                                            {% elif missing.missing < 1 %}
+                                                {{ missing.missing|floatformat:"-2" }}
+                                            {% elif missing.missing == missing.missing|floatformat:"0"|add:"0" %}
+                                                {{ missing.missing|floatformat:"0" }}
+                                            {% else %}
+                                                {{ missing.missing|floatformat:"-2" }}
+                                            {% endif %}
+                                            {{ missing.unit.symbol }}
                                         </span>
                                     {% endif %}
                                 {% endfor %}

@@ -9,6 +9,6 @@
     <input type="number" name="portions" value="{{ recipe.portions }}" min="1">
     <button type="submit">Przelicz</button>
 </form>
-<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
+<a href="{% url 'recipes:list' %}">Wróć do listy przepisów</a>
 
 {% endblock %}

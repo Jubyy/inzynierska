@@ -195,10 +195,29 @@ def add_missing_to_shopping_list(request, pk):
         }
         return render(request, 'recipes/add_missing_to_shopping_list.html', context)
     
+    # Pobierz liczbę porcji z parametru URL (może pochodzić z ekranu prepare_recipe)
+    servings_param = request.GET.get('servings')
+    servings = None
+    
+    if servings_param:
+        try:
+            servings = int(servings_param)
+            if servings <= 0:
+                servings = recipe.servings
+        except (ValueError, TypeError):
+            servings = recipe.servings
+    
     if request.method == 'POST':
         # Pobierz lub utwórz listę zakupów
         shopping_list_id = request.POST.get('shopping_list')
         create_new = request.POST.get('create_new', 'true')
+        post_servings = request.POST.get('servings', servings_param)
+        
+        try:
+            if post_servings:
+                post_servings = int(post_servings)
+        except (ValueError, TypeError):
+            post_servings = None
         
         if shopping_list_id and create_new != 'true':
             shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
@@ -208,7 +227,7 @@ def add_missing_to_shopping_list(request, pk):
             shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
         
         # Dodaj brakujące składniki do listy
-        created_items = shopping_list.add_missing_ingredients(recipe)
+        created_items = shopping_list.add_missing_ingredients(recipe, servings=post_servings or servings)
         
         if created_items:
             messages.success(request, f'Dodano {len(created_items)} brakujących składników do listy zakupów.')
@@ -222,63 +241,100 @@ def add_missing_to_shopping_list(request, pk):
         shopping_lists = ShoppingList.objects.filter(user=request.user, is_completed=False)
     except Exception:
         shopping_lists = []
-        
-    # Pobierz brakujące składniki (zwraca listę obiektów RecipeIngredient)
-    recipe_missing_ingredients = recipe.get_missing_ingredients(request.user)
     
-    # Jeśli nie ma brakujących składników, przekaż pustą listę do szablonu
-    if not recipe_missing_ingredients:
-        context = {
-            'recipe': recipe,
-            'shopping_lists': shopping_lists,
-            'missing_ingredients': []
-        }
-        return render(request, 'recipes/add_missing_to_shopping_list.html', context)
-    
-    # Przekształć obiekty RecipeIngredient na format oczekiwany przez szablon
-    from fridge.models import FridgeItem
-    from recipes.utils import convert_units
-    
+    # Przygotuj brakujące składniki w zależności od liczby porcji
     missing_ingredients = []
-    for ingredient_entry in recipe_missing_ingredients:
-        ingredient = ingredient_entry.ingredient
-        unit = ingredient_entry.unit
-        required_amount = float(ingredient_entry.amount)
+    
+    if servings and servings != recipe.servings:
+        # Dla przeskalowanej liczby porcji
+        scaled_ingredients = recipe.scale_to_servings(servings)
         
-        # Pobierz dostępną ilość składnika w lodówce
-        available_amount = 0
-        fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
-        
-        for item in fridge_items:
-            try:
-                # Jeśli jednostki są różne, przelicz
-                if item.unit != unit:
+        for scaled_ing in scaled_ingredients:
+            ingredient = scaled_ing['ingredient']
+            amount = scaled_ing['amount']
+            unit = scaled_ing['unit']
+            
+            if not FridgeItem.check_ingredient_availability(request.user, ingredient, amount, unit):
+                # Oblicz brakującą ilość
+                total_available = 0.0
+                fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
+                
+                for item in fridge_items:
                     try:
-                        converted = convert_units(float(item.amount), item.unit, unit)
-                        available_amount += converted
+                        # Jeśli jednostki są różne, przelicz
+                        if item.unit != unit:
+                            converted = convert_units(float(item.amount), item.unit, unit)
+                            total_available += converted
+                        else:
+                            total_available += float(item.amount)
                     except Exception:
                         continue
-                else:
-                    available_amount += float(item.amount)
-            except Exception:
-                continue
+                
+                # Oblicz brakującą ilość
+                missing_amount = max(0, float(amount) - total_available)
+                
+                missing_ingredients.append({
+                    'ingredient': ingredient,
+                    'unit': unit,
+                    'required': float(amount),
+                    'available': total_available,
+                    'missing': missing_amount
+                })
+    else:
+        # Dla domyślnej liczby porcji
+        # Pobierz brakujące składniki (zwraca listę obiektów RecipeIngredient)
+        recipe_missing_ingredients = recipe.get_missing_ingredients(request.user)
         
-        # Oblicz brakującą ilość
-        missing_amount = max(0, required_amount - available_amount)
+        # Jeśli nie ma brakujących składników, przekaż pustą listę do szablonu
+        if not recipe_missing_ingredients:
+            context = {
+                'recipe': recipe,
+                'shopping_lists': shopping_lists,
+                'missing_ingredients': []
+            }
+            return render(request, 'recipes/add_missing_to_shopping_list.html', context)
         
-        # Dodaj informacje o składniku do listy
-        missing_ingredients.append({
-            'ingredient': ingredient,
-            'unit': unit,
-            'required': required_amount,
-            'available': available_amount,
-            'missing': missing_amount
-        })
+        # Przekształć obiekty RecipeIngredient na format oczekiwany przez szablon
+        for ingredient_entry in recipe_missing_ingredients:
+            ingredient = ingredient_entry.ingredient
+            unit = ingredient_entry.unit
+            required_amount = float(ingredient_entry.amount)
+            
+            # Pobierz dostępną ilość składnika w lodówce
+            available_amount = 0
+            fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
+            
+            for item in fridge_items:
+                try:
+                    # Jeśli jednostki są różne, przelicz
+                    if item.unit != unit:
+                        try:
+                            converted = convert_units(float(item.amount), item.unit, unit)
+                            available_amount += converted
+                        except Exception:
+                            continue
+                    else:
+                        available_amount += float(item.amount)
+                except Exception:
+                    continue
+            
+            # Oblicz brakującą ilość
+            missing_amount = max(0, required_amount - available_amount)
+            
+            # Dodaj informacje o składniku do listy
+            missing_ingredients.append({
+                'ingredient': ingredient,
+                'unit': unit,
+                'required': required_amount,
+                'available': available_amount,
+                'missing': missing_amount
+            })
     
     context = {
         'recipe': recipe,
         'shopping_lists': shopping_lists,
-        'missing_ingredients': missing_ingredients
+        'missing_ingredients': missing_ingredients,
+        'servings': servings or recipe.servings
     }
     
     return render(request, 'recipes/add_missing_to_shopping_list.html', context)
@@ -453,9 +509,14 @@ class RecipeDetailView(DetailView):
         return context
         
     def post(self, request, *args, **kwargs):
-        """Obsługa dodawania komentarzy przez POST"""
+        """Obsługa dodawania komentarzy lub zmiany liczby porcji przez POST"""
         self.object = self.get_object()
         
+        # Sprawdź, czy to formularz zmiany porcji (ma parametr servings)
+        if 'servings' in request.POST:
+            return self.post_servings(request)
+        
+        # Jeśli to nie formularz zmiany porcji, obsłuż dodawanie komentarzy
         if not request.user.is_authenticated:
             messages.error(request, "Musisz być zalogowany, aby dodawać komentarze.")
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -480,7 +541,27 @@ class RecipeDetailView(DetailView):
         # Jeśli formularz nie jest poprawny, renderuj stronę z błędami
         context = self.get_context_data(object=self.object)
         context['comment_form'] = comment_form
-        return self.render_to_response(context) 
+        return self.render_to_response(context)
+    
+    def post_servings(self, request):
+        """Obsługa formularza zmiany liczby porcji"""
+        try:
+            servings = int(request.POST.get('servings', 1))
+            if servings <= 0:
+                servings = 1
+            
+            # Przygotuj kontekst z uwzględnieniem przeskalowanej liczby porcji
+            context = self.get_context_data(object=self.object)
+            context['servings'] = servings
+            context['original_servings'] = self.object.servings
+            context['scaled_ingredients'] = self.object.scale_to_servings(servings)
+            
+            # Renderuj stronę z nowym kontekstem
+            return self.render_to_response(context)
+            
+        except (ValueError, TypeError):
+            # W przypadku nieprawidłowej wartości, przekieruj bez parametru
+            return HttpResponseRedirect(self.object.get_absolute_url())
 
 class RecipeCreateView(LoginRequiredMixin, CreateView):
     model = Recipe
@@ -616,18 +697,46 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if ingredient_formset.is_valid():
             self.object = form.save()
             ingredient_formset.instance = self.object
-            ingredient_formset.save()
+            
+            # Zapisz składniki tylko jeśli istnieją w formularzu
+            ingredient_forms = ingredient_formset.save(commit=False)
+            
+            # Usuń składniki oznaczone do usunięcia
+            for obj in ingredient_formset.deleted_objects:
+                obj.delete()
+            
+            # Zapisz nowe i zaktualizowane składniki
+            for ingredient_form in ingredient_forms:
+                # Sprawdź, czy składnik nie jest pusty (czy ma wszystkie wymagane pola)
+                if ingredient_form.ingredient and ingredient_form.amount and ingredient_form.unit:
+                    ingredient_form.recipe = self.object
+                    ingredient_form.save()
             
             messages.success(self.request, 'Przepis został zaktualizowany!')
             return redirect(self.get_success_url())
         else:
-            # Jeśli formularz składników jest nieprawidłowy, pokaż błędy
-            for error in ingredient_formset.errors:
-                messages.error(self.request, f"Błąd składnika: {error}")
-            for error in ingredient_formset.non_form_errors():
-                messages.error(self.request, f"Ogólny błąd: {error}")
+            # Jeśli formularz składników jest nieprawidłowy, pokaż błędy tylko jeśli formset zawiera jakieś dane
+            has_non_empty_ingredients = False
+            
+            for form_data in ingredient_formset.cleaned_data:
+                # Jeśli którykolwiek z formularzy ma dane (nie jest pusty), sprawdź błędy
+                if form_data and any(form_data.values()):
+                    has_non_empty_ingredients = True
+                    break
+            
+            if has_non_empty_ingredients:
+                for error in ingredient_formset.errors:
+                    messages.error(self.request, f"Błąd składnika: {error}")
+                for error in ingredient_formset.non_form_errors():
+                    messages.error(self.request, f"Ogólny błąd: {error}")
+                    
+                return self.render_to_response(self.get_context_data(form=form))
+            else:
+                # Jeśli wszystkie formularze są puste, zapisz przepis bez składników
+                self.object = form.save()
                 
-            return self.render_to_response(self.get_context_data(form=form))
+                messages.success(self.request, 'Przepis został zaktualizowany. Pamiętaj, aby dodać składniki!')
+                return redirect(self.get_success_url())
     
     def get_success_url(self):
         return reverse('recipes:detail', kwargs={'pk': self.object.pk})
@@ -727,8 +836,44 @@ def prepare_recipe(request, pk):
     
     # Przygotuj skalowane składniki, jeśli podano liczbę porcji
     scaled_ingredients = None
+    scaled_missing_ingredients = None
     if servings and servings != recipe.servings:
         scaled_ingredients = recipe.scale_to_servings(servings)
+        
+        # Sprawdź dostępność składników dla przeskalowanych wartości
+        scaled_missing_ingredients = []
+        
+        for scaled_ing in scaled_ingredients:
+            ingredient = scaled_ing['ingredient']
+            amount = scaled_ing['amount']
+            unit = scaled_ing['unit']
+            
+            if not FridgeItem.check_ingredient_availability(request.user, ingredient, amount, unit):
+                # Oblicz brakującą ilość
+                total_available = 0.0
+                fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
+                
+                for item in fridge_items:
+                    try:
+                        # Jeśli jednostki są różne, przelicz
+                        if item.unit != unit:
+                            converted = convert_units(float(item.amount), item.unit, unit)
+                            total_available += converted
+                        else:
+                            total_available += float(item.amount)
+                    except Exception:
+                        continue
+                
+                # Oblicz brakującą ilość
+                missing_amount = max(0, float(amount) - total_available)
+                
+                scaled_missing_ingredients.append({
+                    'ingredient': ingredient,
+                    'unit': unit,
+                    'required': float(amount),
+                    'available': total_available,
+                    'missing': missing_amount
+                })
     
     if request.method == 'POST':
         post_servings = request.POST.get('servings')
@@ -740,12 +885,34 @@ def prepare_recipe(request, pk):
         except (ValueError, TypeError):
             post_servings = recipe.servings
             
-        # Sprawdź dostępność składników jeszcze raz - wartości mogły się zmienić
-        current_missing_ingredients = recipe.get_missing_ingredients(request.user)
+        # Sprawdź dostępność składników jeszcze raz - uwzględniając aktualną liczbę porcji
+        if post_servings != recipe.servings:
+            # Jeśli liczba porcji jest inna niż domyślna, używamy specjalnego sprawdzenia
+            scaled_ingredients = recipe.scale_to_servings(post_servings)
+            current_missing_ingredients = []
+            
+            for scaled_ing in scaled_ingredients:
+                ingredient = scaled_ing['ingredient']
+                amount = scaled_ing['amount']
+                unit = scaled_ing['unit']
+                
+                if not FridgeItem.check_ingredient_availability(request.user, ingredient, amount, unit):
+                    current_missing_ingredients.append({
+                        'ingredient': ingredient,
+                        'amount': amount,
+                        'unit': unit
+                    })
+        else:
+            # Standardowe sprawdzenie dla domyślnej liczby porcji
+            current_missing_ingredients = recipe.get_missing_ingredients(request.user)
             
         # Sprawdź czy wszystkie składniki są dostępne
         if current_missing_ingredients:
-            ingredient_names = [ing.ingredient.name for ing in current_missing_ingredients]
+            if post_servings != recipe.servings:
+                ingredient_names = [item['ingredient'].name for item in current_missing_ingredients]
+            else:
+                ingredient_names = [ing.ingredient.name for ing in current_missing_ingredients]
+            
             missing_text = ", ".join(ingredient_names)
             
             messages.warning(
@@ -758,10 +925,38 @@ def prepare_recipe(request, pk):
         
         # Usuń składniki z lodówki
         try:
-            from fridge.models import FridgeItem
             from accounts.models import RecipeHistory
             
-            result = FridgeItem.use_recipe_ingredients(request.user, recipe, post_servings)
+            # Jeśli liczba porcji jest inna niż domyślna, musimy użyć przeskalowanych składników
+            if post_servings != recipe.servings:
+                # Użyj przeskalowanych ilości składników
+                success = True
+                used_items = []
+                scaled_ingredients = recipe.scale_to_servings(post_servings)
+                
+                for scaled_ing in scaled_ingredients:
+                    ingredient = scaled_ing['ingredient']
+                    amount = scaled_ing['amount']
+                    unit = scaled_ing['unit']
+                    
+                    # Usuń składnik z lodówki
+                    if not FridgeItem.remove_from_fridge(request.user, ingredient, amount, unit):
+                        success = False
+                        break
+                    
+                    used_items.append({
+                        "ingredient": ingredient,
+                        "amount": amount,
+                        "unit": unit
+                    })
+                
+                result = {
+                    "success": success,
+                    "used": used_items
+                }
+            else:
+                # Standardowe usunięcie składników dla domyślnej liczby porcji
+                result = FridgeItem.use_recipe_ingredients(request.user, recipe, post_servings)
             
             if result['success']:
                 # Dodaj przepis do historii
@@ -803,6 +998,7 @@ def prepare_recipe(request, pk):
         'recipe': recipe,
         'servings': servings,
         'scaled_ingredients': scaled_ingredients,
+        'scaled_missing_ingredients': scaled_missing_ingredients,
         'missing_ingredients': missing_ingredients
     }
     

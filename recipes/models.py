@@ -18,6 +18,36 @@ class IngredientCategory(models.Model):
 
     def __str__(self):
         return self.name
+        
+    def save(self, *args, **kwargs):
+        """Automatycznie ustawia flagi wegetariańskie i wegańskie na podstawie nazwy kategorii"""
+        # Najpierw zapisz model, żeby zapewnić, że ma on ID
+        super().save(*args, **kwargs)
+        
+        # Lista kategorii niewegetariańskich
+        non_vegetarian_categories = ['mięso', 'mieso', 'wędliny', 'wedliny', 'ryby', 'owoce morza', 'drób', 'drob']
+        # Lista kategorii wegańskich
+        vegan_categories = ['warzywa', 'owoce', 'nasiona', 'ziarna', 'strączkowe', 'strączkowe', 'przyprawy', 'zioła', 'ziola']
+        # Lista kategorii wegetariańskich, ale nie wegańskich
+        vegetarian_not_vegan = ['nabiał', 'nabial', 'jaja', 'jajka', 'miód', 'miod']
+        
+        name_lower = self.name.lower()
+        
+        # Ustaw is_vegetarian na False dla niewegetariańskich kategorii
+        if any(category in name_lower for category in non_vegetarian_categories):
+            self.is_vegetarian = False
+            self.is_vegan = False
+            super().save(update_fields=['is_vegetarian', 'is_vegan'])
+        # Ustaw is_vegan na True dla wegańskich kategorii
+        elif any(category in name_lower for category in vegan_categories):
+            self.is_vegetarian = True
+            self.is_vegan = True
+            super().save(update_fields=['is_vegetarian', 'is_vegan'])
+        # Dla kategorii wegetariańskich, ale nie wegańskich
+        elif any(category in name_lower for category in vegetarian_not_vegan):
+            self.is_vegetarian = True
+            self.is_vegan = False
+            super().save(update_fields=['is_vegetarian', 'is_vegan'])
 
 class MeasurementUnit(models.Model):
     name = models.CharField(max_length=50, verbose_name="Nazwa")

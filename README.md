@@ -1,22 +1,63 @@
-# Książka Kucharska
+# Książka Kucharska - Twoja Wirtualna Asystentka Kulinarna
 
-Aplikacja do zarządzania przepisami kulinarnymi z możliwością generowania list zakupów.
+Książka Kucharska to kompleksowa aplikacja webowa stworzona w Django, która pomaga użytkownikom zarządzać przepisami, planować posiłki w oparciu o dostępne składniki oraz optymalizować zakupy spożywcze. Aplikacja łączy funkcjonalności tradycyjnej książki kucharskiej z nowoczesnym systemem zarządzania zapasami kuchennymi i inteligentnym generowaniem list zakupów.
 
-## Funkcje
+## Główne funkcjonalności
 
-- Dodawanie, edycja i usuwanie przepisów
-- Dodawanie składników z jednostkami miary
-- Przeliczanie jednostek miary
-- Generowanie list zakupów
-- Zarządzanie zawartością lodówki
+### Zarządzanie przepisami 🍽️
+- **Przepisy osobiste i społecznościowe**: tworzenie własnych przepisów i dostęp do publicznych przepisów innych użytkowników
+- **Szczegółowe informacje**: czas przygotowania, poziom trudności, liczba porcji, zdjęcia
+- **Inteligentna klasyfikacja diet**: automatyczne oznaczanie przepisów jako wegetariańskie, wegańskie lub mięsne
+- **Wyszukiwanie i filtrowanie**: według kategorii, składników, diet i dostępności składników
+- **Skalowanie porcji**: dynamiczne przeliczanie ilości składników dla różnej liczby porcji
+- **Interakcje społecznościowe**: polubienia, dodawanie do ulubionych, komentarze do przepisów
 
-## Wymagania
+### Wirtualna lodówka 🧊
+- **Inwentaryzacja produktów**: zarządzanie dostępnymi składnikami i ich ilościami
+- **Śledzenie terminów ważności**: monitoring dat przydatności produktów
+- **Inteligentne dopasowanie przepisów**: wyszukiwanie przepisów, które można przygotować z dostępnych składników
+- **Automatyczne aktualizacje**: odejmowanie zużytych składników po przygotowaniu przepisu
 
+### Inteligentne listy zakupów 🛒
+- **Automatyczne generowanie**: tworzenie list zakupów na podstawie brakujących składników
+- **Niestandardowe listy**: możliwość ręcznego dodawania produktów
+- **Oznaczanie zakupionych produktów**: kontrola nad postępem zakupów
+- **Integracja z lodówką**: automatyczne dodawanie zakupionych produktów do wirtualnej lodówki
+
+### System konwersji jednostek 📏
+- **Uniwersalne przeliczniki**: automatyczna konwersja między różnymi jednostkami miary
+- **Inteligentne konwersje**: uwzględnianie gęstości składników przy przeliczaniu między wagą a objętością
+- **Jednostki specyficzne dla składników**: obsługa sztuk, opakowań i innych niestandardowych jednostek
+
+### Personalizacja i zarządzanie kontami 👤
+- **Profile użytkowników**: osobiste konta z preferencjami i historią
+- **Panel administracyjny**: zaawansowane zarządzanie zawartością dla administratorów
+- **Responsywny interfejs**: dostosowany do komputerów i urządzeń mobilnych
+
+## Korzyści dla użytkowników
+
+- **Oszczędność czasu**: szybkie planowanie posiłków i zakupów
+- **Redukcja marnowania żywności**: lepsze zarządzanie zapasami i datami ważności
+- **Optymalizacja zakupów**: kupowanie tylko tego, co naprawdę potrzebne
+- **Inspiracja kulinarna**: odkrywanie nowych przepisów dopasowanych do preferencji
+- **Adaptacja do różnych diet**: łatwe filtrowanie przepisów dla określonych preferencji żywieniowych
+- **Precyzyjne gotowanie**: dokładne przeliczanie ilości składników dla różnej liczby porcji
+
+## Technologie
+
+- **Backend**: Python, Django, SQLite/PostgreSQL
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap
+- **Narzędzia**: Django ORM, Django Forms, Django Templates
+- **Testy**: Unittest, Django Test Client
+
+## Instalacja i uruchomienie
+
+### Wymagania
 - Python 3.8+
 - Django 4.2+
 - Pozostałe zależności w pliku requirements.txt
 
-## Instalacja
+### Szybka instalacja
 
 1. Sklonuj repozytorium:
 ```
@@ -48,7 +89,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-5. Załaduj początkowe dane (kategorie przepisów, jednostki miary):
+5. Załaduj początkowe dane:
 ```
 python manage.py loaddata recipes/fixtures/initial_categories.json
 python manage.py loaddata recipes/fixtures/initial_units.json
@@ -59,62 +100,35 @@ python manage.py loaddata recipes/fixtures/initial_units.json
 python manage.py createsuperuser
 ```
 
-## Uruchomienie
-
-Uruchom serwer deweloperski:
+7. Uruchom serwer deweloperski:
 ```
 python manage.py runserver
 ```
 
 Aplikacja będzie dostępna pod adresem http://127.0.0.1:8000/
 
-Panel administracyjny: http://127.0.0.1:8000/admin/
-
-## Pierwsze kroki
-
-1. Zaloguj się na utworzone konto użytkownika
-2. Dodaj nowe składniki w sekcji "Składniki"
-3. Dodaj nowy przepis w sekcji "Przepisy"
-4. Przeglądaj przepisy i dodawaj je do ulubionych
-5. Dodawaj składniki przepisów do listy zakupów
-
 ## Struktura projektu
 
-- `recipes` - główna aplikacja do zarządzania przepisami
-- `fridge` - aplikacja do zarządzania zawartością lodówki
-- `shopping` - aplikacja do zarządzania listami zakupów
-- `accounts` - aplikacja do zarządzania kontami użytkowników
+- **recipes**: główna aplikacja do zarządzania przepisami
+- **fridge**: aplikacja do zarządzania zawartością lodówki
+- **shopping**: aplikacja do zarządzania listami zakupów
+- **accounts**: aplikacja do zarządzania kontami użytkowników
 
-## Funkcjonalności szczegółowo
+## Przykładowy przepływ pracy
 
-### Zarządzanie przepisami
-- Dodawanie nowych przepisów z wieloma składnikami
-- Edycja i usuwanie własnych przepisów
-- Przeglądanie przepisów innych użytkowników
-- Filtrowanie przepisów według kategorii, składników, diety
-- Wyszukiwanie przepisów po nazwie lub składnikach
-- Skalowanie przepisów do wybranej liczby porcji
-- Dodawanie przepisów do ulubionych
-- Polubienia i komentarze do przepisów
-
-### Zarządzanie składnikami i jednostkami miary
-- Kategorie składników (np. mięso, nabiał, warzywa)
-- Automatyczne przeliczanie jednostek miary (np. gramy na kilogramy)
-- Konwersje między różnymi typami jednostek (np. gramy na mililitry) z wykorzystaniem gęstości składników
-- Konwersje jednostek specyficzne dla składnika (np. sztuki na gramy)
-
-### Zarządzanie lodówką
-- Dodawanie składników do wirtualnej lodówki
-- Śledzenie ilości i dat ważności produktów
-- Automatyczne sprawdzanie, czy przepis może być przygotowany z dostępnych składników
-- Oznaczanie składników jako zużyte podczas przygotowywania przepisu
-
-### Zarządzanie listami zakupów
-- Tworzenie list zakupów
-- Automatyczne dodawanie brakujących składników do listy
-- Oznaczanie zakupionych produktów
-- Dodawanie produktów do lodówki po zakupach
+1. Zarejestruj się i zaloguj na swoje konto
+2. Dodaj składniki do swojej wirtualnej lodówki
+3. Przeglądaj przepisy, które możesz przygotować z dostępnych składników
+4. Wybierz przepis i dostosuj liczbę porcji
+5. Wygeneruj listę zakupów dla brakujących składników
+6. Po zakupach, oznacz produkty jako zakupione i dodaj je do lodówki
+7. Przygotuj wybrany przepis, a zużyte składniki zostaną automatycznie odjęte z lodówki
 
 ## Licencja
 
 Wszystkie prawa zastrzeżone.
+
+## Autorzy
+
+- Imię Nazwisko
+- Kontakt: email@example.com

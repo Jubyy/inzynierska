@@ -27,7 +27,8 @@ class RecipeCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(IngredientCategory)
 class IngredientCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'is_vegetarian', 'is_vegan')
+    list_filter = ('is_vegetarian', 'is_vegan')
     search_fields = ('name',)
 
 @admin.register(Ingredient)

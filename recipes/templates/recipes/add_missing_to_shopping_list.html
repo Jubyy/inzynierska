@@ -91,6 +91,14 @@ python manage.py migrate</pre>
                                 {% endif %}
                             </div>
                             
+                            {% if servings != recipe.servings %}
+                            <div class="alert alert-info mb-4">
+                                <p class="mb-1"><i class="bi bi-info-circle me-2"></i> Składniki są przeskalowane do <strong>{{ servings }} porcji</strong> (oryginalnie: {{ recipe.servings }} porcji).</p>
+                                <p class="mb-0">Ta liczba porcji zostanie użyta przy dodawaniu składników do listy zakupów.</p>
+                            </div>
+                            <input type="hidden" name="servings" value="{{ servings }}">
+                            {% endif %}
+                            
                             <div class="d-flex justify-content-between mt-4">
                                 <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-left"></i> Anuluj

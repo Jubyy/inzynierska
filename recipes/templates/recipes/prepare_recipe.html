@@ -65,7 +65,23 @@
                                 {% endfor %}
                             </ul>
                             <hr>
-                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}?servings={{ servings }}" class="btn btn-primary">
+                                <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if scaled_missing_ingredients %}
+                        <div class="alert alert-danger">
+                            <h4 class="alert-heading">Brakujące składniki po przeskalowaniu ({{ servings }} porcji)!</h4>
+                            <p>Nie masz wystarczającej ilości składników, aby przygotować ten przepis w podanej liczbie porcji:</p>
+                            <ul>
+                                {% for item in scaled_missing_ingredients %}
+                                <li>{{ item.ingredient.name }} - brakuje {{ item.missing|floatformat:"-2" }} {{ item.unit.symbol }}</li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}?servings={{ servings }}" class="btn btn-primary">
                                 <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
                             </a>
                         </div>
@@ -75,7 +91,7 @@
                             <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left"></i> Anuluj
                             </a>
-                            <button type="submit" class="btn btn-success" {% if missing_ingredients %}disabled{% endif %}>
+                            <button type="submit" class="btn btn-success" {% if missing_ingredients or scaled_missing_ingredients %}disabled{% endif %}>
                                 <i class="bi bi-check-circle"></i> Potwierdzam przygotowanie
                             </button>
                         </div>

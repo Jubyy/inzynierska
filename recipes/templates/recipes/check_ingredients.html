@@ -11,13 +11,13 @@
             <li>{{ item }}</li>
         {% endfor %}
     </ul>
-    <p>Brakujące składniki zostały automatycznie dodane do <a href="{% url 'shopping_list' %}">Twojej listy zakupów</a>.</p>
-    <a href="{% url 'shopping_list' %}">Przejdź do listy zakupów</a>
+    <p>Brakujące składniki zostały automatycznie dodane do <a href="{% url 'shopping:list' %}">Twojej listy zakupów</a>.</p>
+    <a href="{% url 'shopping:list' %}">Przejdź do listy zakupów</a>
 {% else %}
     <p>Masz wszystkie składniki! Możesz zrobić ten przepis.</p>
 {% endif %}
 
-<a href="{% url 'recipe_list' %}">Wróć do listy przepisów</a>
-<a href="{% url 'recipe_detail' recipe.id %}">Zobacz przepis</a>
+<a href="{% url 'recipes:list' %}">Wróć do listy przepisów</a>
+<a href="{% url 'recipes:detail' recipe.id %}">Zobacz przepis</a>
 
 {% endblock %}

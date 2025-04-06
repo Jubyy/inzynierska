@@ -52,12 +52,36 @@ class FridgeItemForm(forms.ModelForm):
             self.fields['unit'].queryset = self.instance.ingredient.compatible_units.all()
             if not self.fields['unit'].queryset.exists() and self.instance.ingredient.default_unit:
                 self.fields['unit'].queryset = MeasurementUnit.objects.filter(pk=self.instance.ingredient.default_unit.pk)
-
+            
+            # Uczyń pole jednostki tylko do odczytu podczas edycji istniejącego składnika
+            if self.instance.pk:
+                # Zapisz oryginalną jednostkę
+                self.initial['unit'] = self.instance.unit.pk
+                # Ustaw pole jako tylko do odczytu
+                self.fields['unit'].widget.attrs['readonly'] = True
+                self.fields['unit'].widget.attrs['disabled'] = True
+                
+                # Dodaj ukryte pole, aby zachować wartość jednostki przy zapisie formularza
+                self.fields['hidden_unit'] = forms.IntegerField(
+                    initial=self.instance.unit.pk,
+                    widget=forms.HiddenInput()
+                )
+    
     def clean(self):
         cleaned_data = super().clean()
         ingredient = cleaned_data.get('ingredient')
         unit = cleaned_data.get('unit')
         amount = cleaned_data.get('amount')
+        
+        # Jeśli pole jednostki jest wyłączone, użyj wartości z ukrytego pola
+        if self.instance and self.instance.pk and 'hidden_unit' in self.fields:
+            try:
+                unit_id = self.cleaned_data.get('hidden_unit')
+                if unit_id:
+                    unit = MeasurementUnit.objects.get(pk=unit_id)
+                    cleaned_data['unit'] = unit
+            except MeasurementUnit.DoesNotExist:
+                pass
         
         if ingredient and unit and amount:
             # Lista jednostek wymagających liczb całkowitych
@@ -68,12 +92,14 @@ class FridgeItemForm(forms.ModelForm):
                 self.add_error('amount', 'Dla tej jednostki można podać tylko liczby całkowite.')
             
             # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
-            compatible_units = ingredient.compatible_units.all()
-            if not compatible_units.exists() and ingredient.default_unit:
-                compatible_units = [ingredient.default_unit]
-            
-            if unit not in compatible_units:
-                self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
+            # Ale tylko dla nowo dodawanych produktów, nie dla edytowanych
+            if not self.instance or not self.instance.pk:
+                compatible_units = ingredient.compatible_units.all()
+                if not compatible_units.exists() and ingredient.default_unit:
+                    compatible_units = [ingredient.default_unit]
+                
+                if unit not in compatible_units:
+                    self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
         
         return cleaned_data
 

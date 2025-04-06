@@ -263,8 +263,16 @@
             dropdownParent: $('body')
         });
         
-        // Wyczyść domyślny wybór składnika
+        {% if not item %}
+        // Wyczyść domyślny wybór składnika tylko przy dodawaniu nowego produktu
         $('#{{ form.ingredient.id_for_label }}').val(null).trigger('change');
+        {% else %}
+        // Dla istniejących produktów, dodaj wybraną opcję i ustaw ją jako wybraną
+        var ingredientId = {{ item.ingredient.id }};
+        var ingredientName = "{{ item.ingredient.name }}";
+        var ingredientOption = new Option(ingredientName, ingredientId, true, true);
+        $('#{{ form.ingredient.id_for_label }}').append(ingredientOption).trigger('change');
+        {% endif %}
         
         // Inicjalizacja Select2 dla dropdown jednostek
         $('#{{ form.unit.id_for_label }}').select2({
@@ -274,11 +282,19 @@
             dropdownParent: $('body')
         });
         
-        // Wyczyść domyślny wybór jednostki
+        {% if not item %}
+        // Wyczyść domyślny wybór jednostki tylko przy dodawaniu nowego produktu
         $('#{{ form.unit.id_for_label }}').val(null).trigger('change');
         
-        // Wyczyść pole ilości
+        // Wyczyść pole ilości tylko przy dodawaniu nowego produktu
         $('#{{ form.amount.id_for_label }}').val('');
+        {% else %}
+        // Dla istniejących produktów, ustaw domyślne wartości
+        var unitId = {{ item.unit.id }};
+        var unitName = "{{ item.unit.name }}";
+        var unitOption = new Option(unitName, unitId, true, true);
+        $('#{{ form.unit.id_for_label }}').append(unitOption).trigger('change');
+        {% endif %}
         
         // Dezaktywuj pole ilości na początku
         $('#{{ form.amount.id_for_label }}').prop('disabled', true);
@@ -307,15 +323,26 @@
         
         // Aktywuj pole ilości tylko gdy składnik i jednostka są wybrane
         function checkFormFields() {
+            {% if item %}
+            // Podczas edycji, pole ilości powinno być zawsze aktywne
+            $('#{{ form.amount.id_for_label }}').prop('disabled', false);
+            {% else %}
+            // Podczas dodawania nowego produktu, sprawdzamy czy składnik i jednostka są wybrane
             var hasIngredient = $('#{{ form.ingredient.id_for_label }}').val() !== null && $('#{{ form.ingredient.id_for_label }}').val() !== '';
             var hasUnit = $('#{{ form.unit.id_for_label }}').val() !== null && $('#{{ form.unit.id_for_label }}').val() !== '';
             
             $('#{{ form.amount.id_for_label }}').prop('disabled', !(hasIngredient && hasUnit));
+            {% endif %}
             
             // Sprawdź typ jednostki, jeśli jest wybrana
+            {% if not item %}
+            var hasUnit = $('#{{ form.unit.id_for_label }}').val() !== null && $('#{{ form.unit.id_for_label }}').val() !== '';
             if (hasUnit) {
                 checkUnitType();
             }
+            {% else %}
+            checkUnitType();
+            {% endif %}
         }
         
         // Sprawdź stan pól po każdej zmianie
