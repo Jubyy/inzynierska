@@ -14,6 +14,7 @@ from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
 from decimal import Decimal
 from django.utils import timezone
+import json
 
 class RecipeListView(ListView):
     model = Recipe
@@ -495,19 +496,24 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
             context['ingredient_formset'] = RecipeIngredientFormSet(prefix='ingredients')
             
         context['ingredient_categories'] = IngredientCategory.objects.all()
+        
+        # Dodaj puste dane składników jako JSON dla JavaScript (pusta tablica)
+        context['ingredient_formset_data'] = '[]'
+        
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
         ingredient_formset = context['ingredient_formset']
         
+        # Sprawdź, czy formset jest prawidłowy lub czy jest pusty (brak składników)
         if ingredient_formset.is_valid():
             self.object = form.save(commit=False)
             self.object.author = self.request.user
             self.object.save()
             form.save_m2m()  # Zapisz relacje many-to-many
             
-            # Zapisz składniki
+            # Zapisz składniki tylko jeśli istnieją w formularzu
             ingredient_forms = ingredient_formset.save(commit=False)
             
             # Usuń składniki oznaczone do usunięcia
@@ -516,8 +522,10 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
             
             # Zapisz nowe i zaktualizowane składniki
             for ingredient_form in ingredient_forms:
-                ingredient_form.recipe = self.object
-                ingredient_form.save()
+                # Sprawdź, czy składnik nie jest pusty (czy ma wszystkie wymagane pola)
+                if ingredient_form.ingredient and ingredient_form.amount and ingredient_form.unit:
+                    ingredient_form.recipe = self.object
+                    ingredient_form.save()
             
             # Wyświetl komunikat z liczbą dodanych składników
             messages.success(
@@ -528,12 +536,35 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
             return redirect(self.get_success_url())
         else:
             # Jeśli formularz składników jest nieprawidłowy, pokaż błędy
-            for error in ingredient_formset.errors:
-                messages.error(self.request, f"Błąd składnika: {error}")
-            for error in ingredient_formset.non_form_errors():
-                messages.error(self.request, f"Ogólny błąd: {error}")
+            # ale tylko jeśli formset zawiera jakieś dane (nie jest pusty)
+            has_non_empty_ingredients = False
+            
+            for form_data in ingredient_formset.cleaned_data:
+                # Jeśli którykolwiek z formularzy ma dane (nie jest pusty), sprawdź błędy
+                if form_data and any(form_data.values()):
+                    has_non_empty_ingredients = True
+                    break
+            
+            if has_non_empty_ingredients:
+                for error in ingredient_formset.errors:
+                    messages.error(self.request, f"Błąd składnika: {error}")
+                for error in ingredient_formset.non_form_errors():
+                    messages.error(self.request, f"Ogólny błąd: {error}")
+                    
+                return self.render_to_response(self.get_context_data(form=form))
+            else:
+                # Jeśli wszystkie formularze są puste, zapisz przepis bez składników
+                self.object = form.save(commit=False)
+                self.object.author = self.request.user
+                self.object.save()
+                form.save_m2m()
                 
-            return self.render_to_response(self.get_context_data(form=form))
+                messages.success(
+                    self.request, 
+                    f'Przepis "{self.object.title}" został dodany. Pamiętaj, aby dodać składniki!'
+                )
+                
+                return redirect(self.get_success_url())
     
     def get_success_url(self):
         # Przekieruj na listę przepisów zamiast na szczegóły przepisu
@@ -557,12 +588,31 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             context['ingredient_formset'] = RecipeIngredientFormSet(instance=self.object, prefix='ingredients')
         context['ingredient_categories'] = IngredientCategory.objects.all()
+        
+        # Dodaj dane składników jako JSON dla JavaScript
+        ingredients_data = []
+        for form in context['ingredient_formset'].forms:
+            if hasattr(form.instance, 'pk') and form.instance.pk and form.instance.ingredient and form.instance.unit:
+                ingredients_data.append({
+                    'id': form.instance.pk,
+                    'formIndex': context['ingredient_formset'].forms.index(form),
+                    'ingredientId': form.instance.ingredient.id,
+                    'ingredientName': form.instance.ingredient.name,
+                    'amount': float(form.instance.amount),
+                    'unitId': form.instance.unit.id,
+                    'unitName': form.instance.unit.name,
+                    'unitSymbol': form.instance.unit.symbol
+                })
+                
+        context['ingredient_formset_data'] = json.dumps(ingredients_data)
+        
         return context
     
     def form_valid(self, form):
         context = self.get_context_data()
         ingredient_formset = context['ingredient_formset']
         
+        # Sprawdź, czy formset jest prawidłowy lub czy jest pusty (brak składników)
         if ingredient_formset.is_valid():
             self.object = form.save()
             ingredient_formset.instance = self.object

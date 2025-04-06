@@ -52,6 +52,17 @@ class ShoppingItemForm(forms.ModelForm):
         
         # Ustaw pogrupowane opcje dla pola ingredient
         self.fields['ingredient'].choices = ingredient_choices
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        amount = cleaned_data.get('amount')
+        unit = cleaned_data.get('unit')
+        
+        # Sprawdź czy jednostka to sztuki (piece) i czy ilość jest liczbą całkowitą
+        if unit and unit.type == 'piece' and amount and amount != int(amount):
+            self.add_error('amount', 'Dla jednostki typu "sztuki" ilość musi być liczbą całkowitą.')
+            
+        return cleaned_data
 
 # Formset do dodawania wielu pozycji jednocześnie
 ShoppingItemFormSet = formset_factory(

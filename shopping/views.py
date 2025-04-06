@@ -291,10 +291,18 @@ def toggle_purchased(request, pk):
         # Oznacz jako zakupiony i dodaj do lodówki
         item.mark_as_purchased()
         
+        # Sprawdź, czy wszystkie pozycje są już zakupione
+        all_purchased = not item.shopping_list.items.filter(is_purchased=False).exists()
+        has_recipe = item.shopping_list.recipe is not None
+        recipe_id = item.shopping_list.recipe.id if has_recipe else None
+        
         if is_ajax:
             return JsonResponse({
                 'success': True, 
                 'purchased': True,
+                'all_purchased': all_purchased,
+                'has_recipe': has_recipe,
+                'recipe_id': recipe_id,
                 'message': f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.'
             })
         
@@ -325,11 +333,17 @@ def complete_shopping(request, pk):
     if request.method == 'POST':
         added_count = shopping_list.complete_shopping()
         
+        # Sprawdź, czy lista ma powiązany przepis
+        has_recipe = shopping_list.recipe is not None
+        recipe_id = shopping_list.recipe.id if has_recipe else None
+        
         if is_ajax:
             return JsonResponse({
                 'success': True,
                 'completed': True,
                 'added_count': added_count,
+                'has_recipe': has_recipe,
+                'recipe_id': recipe_id,
                 'message': f'Zakończono zakupy! Dodano {added_count} produktów do lodówki.'
             })
         
@@ -359,7 +373,7 @@ def create_from_recipe(request):
             
             # Utwórz nową listę zakupów
             list_name = f"Zakupy dla: {recipe.title}"
-            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
+            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name, recipe=recipe)
             
             # Dodaj składniki do listy
             created_items = shopping_list.add_recipe_ingredients(recipe)
@@ -424,7 +438,7 @@ def ajax_load_units(request):
     if not compatible_units.exists() and ingredient.default_unit:
         compatible_units = [ingredient.default_unit]
     
-    units = [{'id': unit.id, 'name': unit.name} for unit in compatible_units]
+    units = [{'id': unit.id, 'name': unit.name, 'type': unit.type} for unit in compatible_units]
     default_unit = ingredient.default_unit.id if ingredient.default_unit else None
     
     return JsonResponse({

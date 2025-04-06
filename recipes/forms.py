@@ -93,8 +93,8 @@ RecipeIngredientFormSet = inlineformset_factory(
     form=RecipeIngredientForm,
     extra=1,  # Liczba pustych formularzy na początku
     can_delete=True,  # Możliwość usuwania składników
-    min_num=1,  # Minimalnie jeden składnik
-    validate_min=True  # Walidacja minimalnej liczby składników
+    min_num=0,  # Zmieniamy z 1 na 0, aby nie wymagać minimalnej liczby składników
+    validate_min=False  # Wyłączamy walidację minimalnej liczby składników
 )
 
 class RecipeCategoryForm(forms.ModelForm):

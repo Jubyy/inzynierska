@@ -263,6 +263,9 @@
             dropdownParent: $('body')
         });
         
+        // Wyczyść domyślny wybór składnika
+        $('#{{ form.ingredient.id_for_label }}').val(null).trigger('change');
+        
         // Inicjalizacja Select2 dla dropdown jednostek
         $('#{{ form.unit.id_for_label }}').select2({
             placeholder: "Wybierz jednostkę",
@@ -270,6 +273,58 @@
             theme: "bootstrap4",
             dropdownParent: $('body')
         });
+        
+        // Wyczyść domyślny wybór jednostki
+        $('#{{ form.unit.id_for_label }}').val(null).trigger('change');
+        
+        // Wyczyść pole ilości
+        $('#{{ form.amount.id_for_label }}').val('');
+        
+        // Dezaktywuj pole ilości na początku
+        $('#{{ form.amount.id_for_label }}').prop('disabled', true);
+        
+        // Sprawdź i ustaw odpowiednie atrybuty dla pola amount w zależności od typu jednostki
+        function checkUnitType() {
+            var selectedUnit = $('#{{ form.unit.id_for_label }} option:selected');
+            var unitType = selectedUnit.data('type');
+            var amountInput = $('#{{ form.amount.id_for_label }}');
+            
+            if (unitType === 'piece') {
+                amountInput.attr('step', '1');
+                amountInput.attr('min', '1');
+                
+                // Zaokrąglij wartość, jeśli jest już wprowadzona
+                var currentValue = amountInput.val();
+                if (currentValue && currentValue % 1 !== 0) {
+                    amountInput.val(Math.round(currentValue));
+                }
+            } else if (unitType) {
+                // Dla innych jednostek - możliwe wartości dziesiętne
+                amountInput.attr('step', '0.01');
+                amountInput.attr('min', '0.01');
+            }
+        }
+        
+        // Aktywuj pole ilości tylko gdy składnik i jednostka są wybrane
+        function checkFormFields() {
+            var hasIngredient = $('#{{ form.ingredient.id_for_label }}').val() !== null && $('#{{ form.ingredient.id_for_label }}').val() !== '';
+            var hasUnit = $('#{{ form.unit.id_for_label }}').val() !== null && $('#{{ form.unit.id_for_label }}').val() !== '';
+            
+            $('#{{ form.amount.id_for_label }}').prop('disabled', !(hasIngredient && hasUnit));
+            
+            // Sprawdź typ jednostki, jeśli jest wybrana
+            if (hasUnit) {
+                checkUnitType();
+            }
+        }
+        
+        // Sprawdź stan pól po każdej zmianie
+        $('#{{ form.ingredient.id_for_label }}, #{{ form.unit.id_for_label }}').on('change', function() {
+            checkFormFields();
+        });
+        
+        // Wywołaj sprawdzenie na początku
+        checkFormFields();
         
         // Funkcja do formatowania opcji w Select2
         function formatIngredient(ingredient) {
@@ -302,7 +357,8 @@
                         $.each(data.units, function(index, unit) {
                             unitSelect.append($('<option></option>')
                                 .attr('value', unit.id)
-                                .text(unit.name));
+                                .text(unit.name)
+                                .data('type', unit.type));
                         });
                         
                         // Jeśli jest domyślna jednostka, ustaw ją
@@ -314,6 +370,29 @@
                         unitSelect.trigger('change');
                     }
                 });
+            }
+        });
+        
+        // Zmiana atrybutów pola amount w zależności od typu jednostki
+        $('#{{ form.unit.id_for_label }}').on('change', function() {
+            var unitOption = $(this).find('option:selected');
+            var unitType = unitOption.data('type');
+            var amountInput = $('#{{ form.amount.id_for_label }}');
+            
+            if (unitType === 'piece') {
+                // Dla jednostek typu sztuki - tylko liczby całkowite
+                amountInput.attr('step', '1');
+                amountInput.attr('min', '1');
+                
+                // Zaokrąglij wartość do liczby całkowitej, jeśli jest wprowadzona
+                var currentValue = amountInput.val();
+                if (currentValue && currentValue % 1 !== 0) {
+                    amountInput.val(Math.round(currentValue));
+                }
+            } else {
+                // Dla innych jednostek - możliwe wartości dziesiętne
+                amountInput.attr('step', '0.01');
+                amountInput.attr('min', '0.01');
             }
         });
         
@@ -398,6 +477,19 @@
                 $amountInput.on('change', function() {
                     var ingId = $(this).data('id');
                     selectedIngredients[ingId].amount = parseFloat($(this).val());
+                    
+                    // Sprawdź, czy jednostka to sztuki i wymuszaj liczby całkowite
+                    var unitSelect = $('.ingredient-unit[data-id="' + ingId + '"]');
+                    var unitType = unitSelect.find('option:selected').data('type');
+                    
+                    if (unitType === 'piece') {
+                        var currentValue = parseFloat($(this).val());
+                        if (currentValue && currentValue % 1 !== 0) {
+                            var roundedValue = Math.round(currentValue);
+                            $(this).val(roundedValue);
+                            selectedIngredients[ingId].amount = roundedValue;
+                        }
+                    }
                 });
                 
                 // Select dla jednostki
@@ -408,7 +500,7 @@
                 if (ingredient.units && ingredient.units.length > 0) {
                     for (var i = 0; i < ingredient.units.length; i++) {
                         var unit = ingredient.units[i];
-                        var $option = $('<option value="' + unit.id + '">' + unit.name + '</option>');
+                        var $option = $('<option value="' + unit.id + '" data-type="' + unit.type + '">' + unit.name + '</option>');
                         if (unit.id == ingredient.unitId) {
                             $option.prop('selected', true);
                         }
@@ -418,7 +510,29 @@
                 
                 $unitSelect.on('change', function() {
                     var ingId = $(this).data('id');
+                    var unitType = $(this).find('option:selected').data('type');
                     selectedIngredients[ingId].unitId = $(this).val();
+                    
+                    // Znajdź pole z ilością dla tego składnika
+                    var $amountInput = $('.ingredient-amount[data-id="' + ingId + '"]');
+                    
+                    if (unitType === 'piece') {
+                        // Dla jednostek typu sztuki - tylko liczby całkowite
+                        $amountInput.attr('step', '1');
+                        $amountInput.attr('min', '1');
+                        
+                        // Zaokrąglij wartość do liczby całkowitej
+                        var currentValue = $amountInput.val();
+                        if (currentValue && currentValue % 1 !== 0) {
+                            var roundedValue = Math.round(currentValue);
+                            $amountInput.val(roundedValue);
+                            selectedIngredients[ingId].amount = roundedValue;
+                        }
+                    } else {
+                        // Dla innych jednostek - możliwe wartości dziesiętne
+                        $amountInput.attr('step', '0.01');
+                        $amountInput.attr('min', '0.01');
+                    }
                 });
                 
                 $amountGroup.append($amountInput);
@@ -453,7 +567,17 @@
             for (var id in selectedIngredients) {
                 var ingredient = selectedIngredients[id];
                 ingredientIds.push(id);
-                amounts.push(ingredient.amount);
+                
+                // Sprawdź typ jednostki i odpowiednio zaokrąglij ilość
+                var amount = ingredient.amount;
+                var unitSelect = $('.ingredient-unit[data-id="' + id + '"]');
+                var unitType = unitSelect.find('option:selected').data('type');
+                
+                if (unitType === 'piece') {
+                    amount = Math.round(amount);
+                }
+                
+                amounts.push(amount);
                 unitIds.push(ingredient.unitId);
             }
             

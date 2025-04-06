@@ -9,6 +9,7 @@ class ShoppingList(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data utworzenia")
     modified_at = models.DateTimeField(auto_now=True, verbose_name="Data modyfikacji")
     is_completed = models.BooleanField(default=False, verbose_name="Zakończona")
+    recipe = models.ForeignKey('recipes.Recipe', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Przepis źródłowy")
     
     class Meta:
         verbose_name = "Lista zakupów"

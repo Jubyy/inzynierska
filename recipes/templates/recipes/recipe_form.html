@@ -617,6 +617,17 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Inicjalizacja danych z serwera dla JavaScript -->
+<script>
+    // Dane istniejących składników jako JSON
+    var existingIngredientsJson = '{{ ingredient_formset_data|safe }}';
+    var existingIngredients = existingIngredientsJson ? JSON.parse(existingIngredientsJson) : [];
+    
+    // ID przepisu
+    var recipeId = {% if form.instance.pk %}{{ form.instance.pk }}{% else %}null{% endif %};
+</script>
+
 <script>
     $(document).ready(function() {
         // Inicjalizacja Select2 dla pola kategorii
@@ -928,7 +939,7 @@
         // Inicjalizacja - wyświetl komunikat, gdy nie ma jeszcze składników
         if ($("#ingredients-list tr").length === 0) {
             $("#ingredients-list").append(
-                '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodaj przynajmniej jeden składnik.</td></tr>'
+                '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodanie składników jest opcjonalne, ale zalecane dla kompletnego przepisu.</td></tr>'
             );
         }
 
@@ -975,6 +986,7 @@
             const amount = $("#ingredient-amount").val();
             const unitId = $("#ingredient-unit").val();
             const unitName = $("#ingredient-unit option:selected").text();
+            const unitSymbol = $("#ingredient-unit option:selected").data('symbol') || '';
             
             // Walidacja
             if (!ingredientId || !amount || !unitId) {
@@ -991,48 +1003,114 @@
             $("#ingredients-list tr.no-ingredients").remove();
             
             // Dodanie do tabeli
-            const formattedAmount = amount + " " + unitName;
-            const newRow = $('<tr data-index="0">' +
+            const newRow = $('<tr data-form-index="' + formIndex + '">' +
                 '<td>' + ingredientName + '</td>' +
-                '<td>' + formattedAmount + '</td>' +
-                '<td><button type="button" class="btn btn-sm btn-danger remove-row">Usuń</button></td>' +
+                '<td>' + amount + ' ' + unitSymbol + ' (' + unitName + ')</td>' +
+                '<td><button type="button" class="btn btn-sm btn-danger remove-ingredient" data-form-index="' + formIndex + '"><i class="bi bi-trash"></i> Usuń</button></td>' +
                 '</tr>');
             
             $("#ingredients-list").append(newRow);
             
-            // Dodanie do formset
-            let formHtml = '<div class="ingredient-form-row">' +
-                '<input type="hidden" name="ingredients-0-id" id="id_ingredients-0-id">' +
-                '<input type="hidden" name="ingredients-0-recipe" id="id_ingredients-0-recipe">' +
-                '<input type="hidden" name="ingredients-0-ingredient" id="id_ingredients-0-ingredient" value="' + ingredientId + '">' +
-                '<input type="hidden" name="ingredients-0-amount" id="id_ingredients-0-amount" value="' + amount + '">' +
-                '<input type="hidden" name="ingredients-0-unit" id="id_ingredients-0-unit" value="' + unitId + '">' +
+            // Dodanie do formset - dodajemy nowy składnik, a nie zastępujemy cały formset
+            let formHtml = '<div class="ingredient-form-row" data-form-index="' + formIndex + '">' +
+                '<input type="hidden" name="ingredients-' + formIndex + '-id" id="id_ingredients-' + formIndex + '-id">' +
+                '<input type="hidden" name="ingredients-' + formIndex + '-recipe" id="id_ingredients-' + formIndex + '-recipe" value="' + (recipeId || '') + '">' +
+                '<input type="hidden" name="ingredients-' + formIndex + '-ingredient" id="id_ingredients-' + formIndex + '-ingredient" value="' + ingredientId + '">' +
+                '<input type="hidden" name="ingredients-' + formIndex + '-amount" id="id_ingredients-' + formIndex + '-amount" value="' + amount + '">' +
+                '<input type="hidden" name="ingredients-' + formIndex + '-unit" id="id_ingredients-' + formIndex + '-unit" value="' + unitId + '">' +
                 '</div>';
                 
-            $("#ingredient-formset").empty().append(formHtml);
-            $("#id_ingredients-TOTAL_FORMS").val(1);
+            $("#ingredient-formset").append(formHtml);
+            
+            // Zwiększamy licznik formularzy i aktualizujemy management form
+            formIndex++;
+            $("#id_ingredients-TOTAL_FORMS").val(formIndex);
+            console.log("Zaktualizowano TOTAL_FORMS na: " + formIndex);
+            
+            // Pokaż tabelę składników
+            $('#ingredients-table').removeClass('d-none');
             
             // Czyszczenie formularza
             $("#ingredient-select").val("").trigger("change");
             $("#ingredient-amount").val("");
             $("#ingredient-unit").val("").trigger("change");
             
-            formIndex = 1;
             $("#ingredientModal").modal("hide");
         });
         
         // Obsługa usuwania składnika
-        $(document).on("click", ".remove-row", function() {
-            $(this).closest("tr").remove();
-            $("#ingredient-formset").empty();
-            $("#id_ingredients-TOTAL_FORMS").val(0);
-            formIndex = 0;
+        $(document).on("click", ".remove-ingredient", function() {
+            var formIndex = $(this).data('form-index');
             
-            if ($("#ingredients-list tr").length === 0) {
+            // Oznacz składnik jako usunięty w formularzu
+            if ($(`#id_ingredients-${formIndex}-DELETE`).length > 0) {
+                $(`#id_ingredients-${formIndex}-DELETE`).prop('checked', true);
+            } else {
+                // Jeśli nie ma pola DELETE, to po prostu usuń ukryty formularz
+                $(`#ingredient-formset .ingredient-form-row[data-form-index="${formIndex}"]`).remove();
+            }
+            
+            // Usuń wiersz z tabeli
+            $(this).closest('tr').remove();
+            
+            // Jeśli nie ma więcej składników, ukryj tabelę
+            if ($('#ingredients-list tr').length === 0) {
+                $('#ingredients-table').addClass('d-none');
                 $("#ingredients-list").append(
-                    '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodaj przynajmniej jeden składnik.</td></tr>'
+                    '<tr class="no-ingredients"><td colspan="3" class="text-center">Brak składników. Dodanie składników jest opcjonalne, ale zalecane dla kompletnego przepisu.</td></tr>'
                 );
             }
+        });
+
+        // Inicjalizacja istniejących składników podczas edycji przepisu
+        function initExistingIngredients() {
+            if (existingIngredients && existingIngredients.length > 0) {
+                // Usuń wiadomość o braku składników
+                $("#ingredients-list tr.no-ingredients").remove();
+                
+                // Dodaj każdy składnik do tabeli i ukrytych pól
+                existingIngredients.forEach(function(ingredient) {
+                    // Dodaj do tabeli
+                    var newRow = $('<tr data-form-index="' + ingredient.formIndex + '">' +
+                        '<td>' + ingredient.ingredientName + '</td>' +
+                        '<td>' + ingredient.amount + ' ' + ingredient.unitSymbol + ' (' + ingredient.unitName + ')</td>' +
+                        '<td><button type="button" class="btn btn-sm btn-danger remove-ingredient" data-form-index="' + ingredient.formIndex + '"><i class="bi bi-trash"></i> Usuń</button></td>' +
+                        '</tr>');
+                    
+                    $("#ingredients-list").append(newRow);
+                    
+                    // Dodaj ukryte pola formularza
+                    var formHtml = '<div class="ingredient-form-row" data-form-index="' + ingredient.formIndex + '">' +
+                        '<input type="hidden" name="ingredients-' + ingredient.formIndex + '-id" id="id_ingredients-' + ingredient.formIndex + '-id" value="' + ingredient.id + '">' +
+                        '<input type="hidden" name="ingredients-' + ingredient.formIndex + '-recipe" id="id_ingredients-' + ingredient.formIndex + '-recipe" value="' + recipeId + '">' +
+                        '<input type="hidden" name="ingredients-' + ingredient.formIndex + '-ingredient" id="id_ingredients-' + ingredient.formIndex + '-ingredient" value="' + ingredient.ingredientId + '">' +
+                        '<input type="hidden" name="ingredients-' + ingredient.formIndex + '-amount" id="id_ingredients-' + ingredient.formIndex + '-amount" value="' + ingredient.amount + '">' +
+                        '<input type="hidden" name="ingredients-' + ingredient.formIndex + '-unit" id="id_ingredients-' + ingredient.formIndex + '-unit" value="' + ingredient.unitId + '">' +
+                        '</div>';
+                    
+                    $("#ingredient-formset").append(formHtml);
+                });
+                
+                // Aktualizuj licznik formularzy
+                var totalForms = existingIngredients.length;
+                $("#id_ingredients-TOTAL_FORMS").val(totalForms);
+                formIndex = totalForms;
+                
+                // Pokaż tabelę
+                $('#ingredients-table').removeClass('d-none');
+            }
+        }
+
+        // Wywołaj inicjalizację po załadowaniu strony
+        initExistingIngredients();
+
+        // Obsługa formularza przy wysyłaniu
+        $("#recipe-form").on("submit", function(e) {
+            // Upewnij się, że pola edytora są zsynchronizowane z ukrytymi polami textarea
+            $("#description-editor").trigger('input');
+            $("#instructions-editor").trigger('input');
+            
+            return true;
         });
     });
 </script>

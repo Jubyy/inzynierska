@@ -156,11 +156,46 @@
         </a>
     </div>
 </div>
+
+<!-- Modal z pytaniem o przejście do przepisu -->
+<div class="modal fade" id="recipe-modal" tabindex="-1" aria-labelledby="recipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="recipeModalLabel">Lista zakupów zakończona!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="text-center mb-3">Wszystkie produkty zostały zakupione!</h4>
+                <p class="text-center">Lista zakupów została utworzona z przepisu. Czy chcesz przejść do tego przepisu teraz?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nie, zostań tutaj</button>
+                <a href="#" id="go-to-recipe-btn" class="btn btn-success">Tak, przejdź do przepisu</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     $(document).ready(function() {
+        // Obsługa zamknięcia modala - odśwież stronę po zamknięciu, jeśli użytkownik nie przechodzi do przepisu
+        $('#recipe-modal').on('hidden.bs.modal', function (e) {
+            // Odśwież stronę, aby zaktualizować jej stan
+            location.reload();
+        });
+        
+        // Zapobiegnij odświeżeniu strony, jeśli użytkownik klika przycisk, aby przejść do przepisu
+        $('#go-to-recipe-btn').on('click', function(e) {
+            // Nie potrzebujemy odświeżać strony, ponieważ przechodzimy do innej strony
+            $('#recipe-modal').off('hidden.bs.modal');
+        });
+        
         // Obsługa oznaczania produktów jako zakupione przez AJAX
         $('.purchase-form').on('submit', function(e) {
             e.preventDefault();
@@ -214,6 +249,28 @@
                                 
                                 // Ukryj przycisk "Zakończ wszystkie"
                                 $('#complete-all-btn').hide();
+                                
+                                // Zmienne dla timeoutu
+                                var refreshTimeout;
+                                
+                                // Jeśli lista ma przypisany przepis, pokaż modal z pytaniem o przejście do przepisu
+                                if (response.has_recipe) {
+                                    $('#go-to-recipe-btn').attr('href', '/recipes/detail/' + response.recipe_id + '/');
+                                    
+                                    // Anuluj wszystkie poprzednie timery odświeżania strony
+                                    clearTimeout(refreshTimeout);
+                                    
+                                    // Pokaż modal po małym opóźnieniu
+                                    setTimeout(function() {
+                                        var recipeModal = new bootstrap.Modal(document.getElementById('recipe-modal'));
+                                        recipeModal.show();
+                                    }, 500);
+                                } else {
+                                    // Tylko jeśli nie ma powiązanego przepisu, odśwież stronę
+                                    refreshTimeout = setTimeout(function() {
+                                        location.reload();
+                                    }, 2000);
+                                }
                             }
                             
                             // Ukryj alert po 5 sekundach
@@ -293,15 +350,27 @@
                             // Ukryj przyciski dodawania i zakończenia
                             $('#complete-all-btn, .btn-primary').hide();
                             
-                            // Ukryj alert po 5 sekundach
-                            setTimeout(function() {
-                                $('#ajax-alert').addClass('d-none');
-                            }, 5000);
+                            // Zmienne dla timeoutu
+                            var refreshTimeout;
                             
-                            // Odśwież stronę po 2 sekundach, aby pokazać prawidłowy stan
-                            setTimeout(function() {
-                                location.reload();
-                            }, 2000);
+                            // Jeśli lista ma przypisany przepis, pokaż modal z pytaniem o przejście do przepisu
+                            if (response.has_recipe) {
+                                $('#go-to-recipe-btn').attr('href', '/recipes/detail/' + response.recipe_id + '/');
+                                
+                                // Anuluj wszystkie poprzednie timery odświeżania strony
+                                clearTimeout(refreshTimeout);
+                                
+                                // Pokaż modal po małym opóźnieniu
+                                setTimeout(function() {
+                                    var recipeModal = new bootstrap.Modal(document.getElementById('recipe-modal'));
+                                    recipeModal.show();
+                                }, 500);
+                            } else {
+                                // Tylko jeśli nie ma powiązanego przepisu, odśwież stronę
+                                refreshTimeout = setTimeout(function() {
+                                    location.reload();
+                                }, 2000);
+                            }
                         });
                     }
                 },
