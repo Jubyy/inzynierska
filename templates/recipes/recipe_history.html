@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Historia przygotowanych przepisów{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Historia przygotowanych przepisów</h1>
+    
+    {% if history_count == 0 %}
+    <div class="alert alert-info">
+        <p class="mb-0">Nie przygotowałeś jeszcze żadnych przepisów.</p>
+        <a href="{% url 'recipes:list' %}" class="alert-link">Przeglądaj przepisy</a> i przygotuj swoje pierwsze danie!
+    </div>
+    {% else %}
+    <p class="lead mb-4">Przygotowałeś łącznie {{ history_count }} {% if history_count == 1 %}przepis{% elif history_count > 1 and history_count < 5 %}przepisy{% else %}przepisów{% endif %}.</p>
+    
+    <div class="accordion" id="historyAccordion">
+        {% for month, items in history.items %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                    {{ month }} ({{ items|length }})
+                </button>
+            </h2>
+            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#historyAccordion">
+                <div class="accordion-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for item in items %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">
+                                        {% if item.recipe %}
+                                        <a href="{% url 'recipes:detail' item.recipe.id %}">{{ item.recipe_name }}</a>
+                                        {% else %}
+                                        {{ item.recipe_name }}
+                                        {% endif %}
+                                    </h5>
+                                    <p class="mb-1 text-muted">
+                                        Porcje: {{ item.servings }}
+                                        {% if item.notes %}
+                                        <br>
+                                        <small>{{ item.notes }}</small>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success">{{ item.prepared_at|date:"d.m.Y" }}</span>
+                                    <br>
+                                    <small class="text-muted">{{ item.prepared_at|time:"H:i" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Powrót do pulpitu
+        </a>
+        <a href="{% url 'recipes:list' %}" class="btn btn-primary">
+            <i class="bi bi-book"></i> Przeglądaj przepisy
+        </a>
+    </div>
+</div>
+{% endblock %} 

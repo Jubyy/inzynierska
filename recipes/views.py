@@ -13,6 +13,7 @@ from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
 from decimal import Decimal
+from django.utils import timezone
 
 class RecipeListView(ListView):
     model = Recipe
@@ -21,15 +22,20 @@ class RecipeListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        # Pobierz wszystkie przepisy, bez filtrowania po autorze na początek
-        queryset = Recipe.objects.all()
+        # Pobierz wszystkie przepisy publiczne lub utworzone przez użytkownika
+        if self.request.user.is_authenticated:
+            queryset = Recipe.objects.filter(
+                Q(is_public=True) | Q(author=self.request.user)
+            ).distinct()
+        else:
+            queryset = Recipe.objects.filter(is_public=True)
         
         # Filtrowanie po kategorii
         category = self.request.GET.get('category')
         if category and category != 'None':
             queryset = queryset.filter(categories__id=category)
         
-        # Filtrowanie po wyszukiwanej frazie - musi być przed konwersją do listy
+        # Filtrowanie po wyszukiwanej frazie
         query = self.request.GET.get('q')
         if query and query != 'None':
             queryset = queryset.filter(
@@ -42,20 +48,10 @@ class RecipeListView(ListView):
         ingredient_id = self.request.GET.get('ingredient')
         if ingredient_id and ingredient_id != 'None':
             queryset = queryset.filter(ingredients__ingredient_id=ingredient_id).distinct()
-            
-        # Filtrowanie po dostępnych składnikach - musi być przed konwersją do listy
-        if self.request.GET.get('available_only') and self.request.GET.get('available_only') != 'None' and self.request.user.is_authenticated:
-            available_recipes = []
-            for recipe in queryset:
-                if recipe.can_be_prepared_with_available_ingredients(self.request.user):
-                    available_recipes.append(recipe.id)
-            queryset = queryset.filter(id__in=available_recipes)
         
-        # Filtrowanie po typie diety - używamy QuerySet.filter() zamiast list comprehension
+        # Filtrowanie po typie diety
         diet = self.request.GET.get('diet')
         if diet and diet != 'None':
-            # Musimy przekonwertować QuerySet do listy, aby móc filtrować po właściwościach
-            # Ale robimy to tak, żeby zachować ID przepisów
             recipe_ids = []
             
             if diet == 'vegetarian':
@@ -71,8 +67,16 @@ class RecipeListView(ListView):
                     if recipe.is_meat:
                         recipe_ids.append(recipe.id)
             
-            # Teraz filtrujemy oryginalny QuerySet według ID
+            # Filtruj oryginalny QuerySet według ID
             queryset = queryset.filter(id__in=recipe_ids)
+        
+        # Filtrowanie po dostępnych składnikach
+        if self.request.GET.get('available_only') == 'true' and self.request.user.is_authenticated:
+            available_recipe_ids = []
+            for recipe in queryset:
+                if recipe.can_be_prepared_with_available_ingredients(self.request.user):
+                    available_recipe_ids.append(recipe.id)
+            queryset = queryset.filter(id__in=available_recipe_ids)
         
         return queryset
     
@@ -193,8 +197,9 @@ def add_missing_to_shopping_list(request, pk):
     if request.method == 'POST':
         # Pobierz lub utwórz listę zakupów
         shopping_list_id = request.POST.get('shopping_list')
+        create_new = request.POST.get('create_new', 'true')
         
-        if shopping_list_id:
+        if shopping_list_id and create_new != 'true':
             shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
         else:
             # Utwórz nową listę zakupów
@@ -217,7 +222,57 @@ def add_missing_to_shopping_list(request, pk):
     except Exception:
         shopping_lists = []
         
-    missing_ingredients = recipe.get_missing_ingredients(request.user)
+    # Pobierz brakujące składniki (zwraca listę obiektów RecipeIngredient)
+    recipe_missing_ingredients = recipe.get_missing_ingredients(request.user)
+    
+    # Jeśli nie ma brakujących składników, przekaż pustą listę do szablonu
+    if not recipe_missing_ingredients:
+        context = {
+            'recipe': recipe,
+            'shopping_lists': shopping_lists,
+            'missing_ingredients': []
+        }
+        return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+    
+    # Przekształć obiekty RecipeIngredient na format oczekiwany przez szablon
+    from fridge.models import FridgeItem
+    from recipes.utils import convert_units
+    
+    missing_ingredients = []
+    for ingredient_entry in recipe_missing_ingredients:
+        ingredient = ingredient_entry.ingredient
+        unit = ingredient_entry.unit
+        required_amount = float(ingredient_entry.amount)
+        
+        # Pobierz dostępną ilość składnika w lodówce
+        available_amount = 0
+        fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
+        
+        for item in fridge_items:
+            try:
+                # Jeśli jednostki są różne, przelicz
+                if item.unit != unit:
+                    try:
+                        converted = convert_units(float(item.amount), item.unit, unit)
+                        available_amount += converted
+                    except Exception:
+                        continue
+                else:
+                    available_amount += float(item.amount)
+            except Exception:
+                continue
+        
+        # Oblicz brakującą ilość
+        missing_amount = max(0, required_amount - available_amount)
+        
+        # Dodaj informacje o składniku do listy
+        missing_ingredients.append({
+            'ingredient': ingredient,
+            'unit': unit,
+            'required': required_amount,
+            'available': available_amount,
+            'missing': missing_amount
+        })
     
     context = {
         'recipe': recipe,
@@ -253,25 +308,99 @@ def ajax_load_units(request):
     
     try:
         ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+        
+        # Pobierz dozwolone jednostki dla składnika
         compatible_units = ingredient.compatible_units.all()
         
-        if not compatible_units.exists() and ingredient.default_unit:
-            compatible_units = [ingredient.default_unit]
+        # Jeśli nie ma zdefiniowanych kompatybilnych jednostek, użyj jednostek dozwolonych dla tego składnika
+        if not compatible_units.exists():
+            compatible_units = ingredient.get_allowed_units()
+            
+            # Jeśli nadal brak jednostek, użyj domyślnej jednostki lub jednostek dla kategorii
+            if not compatible_units.exists():
+                if ingredient.default_unit:
+                    compatible_units = [ingredient.default_unit]
+                else:
+                    # W przypadku braku jednostek, użyj domyślnych dla kategorii
+                    category_name = ingredient.category.name if ingredient.category else ""
+                    compatible_units = MeasurementUnit.get_units_for_ingredient_category(category_name)
         
-        units = [
-            {
+        # Dla składników typu piece_only upewnij się, że dostępne są tylko jednostki sztukowe
+        if ingredient.unit_type == 'piece_only':
+            compatible_units = MeasurementUnit.objects.filter(type='piece')
+            
+            # Jeśli nie ma jednostek sztukowych, dodaj domyślną jednostkę "sztuka"
+            if not compatible_units.exists():
+                sztuka, _ = MeasurementUnit.objects.get_or_create(
+                    symbol='szt',
+                    defaults={
+                        'name': 'Sztuka',
+                        'type': 'piece',
+                        'base_ratio': 1.0,
+                        'is_common': True
+                    }
+                )
+                compatible_units = [sztuka]
+        
+        # Przygotuj dane jednostek z dodatkowymi informacjami
+        units = []
+        for unit in compatible_units:
+            unit_data = {
                 'id': unit.id, 
                 'name': unit.name,
-                'symbol': unit.symbol
-            } 
-            for unit in compatible_units
-        ]
+                'symbol': unit.symbol,
+                'type': unit.type,
+                'base_ratio': float(unit.base_ratio),
+                'description': unit.description or '',
+                'is_common': unit.is_common,
+            }
+            
+            # Dodaj informacje o przeliczniku dla standardowej ilości
+            sample_amount = 100 if unit.type == 'weight' else 1
+            if unit.type == 'weight':
+                unit_data['conversion'] = f"{sample_amount} {unit.symbol} = {sample_amount * float(unit.base_ratio)} g"
+            elif unit.type == 'volume':
+                unit_data['conversion'] = f"{sample_amount} {unit.symbol} = {sample_amount * float(unit.base_ratio)} ml"
+            elif unit.type == 'piece':
+                if ingredient.piece_weight:
+                    unit_data['conversion'] = f"1 {unit.symbol} ≈ {float(ingredient.piece_weight)} g"
+                else:
+                    unit_data['conversion'] = ""
+            elif unit.type == 'spoon':
+                unit_data['conversion'] = f"{sample_amount} {unit.symbol} = {sample_amount * float(unit.base_ratio)} ml/g"
+            
+            units.append(unit_data)
         
+        # Ustal domyślną jednostkę
         default_unit = ingredient.default_unit.id if ingredient.default_unit else None
+        
+        # Jeśli nie ma domyślnej jednostki, wybierz najbardziej odpowiednią bazując na unit_type
+        if default_unit is None and units:
+            unit_type = ingredient.unit_type
+            
+            # Wybierz odpowiednią jednostkę bazową w zależności od unit_type
+            if 'weight' in unit_type:
+                gram_unit = next((u for u in units if u['symbol'] == 'g'), None)
+                if gram_unit:
+                    default_unit = gram_unit['id']
+            elif 'volume' in unit_type:
+                ml_unit = next((u for u in units if u['symbol'] == 'ml'), None)
+                if ml_unit:
+                    default_unit = ml_unit['id']
+            elif 'piece' in unit_type:
+                piece_unit = next((u for u in units if u['type'] == 'piece'), None)
+                if piece_unit:
+                    default_unit = piece_unit['id']
         
         return JsonResponse({
             'units': units,
-            'default_unit': default_unit
+            'default_unit': default_unit,
+            'category': ingredient.category.name if ingredient.category else "",
+            'unit_type': ingredient.unit_type,
+            'is_liquid': 'volume' in ingredient.unit_type,
+            'is_piece': 'piece' in ingredient.unit_type or ingredient.unit_type == 'piece_only',
+            'is_weight': 'weight' in ingredient.unit_type,
+            'has_piece_weight': ingredient.piece_weight is not None
         })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -536,82 +665,89 @@ def prepare_recipe(request, pk):
     if servings_param:
         try:
             servings = int(servings_param)
+            if servings <= 0:
+                servings = recipe.servings
         except (ValueError, TypeError):
             servings = recipe.servings
     else:
         servings = recipe.servings
     
+    # Sprawdź dostępność składników w lodówce
+    missing_ingredients = recipe.get_missing_ingredients(request.user)
+    
     # Przygotuj skalowane składniki, jeśli podano liczbę porcji
     scaled_ingredients = None
-    missing_ingredients = None
-    
     if servings and servings != recipe.servings:
         scaled_ingredients = recipe.scale_to_servings(servings)
-    
-    # Sprawdź dostępność składników w lodówce
-    scale_factor = servings / recipe.servings
-    missing_ingredients = []
-    
-    for ingredient_entry in recipe.ingredients.all():
-        amount_needed = ingredient_entry.amount * scale_factor
-        unit = ingredient_entry.unit
-        ingredient = ingredient_entry.ingredient
-        
-        # Sprawdź dostępność
-        available = FridgeItem.check_ingredient_availability(
-            request.user, ingredient, amount_needed, unit
-        )
-        
-        if not available:
-            # Sprawdź dostępną ilość w lodówce
-            items = FridgeItem.objects.filter(
-                user=request.user,
-                ingredient=ingredient
-            )
-            
-            total_available = 0
-            for item in items:
-                if item.unit != unit:
-                    try:
-                        converted_amount = convert_units(item.amount, item.unit, unit)
-                        total_available += converted_amount
-                    except ValueError:
-                        pass
-                else:
-                    total_available += item.amount
-            
-            missing_ingredients.append({
-                'ingredient': ingredient,
-                'required': amount_needed,
-                'available': total_available,
-                'missing': amount_needed - total_available,
-                'unit': unit
-            })
-    
-    # Jeśli nie brakuje składników, ustaw na None
-    if not missing_ingredients:
-        missing_ingredients = None
     
     if request.method == 'POST':
         post_servings = request.POST.get('servings')
         
         try:
             post_servings = int(post_servings)
+            if post_servings <= 0:
+                post_servings = recipe.servings
         except (ValueError, TypeError):
             post_servings = recipe.servings
             
-        # Usuń składniki z lodówki
-        result = FridgeItem.use_recipe_ingredients(request.user, recipe, post_servings)
-        
-        if result['success']:
-            messages.success(request, f'Przygotowałeś przepis "{recipe.title}" ({post_servings} porcji). Składniki zostały usunięte z lodówki.')
-            return redirect('recipes:detail', pk=recipe.pk)
-        else:
-            missing_text = ", ".join([f"{item['ingredient'].name}" for item in result['missing']])
-            messages.warning(request, f'Nie możesz przygotować tego przepisu - brakuje składników: {missing_text}')
+        # Sprawdź dostępność składników jeszcze raz - wartości mogły się zmienić
+        current_missing_ingredients = recipe.get_missing_ingredients(request.user)
+            
+        # Sprawdź czy wszystkie składniki są dostępne
+        if current_missing_ingredients:
+            ingredient_names = [ing.ingredient.name for ing in current_missing_ingredients]
+            missing_text = ", ".join(ingredient_names)
+            
+            messages.warning(
+                request, 
+                f'Nie możesz przygotować tego przepisu - brakuje składników: {missing_text}'
+            )
             
             # Przekieruj do formularza dodawania brakujących składników do listy zakupów
             return redirect('recipes:add_missing_to_shopping_list', pk=recipe.pk)
+        
+        # Usuń składniki z lodówki
+        try:
+            from fridge.models import FridgeItem
+            from accounts.models import RecipeHistory
+            
+            result = FridgeItem.use_recipe_ingredients(request.user, recipe, post_servings)
+            
+            if result['success']:
+                # Dodaj przepis do historii
+                RecipeHistory.add_to_history(
+                    user=request.user,
+                    recipe=recipe,
+                    servings=post_servings
+                )
+                
+                # Przekaż informację o sukcesie przez sesję (do wyświetlenia modala)
+                request.session['recipe_prepared'] = {
+                    'recipe_id': recipe.pk,
+                    'recipe_title': recipe.title,
+                    'servings': post_servings,
+                    'timestamp': timezone.now().strftime('%d.%m.%Y %H:%M')
+                }
+                
+                messages.success(
+                    request, 
+                    f'Przygotowałeś przepis "{recipe.title}" ({post_servings} porcji). '
+                    f'Składniki zostały usunięte z lodówki.'
+                )
+                return redirect('recipes:detail', pk=recipe.pk)
+            else:
+                # Jeśli nie udało się usunąć składników, pokaż informację o brakujących
+                missing_text = ", ".join([item['ingredient'].name for item in result['missing']])
+                messages.warning(
+                    request, 
+                    f'Nie możesz przygotować tego przepisu - brakuje składników: {missing_text}'
+                )
+                
+                # Przekieruj do formularza dodawania brakujących składników do listy zakupów
+                return redirect('recipes:add_missing_to_shopping_list', pk=recipe.pk)
+        except Exception as e:
+            messages.error(request, f'Wystąpił błąd podczas przygotowywania przepisu: {str(e)}')
+            return redirect('recipes:detail', pk=recipe.pk)
     
     context = {
         'recipe': recipe,
@@ -668,6 +804,40 @@ def toggle_like(request, pk):
     return HttpResponseRedirect(reverse('recipes:detail', args=[pk]))
 
 @login_required
+@require_POST
+def clear_prepared_recipe(request):
+    """Usuwa informację o przygotowanym przepisie z sesji"""
+    if 'recipe_prepared' in request.session:
+        del request.session['recipe_prepared']
+    return JsonResponse({'success': True})
+
+@login_required
+def recipe_history(request):
+    """Wyświetla historię przygotowanych przepisów"""
+    from accounts.models import RecipeHistory
+    
+    history = RecipeHistory.objects.filter(user=request.user).select_related('recipe').order_by('-prepared_at')
+    
+    # Grupowanie po miesiącach
+    from collections import defaultdict
+    from django.utils.dateformat import DateFormat
+    
+    grouped_history = defaultdict(list)
+    
+    for item in history:
+        # Klucz dla grupowania - miesiąc i rok (np. "Kwiecień 2023")
+        date_format = DateFormat(item.prepared_at)
+        month_key = f"{date_format.format('F')} {date_format.format('Y')}"
+        grouped_history[month_key].append(item)
+    
+    context = {
+        'history': dict(grouped_history),
+        'history_count': history.count()
+    }
+    
+    return render(request, 'recipes/recipe_history.html', context)
+
+@login_required
 def ajax_add_ingredient(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -719,14 +889,75 @@ def ajax_unit_info(request):
         
         # Informacja o konwersji
         conversion = ""
-        if unit.base_ratio and unit.type in ['weight', 'volume']:
-            base_amount = amount * unit.base_ratio
-            base_unit = "g" if unit.type == 'weight' else "ml"
-            conversion = f"{amount} {unit.name} ≈ {base_amount} {base_unit}"
+        base_amount = float(unit.base_ratio) * amount
+        
+        if unit.type == 'weight':
+            # Dla wagi, pokaż konwersję na gramy/kilogramy
+            if base_amount < 1000:
+                conversion = f"{amount} {unit.symbol} = {base_amount:.2f} g"
+            else:
+                conversion = f"{amount} {unit.symbol} = {base_amount/1000:.2f} kg ({base_amount:.0f} g)"
+        elif unit.type == 'volume':
+            # Dla objętości, pokaż konwersję na ml/litry
+            if base_amount < 1000:
+                conversion = f"{amount} {unit.symbol} = {base_amount:.2f} ml"
+            else:
+                conversion = f"{amount} {unit.symbol} = {base_amount/1000:.2f} l ({base_amount:.0f} ml)"
+        elif unit.type == 'piece':
+            # Dla sztuk, nie pokazujemy domyślnie konwersji
+            conversion = f"{amount} {unit.symbol}"
+        elif unit.type == 'spoon':
+            # Dla łyżek, pokaż konwersję na ml
+            conversion = f"{amount} {unit.symbol} = {base_amount:.2f} ml"
+            
+        # Dodatkowe konwersje dla często używanych jednostek kuchennych
+        additional_conversions = []
+        
+        # Dla objętości, dodaj konwersje na miary kuchenne
+        if unit.type == 'volume' and unit.symbol == 'ml':
+            if base_amount >= 15 and base_amount < 250:
+                # Konwersja na łyżki
+                tablespoons = base_amount / 15
+                additional_conversions.append(f"≈ {tablespoons:.1f} łyżk{'' if tablespoons == 1 else 'i'}")
+            
+            if base_amount >= 5 and base_amount < 15:
+                # Konwersja na łyżeczki
+                teaspoons = base_amount / 5
+                additional_conversions.append(f"≈ {teaspoons:.1f} łyżeczk{'' if teaspoons == 1 else 'i'}")
+            
+            if base_amount >= 250:
+                # Konwersja na szklanki
+                cups = base_amount / 250
+                additional_conversions.append(f"≈ {cups:.1f} szklank{'' if cups == 1 else ('i' if cups < 5 else 'i')}")
+        
+        # Dla wagi, dodaj konwersje na łyżki/łyżeczki/szklanki (dla produktów sypkich)
+        if unit.type == 'weight' and unit.symbol == 'g':
+            if base_amount >= 15 and base_amount < 200:
+                # Konwersja na łyżki (przybliżona)
+                tablespoons = base_amount / 15
+                additional_conversions.append(f"≈ {tablespoons:.1f} łyżk{'' if tablespoons == 1 else 'i'} (dla produktów sypkich)")
+            
+            if base_amount >= 5 and base_amount < 15:
+                # Konwersja na łyżeczki (przybliżona)
+                teaspoons = base_amount / 5
+                additional_conversions.append(f"≈ {teaspoons:.1f} łyżeczk{'' if teaspoons == 1 else 'i'} (dla produktów sypkich)")
+            
+            if base_amount >= 200:
+                # Konwersja na szklanki (przybliżona)
+                cups = base_amount / 200
+                additional_conversions.append(f"≈ {cups:.1f} szklank{'' if cups == 1 else ('i' if cups < 5 else 'i')} (dla produktów sypkich)")
+        
+        # Dodaj dodatkowe konwersje do głównej konwersji
+        if additional_conversions:
+            conversion += " (" + ", ".join(additional_conversions) + ")"
         
         return JsonResponse({
             'description': description,
-            'conversion': conversion
+            'conversion': conversion,
+            'base_amount': base_amount,
+            'unit_type': unit.type,
+            'unit_symbol': unit.symbol,
+            'requires_whole_number': unit.type == 'piece' or unit.symbol in ['szt', 'sztuka', 'garść', 'opakowanie']
         })
     except Exception as e:
         return JsonResponse({

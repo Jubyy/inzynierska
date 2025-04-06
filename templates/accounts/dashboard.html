@@ -217,11 +217,6 @@
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="bi bi-calendar-week"></i> Planer posiłków
-                </a>
-            </li>
-            <li>
                 <a href="{% url 'accounts:profile' %}">
                     <i class="bi bi-person"></i> Mój profil
                 </a>
@@ -282,6 +277,25 @@
             <a href="{% url 'fridge:add' %}" class="btn btn-secondary">
                 <i class="bi bi-basket me-2"></i>Zaktualizuj lodówkę
             </a>
+        </div>
+        
+        <!-- Recipes section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Twoje przepisy</h5>
+                        <div>
+                            <a href="{% url 'recipes:create' %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-circle"></i> Dodaj przepis
+                            </a>
+                            <a href="{% url 'recipes:history' %}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-clock-history"></i> Historia przepisów
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Suggested Recipes Carousel -->

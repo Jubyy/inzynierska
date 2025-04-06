@@ -5,37 +5,162 @@
 
 {% block extra_css %}
 <style>
-    .table {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .table thead th {
+    .fridge-container {
         background-color: #f8f9fa;
-        border-bottom: 2px solid #dee2e6;
-        color: #495057;
+        padding-bottom: 40px;
+    }
+    .fridge-header {
+        background-color: #28a745;
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .fridge-title {
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .fridge-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    .filters-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    .expired-alert {
+        background-color: #dc3545;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+        display: flex;
+        align-items: center;
+    }
+    .expired-alert i {
+        font-size: 24px;
+        margin-right: 15px;
+    }
+    .expired-alert-content {
+        flex-grow: 1;
+    }
+    .expired-alert-content h5 {
+        margin-bottom: 5px;
         font-weight: 600;
     }
-    .table-hover tbody tr:hover {
-        background-color: rgba(0,0,0,.02);
+    .expired-alert-content p {
+        margin-bottom: 0;
+        opacity: 0.9;
     }
-    .expired-row {
-        background-color: #ffe8e8 !important;
+    .product-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+        border: none;
     }
-    .expired-row:hover {
-        background-color: #ffd9d9 !important;
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
-    .warning-row {
-        background-color: #fff3cd !important;
+    .product-card.expired {
+        border-left: 5px solid #dc3545;
     }
-    .warning-row:hover {
-        background-color: #ffe7b8 !important;
+    .product-card.warning {
+        border-left: 5px solid #ffc107;
+    }
+    .product-card.fresh {
+        border-left: 5px solid #28a745;
+    }
+    .product-card-header {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    .product-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 24px;
+    }
+    .product-icon.dairy { background-color: #cff4fc; color: #084298; }
+    .product-icon.meat { background-color: #f8d7da; color: #b02a37; }
+    .product-icon.vegetable { background-color: #d1e7dd; color: #0a3622; }
+    .product-icon.fruit { background-color: #fff3cd; color: #997404; }
+    .product-icon.grain { background-color: #e2dcc5; color: #846512; }
+    .product-icon.condiment { background-color: #f5e5c2; color: #a0680b; }
+    .product-card-body {
+        padding: 20px;
+    }
+    .product-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .product-category {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+    }
+    .product-category i {
+        margin-right: 5px;
+    }
+    .product-quantity {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+    .product-expiry {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .product-expiry i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+    .expiry-date {
+        font-weight: 500;
+    }
+    .expiry-date.expired {
+        color: #dc3545;
+    }
+    .expiry-date.warning {
+        color: #ffc107;
+    }
+    .expiry-date.ok {
+        color: #28a745;
+    }
+    .expiry-date.infinite {
+        color: #6c757d;
     }
     .status-badge {
-        padding: 6px 12px;
+        padding: 8px 15px;
         border-radius: 20px;
         font-weight: 500;
-        font-size: 0.875rem;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .status-badge i {
+        margin-right: 8px;
     }
     .status-expired {
         background-color: #dc3545;
@@ -43,201 +168,300 @@
     }
     .status-warning {
         background-color: #ffc107;
-        color: #000;
+        color: #212529;
     }
     .status-ok {
         background-color: #28a745;
         color: white;
     }
-    .action-buttons {
-        white-space: nowrap;
+    .status-infinite {
+        background-color: #e9ecef;
+        color: #212529;
     }
-    .action-buttons .btn {
-        padding: 4px 8px;
-        margin-right: 4px;
-    }
-    .action-buttons .btn i {
-        margin-right: 4px;
-    }
-    .filters-section {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    .section-header {
+    .product-actions {
         display: flex;
-        justify-content: space-between;
+        gap: 10px;
+    }
+    .product-actions .btn {
+        flex: 1;
+        display: flex;
         align-items: center;
+        justify-content: center;
+    }
+    .product-actions .btn i {
+        margin-right: 5px;
+    }
+    .empty-fridge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .empty-fridge i {
+        font-size: 4rem;
+        color: #adb5bd;
         margin-bottom: 20px;
     }
-    .expired-alert {
-        background-color: #dc3545;
+    .empty-fridge h3 {
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    .empty-fridge p {
+        max-width: 500px;
+        margin-bottom: 20px;
+        color: #6c757d;
+    }
+    .pagination-container {
+        margin-top: 30px;
+    }
+    .pagination .page-link {
+        border-radius: 50%;
+        margin: 0 5px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+    }
+    .pagination .page-link:hover {
+        background-color: #28a745;
         color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        border-color: #28a745;
     }
-    .expired-alert i {
-        margin-right: 8px;
+    .pagination .page-item.active .page-link {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .pagination-info {
+        background-color: white;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="section-header">
-        <h1>Moja lodówka</h1>
-        <div>
-            <a href="{% url 'fridge:add' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Dodaj nowy produkt
-            </a>
-            {% if expired_count > 0 %}
-            <a href="{% url 'fridge:clean_expired' %}" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Usuń przeterminowane ({{ expired_count }})
-            </a>
-            {% endif %}
+<div class="fridge-container">
+    <!-- Nagłówek lodówki -->
+    <div class="fridge-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="fridge-title">Moja lodówka</h1>
+                    <p class="fridge-subtitle">Zarządzaj swoimi produktami i monitoruj daty ważności</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'fridge:add' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus"></i> Dodaj nowy produkt
+                    </a>
+                    {% if expired_count > 0 %}
+                    <a href="{% url 'fridge:clean_expired' %}" class="btn btn-danger btn-lg mt-2">
+                        <i class="fas fa-trash"></i> Usuń przeterminowane ({{ expired_count }})
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
-    {% if expired_count > 0 %}
-    <div class="expired-alert">
-        <i class="fas fa-exclamation-triangle"></i>
-        Uwaga! Masz {{ expired_count }} przeterminowanych produktów w lodówce!
-    </div>
-    {% endif %}
+    <div class="container">
+        <!-- Alert o przeterminowanych produktach -->
+        {% if expired_count > 0 %}
+        <div class="expired-alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="expired-alert-content">
+                <h5>Uwaga! Masz przeterminowane produkty</h5>
+                <p>W Twojej lodówce jest {{ expired_count }} produktów po terminie ważności. Zalecamy ich usunięcie.</p>
+            </div>
+            <a href="{% url 'fridge:clean_expired' %}" class="btn btn-light">
+                <i class="fas fa-trash"></i> Usuń
+            </a>
+        </div>
+        {% endif %}
 
-    <div class="filters-section">
-        <form method="get" class="row g-3">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" name="q" class="form-control" placeholder="Szukaj produktu..." value="{{ query }}">
+        <!-- Filtry wyszukiwania -->
+        <div class="filters-section">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control" placeholder="Szukaj produktu..." value="{{ query }}">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <select name="expired" class="form-select" onchange="this.form.submit()">
+                        <option value="" {% if not expired %}selected{% endif %}>Wszystkie produkty</option>
+                        <option value="yes" {% if expired == 'yes' %}selected{% endif %}>Tylko przeterminowane</option>
+                        <option value="soon" {% if expired == 'soon' %}selected{% endif %}>Wygasające w ciągu 7 dni</option>
+                        <option value="no" {% if expired == 'no' %}selected{% endif %}>Aktualne</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    {% if query or expired %}
+                    <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times"></i> Wyczyść filtry
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista produktów -->
+        {% if fridge_items %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for item in fridge_items %}
+            <div class="col">
+                <div class="product-card {% if item.is_expired %}expired{% elif item.days_until_expiry <= 3 %}warning{% else %}fresh{% endif %}">
+                    <div class="product-card-header">
+                        <div class="product-icon 
+                            {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}dairy
+                            {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}meat
+                            {% elif 'warzy' in item.ingredient.category.name|lower %}vegetable
+                            {% elif 'owoc' in item.ingredient.category.name|lower %}fruit
+                            {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}grain
+                            {% elif 'przypraw' in item.ingredient.category.name|lower %}condiment
+                            {% endif %}">
+                            {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-cheese"></i>
+                            {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-drumstick-bite"></i>
+                            {% elif 'warzy' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-carrot"></i>
+                            {% elif 'owoc' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-apple-alt"></i>
+                            {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-bread-slice"></i>
+                            {% elif 'przypraw' in item.ingredient.category.name|lower %}
+                                <i class="fas fa-pepper-hot"></i>
+                            {% else %}
+                                <i class="fas fa-utensils"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h2 class="product-title">{{ item.ingredient.name }}</h2>
+                            <div class="product-category">
+                                <i class="fas fa-tags"></i> {{ item.ingredient.category.name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-quantity">
+                            <i class="fas fa-weight"></i> {{ item.amount }} {{ item.unit.symbol }}
+                        </div>
+                        
+                        <div class="product-expiry">
+                            <i class="far fa-calendar-alt"></i>
+                            <span class="expiry-date 
+                                {% if item.is_expired %}expired
+                                {% elif item.days_until_expiry <= 3 %}warning
+                                {% elif item.expiry_date %}ok
+                                {% else %}infinite{% endif %}">
+                                {% if item.expiry_date %}
+                                    {{ item.expiry_date|date:"d.m.Y" }}
+                                    {% if item.is_expired %}
+                                        (przeterminowane)
+                                    {% elif item.days_until_expiry <= 3 %}
+                                        (zostało {{ item.days_until_expiry }} dni)
+                                    {% endif %}
+                                {% else %}
+                                    Bez terminu ważności
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="status-badge 
+                            {% if item.is_expired %}status-expired
+                            {% elif item.days_until_expiry <= 3 %}status-warning
+                            {% elif item.expiry_date %}status-ok
+                            {% else %}status-infinite{% endif %}">
+                            {% if item.is_expired %}
+                                <i class="fas fa-exclamation-circle"></i> Przeterminowane
+                            {% elif item.days_until_expiry <= 3 %}
+                                <i class="fas fa-clock"></i> Wygasa wkrótce
+                            {% elif item.expiry_date %}
+                                <i class="fas fa-check-circle"></i> Świeże
+                            {% else %}
+                                <i class="fas fa-infinity"></i> Bez terminu
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-actions">
+                            <a href="{% url 'fridge:edit' item.id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edytuj
+                            </a>
+                            <a href="{% url 'fridge:delete' item.id %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i> Usuń
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <select name="expired" class="form-select" onchange="this.form.submit()">
-                    <option value="" {% if not expired %}selected{% endif %}>Wszystkie produkty</option>
-                    <option value="yes" {% if expired == 'yes' %}selected{% endif %}>Tylko przeterminowane</option>
-                    <option value="soon" {% if expired == 'soon' %}selected{% endif %}>Wygasające w ciągu 7 dni</option>
-                    <option value="no" {% if expired == 'no' %}selected{% endif %}>Aktualne</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                {% if query or expired %}
-                <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary w-100">
-                    <i class="fas fa-times"></i> Wyczyść filtry
-                </a>
-                {% endif %}
-            </div>
-        </form>
-    </div>
+            {% endfor %}
+        </div>
 
-    {% if fridge_items %}
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Produkt</th>
-                    <th>Kategoria</th>
-                    <th>Ilość</th>
-                    <th>Data ważności</th>
-                    <th>Status</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in fridge_items %}
-                <tr class="{% if item.is_expired %}expired-row{% elif item.days_until_expiry <= 3 %}warning-row{% endif %}">
-                    <td>{{ item.ingredient.name }}</td>
-                    <td>{{ item.ingredient.category.name }}</td>
-                    <td>{{ item.amount }} {{ item.unit.symbol }}</td>
-                    <td>
-                        {% if item.expiry_date %}
-                            {{ item.expiry_date|date:"d.m.Y" }}
-                        {% else %}
-                            <span class="text-muted">Bez terminu</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if item.is_expired %}
-                            <span class="status-badge status-expired">
-                                <i class="fas fa-exclamation-circle"></i> Przeterminowane
-                            </span>
-                        {% elif item.days_until_expiry <= 3 %}
-                            <span class="status-badge status-warning">
-                                <i class="fas fa-clock"></i> Wygasa za {{ item.days_until_expiry }} dni
-                            </span>
-                        {% elif item.expiry_date %}
-                            <span class="status-badge status-ok">
-                                <i class="fas fa-check"></i> OK
-                            </span>
-                        {% else %}
-                            <span class="status-badge">
-                                <i class="fas fa-infinity"></i> Bez terminu
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td class="action-buttons">
-                        <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary" title="Edytuj produkt">
-                            <i class="fas fa-edit"></i> Edytuj
+        <!-- Paginacja -->
+        {% if is_paginated %}
+        <div class="pagination-container text-center">
+            <nav aria-label="Paginacja">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
                         </a>
-                        <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń produkt">
-                            <i class="fas fa-trash"></i> Usuń
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
                         </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item">
+                        <span class="pagination-info">
+                            Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Pusta lodówka -->
+        <div class="empty-fridge">
+            <i class="fas fa-snowflake"></i>
+            <h3>Twoja lodówka jest pusta</h3>
+            <p>Wygląda na to, że nie masz jeszcze żadnych produktów w swojej lodówce.
+               Dodaj swój pierwszy produkt, aby rozpocząć zarządzanie zapasami.</p>
+            <a href="{% url 'fridge:add' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Dodaj pierwszy produkt
+            </a>
+        </div>
+        {% endif %}
     </div>
-
-    {% if is_paginated %}
-    <nav aria-label="Paginacja" class="mt-4">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
-                    <i class="fas fa-angle-double-left"></i>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
-                    <i class="fas fa-angle-left"></i>
-                </a>
-            </li>
-            {% endif %}
-
-            <li class="page-item disabled">
-                <span class="page-link">
-                    Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}
-                </span>
-            </li>
-
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
-                    <i class="fas fa-angle-right"></i>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">
-                    <i class="fas fa-angle-double-right"></i>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-
-    {% else %}
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> Twoja lodówka jest pusta. 
-        <a href="{% url 'fridge:add' %}" class="alert-link">Dodaj pierwszy produkt</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

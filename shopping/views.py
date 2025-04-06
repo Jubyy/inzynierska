@@ -274,30 +274,64 @@ def delete_shopping_item(request, pk):
 def toggle_purchased(request, pk):
     """Oznaczanie pozycji jako zakupionej/niezakupionej"""
     item = get_object_or_404(ShoppingItem, pk=pk, shopping_list__user=request.user)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     if request.method == 'POST':
-        item.is_purchased = not item.is_purchased
-        
+        # Jeśli produkt jest już zakupiony, nie robimy nic
         if item.is_purchased:
-            item.mark_as_purchased()
-            messages.success(request, f'Oznaczono {item.ingredient.name} jako zakupione.')
-        else:
-            item.is_purchased = False
-            item.purchase_date = None
-            item.save()
-            messages.success(request, f'Oznaczono {item.ingredient.name} jako niezakupione.')
+            if is_ajax:
+                return JsonResponse({
+                    'success': True, 
+                    'purchased': True,
+                    'message': f'Produkt {item.ingredient.name} jest już oznaczony jako zakupiony.'
+                })
+            messages.info(request, f'Produkt {item.ingredient.name} jest już oznaczony jako zakupiony.')
+            return redirect('shopping:detail', pk=item.shopping_list.pk)
         
+        # Oznacz jako zakupiony i dodaj do lodówki
+        item.mark_as_purchased()
+        
+        if is_ajax:
+            return JsonResponse({
+                'success': True, 
+                'purchased': True,
+                'message': f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.'
+            })
+        
+        messages.success(request, f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.')
         return redirect('shopping:detail', pk=item.shopping_list.pk)
     
+    if is_ajax:
+        return JsonResponse({'success': False, 'message': 'Niedozwolona metoda'}, status=405)
     return redirect('shopping:detail', pk=item.shopping_list.pk)
 
 @login_required
 def complete_shopping(request, pk):
     """Oznaczanie wszystkich pozycji na liście jako zakupione i dodawanie ich do lodówki"""
     shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    # Jeśli lista jest już zakończona, nie rób nic
+    if shopping_list.is_completed:
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'completed': True,
+                'message': 'Lista zakupów jest już zakończona.'
+            })
+        messages.info(request, 'Lista zakupów jest już zakończona.')
+        return redirect('shopping:detail', pk=shopping_list.pk)
     
     if request.method == 'POST':
         added_count = shopping_list.complete_shopping()
+        
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'completed': True,
+                'added_count': added_count,
+                'message': f'Zakończono zakupy! Dodano {added_count} produktów do lodówki.'
+            })
         
         if added_count > 0:
             messages.success(request, f'Zakończono zakupy! Dodano {added_count} produktów do lodówki.')
@@ -306,6 +340,12 @@ def complete_shopping(request, pk):
             
         return redirect('shopping:detail', pk=shopping_list.pk)
     
+    if is_ajax:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Ta operacja wymaga zapytania POST.'
+        }, status=405)
+        
     return render(request, 'shopping/complete_shopping.html', {'shopping_list': shopping_list})
 
 @login_required

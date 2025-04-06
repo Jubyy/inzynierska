@@ -600,6 +600,10 @@
                         <select id="ingredient-unit" class="form-control">
                             <option value="">-- Wybierz jednostkę --</option>
                         </select>
+                        <div id="unit-info" class="unit-info mt-2">
+                            <div id="unit-description" class="unit-description"></div>
+                            <div id="unit-conversion" class="unit-conversion fw-bold text-success"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -673,50 +677,185 @@
                         const unitSelect = $('#ingredient-unit');
                         unitSelect.empty().append('<option value="">-- Wybierz jednostkę --</option>');
                         
-                        data.units.forEach(function(unit) {
-                            // Tworzenie opcji z dodatkowym atrybutem data-symbol
-                            const option = new Option(unit.name, unit.id, false, unit.id === data.default_unit);
-                            $(option).attr('data-symbol', unit.symbol);
-                            unitSelect.append(option);
+                        // Sortowanie jednostek: najpierw najczęściej używane
+                        const sortedUnits = [...data.units].sort((a, b) => {
+                            // Najpierw domyślna jednostka
+                            if (a.id === data.default_unit) return -1;
+                            if (b.id === data.default_unit) return 1;
+                            
+                            // Potem popularne jednostki
+                            if (a.is_common && !b.is_common) return -1;
+                            if (!a.is_common && b.is_common) return 1;
+                            
+                            // Na końcu sortuj według typu i nazwy
+                            if (a.type !== b.type) {
+                                const typeOrder = { 'weight': 1, 'volume': 2, 'piece': 3, 'spoon': 4, 'custom': 5 };
+                                return typeOrder[a.type] - typeOrder[b.type];
+                            }
+                            
+                            return a.name.localeCompare(b.name);
                         });
                         
+                        // Grupowanie jednostek według typu
+                        const typeLabels = {
+                            'weight': 'Waga',
+                            'volume': 'Objętość',
+                            'piece': 'Sztuki',
+                            'spoon': 'Łyżki',
+                            'custom': 'Inne'
+                        };
+                        
+                        // Jeśli to składnik mięsny, ograniczamy do jednostek wagi
+                        if (data.is_meat) {
+                            // Dla mięsa tylko jednostki wagi
+                            const weightUnits = sortedUnits.filter(unit => unit.type === 'weight');
+                            const optgroup = $('<optgroup label="Waga">');
+                            
+                            weightUnits.forEach(function(unit) {
+                                const option = new Option(
+                                    `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`,
+                                    unit.id,
+                                    false,
+                                    unit.id === data.default_unit
+                                );
+                                $(option).attr('data-symbol', unit.symbol);
+                                $(option).attr('data-type', unit.type);
+                                $(option).attr('data-conversion', unit.conversion || '');
+                                optgroup.append(option);
+                            });
+                            
+                            unitSelect.append(optgroup);
+                        } else {
+                            // Dla innych składników grupuj według typu
+                            const unitsByType = {};
+                            
+                            sortedUnits.forEach(unit => {
+                                if (!unitsByType[unit.type]) {
+                                    unitsByType[unit.type] = [];
+                                }
+                                unitsByType[unit.type].push(unit);
+                            });
+                            
+                            // Dodaj jednostki pogrupowane
+                            Object.keys(unitsByType).forEach(type => {
+                                const optgroup = $('<optgroup label="' + typeLabels[type] + '">');
+                                
+                                unitsByType[type].forEach(unit => {
+                                    const option = new Option(
+                                        `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`,
+                                        unit.id,
+                                        false,
+                                        unit.id === data.default_unit
+                                    );
+                                    $(option).attr('data-symbol', unit.symbol);
+                                    $(option).attr('data-type', unit.type);
+                                    $(option).attr('data-conversion', unit.conversion || '');
+                                    optgroup.append(option);
+                                });
+                                
+                                unitSelect.append(optgroup);
+                            });
+                        }
+                        
                         unitSelect.trigger('change');
+                        
+                        // Pokaż informację o domyślnych jednostkach dla składnika bazując na unit_type
+                        if (data.unit_type) {
+                            let descriptions = {
+                                'weight_only': 'Ten składnik wymaga jednostek wagi (g, kg).',
+                                'volume_only': 'Ten składnik wymaga jednostek objętości (ml, l).',
+                                'piece_only': 'Ten składnik wymaga jednostek sztukowych.',
+                                'weight_volume': 'Ten składnik można podać w jednostkach wagi lub objętości (g, ml, l).',
+                                'weight_piece': 'Ten składnik można podać w jednostkach wagi lub sztukach.',
+                                'weight_spoon': 'Ten składnik można podać w jednostkach wagi lub łyżkach/łyżeczkach.',
+                                'volume_spoon': 'Ten składnik można podać w jednostkach objętości lub łyżkach/łyżeczkach.',
+                                'all': 'Ten składnik można podać w dowolnych jednostkach.'
+                            };
+                            
+                            $('#unit-description').html(descriptions[data.unit_type] || '');
+                            
+                            // Dla składników sztukowych dodaj informację, że można podać tylko sztuki
+                            if (data.unit_type === 'piece_only') {
+                                $('#unit-description').addClass('text-warning').html('Ten składnik podaje się w sztukach.');
+                            }
+                        }
                     }
                 });
+            } else {
+                // Jeśli nie wybrano składnika, wyczyść listę jednostek
+                $('#ingredient-unit').empty().append('<option value="">-- Wybierz jednostkę --</option>');
+                $('#unit-description').html('');
+                $('#unit-conversion').html('');
             }
         });
 
         // Obsługa zmiany jednostki - wyświetlanie opisu i przelicznika
         $('#ingredient-unit').on('change', function() {
             const unitId = $(this).val();
-            const amount = $('#ingredient-amount').val();
-            const unitSymbol = $(this).find('option:selected').data('symbol');
+            const amount = $('#ingredient-amount').val() || 1;
+            const selectedOption = $(this).find('option:selected');
+            const unitSymbol = selectedOption.data('symbol');
+            const unitType = selectedOption.data('type');
+            const unitConversion = selectedOption.data('conversion');
             
-            // Sprawdź, czy wybrana jednostka wymaga liczb całkowitych
-            const wholeNumberUnits = ['szt', 'sztuka', 'garść', 'opakowanie'];
-            const requiresWholeNumber = wholeNumberUnits.includes(unitSymbol);
+            // Wyczyść poprzednie informacje
+            $('#unit-conversion').html('');
             
-            // Zaktualizuj pole amount z odpowiednimi atrybutami
-            const amountInput = $('#ingredient-amount');
-            if (requiresWholeNumber) {
-                amountInput.attr('step', '1');
-                amountInput.attr('pattern', '[0-9]*');
-                
-                // Jeśli wartość nie jest liczbą całkowitą, zaokrąglij
-                if (amountInput.val() && !Number.isInteger(parseFloat(amountInput.val()))) {
-                    amountInput.val(Math.round(parseFloat(amountInput.val())));
+            if (unitId) {
+                // Pokaż podstawowy przelicznik z atrybutu data-conversion
+                if (unitConversion) {
+                    $('#unit-conversion').html(unitConversion);
                 }
                 
-                // Dodaj podpowiedź
-                amountInput.closest('.form-group').find('.form-text').remove();
-                amountInput.closest('.form-group').append('<small class="form-text text-warning">Ta jednostka wymaga liczby całkowitej.</small>');
-            } else {
-                amountInput.attr('step', '0.01');
-                amountInput.removeAttr('pattern');
-                amountInput.closest('.form-group').find('.form-text').remove();
+                // Sprawdź, czy wybrana jednostka wymaga liczb całkowitych
+                const wholeNumberUnits = ['szt', 'sztuka', 'garść', 'opakowanie'];
+                const requiresWholeNumber = wholeNumberUnits.includes(unitSymbol);
+                
+                // Zaktualizuj pole amount z odpowiednimi atrybutami
+                const amountInput = $('#ingredient-amount');
+                if (requiresWholeNumber) {
+                    amountInput.attr('step', '1');
+                    amountInput.attr('pattern', '[0-9]*');
+                    
+                    // Jeśli wartość nie jest liczbą całkowitą, zaokrąglij
+                    if (amountInput.val() && !Number.isInteger(parseFloat(amountInput.val()))) {
+                        amountInput.val(Math.round(parseFloat(amountInput.val())));
+                    }
+                    
+                    // Dodaj podpowiedź
+                    $('<small class="form-text text-warning mt-1">Ta jednostka wymaga liczby całkowitej.</small>')
+                        .insertAfter(amountInput)
+                        .fadeIn();
+                } else {
+                    amountInput.attr('step', '0.01');
+                    amountInput.removeAttr('pattern');
+                    amountInput.next('.form-text').remove();
+                }
+                
+                // Pobierz aktualny przelicznik dla konkretnej ilości
+                if (amount && amount > 0) {
+                    $.ajax({
+                        url: "{% url 'recipes:ajax_unit_info' %}",
+                        data: { 
+                            unit_id: unitId,
+                            amount: amount
+                        },
+                        success: function(data) {
+                            if (data.conversion) {
+                                $('#unit-conversion').html(data.conversion);
+                            }
+                        }
+                    });
+                }
             }
+        });
+
+        // Aktualizacja przelicznika przy zmianie ilości
+        $('#ingredient-amount').on('input', function() {
+            const unitId = $('#ingredient-unit').val();
+            const amount = $(this).val();
             
-            if (unitId && amount) {
+            if (unitId && amount && amount > 0) {
                 $.ajax({
                     url: "{% url 'recipes:ajax_unit_info' %}",
                     data: { 
@@ -724,18 +863,11 @@
                         amount: amount
                     },
                     success: function(data) {
-                        $('#unit-description').html(data.description);
-                        $('#unit-conversion').html(data.conversion);
+                        if (data.conversion) {
+                            $('#unit-conversion').html(data.conversion);
+                        }
                     }
                 });
-            }
-        });
-
-        // Aktualizacja przelicznika przy zmianie ilości
-        $('#ingredient-amount').on('input', function() {
-            const unitId = $('#ingredient-unit').val();
-            if (unitId) {
-                $('#ingredient-unit').trigger('change');
             }
         });
 

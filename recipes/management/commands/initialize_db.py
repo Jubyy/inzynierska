@@ -53,7 +53,9 @@ class Command(BaseCommand):
                 symbol=unit_data['symbol'],
                 defaults={
                     'name': unit_data['name'],
-                    'is_base': unit_data['is_base']
+                    'is_common': unit_data['is_common'],
+                    'type': unit_data['type'],
+                    'base_ratio': unit_data['base_ratio']
                 }
             )
         

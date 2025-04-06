@@ -1,12 +1,159 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block title %}Rejestracja - Książka Kucharska{% endblock %}
 
-<h2>Rejestracja</h2>
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0"><i class="bi bi-person-plus me-2"></i>Rejestracja konta</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span>Uzupełnij poniższy formularz, aby utworzyć nowe konto. Wszystkie pola oznaczone * są wymagane.</span>
+                    </div>
+                    
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Zarejestruj</button>
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <span>Popraw poniższe błędy:</span>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Nazwa użytkownika*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                {{ form.username }}
+                            </div>
+                            <div class="form-text">Wybierz unikalną nazwę użytkownika (bez spacji i znaków specjalnych).</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Adres e-mail*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                {{ form.email }}
+                            </div>
+                            <div class="form-text">Podaj działający adres email, na który wyślemy link aktywacyjny.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Imię</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                        {{ form.first_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nazwisko</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                        {{ form.last_name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Hasło*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                {{ form.password1 }}
+                            </div>
+                            <div class="form-text">{{ form.password1.help_text|safe }}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Powtórz hasło*</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                {{ form.password2 }}
+                            </div>
+                            <div class="form-text">Wprowadź to samo hasło ponownie dla weryfikacji.</div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                Akceptuję <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">regulamin</a> i <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">politykę prywatności</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-check me-2"></i>Zarejestruj się
+                            </button>
+                        </div>
 </form>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="text-center">
+                        Masz już konto? <a href="{% url 'login' %}" class="text-decoration-none">Zaloguj się</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Modal regulaminu -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Regulamin korzystania z serwisu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Postanowienia ogólne</h6>
+                <p>Niniejszy regulamin określa zasady korzystania z serwisu Książka Kucharska.</p>
+                <!-- Tu dodaj więcej zawartości regulaminu -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal polityki prywatności -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Polityka prywatności</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Informacje ogólne</h6>
+                <p>Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych przekazanych przez Użytkowników.</p>
+                <!-- Tu dodaj więcej zawartości polityki prywatności -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Przepisy dostępne z Lodówki{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Przepisy dostępne z Lodówki</h1>
+    <p class="lead">Przepisy, które możesz przygotować z produktów dostępnych w Twojej lodówce.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="show-all" checked>
+                <label class="form-check-label" for="show-all">Pokaż wszystkie przepisy</label>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'recipes:list' %}?available_only=true" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i> Zaawansowane wyszukiwanie
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for item in recipes %}
+        <div class="col-md-6 mb-4 recipe-card {% if not item.available %}missing-ingredients{% endif %}">
+            <div class="card h-100 {% if item.available %}border-success{% else %}border-warning{% endif %}">
+                <div class="card-header {% if item.available %}bg-success text-white{% else %}bg-warning{% endif %}">
+                    {% if item.available %}
+                    <span><i class="bi bi-check-circle"></i> Wszystkie składniki dostępne</span>
+                    {% else %}
+                    <span><i class="bi bi-exclamation-triangle"></i> Brakuje składników</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.recipe.title }}</h5>
+                    <p class="card-text">{{ item.recipe.description|truncatechars:100 }}</p>
+                    
+                    {% if not item.available and item.missing %}
+                    <div class="missing-items mt-3">
+                        <p><strong>Brakujące składniki:</strong></p>
+                        <ul>
+                            {% for ingredient in item.missing %}
+                            <li>{{ ingredient.name }} ({{ ingredient.amount }} {{ ingredient.unit }})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'recipes:detail' item.recipe.id %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-eye"></i> Zobacz przepis
+                    </a>
+                    {% if item.available %}
+                    <a href="{% url 'recipes:prepare' item.recipe.id %}" class="btn btn-success btn-sm">
+                        <i class="bi bi-utensils"></i> Przygotuj
+                    </a>
+                    {% else %}
+                    <a href="{% url 'recipes:add_missing_to_shopping_list' item.recipe.id %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-cart"></i> Dodaj do listy zakupów
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Brak przepisów do wyświetlenia.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const showAllCheckbox = document.getElementById('show-all');
+    const missingIngredientsCards = document.querySelectorAll('.missing-ingredients');
+    
+    showAllCheckbox.addEventListener('change', function() {
+        missingIngredientsCards.forEach(card => {
+            if (this.checked) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -80,10 +80,6 @@
         border-left-color: #4ecdc4;
     }
     
-    .stat-card.meal-plan {
-        border-left-color: #ffbe0b;
-    }
-    
     .stat-card .stat-icon {
         font-size: 2.5rem;
         margin-bottom: 1rem;
@@ -115,11 +111,36 @@
         color: var(--text-color);
     }
     
-    .small-carousel {
+    .feature-card {
         border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
         overflow: hidden;
-        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+        background: white;
+        transition: transform 0.3s;
+        height: 100%;
+        border: none;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-card .card-img-overlay {
+        background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    
+    .feature-card .card-title {
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    }
+    
+    .feature-card .card-text {
+        color: rgba(255,255,255,0.9);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
     
     .recent-recipe {
@@ -146,6 +167,165 @@
     
     .mobile-sidebar-toggle {
         display: none;
+    }
+    
+    /* Podium dla najlepszych przepisów */
+    .podium-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        padding: 2rem 0;
+        position: relative;
+    }
+    
+    .podium-place {
+        text-align: center;
+        margin: 0 10px;
+        transition: all 0.3s;
+    }
+    
+    .podium-place:hover {
+        transform: translateY(-8px);
+    }
+    
+    .podium-icon {
+        font-size: 1.5rem;
+        background-color: #f8cc43;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        margin-bottom: 10px;
+        color: white;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .podium-1 .podium-icon {
+        background-color: #ffd700; /* gold */
+        width: 48px;
+        height: 48px;
+        font-size: 2rem;
+    }
+    
+    .podium-2 .podium-icon {
+        background-color: #c0c0c0; /* silver */
+        width: 40px;
+        height: 40px;
+        font-size: 1.7rem;
+    }
+    
+    .podium-3 .podium-icon {
+        background-color: #cd7f32; /* bronze */
+    }
+    
+    .podium-step {
+        height: 80px;
+        width: 90px;
+        background: white;
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    
+    .podium-1 .podium-step {
+        height: 110px;
+        width: 110px;
+    }
+    
+    .podium-2 .podium-step {
+        height: 90px;
+        width: 90px;
+    }
+    
+    .podium-recipe {
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 80px;
+        overflow: hidden;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .podium-1 .podium-recipe {
+        width: 100px;
+        height: 100px;
+        top: -80px;
+    }
+    
+    .podium-recipe img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .podium-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 120px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .podium-1 .podium-title {
+        font-size: 1.1rem;
+        max-width: 160px;
+    }
+    
+    .podium-likes {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .podium-1 .podium-likes {
+        font-size: 0.9rem;
+    }
+    
+    /* Tabela rankingowa */
+    .ranking-table {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .ranking-badge {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #f1f1f1;
+        color: #333;
+        font-weight: bold;
+        font-size: 0.85rem;
+        margin-right: 10px;
+    }
+    
+    .ranking-badge-1 {
+        background-color: #ffd700;
+        color: white;
+    }
+    
+    .ranking-badge-2 {
+        background-color: #c0c0c0;
+        color: white;
+    }
+    
+    .ranking-badge-3 {
+        background-color: #cd7f32;
+        color: white;
     }
     
     @media (max-width: 991.98px) {
@@ -182,6 +362,26 @@
         
         .sidebar-menu.show {
             display: block;
+        }
+        
+        .podium-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .podium-place {
+            margin-bottom: 40px;
+        }
+        
+        .podium-step {
+            width: 80px !important;
+            height: 40px !important;
+        }
+        
+        .podium-recipe {
+            width: 60px !important;
+            height: 60px !important;
+            top: -40px !important;
         }
     }
 </style>
@@ -269,125 +469,170 @@
             </div>
         </div>
         
-        <!-- Action Buttons -->
-        <div class="d-flex flex-wrap gap-3 mb-4">
-            <a href="{% url 'recipes:create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Dodaj nowy przepis
-            </a>
-            <a href="{% url 'fridge:add' %}" class="btn btn-secondary">
-                <i class="bi bi-basket me-2"></i>Zaktualizuj lodówkę
-            </a>
+        <!-- Główne funkcjonalności - Ładne odnośniki -->
+        <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+            <div class="col">
+                <a href="{% url 'recipes:list' %}" class="text-decoration-none">
+                    <div class="card feature-card text-white">
+                        <img src="https://source.unsplash.com/random/600x300/?food,recipes" class="card-img" alt="Przepisy">
+                        <div class="card-img-overlay">
+                            <h5 class="card-title">Przepisy Kulinarne</h5>
+                            <p class="card-text">Przeglądaj, dodawaj i odkrywaj przepisy pasujące do zawartości Twojej lodówki</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{% url 'fridge:list' %}" class="text-decoration-none">
+                    <div class="card feature-card text-white">
+                        <img src="https://source.unsplash.com/random/600x300/?fridge,kitchen" class="card-img" alt="Lodówka">
+                        <div class="card-img-overlay">
+                            <h5 class="card-title">Twoja Lodówka</h5>
+                            <p class="card-text">Zarządzaj zawartością lodówki i odkryj przepisy dopasowane do dostępnych składników</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
         
-        <!-- Suggested Recipes Carousel -->
-        <div class="card mb-4">
-            <div class="card-header bg-white">
-                <h2 class="h5 mb-0">Sugerowane przepisy na dziś</h2>
+        <!-- Podium Najlepszych Przepisów -->
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Ranking Najlepszych Przepisów</h2>
             </div>
-            <div class="card-body p-0">
-                <div id="suggestedRecipesCarousel" class="carousel slide small-carousel" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        {% if available_recipes %}
-                            {% for recipe in available_recipes %}
-                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                    <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
-                                                {% if recipe.image %}
-                                                    <img src="{{ recipe.image.url }}" class="img-fluid rounded-start" alt="{{ recipe.title }}" style="height: 100%; object-fit: cover;">
-                                                {% else %}
-                                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 100%; min-height: 200px;">
-                                                        <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
-                                                    </div>
-                                                {% endif %}
-                                            </a>
+            <div class="card-body">
+                {% if top_recipes %}
+                <div class="podium-container">
+                    {% for recipe in top_recipes %}
+                        {% if forloop.counter == 2 %}
+                            <div class="podium-place podium-2">
+                                <div class="podium-icon">2</div>
+                                <div class="podium-step">
+                                    <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
+                                        <div class="podium-recipe">
+                                            {% if recipe.image %}
+                                                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                                            {% else %}
+                                                <img src="https://source.unsplash.com/random/150x150/?food" alt="Przepis">
+                                            {% endif %}
                                         </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body">
-                                                <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
-                                                    <h5 class="card-title">{{ recipe.title }}</h5>
-                                                    <p class="card-text">{{ recipe.description|truncatechars:150 }}</p>
-                                                    <div class="recipe-stats mb-2">
-                                                        <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
-                                                        <span class="ms-3"><i class="bi bi-people"></i> {{ recipe.servings }}</span>
-                                                    </div>
-                                                </a>
-                                                <div class="text-end">
-                                                    <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="bi bi-eye me-1"></i>Zobacz przepis
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </a>
                                 </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="carousel-item active">
-                                <div class="alert alert-info m-3">
-                                    Brak sugerowanych przepisów. Dodaj więcej produktów do lodówki.
+                                <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
+                                    <div class="podium-title">{{ recipe.title }}</div>
+                                </a>
+                                <div class="podium-likes">
+                                    <i class="bi bi-hand-thumbs-up"></i> {{ recipe.likes_total }}
+                                </div>
+                            </div>
+                        {% elif forloop.counter == 1 %}
+                            <div class="podium-place podium-1">
+                                <div class="podium-icon">1</div>
+                                <div class="podium-step">
+                                    <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
+                                        <div class="podium-recipe">
+                                            {% if recipe.image %}
+                                                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                                            {% else %}
+                                                <img src="https://source.unsplash.com/random/150x150/?meal" alt="Przepis">
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                </div>
+                                <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
+                                    <div class="podium-title">{{ recipe.title }}</div>
+                                </a>
+                                <div class="podium-likes">
+                                    <i class="bi bi-hand-thumbs-up"></i> {{ recipe.likes_total }}
+                                </div>
+                            </div>
+                        {% elif forloop.counter == 3 %}
+                            <div class="podium-place podium-3">
+                                <div class="podium-icon">3</div>
+                                <div class="podium-step">
+                                    <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
+                                        <div class="podium-recipe">
+                                            {% if recipe.image %}
+                                                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                                            {% else %}
+                                                <img src="https://source.unsplash.com/random/150x150/?cooking" alt="Przepis">
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                </div>
+                                <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
+                                    <div class="podium-title">{{ recipe.title }}</div>
+                                </a>
+                                <div class="podium-likes">
+                                    <i class="bi bi-hand-thumbs-up"></i> {{ recipe.likes_total }}
                                 </div>
                             </div>
                         {% endif %}
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#suggestedRecipesCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Poprzedni</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#suggestedRecipesCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Następny</span>
-                    </button>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="alert alert-light text-center py-4">
+                    <i class="bi bi-trophy display-5 d-block mb-3 text-muted"></i>
+                    <p>Brak przepisów do wyświetlenia w rankingu.</p>
+                    <a href="{% url 'recipes:create' %}" class="btn btn-primary">Dodaj pierwszy przepis</a>
+                </div>
+                {% endif %}
             </div>
         </div>
         
-        <!-- Recently Viewed Recipes -->
-        <div class="card">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Ostatnio oglądane przepisy</h2>
-                <a href="{% url 'recipes:list' %}" class="btn btn-sm btn-outline-primary">Zobacz wszystkie</a>
+        <!-- Ranking Użytkowników -->
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Ranking Użytkowników</h2>
             </div>
             <div class="card-body">
-                {% if user_recipes %}
-                    <div class="row row-cols-1 row-cols-md-3 g-3">
-                        {% for recipe in user_recipes %}
-                            <div class="col">
-                                <div class="recent-recipe">
-                                    <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
-                                        {% if recipe.image %}
-                                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
-                                        {% else %}
-                                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 120px;">
-                                                <i class="bi bi-camera text-muted" style="font-size: 1.5rem;"></i>
-                                            </div>
-                                        {% endif %}
-                                    </a>
-                                    <div class="card-body">
-                                        <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">
-                                            <h6 class="card-title text-truncate" title="{{ recipe.title }}">{{ recipe.title }}</h6>
-                                            <small class="text-muted">
-                                                <i class="bi bi-clock"></i> {{ recipe.preparation_time }} min
-                                            </small>
-                                        </a>
-                                        <div class="d-flex justify-content-end mt-2">
-                                            <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-link p-0">
-                                                <i class="bi bi-arrow-right-circle"></i>
-                                            </a>
-                                        </div>
+                {% if top_users %}
+                <div class="table-responsive">
+                    <table class="table table-hover ranking-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" width="80">#</th>
+                                <th scope="col">Użytkownik</th>
+                                <th scope="col" class="text-end">Liczba przepisów</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user_obj in top_users %}
+                            <tr>
+                                <td>
+                                    <div class="ranking-badge {% if forloop.counter == 1 %}ranking-badge-1{% elif forloop.counter == 2 %}ranking-badge-2{% elif forloop.counter == 3 %}ranking-badge-3{% endif %}">
+                                        {{ forloop.counter }}
                                     </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://ui-avatars.com/api/?name={{ user_obj.username }}&background=random" alt="{{ user_obj.username }}" class="rounded-circle me-2" width="32" height="32">
+                                        <span>{{ user_obj.username }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-end">{{ user_obj.recipes_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 {% else %}
-                    <div class="alert alert-light text-center py-4">
-                        <i class="bi bi-journal-album display-5 d-block mb-3 text-muted"></i>
-                        <p>Nie przeglądałeś jeszcze żadnych przepisów.</p>
-                        <a href="{% url 'recipes:list' %}" class="btn btn-primary">Przeglądaj przepisy</a>
-                    </div>
+                <div class="alert alert-light text-center py-4">
+                    <i class="bi bi-people display-5 d-block mb-3 text-muted"></i>
+                    <p>Brak danych do wyświetlenia rankingu użytkowników.</p>
+                </div>
                 {% endif %}
             </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap gap-3 mb-4 justify-content-center">
+            <a href="{% url 'recipes:create' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Dodaj nowy przepis
+            </a>
+            <a href="{% url 'fridge:add' %}" class="btn btn-secondary btn-lg">
+                <i class="bi bi-basket me-2"></i>Zaktualizuj lodówkę
+            </a>
         </div>
     </div>
 </div>

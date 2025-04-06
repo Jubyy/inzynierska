@@ -89,25 +89,42 @@ class ShoppingList(models.Model):
             servings (int, optional): Liczba porcji. Domyślnie używa liczby porcji z przepisu.
             
         Returns:
-            dict: Słownik z informacjami o dodanych składnikach
+            list: Lista utworzonych obiektów ShoppingItem
         """
         from fridge.models import FridgeItem
         
         missing_ingredients = recipe.get_missing_ingredients(self.user)
+        
+        if not missing_ingredients:
+            return []
+            
         created_items = []
         
         for missing in missing_ingredients:
-            ingredient = missing['ingredient']
-            amount = missing['missing']
-            unit = missing['unit']
+            # Obsługa zarówno obiektów RecipeIngredient, jak i słowników
+            if isinstance(missing, dict):
+                # Jeśli to słownik, pobierz dane z kluczy
+                ingredient = missing.get('ingredient')
+                unit = missing.get('unit')
+                # Użyj 'missing' jeśli istnieje, w przeciwnym razie 'amount'
+                amount = missing.get('missing', missing.get('amount', 0))
+            else:
+                # Jeśli to obiekt RecipeIngredient
+                ingredient = missing.ingredient
+                unit = missing.unit
+                amount = missing.amount
+            
+            # Sprawdź czy wszystkie wymagane dane istnieją
+            if not ingredient or not unit or not amount:
+                continue
             
             # Sprawdź, czy ten składnik już jest na liście
             existing_item = self.items.filter(ingredient=ingredient, unit=unit).first()
             
             if existing_item:
                 # Jeśli tak, zwiększ ilość ale tylko jeśli nowa ilość jest większa
-                if amount > existing_item.amount:
-                    existing_item.amount = amount
+                if float(amount) > existing_item.amount:
+                    existing_item.amount = float(amount)
                     existing_item.save()
                 created_items.append(existing_item)
             else:
@@ -115,7 +132,7 @@ class ShoppingList(models.Model):
                 item = ShoppingItem.objects.create(
                     shopping_list=self,
                     ingredient=ingredient,
-                    amount=amount,
+                    amount=float(amount),
                     unit=unit,
                     recipe=recipe
                 )
@@ -177,25 +194,36 @@ class ShoppingItem(models.Model):
     def mark_as_purchased(self):
         """Oznacza pozycję jako zakupioną i dodaje do lodówki"""
         from fridge.models import FridgeItem
+        from django.utils import timezone
         
         if not self.is_purchased:
-            # Dodaj do lodówki
-            FridgeItem.add_to_fridge(
-                user=self.shopping_list.user,
-                ingredient=self.ingredient,
-                amount=self.amount,
-                unit=self.unit
-            )
-            
-            # Oznacz jako zakupione
-            self.is_purchased = True
-            self.purchase_date = timezone.now()
-            self.save()
-            
-            # Sprawdź, czy wszystkie pozycje na liście są zakupione
-            all_purchased = not self.shopping_list.items.filter(is_purchased=False).exists()
-            
-            if all_purchased:
-                # Oznacz listę jako zakończoną
-                self.shopping_list.is_completed = True
-                self.shopping_list.save()
+            # Dodaj do lodówki tylko jeśli produkt nie był wcześniej oznaczony jako zakupiony
+            try:
+                # Dodaj do lodówki
+                FridgeItem.add_to_fridge(
+                    user=self.shopping_list.user,
+                    ingredient=self.ingredient,
+                    amount=self.amount,
+                    unit=self.unit
+                )
+                
+                # Oznacz jako zakupione
+                self.is_purchased = True
+                self.purchase_date = timezone.now()
+                self.save()
+                
+                # Sprawdź, czy wszystkie pozycje na liście są zakupione
+                all_purchased = not self.shopping_list.items.filter(is_purchased=False).exists()
+                
+                if all_purchased:
+                    # Oznacz listę jako zakończoną
+                    self.shopping_list.is_completed = True
+                    self.shopping_list.save()
+                    
+                    return True
+            except Exception as e:
+                # W przypadku błędu podczas dodawania do lodówki, nie oznaczaj jako zakupione
+                print(f"Błąd podczas dodawania do lodówki: {str(e)}")
+                return False
+                
+        return False

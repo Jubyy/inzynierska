@@ -13,6 +13,26 @@ def convert_units(amount, from_unit, to_unit):
     Raises:
         ValueError: Jeśli konwersja nie jest możliwa
     """
+    from decimal import Decimal
+    
+    # Sprawdź, czy jednostki nie są None
+    if from_unit is None or to_unit is None:
+        raise ValueError("Jednostki nie mogą być puste")
+    
+    # Upewnij się, że amount jest typu float i nie jest ujemny
+    try:
+        if isinstance(amount, str):
+            amount = float(amount.replace(',', '.'))
+        elif isinstance(amount, Decimal):
+            amount = float(amount)
+        else:
+            amount = float(amount)
+            
+        if amount < 0:
+            raise ValueError("Ilość nie może być ujemna")
+    except (ValueError, TypeError):
+        raise ValueError(f"Nieprawidłowa wartość: {amount}")
+    
     # Jeśli jednostki są takie same, nie ma potrzeby konwersji
     if from_unit == to_unit:
         return amount
@@ -21,25 +41,70 @@ def convert_units(amount, from_unit, to_unit):
         # Próba bezpośredniej konwersji
         from recipes.models import UnitConversion
         conversion = UnitConversion.objects.get(from_unit=from_unit, to_unit=to_unit)
-        return amount * conversion.ratio
+        # Zapewnij zgodność typów przed mnożeniem
+        ratio = float(conversion.ratio)
+        return amount * ratio
     except UnitConversion.DoesNotExist:
         # Próba odwrotnej konwersji
         try:
             conversion = UnitConversion.objects.get(from_unit=to_unit, to_unit=from_unit)
-            return amount / conversion.ratio
+            # Zapewnij zgodność typów przed dzieleniem
+            ratio = float(conversion.ratio)
+            if ratio == 0:
+                raise ValueError(f"Współczynnik konwersji nie może być zerowy")
+            return amount / ratio
         except UnitConversion.DoesNotExist:
             # Konwersja przez jednostki bazowe (bazując na typie i base_ratio)
             
             # Sprawdź czy obie jednostki są tego samego typu
             if from_unit.type == to_unit.type:
                 # Konwersja za pomocą base_ratio
-                # Najpierw konwertujemy amount do wartości bazowej (w g lub ml)
-                base_amount = amount * from_unit.base_ratio
-                # Następnie konwertujemy z wartości bazowej do jednostki docelowej
-                return base_amount / to_unit.base_ratio
+                # Zapewnij zgodność typów 
+                try:
+                    from_ratio = float(from_unit.base_ratio)
+                    to_ratio = float(to_unit.base_ratio)
+                    
+                    if to_ratio == 0:
+                        raise ValueError(f"Współczynnik bazowy jednostki docelowej nie może być zerowy")
+                    
+                    # Najpierw konwertujemy amount do wartości bazowej (w g lub ml)
+                    base_amount = amount * from_ratio
+                    # Następnie konwertujemy z wartości bazowej do jednostki docelowej
+                    return base_amount / to_ratio
+                except (ValueError, TypeError, AttributeError) as e:
+                    raise ValueError(f"Błąd konwersji: {str(e)}")
             else:
-                # Konwersja między różnymi typami jednostek nie jest obsługiwana bezpośrednio
-                raise ValueError(f"Nie można przekonwertować z {from_unit} na {to_unit} - różne typy jednostek")
+                # Obsługa konwersji między różnymi typami jednostek
+                if hasattr(from_unit, 'type') and hasattr(to_unit, 'type'):
+                    # Konwersja między sztukami a wagą/objętością wymaga dodatkowych informacji
+                    if (from_unit.type == 'piece' and to_unit.type in ['weight', 'volume']) or \
+                       (to_unit.type == 'piece' and from_unit.type in ['weight', 'volume']):
+                        raise ValueError(f"Konwersja między {from_unit.type} a {to_unit.type} wymaga informacji o wadze sztuki")
+                    
+                    # Konwersja między wagą a objętością wymaga informacji o gęstości
+                    if (from_unit.type == 'weight' and to_unit.type == 'volume') or \
+                       (from_unit.type == 'volume' and to_unit.type == 'weight'):
+                        raise ValueError(f"Konwersja między {from_unit.type} a {to_unit.type} wymaga informacji o gęstości")
+                    
+                    # Dla łyżek/łyżeczek, można zrobić przybliżoną konwersję
+                    if from_unit.type == 'spoon' and to_unit.type in ['weight', 'volume']:
+                        try:
+                            # Łyżki/łyżeczki -> ml/g
+                            base_amount = amount * float(from_unit.base_ratio)
+                            return base_amount / float(to_unit.base_ratio)
+                        except (ValueError, TypeError, AttributeError):
+                            pass
+                    
+                    if to_unit.type == 'spoon' and from_unit.type in ['weight', 'volume']:
+                        try:
+                            # ml/g -> łyżki/łyżeczki
+                            base_amount = amount * float(from_unit.base_ratio)
+                            return base_amount / float(to_unit.base_ratio)
+                        except (ValueError, TypeError, AttributeError):
+                            pass
+                            
+                # Jeśli nie udało się przeprowadzić żadnej konwersji
+                raise ValueError(f"Nie można przekonwertować z {from_unit} na {to_unit} - niekompatybilne typy jednostek")
 
 def get_common_units():
     """

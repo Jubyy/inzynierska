@@ -1,12 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, PasswordResetForm
-from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth import login, logout, update_session_auth_hash, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.views.generic import DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import EmailMessage
+from django.db.models.query_utils import Q
+from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Count
 
 from recipes.models import Recipe
 from fridge.models import FridgeItem
@@ -15,20 +23,81 @@ from shopping.models import ShoppingList
 from .models import UserProfile
 from .forms import UserProfileForm, CustomUserCreationForm, CustomPasswordChangeForm
 
+# Funkcja pomocnicza do wysyłania emaili
+def send_email(request, user, subject_template, email_template):
+    current_site = get_current_site(request)
+    subject = render_to_string(subject_template)
+    body = render_to_string(email_template, {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': default_token_generator.make_token(user),
+        'protocol': 'https' if request.is_secure() else 'http',
+    })
+    email = EmailMessage(subject, body, to=[user.email])
+    email.content_subtype = 'html'  # Używamy HTML w emailach
+    return email.send()
+
 def register(request):
-    """Rejestracja nowego użytkownika"""
+    """Rejestracja nowego użytkownika z weryfikacją email"""
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Konto zostało utworzone pomyślnie!')
-            return redirect('dashboard')
+            # Tworzymy użytkownika, ale nie zapisujemy go jeszcze (commit=False)
+            user = form.save(commit=False)
+            user.is_active = False  # Deaktywuj użytkownika do momentu weryfikacji email
+            user.save()
+            
+            # Wyślij email z linkiem aktywacyjnym
+            try:
+                send_email(
+                    request, 
+                    user, 
+                    'accounts/email/activation_subject.txt',
+                    'accounts/email/activation_email.html'
+                )
+                messages.success(
+                    request, 
+                    'Twoje konto zostało utworzone! Na podany adres email wysłaliśmy link aktywacyjny. '
+                    'Sprawdź swoją skrzynkę (również folder SPAM) i kliknij w link, aby aktywować konto.'
+                )
+                return redirect('accounts:activation_sent')
+            except Exception as e:
+                messages.error(
+                    request, 
+                    f'Wystąpił problem podczas wysyłania emaila aktywacyjnego: {str(e)}. '
+                    'Skontaktuj się z administratorem.'
+                )
+                # W przypadku błędu, usuwamy utworzonego użytkownika
+                user.delete()
         else:
             messages.error(request, 'Wystąpił błąd podczas rejestracji. Popraw błędy i spróbuj ponownie.')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'accounts/register.html', {'form': form})
+
+def activate_account(request, uidb64, token):
+    """Aktywacja konta użytkownika poprzez link z emaila"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    # Sprawdź czy użytkownik istnieje i token jest prawidłowy
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, 'Twoje konto zostało aktywowane! Możesz teraz korzystać z serwisu.')
+        return redirect('accounts:dashboard')
+    else:
+        messages.error(request, 'Link aktywacyjny jest nieprawidłowy lub wygasł.')
+        return redirect('login')
+
+def activation_sent(request):
+    """Strona potwierdzająca wysłanie linku aktywacyjnego"""
+    return render(request, 'accounts/activation_sent.html')
 
 @login_required
 def dashboard(request):
@@ -55,6 +124,16 @@ def dashboard(request):
             if len(available_recipes) >= 5:  # Ogranicz do 5 przepisów
                 break
     
+    # Pobierz top 3 najlepsze przepisy (z największą liczbą polubień)
+    top_recipes = Recipe.objects.annotate(
+        likes_total=Count('likes')
+    ).order_by('-likes_total', '-created_at')[:3]
+    
+    # Pobierz ranking użytkowników (top 5) dodających najwięcej przepisów
+    top_users = User.objects.annotate(
+        recipes_count=Count('recipe')
+    ).order_by('-recipes_count')[:5]
+    
     context = {
         'user_recipes': user_recipes,
         'fridge_items': fridge_items,
@@ -63,7 +142,9 @@ def dashboard(request):
         'available_recipes': available_recipes,
         'recipe_count': Recipe.objects.filter(author=request.user).count(),
         'fridge_item_count': FridgeItem.objects.filter(user=request.user).count(),
-        'shopping_list_count': ShoppingList.objects.filter(user=request.user).count()
+        'shopping_list_count': ShoppingList.objects.filter(user=request.user).count(),
+        'top_recipes': top_recipes,
+        'top_users': top_users
     }
     
     return render(request, 'accounts/dashboard.html', context)
@@ -166,3 +247,28 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Profil został zaktualizowany!')
         return super().form_valid(form)
+
+@login_required
+def delete_account(request):
+    """Usuwanie konta użytkownika"""
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        user = request.user
+        
+        # Sprawdź, czy hasło jest poprawne
+        if authenticate(username=user.username, password=password):
+            # Zapisz informacje o użytkowniku, aby użyć w komunikacie
+            username = user.username
+            
+            # Wyloguj użytkownika
+            logout(request)
+            
+            # Usuń konto
+            user.delete()
+            
+            messages.success(request, f'Konto {username} zostało usunięte.')
+            return redirect('home')  # lub inna strona główna
+        else:
+            messages.error(request, 'Nieprawidłowe hasło. Spróbuj ponownie.')
+    
+    return render(request, 'accounts/delete_account.html')

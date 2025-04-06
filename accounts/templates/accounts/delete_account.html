@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Usuwanie konta - Książka Kucharska{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="h4 mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Usuwanie konta</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning mb-4">
+                        <h5 class="alert-heading"><i class="bi bi-exclamation-circle me-2"></i>Uwaga!</h5>
+                        <p>Zamierzasz usunąć swoje konto. Ta operacja jest <strong>nieodwracalna</strong>!</p>
+                        <hr>
+                        <p class="mb-0">Po usunięciu konta utracisz:</p>
+                        <ul class="mb-0">
+                            <li>Wszystkie swoje przepisy</li>
+                            <li>Zapisane składniki w lodówce</li>
+                            <li>Listy zakupów</li>
+                            <li>Historię przygotowanych dań</li>
+                            <li>Wszystkie inne dane związane z kontem</li>
+                        </ul>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Podaj swoje hasło, aby potwierdzić usunięcie konta:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" name="password" id="password" class="form-control" placeholder="Twoje hasło" required>
+                            </div>
+                            <div class="form-text text-muted">
+                                Wprowadź swoje aktualne hasło, aby potwierdzić, że to naprawdę Ty chcesz usunąć konto.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="confirmDelete" required>
+                            <label class="form-check-label" for="confirmDelete">
+                                Rozumiem, że po usunięciu konta wszystkie moje dane zostaną bezpowrotnie utracone.
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>Usuń moje konto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left me-2"></i>Anuluj i wróć do profilu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -23,9 +23,16 @@
             <a href="{% url 'shopping:export_pdf' shopping_list.id %}" class="btn btn-outline-secondary me-2">
                 <i class="bi bi-file-pdf"></i> Eksportuj do PDF
             </a>
-            <a href="{% url 'shopping:add_item' shopping_list.id %}" class="btn btn-primary me-2">
-                <i class="bi bi-plus-circle"></i> Dodaj produkt
-            </a>
+            {% if not shopping_list.is_completed %}
+                <a href="{% url 'shopping:add_item' shopping_list.id %}" class="btn btn-primary me-2">
+                    <i class="bi bi-plus-circle"></i> Dodaj produkt
+                </a>
+                {% if unpurchased_items %}
+                    <button id="complete-all-btn" class="btn btn-success me-2" data-list-id="{{ shopping_list.id }}">
+                        <i class="bi bi-check-circle"></i> Zakończ wszystkie
+                    </button>
+                {% endif %}
+            {% endif %}
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots-vertical"></i>
@@ -34,7 +41,7 @@
                     <li><a class="dropdown-item" href="{% url 'shopping:update' shopping_list.id %}">
                         <i class="bi bi-pencil me-2"></i> Edytuj listę
                     </a></li>
-                    {% if not shopping_list.is_completed %}
+                    {% if not shopping_list.is_completed and unpurchased_items %}
                         <li><a class="dropdown-item" href="{% url 'shopping:complete' shopping_list.id %}">
                             <i class="bi bi-check-circle me-2"></i> Zakończ zakupy
                         </a></li>
@@ -48,9 +55,14 @@
         </div>
     </div>
     
+    <!-- Alert dla komunikatów AJAX -->
+    <div id="ajax-alert" class="alert alert-success d-none">
+        <span id="ajax-message"></span>
+    </div>
+    
     {% if unpurchased_items or purchased_items %}
         <!-- Produkty do kupienia -->
-        <div class="card mb-4">
+        <div class="card mb-4" id="unpurchased-card">
             <div class="card-header bg-primary text-white">
                 <h2 class="h5 mb-0">Produkty do kupienia</h2>
             </div>
@@ -65,24 +77,26 @@
                                     <th class="text-center">Akcje</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="unpurchased-items">
                                 {% for item in unpurchased_items %}
-                                    <tr>
+                                    <tr id="item-row-{{ item.id }}">
                                         <td>{{ item.ingredient.name }}</td>
                                         <td>{{ item.amount }} {{ item.unit.name }}</td>
                                         <td class="text-center">
-                                            <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline">
+                                            <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline purchase-form">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Oznacz jako kupione">
+                                                <button type="submit" class="btn btn-sm btn-outline-success purchase-btn" data-item-id="{{ item.id }}" title="Oznacz jako kupione">
                                                     <i class="bi bi-check"></i>
                                                 </button>
                                             </form>
-                                            <a href="{% url 'shopping:edit_item' item.id %}" class="btn btn-sm btn-outline-primary" title="Edytuj">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a href="{% url 'shopping:delete_item' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            {% if not shopping_list.is_completed %}
+                                                <a href="{% url 'shopping:edit_item' item.id %}" class="btn btn-sm btn-outline-primary" title="Edytuj">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'shopping:delete_item' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -98,44 +112,37 @@
         </div>
         
         <!-- Zakupione produkty -->
-        {% if purchased_items %}
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h2 class="h5 mb-0">Zakupione produkty</h2>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Produkt</th>
-                                    <th>Ilość</th>
-                                    <th>Data zakupu</th>
-                                    <th class="text-center">Akcje</th>
+        <div class="card" id="purchased-card">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">Zakupione produkty</h2>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Produkt</th>
+                                <th>Ilość</th>
+                                <th>Data zakupu</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchased-items">
+                            {% for item in purchased_items %}
+                                <tr id="purchased-item-{{ item.id }}">
+                                    <td>{{ item.ingredient.name }}</td>
+                                    <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                    <td>{{ item.purchase_date|date:"d.m.Y H:i" }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">Dodano do lodówki</span>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in purchased_items %}
-                                    <tr>
-                                        <td>{{ item.ingredient.name }}</td>
-                                        <td>{{ item.amount }} {{ item.unit.name }}</td>
-                                        <td>{{ item.purchase_date|date:"d.m.Y H:i" }}</td>
-                                        <td class="text-center">
-                                            <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Oznacz jako niezakupione">
-                                                    <i class="bi bi-x"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        {% endif %}
+        </div>
     {% else %}
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-2"></i> Ta lista zakupów jest pusta. 
@@ -149,4 +156,168 @@
         </a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Obsługa oznaczania produktów jako zakupione przez AJAX
+        $('.purchase-form').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var itemId = form.find('.purchase-btn').data('item-id');
+            var row = $('#item-row-' + itemId);
+            
+            // Wyłącz przycisk podczas przetwarzania
+            form.find('.purchase-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split"></i>');
+            
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Pokaż komunikat
+                        $('#ajax-alert').removeClass('d-none alert-danger').addClass('alert-success');
+                        $('#ajax-message').text(response.message);
+                        
+                        // Usuń wiersz z listy niezakupionych
+                        row.fadeOut(300, function() {
+                            // Utwórz nowy wiersz w sekcji zakupionych
+                            var now = new Date();
+                            var dateStr = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear() + ' ' + 
+                                          now.getHours() + ':' + now.getMinutes();
+                            
+                            var productName = row.find('td').eq(0).text();
+                            var amount = row.find('td').eq(1).text();
+                            
+                            var newRow = '<tr id="purchased-item-' + itemId + '">' +
+                                        '<td>' + productName + '</td>' +
+                                        '<td>' + amount + '</td>' +
+                                        '<td>' + dateStr + '</td>' +
+                                        '<td class="text-center"><span class="badge bg-success">Dodano do lodówki</span></td>' +
+                                        '</tr>';
+                            
+                            // Dodaj do tabeli zakupionych
+                            $('#purchased-items').prepend(newRow);
+                            
+                            // Sprawdź czy wszystkie produkty zostały zakupione
+                            if ($('#unpurchased-items tr').length === 1) {
+                                // Zastąp tabelę komunikatem o zakończeniu
+                                var allPurchasedMsg = '<div class="alert alert-success m-3">' +
+                                                     '<i class="bi bi-check-circle me-2"></i> Wszystkie produkty zostały zakupione!' +
+                                                     '</div>';
+                                $('#unpurchased-items').closest('.table-responsive').html(allPurchasedMsg);
+                                
+                                // Ukryj przycisk "Zakończ wszystkie"
+                                $('#complete-all-btn').hide();
+                            }
+                            
+                            // Ukryj alert po 5 sekundach
+                            setTimeout(function() {
+                                $('#ajax-alert').addClass('d-none');
+                            }, 5000);
+                        });
+                    }
+                },
+                error: function() {
+                    // Pokaż błąd i włącz przycisk ponownie
+                    $('#ajax-alert').removeClass('d-none alert-success').addClass('alert-danger');
+                    $('#ajax-message').text('Wystąpił błąd podczas przetwarzania żądania.');
+                    form.find('.purchase-btn').prop('disabled', false).html('<i class="bi bi-check"></i>');
+                    
+                    // Ukryj alert po 5 sekundach
+                    setTimeout(function() {
+                        $('#ajax-alert').addClass('d-none');
+                    }, 5000);
+                }
+            });
+        });
+        
+        // Obsługa przycisku "Zakończ wszystkie"
+        $('#complete-all-btn').on('click', function() {
+            var btn = $(this);
+            var listId = btn.data('list-id');
+            
+            // Wyłącz przycisk podczas przetwarzania
+            btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Przetwarzanie...');
+            
+            $.ajax({
+                url: '/shopping/' + listId + '/complete/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Pokaż komunikat
+                        $('#ajax-alert').removeClass('d-none alert-danger').addClass('alert-success');
+                        $('#ajax-message').text(response.message);
+                        
+                        // Ukryj sekcję niezakupionych produktów
+                        $('#unpurchased-card').fadeOut(300, function() {
+                            // Załaduj wszystkie niezakupione elementy do zakupionych
+                            var now = new Date();
+                            var dateStr = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear() + ' ' + 
+                                          now.getHours() + ':' + now.getMinutes();
+                            
+                            $('#unpurchased-items tr').each(function() {
+                                var row = $(this);
+                                var itemId = row.attr('id').replace('item-row-', '');
+                                var productName = row.find('td').eq(0).text();
+                                var amount = row.find('td').eq(1).text();
+                                
+                                var newRow = '<tr id="purchased-item-' + itemId + '">' +
+                                            '<td>' + productName + '</td>' +
+                                            '<td>' + amount + '</td>' +
+                                            '<td>' + dateStr + '</td>' +
+                                            '<td class="text-center"><span class="badge bg-success">Dodano do lodówki</span></td>' +
+                                            '</tr>';
+                                
+                                // Dodaj do tabeli zakupionych
+                                $('#purchased-items').prepend(newRow);
+                            });
+                            
+                            // Ukryj przyciski akcji
+                            $('.purchase-btn, .btn-outline-primary, .btn-outline-danger').prop('disabled', true).hide();
+                            
+                            // Dodaj oznaczenie, że lista jest zakończona
+                            $('.display-5').append(' <span class="badge bg-success">Zakończona</span>');
+                            
+                            // Ukryj przyciski dodawania i zakończenia
+                            $('#complete-all-btn, .btn-primary').hide();
+                            
+                            // Ukryj alert po 5 sekundach
+                            setTimeout(function() {
+                                $('#ajax-alert').addClass('d-none');
+                            }, 5000);
+                            
+                            // Odśwież stronę po 2 sekundach, aby pokazać prawidłowy stan
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        });
+                    }
+                },
+                error: function() {
+                    // Pokaż błąd i włącz przycisk ponownie
+                    $('#ajax-alert').removeClass('d-none alert-success').addClass('alert-danger');
+                    $('#ajax-message').text('Wystąpił błąd podczas przetwarzania żądania.');
+                    btn.prop('disabled', false).html('<i class="bi bi-check-circle"></i> Zakończ wszystkie');
+                    
+                    // Ukryj alert po 5 sekundach
+                    setTimeout(function() {
+                        $('#ajax-alert').addClass('d-none');
+                    }, 5000);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %} 

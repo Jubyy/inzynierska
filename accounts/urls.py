@@ -1,21 +1,30 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .forms import CustomAuthenticationForm
 
 app_name = 'accounts'
 
 urlpatterns = [
     # Podstawowe widoki kont
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
+    path('login/', auth_views.LoginView.as_view(
+        template_name='registration/login.html',
+        authentication_form=CustomAuthenticationForm
+    ), name='login'),
     path('logout/', views.custom_logout, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    
+    # Aktywacja konta
+    path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
+    path('activation-sent/', views.activation_sent, name='activation_sent'),
     
     # Profil użytkownika
     path('profile/', views.profile, name='profile'),
     path('profile/edit/', views.UserProfileUpdateView.as_view(), name='profile_edit'),
     path('profile/change-password/', views.change_password, name='change_password'),
     path('profile/recipes/', views.user_recipes, name='user_recipes'),
+    path('profile/delete/', views.delete_account, name='delete_account'),
     
     # Przeglądanie innych użytkowników
     path('user/<str:username>/', views.UserProfileDetailView.as_view(), name='user_detail'),

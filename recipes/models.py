@@ -64,6 +64,32 @@ class MeasurementUnit(models.Model):
         elif self.type == 'volume':
             return f"{amount} {self.name} ({base_amount}ml)"
         return f"{amount} {self.name}"
+        
+    @classmethod
+    def get_common_units_by_type(cls, unit_type):
+        """Zwraca popularne jednostki dla danego typu"""
+        return cls.objects.filter(type=unit_type, is_common=True)
+        
+    @classmethod
+    def get_units_for_ingredient_category(cls, category_name):
+        """
+        Zwraca odpowiednie jednostki miary dla danej kategorii składników
+        """
+        if category_name.lower() in ['mięso', 'wędliny']:
+            # Dla mięsa, tylko jednostki wagi (głównie gramy i kilogramy)
+            return cls.objects.filter(type='weight')
+        elif category_name.lower() in ['nabiał']:
+            # Dla nabiału, jednostki wagi i objętości
+            return cls.objects.filter(type__in=['weight', 'volume'])
+        elif category_name.lower() in ['warzywa', 'owoce']:
+            # Dla warzyw i owoców, jednostki wagi i sztuki
+            return cls.objects.filter(type__in=['weight', 'piece'])
+        elif category_name.lower() in ['przyprawy']:
+            # Dla przypraw, jednostki wagi i łyżki/łyżeczki
+            return cls.objects.filter(type__in=['weight', 'spoon'])
+        else:
+            # Dla pozostałych, wszystkie jednostki
+            return cls.objects.all()
 
 class UnitConversion(models.Model):
     """Model reprezentujący konwersję między jednostkami miar"""
@@ -103,6 +129,21 @@ class Ingredient(models.Model):
         verbose_name="Waga sztuki [g]",
         help_text="Waga jednej sztuki w gramach"
     )
+    unit_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('weight_only', 'Tylko waga (g, kg)'),
+            ('volume_only', 'Tylko objętość (ml, l)'),
+            ('piece_only', 'Tylko sztuki'),
+            ('weight_volume', 'Waga i objętość'),
+            ('weight_piece', 'Waga i sztuki'),
+            ('weight_spoon', 'Waga i łyżki'),
+            ('volume_spoon', 'Objętość i łyżki'),
+            ('all', 'Wszystkie jednostki')
+        ],
+        default='weight_only',
+        verbose_name="Dozwolone jednostki"
+    )
     
     class Meta:
         verbose_name = "Składnik"
@@ -119,6 +160,25 @@ class Ingredient(models.Model):
     @property
     def is_vegan(self):
         return self.category.is_vegan
+
+    def get_allowed_units(self):
+        """Zwraca queryset dozwolonych jednostek miary dla składnika"""
+        if self.unit_type == 'weight_only':
+            return MeasurementUnit.objects.filter(type='weight')
+        elif self.unit_type == 'volume_only':
+            return MeasurementUnit.objects.filter(type='volume')
+        elif self.unit_type == 'piece_only':
+            return MeasurementUnit.objects.filter(type='piece')
+        elif self.unit_type == 'weight_volume':
+            return MeasurementUnit.objects.filter(type__in=['weight', 'volume'])
+        elif self.unit_type == 'weight_piece':
+            return MeasurementUnit.objects.filter(type__in=['weight', 'piece'])
+        elif self.unit_type == 'weight_spoon':
+            return MeasurementUnit.objects.filter(type__in=['weight', 'spoon'])
+        elif self.unit_type == 'volume_spoon':
+            return MeasurementUnit.objects.filter(type__in=['volume', 'spoon'])
+        else:  # all
+            return MeasurementUnit.objects.all()
 
     def save(self, *args, **kwargs):
         """Zapisz model i dodaj domyślną jednostkę do kompatybilnych"""
@@ -304,21 +364,30 @@ class Recipe(models.Model):
     
     def scale_to_servings(self, target_servings):
         """Zwraca listę składników przepisu przeskalowaną do podanej liczby porcji"""
-        if target_servings <= 0:
-            raise ValueError("Liczba porcji musi być większa od zera")
+        try:
+            target_servings = float(target_servings)
             
-        ratio = target_servings / self.servings
-        scaled_ingredients = []
-        
-        for ing in self.ingredients.all():
-            scaled_ingredients.append({
-                'ingredient': ing.ingredient,
-                'amount': ing.amount * ratio,
-                'unit': ing.unit,
-                'original_amount': ing.amount
-            })
+            if target_servings <= 0:
+                raise ValueError("Liczba porcji musi być większa od zera")
+                
+            ratio = target_servings / float(self.servings)
+            scaled_ingredients = []
             
-        return scaled_ingredients
+            for ing in self.ingredients.all():
+                # Zapewnij, że wartości są typu float
+                original_amount = float(ing.amount)
+                scaled_amount = original_amount * ratio
+                
+                scaled_ingredients.append({
+                    'ingredient': ing.ingredient,
+                    'amount': scaled_amount,
+                    'unit': ing.unit,
+                    'original_amount': original_amount
+                })
+                
+            return scaled_ingredients
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Błąd skalowania przepisu: {str(e)}")
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='ingredients', on_delete=models.CASCADE, verbose_name="Przepis")

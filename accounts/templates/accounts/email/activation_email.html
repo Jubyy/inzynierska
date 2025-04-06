@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Aktywacja konta</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .btn:hover {
+            background-color: #0b5ed7;
+        }
+        .important {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Książka Kucharska</h1>
+            <p>Aktywacja konta</p>
+        </div>
+        <div class="content">
+            <p>Witaj <strong>{{ user.username }}</strong>,</p>
+            
+            <p>Dziękujemy za rejestrację w serwisie Książka Kucharska! Aby aktywować swoje konto, kliknij przycisk poniżej:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}" class="btn">Aktywuj konto</a>
+            </div>
+            
+            <p>Jeśli przycisk nie działa, skopiuj i wklej poniższy link do przeglądarki:</p>
+            <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+                {{ protocol }}://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}
+            </p>
+            
+            <p class="important">Uwaga: Link aktywacyjny jest ważny tylko przez 24 godziny.</p>
+            
+            <p>Jeśli to nie Ty rejestrowałeś się w naszym serwisie, zignoruj tę wiadomość.</p>
+            
+            <p>Pozdrawiamy,<br>Zespół Książki Kucharskiej</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Książka Kucharska. Wszystkie prawa zastrzeżone.</p>
+            <p>Wiadomość wygenerowana automatycznie, prosimy na nią nie odpowiadać.</p>
+        </div>
+    </div>
+</body>
+</html> 

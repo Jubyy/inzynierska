@@ -4,23 +4,42 @@
 
 {% block extra_css %}
 <style>
+    .recipe-header {
+        padding: 20px 0;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+    }
+    
     .recipe-image {
         max-width: 100%;
         height: auto;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .recipe-image:hover {
+        transform: scale(1.02);
     }
     
     .ingredient-list li {
-        padding: 5px 0;
+        padding: 8px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    
+    .ingredient-list li:last-child {
+        border-bottom: none;
     }
     
     .instructions {
         white-space: pre-line;
+        line-height: 1.7;
     }
     
     .missing-ingredient {
         color: #dc3545;
+        font-weight: 500;
+        margin-left: 8px;
     }
     
     .action-buttons {
@@ -30,10 +49,69 @@
     
     .badge-vegetarian {
         background-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
     }
     
     .badge-vegan {
         background-color: #20c997;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .comment {
+        transition: background-color 0.3s ease;
+        border-radius: 10px;
+        padding: 15px;
+    }
+    
+    .comment:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .reply {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px;
+    }
+    
+    .user-profile-link {
+        color: #212529;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    
+    .user-profile-link:hover {
+        color: #0d6efd;
+        text-decoration: underline;
+    }
+    
+    .recipe-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 15px 0;
+    }
+    
+    .recipe-stat-item {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+    
+    .recipe-stat-item i {
+        margin-right: 5px;
+        font-size: 1.1rem;
+    }
+    
+    .card-header.bg-primary {
+        background-color: #0d6efd !important;
     }
 </style>
 {% endblock %}
@@ -41,69 +119,75 @@
 {% block content %}
 <div class="container mt-4">
     <!-- Nagłówek przepisu -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="display-5">{{ recipe.title }}</h1>
-            
-            <div class="mb-3">
-                {% if recipe.is_vegetarian %}
-                    <span class="badge badge-vegetarian">Wegetariańskie</span>
-    {% endif %}
+    <div class="recipe-header">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="display-5">{{ recipe.title }}</h1>
+                
+                <div class="mb-3">
+                    {% if recipe.is_vegetarian %}
+                        <span class="badge badge-vegetarian">
+                            <i class="bi bi-check-circle-fill me-1"></i>Wegetariańskie
+                        </span>
+                    {% endif %}
 
-                {% if recipe.is_vegan %}
-                    <span class="badge badge-vegan">Wegańskie</span>
-                {% endif %}
-            </div>
-            
-            <p class="lead">{{ recipe.description }}</p>
-            
-            <div class="row">
-                <div class="col-auto">
-                    <small class="text-muted">
-                        <i class="bi bi-clock me-1"></i> {{ recipe.preparation_time }} minut
-                    </small>
+                    {% if recipe.is_vegan %}
+                        <span class="badge badge-vegan ms-2">
+                            <i class="bi bi-check-circle-fill me-1"></i>Wegańskie
+                        </span>
+                    {% endif %}
                 </div>
-                <div class="col-auto">
-                    <small class="text-muted">
-                        <i class="bi bi-people me-1"></i> 
+                
+                <p class="lead">{{ recipe.description }}</p>
+                
+                <div class="recipe-stats">
+                    <div class="recipe-stat-item">
+                        <i class="bi bi-clock"></i> 
+                        {{ recipe.preparation_time }} minut
+                    </div>
+                    <div class="recipe-stat-item">
+                        <i class="bi bi-people"></i> 
                         {% if servings %}
                             {{ servings }} porcji (oryginalnie {{ original_servings }})
                         {% else %}
                             {{ recipe.servings }} porcji
                         {% endif %}
-                    </small>
-                </div>
-                <div class="col-auto">
-                    <small class="text-muted">
-                        <i class="bi bi-calendar me-1"></i> Dodano: {{ recipe.created_at|date:"d.m.Y" }}
-                    </small>
+                    </div>
+                    <div class="recipe-stat-item">
+                        <i class="bi bi-calendar"></i> 
+                        Dodano: {{ recipe.created_at|date:"d.m.Y" }}
+                    </div>
+                    <div class="recipe-stat-item">
+                        <i class="bi bi-person"></i> 
+                        Autor: <a href="{% url 'accounts:user_detail' recipe.author.username %}" class="user-profile-link">{{ recipe.author.username }}</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-md-4 text-end">
-            <!-- Przyciski akcji dla przepisu -->
-            <form method="get" class="mb-2">
-                <div class="input-group">
-                    <input type="number" name="servings" min="1" max="20" class="form-control" 
-                          placeholder="Liczba porcji" value="{{ servings|default:recipe.servings }}">
-                    <button type="submit" class="btn btn-outline-primary">Przelicz</button>
-                </div>
-            </form>
             
-            {% if user.is_authenticated %}
-                <div class="btn-group" role="group">
-                    {% if can_be_prepared %}
-                        <a href="{% url 'recipes:prepare' recipe.pk %}" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Przygotuj danie
-                        </a>
-                    {% else %}
-                        <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
-                            <i class="bi bi-cart-plus"></i> Dodaj brakujące do zakupów
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
+            <div class="col-md-4 text-end">
+                <!-- Przyciski akcji dla przepisu -->
+                <form method="get" class="mb-2">
+                    <div class="input-group">
+                        <input type="number" name="servings" min="1" max="20" class="form-control" 
+                              placeholder="Liczba porcji" value="{{ servings|default:recipe.servings }}">
+                        <button type="submit" class="btn btn-outline-primary">Przelicz</button>
+                    </div>
+                </form>
+                
+                {% if user.is_authenticated %}
+                    <div class="btn-group" role="group">
+                        {% if can_be_prepared %}
+                            <a href="{% url 'recipes:prepare' recipe.pk %}" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Przygotuj danie
+                            </a>
+                        {% elif missing_ingredients %}
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+                                <i class="bi bi-cart-plus"></i> Dodaj brakujące do zakupów
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -137,7 +221,8 @@
                                 {% for missing in missing_ingredients %}
                                     {% if missing.ingredient.id == ingredient.ingredient.id %}
                                         <span class="missing-ingredient">
-                                            (brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }})
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            Brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }}
                                         </span>
                                     {% endif %}
                                 {% endfor %}
@@ -153,14 +238,15 @@
                                 {% for missing in missing_ingredients %}
                                     {% if missing.ingredient.id == ingredient.ingredient.id %}
                                         <span class="missing-ingredient">
-                                            (brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }})
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            Brakuje {{ missing.missing|floatformat:"-2" }} {{ missing.unit.symbol }}
                                         </span>
                                     {% endif %}
                                 {% endfor %}
                             </li>
-        {% endfor %}
+                        {% endfor %}
                     {% endif %}
-        </ul>
+                    </ul>
                 </div>
                 
                 {% if missing_ingredients and user.is_authenticated %}
@@ -221,14 +307,7 @@
                 </div>
                 
                 <div>
-                    <!-- Inne przyciski akcji -->
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.id %}" class="btn btn-outline-primary">
-                            <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
-                        </a>
-                    {% endif %}
-                    
-                    <!-- Jeśli autor to aktualny użytkownik, pokaż przyciski edycji i usunięcia -->
+                    <!-- Przyciski edycji i usunięcia - tylko dla autora -->
                     {% if recipe.author == user %}
                         <a href="{% url 'recipes:update' recipe.id %}" class="btn btn-outline-secondary">
                             <i class="bi bi-pencil"></i> Edytuj
@@ -271,16 +350,22 @@
                     <div class="comment mb-4" id="comment-{{ comment.id }}">
                         <div class="d-flex">
                             <div class="flex-shrink-0">
-                                <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ comment.user.username }}&background=random" width="50" height="50" alt="{{ comment.user.username }}">
+                                <a href="{% url 'accounts:user_detail' comment.user.username %}">
+                                    <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ comment.user.username }}&background=random" width="50" height="50" alt="{{ comment.user.username }}">
+                                </a>
                             </div>
                             <div class="ms-3 flex-grow-1">
                                 <div class="d-flex justify-content-between">
-                                    <h5 class="mb-1">{{ comment.user.username }}</h5>
+                                    <h5 class="mb-1">
+                                        <a href="{% url 'accounts:user_detail' comment.user.username %}" class="user-profile-link">
+                                            {{ comment.user.username }}
+                                        </a>
+                                    </h5>
                                     <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
                                 </div>
                                 <p class="mb-1">{{ comment.content }}</p>
                                 <div class="d-flex justify-content-between">
-    <div>
+                                    <div>
                                         <button class="btn btn-sm btn-link p-0 reply-btn" data-comment-id="{{ comment.id }}">
                                             <i class="bi bi-reply"></i> Odpowiedz
                                         </button>
@@ -317,11 +402,17 @@
                                             <div class="reply mb-3" id="comment-{{ reply.id }}">
                                                 <div class="d-flex">
                                                     <div class="flex-shrink-0">
-                                                        <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ reply.user.username }}&background=random" width="40" height="40" alt="{{ reply.user.username }}">
+                                                        <a href="{% url 'accounts:user_detail' reply.user.username %}">
+                                                            <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ reply.user.username }}&background=random" width="40" height="40" alt="{{ reply.user.username }}">
+                                                        </a>
                                                     </div>
                                                     <div class="ms-2 flex-grow-1">
                                                         <div class="d-flex justify-content-between">
-                                                            <h6 class="mb-1">{{ reply.user.username }}</h6>
+                                                            <h6 class="mb-1">
+                                                                <a href="{% url 'accounts:user_detail' reply.user.username %}" class="user-profile-link">
+                                                                    {{ reply.user.username }}
+                                                                </a>
+                                                            </h6>
                                                             <small class="text-muted">{{ reply.created_at|date:"d.m.Y H:i" }}</small>
                                                         </div>
                                                         <p class="mb-1">{{ reply.content }}</p>
@@ -345,7 +436,7 @@
                             </div>
                         </div>
                     </div>
-        {% endfor %}
+                {% endfor %}
             {% else %}
                 <div class="text-center my-4">
                     <p class="text-muted">Brak komentarzy. Bądź pierwszy!</p>
@@ -360,16 +451,12 @@
             <i class="bi bi-arrow-left"></i> Powrót do listy przepisów
         </a>
 
-    {% if user == recipe.author %}
-        <div>
-                <a href="{% url 'recipes:update' recipe.pk %}" class="btn btn-outline-primary">
-                    <i class="bi bi-pencil"></i> Edytuj przepis
-                </a>
-                <a href="{% url 'recipes:delete' recipe.pk %}" class="btn btn-outline-danger">
-                    <i class="bi bi-trash"></i> Usuń przepis
-                </a>
-        </div>
-    {% endif %}
+        <!-- Dodatkowe przyciski akcji tylko dla zalogowanych -->
+        {% if user.is_authenticated and missing_ingredients %}
+            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+                <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
+            </a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

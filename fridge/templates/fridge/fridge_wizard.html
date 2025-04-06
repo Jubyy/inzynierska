@@ -315,6 +315,17 @@
                 expiry_date: $('#expiry-date').val() || null
             };
 
+            // Sprawdź czy wszystkie wymagane pola są wypełnione
+            if (!formData.ingredient || !formData.unit || !formData.amount) {
+                alert('Proszę wypełnić wszystkie wymagane pola.');
+                return;
+            }
+
+            // Wyświetl informację o przetwarzaniu
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.html();
+            submitBtn.html('<i class="spinner-border spinner-border-sm"></i> Dodawanie...').prop('disabled', true);
+
             $.ajax({
                 url: "{% url 'fridge:add' %}",
                 method: 'POST',
@@ -322,11 +333,22 @@
                 headers: {
                     'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
                 },
-                success: function() {
-                    window.location.href = "{% url 'fridge:list' %}";
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = "{% url 'fridge:list' %}";
+                    } else {
+                        alert('Wystąpił błąd: ' + (response.error || 'Nieznany błąd'));
+                        submitBtn.html(originalText).prop('disabled', false);
+                    }
                 },
                 error: function(xhr) {
-                    alert('Wystąpił błąd podczas dodawania produktu.');
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        alert('Błąd: ' + (response.error || xhr.statusText || 'Nieznany błąd'));
+                    } catch (e) {
+                        alert('Wystąpił błąd podczas dodawania produktu: ' + xhr.statusText);
+                    }
+                    submitBtn.html(originalText).prop('disabled', false);
                 }
             });
         });

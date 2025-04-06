@@ -10,11 +10,13 @@ urlpatterns = [
     path('create/', views.RecipeCreateView.as_view(), name='create'),
     path('update/<int:pk>/', views.RecipeUpdateView.as_view(), name='update'),
     path('delete/<int:pk>/', views.RecipeDeleteView.as_view(), name='delete'),
+    path('prepare/<int:pk>/', views.prepare_recipe, name='prepare'),
+    path('clear-prepared/', views.clear_prepared_recipe, name='clear_prepared_recipe'),
+    path('recipes/history/', views.recipe_history, name='history'),
     
     # Operacje na przepisach
     path('shopping-list/<int:pk>/', views.add_to_shopping_list, name='add_to_shopping_list'),
     path('missing-ingredients/<int:pk>/', views.add_missing_to_shopping_list, name='add_missing_to_shopping_list'),
-    path('prepare/<int:pk>/', views.prepare_recipe, name='prepare_recipe'),
     path('toggle-favorite/<int:pk>/', views.toggle_favorite, name='toggle_favorite'),
     path('toggle-like/<int:pk>/', views.toggle_like, name='toggle_like'),
     

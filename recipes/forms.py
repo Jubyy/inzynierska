@@ -115,17 +115,42 @@ class IngredientForm(forms.ModelForm):
     """Formularz do tworzenia składników"""
     class Meta:
         model = Ingredient
-        fields = ['name', 'category', 'description']
+        fields = ['name', 'category', 'description', 'unit_type', 'default_unit', 'piece_weight', 'density']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'unit_type': forms.Select(attrs={'class': 'form-control'}),
+            'default_unit': forms.Select(attrs={'class': 'form-control'}),
+            'piece_weight': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'density': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001'})
         }
         labels = {
             'name': 'Nazwa składnika',
             'category': 'Kategoria',
-            'description': 'Opis'
+            'description': 'Opis',
+            'unit_type': 'Dozwolone jednostki',
+            'default_unit': 'Domyślna jednostka',
+            'piece_weight': 'Waga sztuki [g]',
+            'density': 'Gęstość [g/ml]'
         }
+        help_texts = {
+            'unit_type': 'Wybierz, jakie typy jednostek miary są dozwolone dla tego składnika',
+            'piece_weight': 'Dla składników sprzedawanych na sztuki, podaj wagę jednej sztuki w gramach',
+            'density': 'Dla płynów i składników sypkich, podaj gęstość w g/ml dla konwersji między wagą a objętością'
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Pole default_unit jest opcjonalne
+        self.fields['default_unit'].required = False
+        self.fields['piece_weight'].required = False
+        self.fields['density'].required = False
+        
+        # Jeśli to edycja istniejącego składnika, filtruj jednostki wg unit_type
+        if self.instance and self.instance.pk:
+            if self.instance.unit_type:
+                self.fields['default_unit'].queryset = self.instance.get_allowed_units()
 
 class RecipeSearchForm(forms.Form):
     """Formularz do wyszukiwania przepisów"""

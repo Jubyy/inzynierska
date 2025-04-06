@@ -116,18 +116,37 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         try:
+            # Pobranie danych z formularza
+            ingredient = form.cleaned_data['ingredient']
+            unit = form.cleaned_data['unit']
+            amount = form.cleaned_data['amount']
+            expiry_date = form.cleaned_data['expiry_date']
+            
+            # Sprawdzenie czy jednostka jest kompatybilna ze składnikiem
+            if unit not in ingredient.get_allowed_units().all() and unit not in ingredient.compatible_units.all():
+                # Próba naprawy - dodaj jednostkę do kompatybilnych
+                ingredient.compatible_units.add(unit)
+                self.request.session['unit_fixed'] = True
+            
+            # Dodaj produkt do lodówki
             FridgeItem.add_to_fridge(
                 user=self.request.user,
-                ingredient=form.cleaned_data['ingredient'],
-                amount=form.cleaned_data['amount'],
-                unit=form.cleaned_data['unit'],
-                expiry_date=form.cleaned_data['expiry_date']
+                ingredient=ingredient,
+                amount=amount,
+                unit=unit,
+                expiry_date=expiry_date
             )
-            messages.success(self.request, 'Produkt został dodany do lodówki.')
+            
+            messages.success(self.request, f'Produkt {ingredient.name} został dodany do lodówki.')
             return JsonResponse({'success': True})
+        except ValueError as e:
+            # Błąd walidacji (np. nieprawidłowa ilość)
+            messages.error(self.request, f'Błąd walidacji: {str(e)}')
+            return JsonResponse({'success': False, 'error': f'Błąd walidacji: {str(e)}'}, status=400)
         except Exception as e:
-            messages.error(self.request, f'Wystąpił błąd podczas dodawania produktu: {str(e)}')
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            # Inny nieoczekiwany błąd
+            messages.error(self.request, f'Wystąpił nieoczekiwany błąd: {str(e)}')
+            return JsonResponse({'success': False, 'error': f'Nieoczekiwany błąd: {str(e)}'}, status=500)
 
 class FridgeItemUpdateView(LoginRequiredMixin, UpdateView):
     """Edycja produktu w lodówce"""
@@ -224,48 +243,31 @@ def clean_expired(request):
 @login_required
 def available_recipes(request):
     """Pokazuje przepisy, które można przygotować z produktów w lodówce"""
-    # Pobierz wszystkie przepisy użytkownika
-    recipes = Recipe.objects.filter(user=request.user)
+    # Pobierz wszystkie przepisy użytkownika i publiczne przepisy
+    recipes = Recipe.objects.filter(Q(author=request.user) | Q(is_public=True)).distinct()
     
-    # Pobierz produkty z lodówki
-    fridge_items = FridgeItem.objects.filter(user=request.user)
-    
-    # Przygotuj słownik dostępnych składników (id: [ilość, jednostka])
-    available_ingredients = {}
-    
-    for item in fridge_items:
-        if item.ingredient_id not in available_ingredients:
-            available_ingredients[item.ingredient_id] = []
-        
-        available_ingredients[item.ingredient_id].append({
-            'amount': item.amount,
-            'unit': item.unit
-        })
-    
-    # Sprawdź dla każdego przepisu, czy wszystkie składniki są dostępne
+    # Przygotuj listę przepisów z informacją o dostępności
     recipes_with_availability = []
     
     for recipe in recipes:
-        ingredients_needed = recipe.ingredients.all()
-        
-        # Sprawdź każdy składnik
+        # Sprawdź, czy wszystkie składniki są dostępne w odpowiedniej ilości
+        can_be_prepared = recipe.can_be_prepared_with_available_ingredients(request.user)
         missing_ingredients = []
-        all_available = True
         
-        for ingredient_entry in ingredients_needed:
-            ingredient_id = ingredient_entry.ingredient.id
-            
-            if ingredient_id not in available_ingredients:
-                # Brak tego składnika w lodówce
-                missing_ingredients.append(ingredient_entry.ingredient.name)
-                all_available = False
-                continue
-            
-            # TODO: W przyszłości można dodać sprawdzanie ilości i konwersji jednostek
+        if not can_be_prepared:
+            # Jeśli nie wszystkie składniki są dostępne, zbierz listę brakujących
+            missing_ingredients_data = recipe.get_missing_ingredients(request.user)
+            if missing_ingredients_data:
+                for item in missing_ingredients_data:
+                    missing_ingredients.append({
+                        'name': item.ingredient.name,
+                        'amount': item.amount,
+                        'unit': item.unit.symbol if item.unit else ''
+                    })
         
         recipes_with_availability.append({
             'recipe': recipe,
-            'available': all_available,
+            'available': can_be_prepared,
             'missing': missing_ingredients
         })
     
@@ -301,21 +303,32 @@ def ajax_load_units(request):
     
     if ingredient_id:
         ingredient = get_object_or_404(Ingredient, id=ingredient_id)
-        # Pobierz kompatybilne jednostki dla składnika
+        
+        # Użyj metody get_allowed_units, która zwraca jednostki bazując na unit_type
+        allowed_units = ingredient.get_allowed_units()
+        
+        # Ponadto, uwzględnij również jednostki explicite dodane jako kompatybilne
         compatible_units = ingredient.compatible_units.all()
         
-        # Jeśli nie ma kompatybilnych jednostek, użyj domyślnej jednostki
-        if not compatible_units.exists() and ingredient.default_unit:
-            compatible_units = [ingredient.default_unit]
+        # Połącz obie listy jednostek (używamy distinct by uniknąć duplikatów)
+        all_units = (allowed_units | compatible_units).distinct()
         
-        # Filtruj jednostki wagowe - zostaw tylko gramy i kilogramy
+        # Jeśli nadal nie mamy żadnych jednostek, a istnieje domyślna - użyj jej
+        if not all_units.exists() and ingredient.default_unit:
+            all_units = [ingredient.default_unit]
+            
+        # Filtruj jednostki wagowe - zostaw tylko gramy i kilogramy (opcjonalnie)
         filtered_units = []
-        for unit in compatible_units:
+        for unit in all_units:
             if unit.type == 'weight':
                 if unit.symbol in ['g', 'kg']:  # tylko gramy i kilogramy
                     filtered_units.append(unit)
             else:
                 filtered_units.append(unit)
+                
+        # Jeśli nie mamy żadnych jednostek po filtrowaniu, użyj wszystkich
+        if not filtered_units and all_units:
+            filtered_units = list(all_units)
             
         units = [{
             'id': unit.id, 
@@ -344,3 +357,72 @@ def ajax_compatible_units(request):
     return JsonResponse({
         'units': [{'id': u.id, 'name': u.name} for u in compatible_units]
     })
+
+@classmethod
+def check_ingredient_availability(cls, user, ingredient, amount, unit):
+    """
+    Sprawdza, czy dany składnik jest dostępny w wystarczającej ilości.
+    
+    Args:
+        user (User): Użytkownik
+        ingredient (Ingredient): Składnik
+        amount (float): Potrzebna ilość
+        unit (MeasurementUnit): Jednostka
+        
+    Returns:
+        bool: True jeśli składnik jest dostępny, False w przeciwnym razie
+    """
+    if not user or not user.is_authenticated:
+        return False
+    
+    if amount <= 0:
+        # Jeśli nie potrzebujemy składnika, to jest dostępny
+        return True
+    
+    # Sprawdź czy jednostka jest określona
+    if not unit:
+        return False
+    
+    items = cls.objects.filter(
+        user=user,
+        ingredient=ingredient
+    )
+    
+    if not items.exists():
+        # Brak składnika w lodówce
+        return False
+    
+    total_available = 0.0
+    debug_info = []
+    
+    for item in items:
+        try:
+            # Jeśli jednostki są różne, przelicz ilość
+            if item.unit != unit:
+                try:
+                    from recipes.utils import convert_units
+                    converted_amount = convert_units(float(item.amount), item.unit, unit)
+                    total_available += converted_amount
+                    debug_info.append(f"Konwersja: {item.amount} {item.unit.symbol} -> {converted_amount} {unit.symbol}")
+                except (ValueError, TypeError) as e:
+                    # Logowanie błędu dla debugowania
+                    debug_msg = f"Błąd konwersji: {e} dla {item.ingredient.name} z {item.unit} na {unit}"
+                    print(debug_msg)
+                    debug_info.append(debug_msg)
+                    # Ignoruj ten produkt, jeśli konwersja nie jest możliwa
+                    continue
+            else:
+                total_available += float(item.amount)
+                debug_info.append(f"Bezpośrednio: {item.amount} {item.unit.symbol}")
+        except Exception as e:
+            # W przypadku nieoczekiwanego błędu, ignoruj ten produkt
+            debug_msg = f"Nieoczekiwany błąd: {e}"
+            print(debug_msg)
+            debug_info.append(debug_msg)
+            continue
+    
+    print(f"Dostępność składnika {ingredient.name}: potrzeba {amount} {unit.symbol}, dostępne {total_available} {unit.symbol}")
+    print(f"Szczegóły konwersji: {', '.join(debug_info)}")
+    
+    # Porównanie dostępnej ilości z potrzebną ilością
+    return total_available >= float(amount)
