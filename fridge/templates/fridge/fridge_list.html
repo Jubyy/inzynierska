@@ -245,6 +245,80 @@
         font-weight: 500;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    
+    /* Nowe style dla widoku tabeli */
+    .view-toggle {
+        background-color: white;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .view-toggle .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+    }
+    .view-toggle .btn.active {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    .view-toggle .btn:not(.active) {
+        background-color: white;
+        color: #495057;
+        border-color: #ced4da;
+    }
+    .table-view {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .fridge-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-top: none;
+    }
+    .fridge-table td {
+        vertical-align: middle;
+    }
+    .fridge-table .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    .category-header {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        border-left: 4px solid #28a745;
+    }
+    .fridge-table tr.expired-row {
+        background-color: rgba(220,53,69,0.05);
+    }
+    .fridge-table tr.warning-row {
+        background-color: rgba(255,193,7,0.05);
+    }
+    .fridge-table .item-icon {
+        font-size: 1.2rem;
+        margin-right: 8px;
+    }
+    .fridge-table .table-actions {
+        white-space: nowrap;
+    }
+    .fridge-table .table-actions .btn {
+        padding: 0.25rem 0.5rem;
+        margin: 0 2px;
+    }
+    .table-view-container {
+        overflow-x: auto;
+    }
 </style>
 {% endblock %}
 
@@ -316,97 +390,291 @@
             </form>
         </div>
 
-        <!-- Lista produktów -->
-        {% if fridge_items %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for item in fridge_items %}
-            <div class="col">
-                <div class="product-card {% if item.is_expired %}expired{% elif item.days_until_expiry <= 3 %}warning{% else %}fresh{% endif %}">
-                    <div class="product-card-header">
-                        <div class="product-icon 
-                            {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}dairy
-                            {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}meat
-                            {% elif 'warzy' in item.ingredient.category.name|lower %}vegetable
-                            {% elif 'owoc' in item.ingredient.category.name|lower %}fruit
-                            {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}grain
-                            {% elif 'przypraw' in item.ingredient.category.name|lower %}condiment
-                            {% endif %}">
-                            {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-cheese"></i>
-                            {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-drumstick-bite"></i>
-                            {% elif 'warzy' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-carrot"></i>
-                            {% elif 'owoc' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-apple-alt"></i>
-                            {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-bread-slice"></i>
-                            {% elif 'przypraw' in item.ingredient.category.name|lower %}
-                                <i class="fas fa-pepper-hot"></i>
-                            {% else %}
-                                <i class="fas fa-utensils"></i>
-                            {% endif %}
+        <!-- Legenda przeliczników kuchennych -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i> Przeliczniki kulinarne</h5>
+                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#conversionLegend" aria-expanded="false">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse" id="conversionLegend">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Jednostki objętości -->
+                        <div class="col-md-4 mb-3">
+                            <h6 class="border-bottom pb-2 text-primary"><i class="fas fa-tint me-1"></i> Miary objętości</h6>
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Miara</th>
+                                        <th>Równowartość</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for unit in measurement_units.volume %}
+                                    <tr>
+                                        <td>1 {{ unit.name }}</td>
+                                        <td>{{ unit.base_ratio|floatformat:"0" }} ml</td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for unit in measurement_units.special %}
+                                    {% if unit.type == 'volume' %}
+                                    <tr>
+                                        <td>1 {{ unit.name }}</td>
+                                        <td>{{ unit.base_ratio|floatformat:"0" }} ml</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        <div>
-                            <h2 class="product-title">{{ item.ingredient.name }}</h2>
-                            <div class="product-category">
-                                <i class="fas fa-tags"></i> {{ item.ingredient.category.name }}
-                            </div>
+                        
+                        <!-- Jednostki wagi -->
+                        <div class="col-md-4 mb-3">
+                            <h6 class="border-bottom pb-2 text-success"><i class="fas fa-weight me-1"></i> Miary wagi</h6>
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Miara</th>
+                                        <th>Równowartość</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for unit in measurement_units.weight %}
+                                    <tr>
+                                        <td>1 {{ unit.name }}</td>
+                                        <td>{{ unit.base_ratio|floatformat:"0" }} g</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Łyżki i inne miary -->
+                        <div class="col-md-4 mb-3">
+                            <h6 class="border-bottom pb-2 text-danger"><i class="fas fa-utensils me-1"></i> Miary kuchenne</h6>
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Miara</th>
+                                        <th>Równowartość</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for unit in measurement_units.spoon %}
+                                    <tr>
+                                        <td>1 {{ unit.name }}</td>
+                                        <td>{{ unit.base_ratio|floatformat:"0" }} ml/g</td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for unit in measurement_units.special %}
+                                    {% if unit.type != 'volume' %}
+                                    <tr>
+                                        <td>1 {{ unit.name }}</td>
+                                        <td>{{ unit.description }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="product-card-body">
-                        <div class="product-quantity">
-                            <i class="fas fa-weight"></i> {{ item.amount }} {{ item.unit.symbol }}
-                        </div>
-                        
-                        <div class="product-expiry">
-                            <i class="far fa-calendar-alt"></i>
-                            <span class="expiry-date 
-                                {% if item.is_expired %}expired
-                                {% elif item.days_until_expiry <= 3 %}warning
-                                {% elif item.expiry_date %}ok
-                                {% else %}infinite{% endif %}">
-                                {% if item.expiry_date %}
-                                    {{ item.expiry_date|date:"d.m.Y" }}
-                                    {% if item.is_expired %}
-                                        (przeterminowane)
-                                    {% elif item.days_until_expiry <= 3 %}
-                                        (zostało {{ item.days_until_expiry }} dni)
-                                    {% endif %}
-                                {% else %}
-                                    Bez terminu ważności
-                                {% endif %}
-                            </span>
-                        </div>
-                        
-                        <div class="status-badge 
-                            {% if item.is_expired %}status-expired
-                            {% elif item.days_until_expiry <= 3 %}status-warning
-                            {% elif item.expiry_date %}status-ok
-                            {% else %}status-infinite{% endif %}">
-                            {% if item.is_expired %}
-                                <i class="fas fa-exclamation-circle"></i> Przeterminowane
-                            {% elif item.days_until_expiry <= 3 %}
-                                <i class="fas fa-clock"></i> Wygasa wkrótce
-                            {% elif item.expiry_date %}
-                                <i class="fas fa-check-circle"></i> Świeże
-                            {% else %}
-                                <i class="fas fa-infinity"></i> Bez terminu
-                            {% endif %}
-                        </div>
-                        
-                        <div class="product-actions">
-                            <a href="{% url 'fridge:edit' item.id %}" class="btn btn-outline-primary">
-                                <i class="fas fa-edit"></i> Edytuj
-                            </a>
-                            <a href="{% url 'fridge:delete' item.id %}" class="btn btn-outline-danger">
-                                <i class="fas fa-trash"></i> Usuń
-                            </a>
-                        </div>
+                    <div class="text-muted small mt-2">
+                        <i class="fas fa-info-circle me-1"></i> Pamiętaj, że przeliczniki mogą się różnić w zależności od produktu. Podane wartości są orientacyjne.
                     </div>
                 </div>
             </div>
-            {% endfor %}
+        </div>
+
+        {% if fridge_items %}
+        <!-- Przyciski przełączania widoku -->
+        <div class="view-toggle d-flex justify-content-between align-items-center">
+            <div class="btn-group" role="group" aria-label="Przełącz widok">
+                <button type="button" class="btn" id="table-view-btn">
+                    <i class="fas fa-list"></i> Tabela
+                </button>
+                <button type="button" class="btn active" id="card-view-btn">
+                    <i class="fas fa-th-large"></i> Karty
+                </button>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="groupByCategory">
+                <label class="form-check-label" for="groupByCategory">Grupuj według kategorii</label>
+            </div>
+        </div>
+
+        <!-- Widok tabeli -->
+        <div class="table-view-container" id="table-view" style="display: none;">
+            <div class="table-view">
+                <table class="table table-hover fridge-table mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 30%">Produkt</th>
+                            <th style="width: 15%">Ilość</th>
+                            <th style="width: 15%">Kategoria</th>
+                            <th style="width: 20%">Termin ważności</th>
+                            <th style="width: 15%">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in fridge_items %}
+                        <tr class="{% if item.is_expired %}expired-row{% elif item.days_until_expiry <= 3 %}warning-row{% endif %}">
+                            <td>
+                                <span class="status-indicator 
+                                    {% if item.is_expired %}bg-danger
+                                    {% elif item.days_until_expiry <= 3 %}bg-warning
+                                    {% else %}bg-success{% endif %}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="item-icon">
+                                    {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-cheese text-primary"></i>
+                                    {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-drumstick-bite text-danger"></i>
+                                    {% elif 'warzy' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-carrot text-success"></i>
+                                    {% elif 'owoc' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-apple-alt text-warning"></i>
+                                    {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-bread-slice text-secondary"></i>
+                                    {% elif 'przypraw' in item.ingredient.category.name|lower %}
+                                        <i class="fas fa-pepper-hot text-danger"></i>
+                                    {% else %}
+                                        <i class="fas fa-utensils text-secondary"></i>
+                                    {% endif %}
+                                </span>
+                                <strong>{{ item.ingredient.name }}</strong>
+                            </td>
+                            <td>{{ item.amount }} {{ item.unit.symbol }}</td>
+                            <td>{{ item.ingredient.category.name }}</td>
+                            <td>
+                                {% if item.expiry_date %}
+                                    <span class="{% if item.is_expired %}text-danger fw-bold
+                                    {% elif item.days_until_expiry <= 3 %}text-warning fw-bold
+                                    {% else %}text-success{% endif %}">
+                                        {{ item.expiry_date|date:"d.m.Y" }}
+                                        {% if item.is_expired %}
+                                            <span class="badge bg-danger">Przeterminowane</span>
+                                        {% elif item.days_until_expiry <= 3 %}
+                                            <span class="badge bg-warning text-dark">Zostało {{ item.days_until_expiry }} dni</span>
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Bez terminu</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-actions">
+                                <a href="{% url 'fridge:edit' item.id %}" class="btn btn-sm btn-outline-primary" title="Edytuj produkt">
+                                    <i class="fas fa-edit"></i> Edytuj
+                                </a>
+                                <a href="{% url 'fridge:delete' item.id %}" class="btn btn-sm btn-outline-danger" title="Usuń produkt">
+                                    <i class="fas fa-trash"></i> Usuń
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Widok kart -->
+        <div id="card-view">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cards-container">
+                {% for item in fridge_items %}
+                <div class="col product-item" data-category="{{ item.ingredient.category.name }}">
+                    <div class="product-card {% if item.is_expired %}expired{% elif item.days_until_expiry <= 3 %}warning{% else %}fresh{% endif %}">
+                        <div class="product-card-header">
+                            <div class="product-icon 
+                                {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}dairy
+                                {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}meat
+                                {% elif 'warzy' in item.ingredient.category.name|lower %}vegetable
+                                {% elif 'owoc' in item.ingredient.category.name|lower %}fruit
+                                {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}grain
+                                {% elif 'przypraw' in item.ingredient.category.name|lower %}condiment
+                                {% endif %}">
+                                {% if 'nabial' in item.ingredient.category.name|lower or 'nabiał' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-cheese"></i>
+                                {% elif 'mięs' in item.ingredient.category.name|lower or 'mies' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-drumstick-bite"></i>
+                                {% elif 'warzy' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-carrot"></i>
+                                {% elif 'owoc' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-apple-alt"></i>
+                                {% elif 'zboz' in item.ingredient.category.name|lower or 'zboż' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-bread-slice"></i>
+                                {% elif 'przypraw' in item.ingredient.category.name|lower %}
+                                    <i class="fas fa-pepper-hot"></i>
+                                {% else %}
+                                    <i class="fas fa-utensils"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h2 class="product-title">{{ item.ingredient.name }}</h2>
+                                <div class="product-category">
+                                    <i class="fas fa-tags"></i> {{ item.ingredient.category.name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-card-body">
+                            <div class="product-quantity">
+                                <i class="fas fa-weight"></i> {{ item.amount }} {{ item.unit.symbol }}
+                            </div>
+                            
+                            <div class="product-expiry">
+                                <i class="far fa-calendar-alt"></i>
+                                <span class="expiry-date 
+                                    {% if item.is_expired %}expired
+                                    {% elif item.days_until_expiry <= 3 %}warning
+                                    {% elif item.expiry_date %}ok
+                                    {% else %}infinite{% endif %}">
+                                    {% if item.expiry_date %}
+                                        {{ item.expiry_date|date:"d.m.Y" }}
+                                        {% if item.is_expired %}
+                                            (przeterminowane)
+                                        {% elif item.days_until_expiry <= 3 %}
+                                            (zostało {{ item.days_until_expiry }} dni)
+                                        {% endif %}
+                                    {% else %}
+                                        Bez terminu ważności
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="status-badge 
+                                {% if item.is_expired %}status-expired
+                                {% elif item.days_until_expiry <= 3 %}status-warning
+                                {% elif item.expiry_date %}status-ok
+                                {% else %}status-infinite{% endif %}">
+                                {% if item.is_expired %}
+                                    <i class="fas fa-exclamation-circle"></i> Przeterminowane
+                                {% elif item.days_until_expiry <= 3 %}
+                                    <i class="fas fa-clock"></i> Wygasa wkrótce
+                                {% elif item.expiry_date %}
+                                    <i class="fas fa-check-circle"></i> Świeże
+                                {% else %}
+                                    <i class="fas fa-infinity"></i> Bez terminu
+                                {% endif %}
+                            </div>
+                            
+                            <div class="product-actions">
+                                <a href="{% url 'fridge:edit' item.id %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Edytuj
+                                </a>
+                                <a href="{% url 'fridge:delete' item.id %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Usuń
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- Paginacja -->
@@ -464,4 +732,138 @@
         {% endif %}
     </div>
 </div>
+
+{% if fridge_items %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Przyciski przełączania widoku
+        const tableViewBtn = document.getElementById('table-view-btn');
+        const cardViewBtn = document.getElementById('card-view-btn');
+        const tableView = document.getElementById('table-view');
+        const cardView = document.getElementById('card-view');
+        const groupByCategory = document.getElementById('groupByCategory');
+        const cardsContainer = document.getElementById('cards-container');
+        
+        // Zapisanie oryginalnego HTML kontenera kart dla operacji resetowania
+        const originalCardsHtml = cardsContainer.innerHTML;
+        
+        // Funkcja do zapisywania preferencji widoku w localStorage
+        function saveViewPreference(viewType) {
+            localStorage.setItem('fridgeViewType', viewType);
+        }
+        
+        // Funkcja do odczytywania preferencji widoku z localStorage
+        function loadViewPreference() {
+            const viewType = localStorage.getItem('fridgeViewType');
+            if (viewType === 'table') {
+                showTableView();
+            } else {
+                showCardView();
+            }
+        }
+        
+        // Funkcja do zapisywania preferencji grupowania w localStorage
+        function saveGroupPreference(grouped) {
+            localStorage.setItem('fridgeGroupByCategory', grouped ? 'true' : 'false');
+        }
+        
+        // Funkcja do odczytywania preferencji grupowania z localStorage
+        function loadGroupPreference() {
+            const grouped = localStorage.getItem('fridgeGroupByCategory');
+            if (grouped === 'true') {
+                groupByCategory.checked = true;
+                updateGrouping(true);
+            } else {
+                groupByCategory.checked = false;
+                // Nie wywołujemy updateGrouping(false) przy ładowaniu
+            }
+        }
+        
+        // Pokaz widok tabeli
+        function showTableView() {
+            tableView.style.display = 'block';
+            cardView.style.display = 'none';
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+            saveViewPreference('table');
+            
+            // Dodaj tooltips do przycisków w tabeli
+            const tableButtons = document.querySelectorAll('.table-actions .btn');
+            tableButtons.forEach(btn => {
+                // Inicjalizacja tooltipów dla przycisków - kod można aktywować jeśli używasz Bootstrap JS
+                // new bootstrap.Tooltip(btn);
+            });
+        }
+        
+        // Pokaz widok kart
+        function showCardView() {
+            tableView.style.display = 'none';
+            cardView.style.display = 'block';
+            tableViewBtn.classList.remove('active');
+            cardViewBtn.classList.add('active');
+            saveViewPreference('card');
+        }
+        
+        // Funkcja grupująca produkty według kategorii
+        function updateGrouping(grouped) {
+            if (grouped) {
+                // Grupowanie produktów
+                const categories = {};
+                const productItems = document.querySelectorAll('.product-item');
+                
+                // Zbierz produkty według kategorii
+                productItems.forEach(item => {
+                    const category = item.dataset.category;
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+                    categories[category].push(item);
+                });
+                
+                // Usuń wszystkie produkty
+                cardsContainer.innerHTML = '';
+                
+                // Dodaj produkty pogrupowane według kategorii
+                for (const category in categories) {
+                    // Utwórz nagłówek kategorii
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'col-12 category-header';
+                    categoryHeader.innerHTML = `<i class="fas fa-tag"></i> ${category}`;
+                    cardsContainer.appendChild(categoryHeader);
+                    
+                    // Dodaj produkty z tej kategorii
+                    categories[category].forEach(item => {
+                        cardsContainer.appendChild(item.cloneNode(true));
+                    });
+                }
+            } else {
+                // Całkowicie nowe podejście do wyłączania grupowania - 
+                // Zamiast skomplikowanej manipulacji DOM, po prostu przywracamy oryginalny HTML
+                cardsContainer.innerHTML = originalCardsHtml;
+            }
+            
+            saveGroupPreference(grouped);
+        }
+        
+        // Obsługa kliknięć przycisków
+        tableViewBtn.addEventListener('click', showTableView);
+        cardViewBtn.addEventListener('click', showCardView);
+        
+        // Obsługa zmiany przełącznika grupowania
+        groupByCategory.addEventListener('change', function() {
+            updateGrouping(this.checked);
+        });
+        
+        // Załaduj preferencje użytkownika
+        loadViewPreference();
+        loadGroupPreference();
+        
+        // Dodaj tooltips do przycisków - dodajemy tooltips przy inicjalizacji strony
+        document.querySelectorAll('[title]').forEach(element => {
+            // Inicjalizacja tooltipów - kod można aktywować jeśli używasz Bootstrap JS
+            // new bootstrap.Tooltip(element);
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

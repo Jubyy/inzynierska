@@ -4,19 +4,12 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse, FileResponse, HttpResponse
 from django.db.models import Q, Sum
+from django.template.loader import get_template
 import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib import colors
-from django.utils.translation import gettext as _
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from xhtml2pdf import pisa
+from datetime import date
 
 from .models import ShoppingList, ShoppingItem
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
@@ -448,72 +441,33 @@ def ajax_load_units(request):
 
 @login_required
 def export_list_to_pdf(request, pk):
-    """Eksportuje listę zakupów do pliku PDF"""
+    """Eksportuje listę zakupów do pliku PDF używając xhtml2pdf, która obsługuje polskie znaki"""
     shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
     
-    # Utwórz bufor pamięci do zapisania PDF
-    buffer = io.BytesIO()
+    # Przygotuj kontekst do szablonu
+    context = {
+        'shopping_list': shopping_list,
+        'today': date.today(),
+        'request': request,
+        'items': shopping_list.items.all().order_by('ingredient__name'),
+    }
     
-    # Utwórz dokument PDF z obiegiem kodowania UTF-8
-    doc = SimpleDocTemplate(buffer, pagesize=A4, encoding='utf-8')
+    # Wygeneruj HTML z szablonu
+    template = get_template('shopping/shopping_list_pdf.html')
+    html = template.render(context)
     
-    # Definiuj style
-    styles = getSampleStyleSheet()
+    # Utwórz obiekt response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="lista_zakupow_{shopping_list.id}.pdf"'
     
-    # Lista elementów do dodania do dokumentu
-    elements = []
+    # Konwertuj HTML do PDF z obsługą polskich znaków
+    pisa_status = pisa.CreatePDF(
+        html,
+        dest=response,
+        encoding='utf-8'
+    )
     
-    # Tytuł dokumentu - używamy obiektu Paragraph zamiast bezpośredniego rysowania stringa
-    title_style = styles['Title']
-    elements.append(Paragraph(f"Lista zakupów: {shopping_list.name}", title_style))
-    
-    # Informacje o liście
-    elements.append(Spacer(1, 0.5*cm))
-    elements.append(Paragraph(f"Data utworzenia: {shopping_list.created_at.strftime('%d-%m-%Y')}", styles['Normal']))
-    elements.append(Paragraph(f"Użytkownik: {shopping_list.user.username}", styles['Normal']))
-    elements.append(Spacer(1, 0.5*cm))
-    
-    # Dane do tabeli
-    data = [["Składnik", "Ilość", "Jednostka", "Kupiono"]]
-    
-    for item in shopping_list.items.all():
-        data.append([
-            item.ingredient.name,
-            str(round(item.amount, 2)),
-            item.unit.symbol,
-            "✓" if item.is_purchased else ""
-        ])
-    
-    # Tworzenie tabeli
-    table = Table(data, colWidths=[8*cm, 3*cm, 3*cm, 2*cm])
-    
-    # Stylizacja tabeli
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
-    
-    elements.append(table)
-    
-    # Stopka
-    elements.append(Spacer(1, 1*cm))
-    elements.append(Paragraph("Wygenerowano z aplikacji Książka Kucharska", styles['Italic']))
-    
-    # Zbuduj dokument
-    doc.build(elements)
-    
-    # Odczytaj zawartość bufora
-    buffer.seek(0)
-    
-    # Przygotuj odpowiedź
-    filename = f"lista_zakupow_{shopping_list.id}.pdf"
-    response = FileResponse(buffer, as_attachment=True, filename=filename)
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    
+    # Zwróć PDF jako odpowiedź
+    if pisa_status.err:
+        return HttpResponse('Wystąpił błąd podczas generowania PDF', status=500)
     return response

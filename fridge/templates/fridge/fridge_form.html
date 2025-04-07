@@ -75,6 +75,29 @@
         background: #f8f9fa;
         border-radius: 3px;
     }
+    
+    /* Style dla pola readonly */
+    .readonly-select + .select2-container {
+        background-color: #f8f9fa;
+        opacity: 0.8;
+    }
+    .readonly-select + .select2-container .select2-selection {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+        cursor: not-allowed;
+    }
+    .readonly-select + .select2-container .select2-selection__rendered {
+        color: #6c757d;
+    }
+    .readonly-select + .select2-container .select2-selection__arrow {
+        display: none;
+    }
+    .readonly-select-info {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
 </style>
 {% endblock %}
 
@@ -129,6 +152,9 @@
                                 <div class="mb-3">
                                     <label for="{{ form.unit.id_for_label }}" class="form-label">{{ form.unit.label }}</label>
                                     {{ form.unit }}
+                                    {% if form.instance.pk %}
+                                    <div class="readonly-select-info">Jednostka nie może być zmieniona podczas edycji</div>
+                                    {% endif %}
                                     {% if form.unit.errors %}
                                         <div class="invalid-feedback d-block">
                                             {{ form.unit.errors }}
@@ -198,6 +224,12 @@
                 },
                 success: function(data) {
                     var unitSelect = $('#{{ form.unit.id_for_label }}');
+                    
+                    // Podczas edycji, jeśli mamy klasę readonly, nie zmieniamy zawartości
+                    if (unitSelect.hasClass('readonly-select')) {
+                        return;
+                    }
+                    
                     unitSelect.empty();
                     
                     // Dodaj pustą opcję
@@ -252,17 +284,25 @@
                 cache: true
             }
         }).on('select2:select', function(e) {
-            loadCompatibleUnits(e.params.data.id);
+            // Tylko przy dodawaniu, nie przy edycji
+            var unitSelect = $('#{{ form.unit.id_for_label }}');
+            if (!unitSelect.hasClass('readonly-select')) {
+                loadCompatibleUnits(e.params.data.id);
+            }
         }).on('select2:clear', function() {
             // Wyczyść listę jednostek gdy składnik zostanie wyczyszczony
+            // Ale tylko przy dodawaniu, nie przy edycji
             var unitSelect = $('#{{ form.unit.id_for_label }}');
-            unitSelect.empty();
-            unitSelect.append(new Option('', '', false, false));
-            unitSelect.trigger('change');
+            if (!unitSelect.hasClass('readonly-select')) {
+                unitSelect.empty();
+                unitSelect.append(new Option('', '', false, false));
+                unitSelect.trigger('change');
+            }
         });
 
         // Inicjalizacja Select2 dla jednostek
-        $('#{{ form.unit.id_for_label }}').select2({
+        var unitSelect = $('#{{ form.unit.id_for_label }}');
+        unitSelect.select2({
             theme: "bootstrap4",
             width: '100%',
             placeholder: "Wybierz jednostkę",
@@ -272,6 +312,20 @@
             const unitType = $(e.target).find(':selected').data('type');
             updateAmountInput(unitType);
         });
+        
+        // Jeśli pole jednostki ma klasę readonly-select, uniemożliw zmianę
+        if (unitSelect.hasClass('readonly-select')) {
+            // Zablokuj możliwość zmiany wartości, ale bez używania disabled
+            unitSelect.on('select2:opening', function(e) {
+                e.preventDefault();
+            });
+            
+            // Stylizuj jako readonly
+            unitSelect.closest('.select2-container').css('opacity', '0.7');
+            
+            // Dodaj tooltip wyjaśniający
+            unitSelect.attr('title', 'Jednostka nie może być zmieniona podczas edycji');
+        }
 
         // Dodaj nasłuchiwanie na zmiany w polu amount
         $('#{{ form.amount.id_for_label }}').on('input change', function() {
@@ -292,7 +346,7 @@
 
         // Jeśli jest już wybrany składnik przy ładowaniu strony, załaduj jego jednostki
         const selectedIngredient = $('#{{ form.ingredient.id_for_label }}').val();
-        if (selectedIngredient) {
+        if (selectedIngredient && !unitSelect.hasClass('readonly-select')) {
             loadCompatibleUnits(selectedIngredient);
         }
     });

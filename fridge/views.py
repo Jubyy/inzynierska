@@ -100,7 +100,41 @@ class FridgeItemListView(LoginRequiredMixin, ListView):
             expiry_date__lt=date.today()
         ).count()
         
+        # Pobierz jednostki miary do legendy przeliczników
+        context['measurement_units'] = self.get_measurement_units()
+        
         return context
+    
+    def get_measurement_units(self):
+        """
+        Pobiera jednostki miary pogrupowane według typu do legendy przeliczników
+        """
+        units = {}
+        
+        # Pobierz popularne jednostki wagowe
+        units['weight'] = MeasurementUnit.objects.filter(
+            type='weight', 
+            is_common=True
+        ).order_by('base_ratio')
+        
+        # Pobierz popularne jednostki objętości
+        units['volume'] = MeasurementUnit.objects.filter(
+            type='volume', 
+            is_common=True
+        ).order_by('base_ratio')
+        
+        # Pobierz popularne jednostki łyżkowe
+        units['spoon'] = MeasurementUnit.objects.filter(
+            type='spoon', 
+            is_common=True
+        ).order_by('base_ratio')
+        
+        # Pobierz specjalne jednostki (szklanka, itp.)
+        units['special'] = MeasurementUnit.objects.filter(
+            description__icontains='szklanka'
+        ).order_by('name')
+        
+        return units
 
 class FridgeItemCreateView(LoginRequiredMixin, CreateView):
     """Dodawanie nowego produktu do lodówki"""
