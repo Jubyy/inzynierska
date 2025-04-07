@@ -369,7 +369,7 @@ class Recipe(models.Model):
         """Zwraca listę brakujących składników, które użytkownik musi dokupić,
         aby przygotować przepis"""
         if not user.is_authenticated:
-            return None
+            return []
         
         # Import lokalny, aby uniknąć cyklicznego importu
         from fridge.models import FridgeItem
@@ -386,11 +386,11 @@ class Recipe(models.Model):
                 # Dodaj do listy brakujących
                 missing.append(ingredient_entry)
         
-        return missing if missing else None
+        return missing
     
     def can_be_prepared_with_available_ingredients(self, user):
         """Sprawdza, czy przepis może być przygotowany z dostępnych składników"""
-        return self.get_missing_ingredients(user) is None
+        return self.get_missing_ingredients(user) == []
     
     def scale_to_servings(self, target_servings):
         """Zwraca listę składników przepisu przeskalowaną do podanej liczby porcji"""

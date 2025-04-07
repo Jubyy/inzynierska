@@ -182,6 +182,8 @@ def add_to_shopping_list(request, pk):
 @login_required
 def add_missing_to_shopping_list(request, pk):
     """Dodaje brakujące składniki przepisu do listy zakupów"""
+    from fridge.models import FridgeItem
+    
     recipe = get_object_or_404(Recipe, pk=pk)
     
     # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
@@ -213,6 +215,8 @@ def add_missing_to_shopping_list(request, pk):
         create_new = request.POST.get('create_new', 'true')
         post_servings = request.POST.get('servings', servings_param)
         
+        print(f"DEBUG: add_missing_to_shopping_list POST - shopping_list_id: {shopping_list_id}, create_new: {create_new}, post_servings: {post_servings}")
+        
         try:
             if post_servings:
                 post_servings = int(post_servings)
@@ -221,16 +225,45 @@ def add_missing_to_shopping_list(request, pk):
         
         if shopping_list_id and create_new != 'true':
             shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
+            print(f"DEBUG: Używam istniejącej listy zakupów: ID {shopping_list.id}, nazwa: {shopping_list.name}")
         else:
             # Utwórz nową listę zakupów
             list_name = f"Brakujące składniki: {recipe.title}"
-            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
+            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name, recipe=recipe)
+            print(f"DEBUG: Utworzono nową listę zakupów: ID {shopping_list.id}, nazwa: {shopping_list.name}")
         
-        # Dodaj brakujące składniki do listy
+        # Sprawdź bezpośrednio, czy są brakujące składniki
+        missing_ingredients = recipe.get_missing_ingredients(request.user)
+        print(f"DEBUG: Liczba brakujących składników przed wywołaniem add_missing_ingredients: {len(missing_ingredients)}")
+        for i, item in enumerate(missing_ingredients):
+            ingredient_name = item.ingredient.name if hasattr(item, 'ingredient') else item.get('ingredient', {}).name if hasattr(item.get('ingredient', {}), 'name') else 'Unknown'
+            amount = item.amount if hasattr(item, 'amount') else item.get('amount', 'Unknown')
+            unit = item.unit.name if hasattr(item, 'unit') and item.unit else (item.get('unit').name if item.get('unit') else 'Unknown')
+            print(f"DEBUG: Brakujący składnik #{i+1}: {ingredient_name}, {amount} {unit}")
+        
+        # Próbujemy najpierw standardową metodą
         created_items = shopping_list.add_missing_ingredients(recipe, servings=post_servings or servings)
+        print(f"DEBUG: Liczba utworzonych pozycji: {len(created_items)}")
         
-        if created_items:
-            messages.success(request, f'Dodano {len(created_items)} brakujących składników do listy zakupów.')
+        # Sprawdź, czy lista faktycznie ma pozycje
+        list_items = shopping_list.items.all()
+        print(f"DEBUG: Lista po dodaniu ma {list_items.count()} pozycji")
+        
+        # Jeśli lista jest pusta, dodaj elementy bezpośrednio
+        if list_items.count() == 0 and missing_ingredients:
+            print("DEBUG: Lista jest pusta, dodaję składniki bezpośrednio")
+            add_items_directly(shopping_list, recipe, missing_ingredients, post_servings or servings)
+            # Sprawdź ponownie po bezpośrednim dodaniu
+            list_items = shopping_list.items.all()
+            print(f"DEBUG: Lista po bezpośrednim dodaniu ma {list_items.count()} pozycji")
+            
+        # Wyświetl dodane elementy
+        for i, item in enumerate(list_items):
+            print(f"DEBUG: Pozycja #{i+1} na liście: {item.ingredient.name}, {item.amount} {item.unit.name}")
+        
+        # Jeśli dodano elementy, pokaż komunikat sukcesu
+        if list_items.count() > 0:
+            messages.success(request, f'Dodano {list_items.count()} brakujących składników do listy zakupów.')
         else:
             messages.info(request, 'Wszystkie składniki do tego przepisu są już dostępne w Twojej lodówce.')
             
@@ -338,6 +371,42 @@ def add_missing_to_shopping_list(request, pk):
     }
     
     return render(request, 'recipes/add_missing_to_shopping_list.html', context)
+
+def add_items_directly(shopping_list, recipe, missing_ingredients, servings=None):
+    """
+    Funkcja pomocnicza do bezpośredniego dodawania brakujących składników do listy zakupów
+    """
+    from shopping.models import ShoppingItem
+    
+    # Oblicz współczynnik skalowania
+    scale_factor = 1.0
+    if servings and servings != recipe.servings:
+        scale_factor = float(servings) / float(recipe.servings)
+    
+    # Iteruj przez brakujące składniki i dodawaj je do listy
+    for ingredient_entry in missing_ingredients:
+        ingredient = ingredient_entry.ingredient
+        unit = ingredient_entry.unit
+        amount = float(ingredient_entry.amount) * scale_factor
+        
+        # Sprawdź, czy składnik już istnieje na liście
+        existing_item = shopping_list.items.filter(ingredient=ingredient, unit=unit).first()
+        
+        if existing_item:
+            # Aktualizuj istniejący składnik
+            existing_item.amount = max(existing_item.amount, amount)
+            existing_item.save()
+        else:
+            # Utwórz nowy składnik
+            ShoppingItem.objects.create(
+                shopping_list=shopping_list,
+                ingredient=ingredient,
+                amount=amount,
+                unit=unit,
+                recipe=recipe
+            )
+    
+    return shopping_list.items.count()
 
 def ajax_ingredient_search(request):
     """Widok AJAX do wyszukiwania składników"""

@@ -92,53 +92,54 @@ class ShoppingList(models.Model):
         Returns:
             list: Lista utworzonych obiektów ShoppingItem
         """
-        from fridge.models import FridgeItem
-        
+        # Pobierz brakujące składniki z przepisu
         missing_ingredients = recipe.get_missing_ingredients(self.user)
+        print(f"DEBUG: Znaleziono {len(missing_ingredients)} brakujących składników")
         
         if not missing_ingredients:
+            print("DEBUG: Brak brakujących składników, zwracam pustą listę")
             return []
             
         created_items = []
         
-        for missing in missing_ingredients:
-            # Obsługa zarówno obiektów RecipeIngredient, jak i słowników
-            if isinstance(missing, dict):
-                # Jeśli to słownik, pobierz dane z kluczy
-                ingredient = missing.get('ingredient')
-                unit = missing.get('unit')
-                # Użyj 'missing' jeśli istnieje, w przeciwnym razie 'amount'
-                amount = missing.get('missing', missing.get('amount', 0))
-            else:
-                # Jeśli to obiekt RecipeIngredient
-                ingredient = missing.ingredient
-                unit = missing.unit
-                amount = missing.amount
+        # Oblicz współczynnik skalowania, jeśli podano liczbę porcji inną niż domyślna
+        scale_factor = 1.0
+        if servings and servings != recipe.servings:
+            scale_factor = float(servings) / float(recipe.servings)
+            print(f"DEBUG: Współczynnik skalowania: {scale_factor}")
             
-            # Sprawdź czy wszystkie wymagane dane istnieją
-            if not ingredient or not unit or not amount:
-                continue
+        # Przetwarzaj każdy brakujący składnik
+        for ingredient_entry in missing_ingredients:
+            # Pobierz informacje o składniku
+            ingredient = ingredient_entry.ingredient
+            amount = float(ingredient_entry.amount) * scale_factor
+            unit = ingredient_entry.unit
+            
+            print(f"DEBUG: Dodaję składnik: {ingredient.name}, {amount} {unit.symbol}")
             
             # Sprawdź, czy ten składnik już jest na liście
             existing_item = self.items.filter(ingredient=ingredient, unit=unit).first()
             
             if existing_item:
-                # Jeśli tak, zwiększ ilość ale tylko jeśli nowa ilość jest większa
-                if float(amount) > existing_item.amount:
-                    existing_item.amount = float(amount)
-                    existing_item.save()
+                # Jeśli tak, zwiększ ilość
+                print(f"DEBUG: Składnik już istnieje na liście, aktualizuję ilość")
+                existing_item.amount = max(existing_item.amount, amount)  # Ustaw większą wartość
+                existing_item.save()
                 created_items.append(existing_item)
             else:
                 # Jeśli nie, utwórz nową pozycję
+                print(f"DEBUG: Tworzę nowy składnik na liście")
                 item = ShoppingItem.objects.create(
                     shopping_list=self,
                     ingredient=ingredient,
-                    amount=float(amount),
+                    amount=amount,
                     unit=unit,
                     recipe=recipe
                 )
                 created_items.append(item)
+                print(f"DEBUG: Utworzono składnik, ID: {item.id}")
                 
+        print(f"DEBUG: Dodano {len(created_items)} składników do listy zakupów")
         return created_items
     
     def complete_shopping(self):
