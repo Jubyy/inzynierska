@@ -1,4 +1,4 @@
-def convert_units(amount, from_unit, to_unit):
+def convert_units(amount, from_unit, to_unit, ingredient=None):
     """
     Konwertuje ilość z jednej jednostki na drugą.
     
@@ -6,6 +6,7 @@ def convert_units(amount, from_unit, to_unit):
         amount (float): Ilość do konwersji
         from_unit (MeasurementUnit): Jednostka źródłowa
         to_unit (MeasurementUnit): Jednostka docelowa
+        ingredient (Ingredient, optional): Składnik, dla którego wykonywana jest konwersja
         
     Returns:
         float: Skonwertowana ilość
@@ -36,6 +37,16 @@ def convert_units(amount, from_unit, to_unit):
     # Jeśli jednostki są takie same, nie ma potrzeby konwersji
     if from_unit == to_unit:
         return amount
+    
+    # Jeśli podano składnik, spróbuj użyć specyficznej konwersji dla niego
+    if ingredient is not None:
+        try:
+            from recipes.models import IngredientConversion
+            ratio = IngredientConversion.get_conversion_ratio(ingredient, from_unit, to_unit)
+            return float(amount) * float(ratio)
+        except (ValueError, Exception) as e:
+            # Jeśli nie można wykonać konwersji dla składnika, pomiń i spróbuj ogólnej konwersji
+            pass
     
     try:
         # Próba bezpośredniej konwersji

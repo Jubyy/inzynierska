@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista produktów w lodówce{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Produkty w Twojej lodówce</h1>
+    
+    <!-- Karty akcji -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">Akcje</h5>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'fridge:add' %}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Dodaj produkt
+                        </a>
+                        <a href="{% url 'fridge:bulk_add' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list-check"></i> Dodaj wiele
+                        </a>
+                        <a href="{% url 'fridge:consolidate' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-compress-arrows-alt"></i> Konsoliduj
+                        </a>
+                        <a href="{% url 'fridge:conversion_dashboard' %}" class="btn btn-outline-info">
+                            <i class="fas fa-exchange-alt"></i> Tablice konwersji
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtrowanie i wyszukiwanie -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" name="q" class="form-control" placeholder="Wyszukaj produkt..." value="{{ query }}">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <select name="expired" class="form-select" onchange="this.form.submit()">
+                                <option value="" {% if not expired %}selected{% endif %}>Wszystkie produkty</option>
+                                <option value="no" {% if expired == 'no' %}selected{% endif %}>Tylko aktualne</option>
+                                <option value="soon" {% if expired == 'soon' %}selected{% endif %}>Wkrótce przeterminowane</option>
+                                <option value="yes" {% if expired == 'yes' %}selected{% endif %}>
+                                    Przeterminowane {% if expired_count %} ({{ expired_count }}){% endif %}
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2 text-end">
+                            {% if query or expired %}
+                                <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-undo"></i> Resetuj
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lista produktów -->
+    {% if fridge_items %}
+    <!-- Przyciski przełączania widoku -->
+    <div class="view-toggle d-flex justify-content-between align-items-center">
+        <div class="btn-group" role="group" aria-label="Przełącz widok">
+            <button type="button" class="btn" id="table-view-btn">
+                <i class="fas fa-list"></i> Tabela
+            </button>
+            <button type="button" class="btn active" id="card-view-btn">
+                <i class="fas fa-th-large"></i> Karty
+            </button>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="groupByCategory">
+            <label class="form-check-label" for="groupByCategory">Grupuj według kategorii</label>
+        </div>
+    </div>
+    
+    <!-- Widok tabeli (domyślnie ukryty) -->
+    <div id="table-view" class="mt-3" style="display: none;">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Ilość</th>
+                            <th>Data ważności</th>
+                            <th>Status</th>
+                            <th>Kategoria</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in display_items %}
+                        <tr{% if item.is_expired %} class="table-danger"{% endif %}>
+                            <td>{{ item.ingredient.name }}</td>
+                            <td>
+                                {{ item.amount }} {{ item.unit.symbol }}
+                                {% if item.was_converted %}
+                                <small class="text-muted">(oryg. {{ item.original_amount }} {{ item.original_unit.symbol }})</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.expiry_date|default:"Brak" }}</td>
+                            <td>
+                                {% if item.is_expired %}
+                                <span class="badge bg-danger">Przeterminowane</span>
+                                {% elif item.days_until_expiry is not None and item.days_until_expiry <= 3 %}
+                                <span class="badge bg-warning">Wygasa w ciągu {{ item.days_until_expiry }} dni</span>
+                                {% else %}
+                                <span class="badge bg-success">Aktualne</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.ingredient.category.name }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'fridge:update' item.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'fridge:delete' item.id %}" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Widok kart -->
+    <div id="card-view" class="mt-3">
+        <div class="row" id="cards-container">
+            {% for item in display_items %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 item-card" data-category="{{ item.ingredient.category.name }}">
+                <div class="card h-100 {% if item.is_expired %}border-danger{% elif item.days_until_expiry is not None and item.days_until_expiry <= 3 %}border-warning{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center 
+                              {% if item.is_expired %}bg-danger text-white{% elif item.days_until_expiry is not None and item.days_until_expiry <= 3 %}bg-warning{% endif %}">
+                        <h5 class="card-title mb-0">{{ item.ingredient.name }}</h5>
+                        <span class="badge bg-secondary">{{ item.ingredient.category.name }}</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Ilość:</strong> {{ item.amount }} {{ item.unit.symbol }}
+                            {% if item.was_converted %}
+                            <br><small class="text-muted">(oryg. {{ item.original_amount }} {{ item.original_unit.symbol }})</small>
+                            {% endif %}
+                        </p>
+                        <p class="card-text">
+                            <strong>Data ważności:</strong> {{ item.expiry_date|default:"Brak" }}
+                            {% if item.is_expired %}
+                            <span class="badge bg-danger ms-2">Przeterminowane</span>
+                            {% elif item.days_until_expiry is not None and item.days_until_expiry <= 3 %}
+                            <span class="badge bg-warning ms-2">Wygasa w ciągu {{ item.days_until_expiry }} dni</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="btn-group w-100">
+                            <a href="{% url 'fridge:update' item.id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i> Edytuj
+                            </a>
+                            <a href="{% url 'fridge:delete' item.id %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash me-1"></i> Usuń
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Paginacja -->
+    {% if is_paginated %}
+    <div class="mt-4">
+        <nav aria-label="Nawigacja stronicowania">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}" aria-label="Pierwsza">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}" aria-label="Poprzednia">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}" aria-label="Następna">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if expired %}&expired={{ expired }}{% endif %}" aria-label="Ostatnia">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- Brak produktów -->
+    <div class="card text-center">
+        <div class="card-body py-5">
+            <h2 class="mt-3">Twoja lodówka jest pusta</h2>
+            <p class="text-muted mb-4">Dodaj produkty, aby móc planować posiłki i zarządzać swoją lodówką.</p>
+            <a href="{% url 'fridge:add' %}" class="btn btn-lg btn-primary mt-2">
+                <i class="fas fa-plus-circle me-2"></i> Dodaj pierwszy produkt
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Przyciski przełączania widoku
+        const tableViewBtn = document.getElementById('table-view-btn');
+        const cardViewBtn = document.getElementById('card-view-btn');
+        const tableView = document.getElementById('table-view');
+        const cardView = document.getElementById('card-view');
+        const groupByCategory = document.getElementById('groupByCategory');
+        const cardsContainer = document.getElementById('cards-container');
+        
+        if (tableViewBtn && cardViewBtn) {
+            // Przełączanie między widokiem tabeli a kartami
+            tableViewBtn.addEventListener('click', function() {
+                tableView.style.display = 'block';
+                cardView.style.display = 'none';
+                tableViewBtn.classList.add('active');
+                cardViewBtn.classList.remove('active');
+            });
+            
+            cardViewBtn.addEventListener('click', function() {
+                tableView.style.display = 'none';
+                cardView.style.display = 'block';
+                cardViewBtn.classList.add('active');
+                tableViewBtn.classList.remove('active');
+            });
+        }
+        
+        if (groupByCategory && cardsContainer) {
+            // Grupowanie kart według kategorii
+            groupByCategory.addEventListener('change', function() {
+                if (this.checked) {
+                    // Pobierz wszystkie karty
+                    const cards = Array.from(document.querySelectorAll('.item-card'));
+                    
+                    // Pobierz unikalne kategorie
+                    const categories = [...new Set(cards.map(card => card.dataset.category))].sort();
+                    
+                    // Wyczyść kontener kart
+                    cardsContainer.innerHTML = '';
+                    
+                    // Dla każdej kategorii dodaj nagłówek i karty
+                    categories.forEach(category => {
+                        // Utwórz nagłówek kategorii
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.className = 'col-12 mb-3 mt-4';
+                        categoryHeader.innerHTML = `<h3 class="border-bottom pb-2">${category}</h3>`;
+                        cardsContainer.appendChild(categoryHeader);
+                        
+                        // Dodaj karty z danej kategorii
+                        const categoryCards = cards.filter(card => card.dataset.category === category);
+                        categoryCards.forEach(card => cardsContainer.appendChild(card.cloneNode(true)));
+                    });
+                } else {
+                    // Przeładuj stronę, aby przywrócić oryginalny układ
+                    window.location.reload();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

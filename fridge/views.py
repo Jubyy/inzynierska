@@ -11,7 +11,7 @@ import requests
 from datetime import datetime, timedelta, date
 from difflib import SequenceMatcher
 
-from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory
+from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory, IngredientConversion
 from .models import FridgeItem
 from .forms import FridgeItemForm, BulkAddForm, FridgeSearchForm, BulkItemFormSet
 
@@ -218,15 +218,15 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
+        # Pobierz dane z formularza
+        ingredient = form.cleaned_data['ingredient']
+        amount = form.cleaned_data['amount']
+        unit = form.cleaned_data['unit']
+        expiry_date = form.cleaned_data['expiry_date']
+        
+        # Zamiast zapisywać model bezpośrednio, użyj metody add_to_fridge
         try:
-            # Pobranie danych z formularza
-            ingredient = form.cleaned_data['ingredient']
-            unit = form.cleaned_data['unit']
-            amount = form.cleaned_data['amount']
-            expiry_date = form.cleaned_data['expiry_date']
-            
-            # Dodaj produkt do lodówki - metoda add_to_fridge zajmie się konwersją do jednostek podstawowych
-            added_item, was_converted = FridgeItem.add_to_fridge(
+            item, was_converted = FridgeItem.add_to_fridge(
                 user=self.request.user,
                 ingredient=ingredient,
                 amount=amount,
@@ -234,25 +234,67 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
                 expiry_date=expiry_date
             )
             
-            # Jeśli jednostka została zmieniona podczas dodawania, poinformuj użytkownika
+            # Wyświetl komunikat o sukcesie
             if was_converted:
-                messages.info(
-                    self.request, 
-                    f'Produkt {ingredient.name} został dodany w jednostce {added_item.unit.name} '
-                    f'(skonwertowano z {unit.name}) dla zachowania standardu podstawowych jednostek.'
+                messages.success(
+                    self.request,
+                    f'Dodano {ingredient.name} w ilości {amount} {unit.symbol} '
+                    f'(skonwertowano do {item.amount:.2f} {item.unit.symbol})'
                 )
             else:
-                messages.success(self.request, f'Produkt {ingredient.name} został dodany do lodówki.')
+                messages.success(
+                    self.request,
+                    f'Dodano {ingredient.name} w ilości {amount} {unit.symbol}'
+                )
             
-            return JsonResponse({'success': True})
+            # Zaproponuj podobne produkty lub tablicę konwersji
+            self.suggest_conversion_table(ingredient)
+            
+            return redirect(self.success_url)
         except ValueError as e:
-            # Błąd walidacji (np. nieprawidłowa ilość)
-            messages.error(self.request, f'Błąd walidacji: {str(e)}')
-            return JsonResponse({'success': False, 'error': f'Błąd walidacji: {str(e)}'}, status=400)
-        except Exception as e:
-            # Inny nieoczekiwany błąd
-            messages.error(self.request, f'Wystąpił nieoczekiwany błąd: {str(e)}')
-            return JsonResponse({'success': False, 'error': f'Nieoczekiwany błąd: {str(e)}'}, status=500)
+            # W przypadku błędu dodaj go do formularza
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+    
+    def suggest_conversion_table(self, ingredient):
+        """
+        Sprawdza czy składnik ma zdefiniowane konwersje jednostek i sugeruje uzupełnienie
+        tablicy konwersji, jeśli brakuje istotnych konwersji.
+        """
+        # Importuj modele konwersji
+        from recipes.models import IngredientConversion, MeasurementUnit
+        
+        # Sprawdź czy składnik ma jakiekolwiek konwersje
+        conversions = IngredientConversion.objects.filter(ingredient=ingredient)
+        
+        # Jeśli nie ma konwersji i mamy składnik z wieloma możliwymi jednostkami
+        if not conversions.exists() and ingredient.unit_type not in ['weight_only', 'volume_only', 'piece_only']:
+            # Sprawdź czy składnik ma określone podstawowe paramtery (gęstość, waga sztuki)
+            missing_params = []
+            
+            # Sprawdź czy składnik może mieć konwersje między wagą a objętością
+            if 'weight' in ingredient.unit_type and 'volume' in ingredient.unit_type and not ingredient.density:
+                missing_params.append('gęstość (g/ml)')
+            
+            # Sprawdź czy składnik może mieć konwersje między wagą a sztukami
+            if 'weight' in ingredient.unit_type and 'piece' in ingredient.unit_type and not ingredient.piece_weight:
+                missing_params.append('wagę sztuki (g)')
+            
+            # Jeśli brakuje parametrów, wyświetl komunikat
+            if missing_params:
+                messages.warning(
+                    self.request,
+                    f'Aby umożliwić dokładniejsze konwersje jednostek dla {ingredient.name}, '
+                    f'uzupełnij następujące parametry: {", ".join(missing_params)}.'
+                )
+            
+            # Sugeruj utworzenie konwersji dla częstych jednostek
+            messages.info(
+                self.request,
+                f'Ten składnik nie ma zdefiniowanej tablicy konwersji. '
+                f'Możesz ją zdefiniować w panelu administracyjnym, '
+                f'aby umożliwić dokładniejsze konwersje między różnymi jednostkami.'
+            )
 
 class FridgeItemUpdateView(LoginRequiredMixin, UpdateView):
     """Edycja produktu w lodówce"""
@@ -507,6 +549,45 @@ def ajax_compatible_units(request):
         'units': [{'id': u.id, 'name': u.name} for u in compatible_units]
     })
 
+@login_required
+def ajax_convert_units(request):
+    """Widok AJAX do konwersji jednostek dla konkretnego składnika"""
+    ingredient_id = request.GET.get('ingredient_id')
+    amount = request.GET.get('amount')
+    from_unit_id = request.GET.get('from_unit')
+    to_unit_id = request.GET.get('to_unit')
+    
+    # Walidacja danych
+    if not all([ingredient_id, amount, from_unit_id, to_unit_id]):
+        return JsonResponse({'success': False, 'error': 'Brakujące parametry'})
+    
+    try:
+        ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+        from_unit = get_object_or_404(MeasurementUnit, id=from_unit_id)
+        to_unit = get_object_or_404(MeasurementUnit, id=to_unit_id)
+        amount = float(amount)
+        
+        # Wykonaj konwersję
+        from recipes.utils import convert_units
+        converted_amount = convert_units(amount, from_unit, to_unit, ingredient=ingredient)
+        
+        # Sformatuj wynik z maksymalnie 4 miejscami po przecinku
+        if converted_amount == int(converted_amount):
+            # Jeśli liczba całkowita, usuń miejsca po przecinku
+            formatted_amount = str(int(converted_amount))
+        else:
+            # W przeciwnym razie ogranicz liczbę miejsc po przecinku
+            formatted_amount = '{:.4f}'.format(converted_amount).rstrip('0').rstrip('.')
+        
+        return JsonResponse({
+            'success': True, 
+            'converted_amount': formatted_amount,
+            'from_unit': from_unit.symbol,
+            'to_unit': to_unit.symbol
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 @classmethod
 def check_ingredient_availability(cls, user, ingredient, amount, unit):
     """
@@ -612,4 +693,297 @@ def consolidate_items(request):
     
     return render(request, 'fridge/consolidate_confirm.html', {
         'ingredients_to_consolidate': ingredients_to_consolidate
+    })
+
+@login_required
+def conversion_dashboard(request):
+    """Panel zarządzania tablicami konwersji dla składników"""
+    # Pobierz wszystkie składniki, które mają zdefiniowane konwersje
+    ingredients_with_conversions = Ingredient.objects.filter(
+        conversions__isnull=False
+    ).distinct().order_by('name')
+    
+    # Pobierz składniki, które mogą mieć konwersje (z różnymi typami jednostek)
+    ingredients_without_conversions = Ingredient.objects.filter(
+        ~Q(unit_type__in=['weight_only', 'volume_only', 'piece_only']),
+        ~Q(id__in=ingredients_with_conversions)
+    ).order_by('name')
+    
+    # Pobierz najczęściej używane składniki z lodówki użytkownika
+    from django.db.models import Count
+    frequent_ingredients = FridgeItem.objects.filter(
+        user=request.user
+    ).values('ingredient__id', 'ingredient__name').annotate(
+        count=Count('ingredient')
+    ).order_by('-count')[:10]
+    
+    return render(request, 'fridge/conversion_dashboard.html', {
+        'ingredients_with_conversions': ingredients_with_conversions,
+        'ingredients_without_conversions': ingredients_without_conversions,
+        'frequent_ingredients': frequent_ingredients
+    })
+
+@login_required
+def ingredient_conversions(request, ingredient_id):
+    """Wyświetla tablicę konwersji dla konkretnego składnika"""
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    
+    # Pobierz wszystkie konwersje dla tego składnika
+    conversions = IngredientConversion.objects.filter(ingredient=ingredient).order_by('from_unit__name', 'to_unit__name')
+    
+    # Pobierz dostępne jednostki dla tego składnika
+    units = ingredient.get_allowed_units()
+    
+    # Sprawdź, jakie parametry są potrzebne do konwersji
+    missing_params = []
+    if 'weight' in ingredient.unit_type and 'volume' in ingredient.unit_type and not ingredient.density:
+        missing_params.append({
+            'name': 'density',
+            'label': 'Gęstość (g/ml)',
+            'description': 'Pozwala na konwersję między wagą a objętością'
+        })
+    
+    if 'weight' in ingredient.unit_type and 'piece' in ingredient.unit_type and not ingredient.piece_weight:
+        missing_params.append({
+            'name': 'piece_weight',
+            'label': 'Waga sztuki (g)',
+            'description': 'Pozwala na konwersję między wagą a sztukami'
+        })
+    
+    return render(request, 'fridge/ingredient_conversions.html', {
+        'ingredient': ingredient,
+        'conversions': conversions,
+        'units': units,
+        'missing_params': missing_params
+    })
+
+@login_required
+def add_conversion(request, ingredient_id):
+    """Dodaje nową konwersję dla składnika"""
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    
+    if request.method == 'POST':
+        from_unit_id = request.POST.get('from_unit')
+        to_unit_id = request.POST.get('to_unit')
+        ratio = request.POST.get('ratio')
+        is_exact = request.POST.get('is_exact') == 'on'
+        description = request.POST.get('description', '')
+        
+        # Walidacja danych
+        errors = []
+        if not from_unit_id:
+            errors.append('Wybierz jednostkę źródłową')
+        if not to_unit_id:
+            errors.append('Wybierz jednostkę docelową')
+        if not ratio:
+            errors.append('Podaj współczynnik konwersji')
+        else:
+            try:
+                ratio = float(ratio.replace(',', '.'))
+                if ratio <= 0:
+                    errors.append('Współczynnik musi być większy od zera')
+            except ValueError:
+                errors.append('Nieprawidłowy format współczynnika')
+        
+        if from_unit_id == to_unit_id:
+            errors.append('Jednostki źródłowa i docelowa muszą być różne')
+        
+        # Jeśli są błędy, wyświetl je
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect('fridge:add_conversion', ingredient_id=ingredient_id)
+        
+        # Pobierz jednostki
+        from_unit = get_object_or_404(MeasurementUnit, id=from_unit_id)
+        to_unit = get_object_or_404(MeasurementUnit, id=to_unit_id)
+        
+        # Sprawdź, czy konwersja już istnieje
+        existing = IngredientConversion.objects.filter(
+            ingredient=ingredient,
+            from_unit=from_unit,
+            to_unit=to_unit
+        ).first()
+        
+        if existing:
+            # Aktualizacja istniejącej konwersji
+            existing.ratio = ratio
+            existing.is_exact = is_exact
+            existing.description = description
+            existing.save()
+            messages.success(request, f'Zaktualizowano konwersję dla {ingredient.name}')
+        else:
+            # Utworzenie nowej konwersji
+            IngredientConversion.objects.create(
+                ingredient=ingredient,
+                from_unit=from_unit,
+                to_unit=to_unit,
+                ratio=ratio,
+                is_exact=is_exact,
+                description=description
+            )
+            messages.success(request, f'Dodano nową konwersję dla {ingredient.name}')
+        
+        # Sprawdź, czy dodać też odwrotną konwersję
+        if request.POST.get('add_reverse') == 'on':
+            # Oblicz odwrotny współczynnik
+            reverse_ratio = 1 / ratio
+            
+            # Sprawdź, czy już istnieje
+            existing_reverse = IngredientConversion.objects.filter(
+                ingredient=ingredient,
+                from_unit=to_unit,
+                to_unit=from_unit
+            ).first()
+            
+            if existing_reverse:
+                existing_reverse.ratio = reverse_ratio
+                existing_reverse.is_exact = is_exact
+                existing_reverse.description = f"Odwrotność: {description}" if description else ""
+                existing_reverse.save()
+            else:
+                IngredientConversion.objects.create(
+                    ingredient=ingredient,
+                    from_unit=to_unit,
+                    to_unit=from_unit,
+                    ratio=reverse_ratio,
+                    is_exact=is_exact,
+                    description=f"Odwrotność: {description}" if description else ""
+                )
+            
+            messages.success(request, f'Dodano również odwrotną konwersję ({to_unit.symbol} → {from_unit.symbol})')
+        
+        return redirect('fridge:ingredient_conversions', ingredient_id=ingredient_id)
+    
+    # Pobierz dostępne jednostki dla tego składnika
+    units = ingredient.get_allowed_units()
+    
+    return render(request, 'fridge/add_conversion.html', {
+        'ingredient': ingredient,
+        'units': units
+    })
+
+@login_required
+def edit_conversion(request, conversion_id):
+    """Edytuje istniejącą konwersję"""
+    conversion = get_object_or_404(IngredientConversion, id=conversion_id)
+    ingredient = conversion.ingredient
+    
+    if request.method == 'POST':
+        ratio = request.POST.get('ratio')
+        is_exact = request.POST.get('is_exact') == 'on'
+        description = request.POST.get('description', '')
+        
+        # Walidacja danych
+        errors = []
+        if not ratio:
+            errors.append('Podaj współczynnik konwersji')
+        else:
+            try:
+                ratio = float(ratio.replace(',', '.'))
+                if ratio <= 0:
+                    errors.append('Współczynnik musi być większy od zera')
+            except ValueError:
+                errors.append('Nieprawidłowy format współczynnika')
+        
+        # Jeśli są błędy, wyświetl je
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect('fridge:edit_conversion', conversion_id=conversion_id)
+        
+        # Aktualizacja konwersji
+        conversion.ratio = ratio
+        conversion.is_exact = is_exact
+        conversion.description = description
+        conversion.save()
+        
+        # Sprawdź, czy zaktualizować też odwrotną konwersję
+        if request.POST.get('update_reverse') == 'on':
+            # Sprawdź, czy istnieje odwrotna konwersja
+            reverse_conversion = IngredientConversion.objects.filter(
+                ingredient=ingredient,
+                from_unit=conversion.to_unit,
+                to_unit=conversion.from_unit
+            ).first()
+            
+            if reverse_conversion:
+                # Oblicz odwrotny współczynnik
+                reverse_ratio = 1 / ratio
+                reverse_conversion.ratio = reverse_ratio
+                reverse_conversion.is_exact = is_exact
+                reverse_conversion.save()
+                messages.success(request, f'Zaktualizowano również odwrotną konwersję')
+        
+        messages.success(request, f'Zaktualizowano konwersję dla {ingredient.name}')
+        return redirect('fridge:ingredient_conversions', ingredient_id=ingredient.id)
+    
+    return render(request, 'fridge/edit_conversion.html', {
+        'conversion': conversion,
+        'ingredient': ingredient
+    })
+
+@login_required
+def delete_conversion(request, conversion_id):
+    """Usuwa konwersję"""
+    conversion = get_object_or_404(IngredientConversion, id=conversion_id)
+    ingredient = conversion.ingredient
+    
+    if request.method == 'POST':
+        # Sprawdź, czy usunąć też odwrotną konwersję
+        if request.POST.get('delete_reverse') == 'on':
+            # Sprawdź, czy istnieje odwrotna konwersja
+            reverse_conversion = IngredientConversion.objects.filter(
+                ingredient=ingredient,
+                from_unit=conversion.to_unit,
+                to_unit=conversion.from_unit
+            ).first()
+            
+            if reverse_conversion:
+                reverse_conversion.delete()
+                messages.success(request, f'Usunięto również odwrotną konwersję')
+        
+        # Usuń konwersję
+        conversion.delete()
+        messages.success(request, f'Usunięto konwersję dla {ingredient.name}')
+        return redirect('fridge:ingredient_conversions', ingredient_id=ingredient.id)
+    
+    return render(request, 'fridge/delete_conversion.html', {
+        'conversion': conversion,
+        'ingredient': ingredient
+    })
+
+@login_required
+def update_ingredient_params(request, ingredient_id):
+    """Aktualizuje parametry składnika (gęstość, waga sztuki)"""
+    ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+    
+    if request.method == 'POST':
+        density = request.POST.get('density')
+        piece_weight = request.POST.get('piece_weight')
+        
+        # Aktualizuj parametry, jeśli podano
+        if density:
+            try:
+                density = float(density.replace(',', '.'))
+                if density > 0:
+                    ingredient.density = density
+            except ValueError:
+                messages.error(request, 'Nieprawidłowy format gęstości')
+        
+        if piece_weight:
+            try:
+                piece_weight = float(piece_weight.replace(',', '.'))
+                if piece_weight > 0:
+                    ingredient.piece_weight = piece_weight
+            except ValueError:
+                messages.error(request, 'Nieprawidłowy format wagi sztuki')
+        
+        ingredient.save()
+        messages.success(request, f'Zaktualizowano parametry dla {ingredient.name}')
+        
+        return redirect('fridge:ingredient_conversions', ingredient_id=ingredient_id)
+    
+    return render(request, 'fridge/update_params.html', {
+        'ingredient': ingredient
     })

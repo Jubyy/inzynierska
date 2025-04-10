@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj konwersję dla {{ ingredient.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Dodaj nową konwersję dla {{ ingredient.name }}</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Nowa konwersja jednostek</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="from_unit" class="form-label">Z jednostki:</label>
+                                <select id="from_unit" name="from_unit" class="form-select" required>
+                                    <option value="">-- Wybierz jednostkę źródłową --</option>
+                                    {% for unit in units %}
+                                        <option value="{{ unit.id }}">
+                                            {{ unit.name }} ({{ unit.symbol }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="to_unit" class="form-label">Na jednostkę:</label>
+                                <select id="to_unit" name="to_unit" class="form-select" required>
+                                    <option value="">-- Wybierz jednostkę docelową --</option>
+                                    {% for unit in units %}
+                                        <option value="{{ unit.id }}">
+                                            {{ unit.name }} ({{ unit.symbol }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="ratio" class="form-label">Współczynnik konwersji:</label>
+                                <div class="input-group">
+                                    <input type="number" id="ratio" name="ratio" class="form-control" 
+                                           min="0.0001" step="0.0001" required placeholder="np. 15.0">
+                                    <span class="input-group-text" id="ratio-explanation">1:X</span>
+                                </div>
+                                <div class="form-text">
+                                    Współczynnik określa, ile jednostek docelowych odpowiada jednej jednostce źródłowej.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="description" class="form-label">Opis (opcjonalnie):</label>
+                                <input type="text" id="description" name="description" class="form-control" 
+                                       placeholder="np. Na podstawie pomiarów">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="is_exact" name="is_exact" checked>
+                                    <label class="form-check-label" for="is_exact">
+                                        Dokładna konwersja
+                                    </label>
+                                    <div class="form-text">
+                                        Odznacz, jeśli konwersja jest przybliżona.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="add_reverse" name="add_reverse" checked>
+                                    <label class="form-check-label" for="add_reverse">
+                                        Dodaj również odwrotną konwersję
+                                    </label>
+                                    <div class="form-text">
+                                        Automatycznie utworzy konwersję w przeciwnym kierunku (X:1).
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i> Zapisz konwersję
+                                </button>
+                                <a href="{% url 'fridge:ingredient_conversions' ingredient.id %}" class="btn btn-outline-secondary ms-2">
+                                    Anuluj
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h2 class="h5 mb-0">Przykłady konwersji</h2>
+                </div>
+                <div class="card-body">
+                    <p>Oto przykłady typowych współczynników konwersji:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Z jednostki</th>
+                                    <th>Na jednostkę</th>
+                                    <th>Współczynnik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Łyżka (mąka)</td>
+                                    <td>Gram</td>
+                                    <td>15</td>
+                                </tr>
+                                <tr>
+                                    <td>Łyżka (olej)</td>
+                                    <td>Mililitr</td>
+                                    <td>15</td>
+                                </tr>
+                                <tr>
+                                    <td>Szklanka (mąka)</td>
+                                    <td>Gram</td>
+                                    <td>120-140</td>
+                                </tr>
+                                <tr>
+                                    <td>Szklanka (płyn)</td>
+                                    <td>Mililitr</td>
+                                    <td>250</td>
+                                </tr>
+                                <tr>
+                                    <td>Sztuka (jabłko)</td>
+                                    <td>Gram</td>
+                                    <td>180</td>
+                                </tr>
+                                <tr>
+                                    <td>Kilogram</td>
+                                    <td>Gram</td>
+                                    <td>1000</td>
+                                </tr>
+                                <tr>
+                                    <td>Litr</td>
+                                    <td>Mililitr</td>
+                                    <td>1000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i> Pamiętaj, że współczynniki mogą się różnić w zależności od składnika!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'fridge:ingredient_conversions' ingredient.id %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Powrót do tablicy konwersji
+        </a>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aktualizuj przykładowy tekst wspołczynnika przy zmianie jednostek
+        const fromUnitSelect = document.getElementById('from_unit');
+        const toUnitSelect = document.getElementById('to_unit');
+        const ratioExplanation = document.getElementById('ratio-explanation');
+        
+        function updateRatioExplanation() {
+            const fromUnitText = fromUnitSelect.options[fromUnitSelect.selectedIndex]?.text || '';
+            const toUnitText = toUnitSelect.options[toUnitSelect.selectedIndex]?.text || '';
+            
+            if (fromUnitText && toUnitText) {
+                const fromSymbol = fromUnitText.match(/\(([^)]+)\)/)?.[1] || '';
+                const toSymbol = toUnitText.match(/\(([^)]+)\)/)?.[1] || '';
+                
+                if (fromSymbol && toSymbol) {
+                    ratioExplanation.textContent = `1 ${fromSymbol} = X ${toSymbol}`;
+                }
+            }
+        }
+        
+        fromUnitSelect.addEventListener('change', updateRatioExplanation);
+        toUnitSelect.addEventListener('change', updateRatioExplanation);
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient
 from .utils import convert_units, get_common_units, get_common_conversions
 from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm
 from shopping.models import ShoppingItem, ShoppingList
@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from decimal import Decimal
 from django.utils import timezone
 import json
+from django.core.paginator import Paginator
 
 class RecipeListView(ListView):
     model = Recipe
@@ -1298,4 +1299,198 @@ def ajax_unit_info(request):
             'description': '',
             'conversion': '',
             'error': str(e)
-        }, status=400) 
+        }, status=400)
+
+@login_required
+def conversion_tables_list(request):
+    """Lista dostępnych tablic konwersji"""
+    # Pobierz zatwierdzone tablice konwersji
+    approved_tables = ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
+    
+    # Jeśli użytkownik jest zalogowany, pobierz również jego własne tablice
+    user_tables = []
+    if request.user.is_authenticated:
+        user_tables = ConversionTable.objects.filter(
+            created_by=request.user, 
+            is_approved=False
+        ).order_by('-created_at')
+    
+    # Pogrupuj tablice według typu produktu
+    grouped_tables = {}
+    for table in approved_tables:
+        if table.product_type not in grouped_tables:
+            grouped_tables[table.product_type] = []
+        grouped_tables[table.product_type].append(table)
+    
+    return render(request, 'recipes/conversion_tables_list.html', {
+        'grouped_tables': grouped_tables,
+        'user_tables': user_tables
+    })
+
+@login_required
+def add_conversion_table(request):
+    """Tworzenie nowej tablicy konwersji"""
+    from django import forms
+    
+    class ConversionTableForm(forms.ModelForm):
+        class Meta:
+            model = ConversionTable
+            fields = ['name', 'description', 'product_type']
+    
+    class ConversionEntryForm(forms.ModelForm):
+        class Meta:
+            model = ConversionTableEntry
+            fields = ['from_unit', 'to_unit', 'ratio', 'is_exact', 'notes']
+    
+    ConversionEntryFormSet = formset_factory(ConversionEntryForm, extra=3)
+    
+    if request.method == 'POST':
+        table_form = ConversionTableForm(request.POST)
+        entry_formset = ConversionEntryFormSet(request.POST, prefix='entries')
+        
+        if table_form.is_valid() and entry_formset.is_valid():
+            # Najpierw zapisz tablicę
+            table = table_form.save(commit=False)
+            table.created_by = request.user
+            table.is_approved = False  # Nowe tablice wymagają zatwierdzenia
+            table.save()
+            
+            # Potem zapisz wpisy konwersji
+            for form in entry_formset:
+                if form.cleaned_data and 'from_unit' in form.cleaned_data and 'to_unit' in form.cleaned_data:
+                    entry = form.save(commit=False)
+                    entry.table = table
+                    entry.save()
+            
+            messages.success(request, 'Tablica konwersji została utworzona i oczekuje na zatwierdzenie przez administratora.')
+            return redirect('recipes:conversion_tables')
+    else:
+        table_form = ConversionTableForm()
+        entry_formset = ConversionEntryFormSet(prefix='entries')
+    
+    return render(request, 'recipes/add_conversion_table.html', {
+        'table_form': table_form,
+        'entry_formset': entry_formset,
+        'measurement_units': MeasurementUnit.objects.all().order_by('type', 'name')
+    })
+
+@login_required
+def conversion_table_detail(request, table_id):
+    """Szczegóły tablicy konwersji"""
+    table = get_object_or_404(ConversionTable, id=table_id)
+    
+    # Sprawdź uprawnienia - tylko zatwierdzone lub własne tablice
+    if not table.is_approved and table.created_by != request.user and not request.user.is_staff:
+        messages.error(request, 'Nie masz uprawnień do wyświetlenia tej tablicy konwersji.')
+        return redirect('recipes:conversion_tables')
+    
+    # Pobierz wszystkie wpisy dla tej tablicy
+    entries = table.entries.all().order_by('from_unit__type', 'from_unit__name', 'to_unit__name')
+    
+    # Pogrupuj wpisy według typów jednostek
+    grouped_entries = {}
+    for entry in entries:
+        unit_type = entry.from_unit.type
+        if unit_type not in grouped_entries:
+            grouped_entries[unit_type] = []
+        grouped_entries[unit_type].append(entry)
+    
+    return render(request, 'recipes/conversion_table_detail.html', {
+        'table': table,
+        'grouped_entries': grouped_entries
+    })
+
+@login_required
+def submit_ingredient(request):
+    """Zgłoszenie nowego składnika przez użytkownika"""
+    from django import forms
+    
+    class UserIngredientForm(forms.ModelForm):
+        class Meta:
+            model = UserIngredient
+            fields = ['name', 'category', 'description', 'default_unit', 
+                     'conversion_table', 'density', 'piece_weight', 'unit_type']
+            widgets = {
+                'description': forms.Textarea(attrs={'rows': 3}),
+            }
+        
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Ogranicz wybór tablic konwersji do zatwierdzonych
+            self.fields['conversion_table'].queryset = ConversionTable.objects.filter(is_approved=True)
+    
+    if request.method == 'POST':
+        form = UserIngredientForm(request.POST)
+        if form.is_valid():
+            ingredient = form.save(commit=False)
+            ingredient.user = request.user
+            ingredient.status = 'pending'
+            ingredient.save()
+            
+            messages.success(request, f'Składnik "{ingredient.name}" został zgłoszony i oczekuje na zatwierdzenie przez administratora.')
+            return redirect('recipes:my_submissions')
+    else:
+        form = UserIngredientForm()
+    
+    return render(request, 'recipes/submit_ingredient.html', {
+        'form': form,
+        'conversion_tables': ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
+    })
+
+@login_required
+def my_ingredient_submissions(request):
+    """Lista składników zgłoszonych przez użytkownika"""
+    submissions = UserIngredient.objects.filter(user=request.user).order_by('-submitted_at')
+    
+    # Podział na strony
+    paginator = Paginator(submissions, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'recipes/my_ingredient_submissions.html', {
+        'page_obj': page_obj
+    })
+
+# Funkcja pomocnicza do sprawdzania uprawnień administratora
+def is_admin(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+@user_passes_test(is_admin)
+def admin_pending_ingredients(request):
+    """Panel administratora - składniki oczekujące na zatwierdzenie"""
+    pending = UserIngredient.objects.filter(status='pending').order_by('-submitted_at')
+    recent = UserIngredient.objects.exclude(status='pending').order_by('-submitted_at')[:10]
+    
+    return render(request, 'recipes/admin/pending_ingredients.html', {
+        'pending_ingredients': pending,
+        'recent_ingredients': recent
+    })
+
+@user_passes_test(is_admin)
+def admin_approve_ingredient(request, ingredient_id):
+    """Zatwierdzenie składnika przez administratora"""
+    user_ingredient = get_object_or_404(UserIngredient, id=ingredient_id, status='pending')
+    
+    if request.method == 'POST':
+        try:
+            ingredient = user_ingredient.approve(admin_user=request.user)
+            messages.success(request, f'Składnik "{ingredient.name}" został zatwierdzony i dodany do bazy.')
+        except Exception as e:
+            messages.error(request, f'Błąd podczas zatwierdzania składnika: {str(e)}')
+    
+    return redirect('recipes:admin_pending_ingredients')
+
+@user_passes_test(is_admin)
+def admin_reject_ingredient(request, ingredient_id):
+    """Odrzucenie składnika przez administratora"""
+    user_ingredient = get_object_or_404(UserIngredient, id=ingredient_id, status='pending')
+    
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '')
+        try:
+            user_ingredient.reject(reason=reason, admin_user=request.user)
+            messages.success(request, f'Składnik "{user_ingredient.name}" został odrzucony.')
+        except Exception as e:
+            messages.error(request, f'Błąd podczas odrzucania składnika: {str(e)}')
+    
+    return redirect('recipes:admin_pending_ingredients') 

@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+from datetime import datetime
 
 class IngredientCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa kategorii")
@@ -540,4 +541,231 @@ class IngredientUnit(models.Model):
         # Upewnij się, że tylko jedna jednostka jest domyślna dla składnika
         if self.is_default:
             IngredientUnit.objects.filter(ingredient=self.ingredient).exclude(id=self.id).update(is_default=False)
-        super().save(*args, **kwargs) 
+        super().save(*args, **kwargs)
+
+class IngredientConversion(models.Model):
+    """
+    Model przechowujący współczynniki konwersji dla konkretnych składników.
+    Pozwala na definiowanie tabeli konwersji między różnymi jednostkami dla danego składnika.
+    """
+    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, related_name='conversions', verbose_name="Składnik")
+    from_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE, related_name='from_conversions', verbose_name="Z jednostki")
+    to_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE, related_name='to_conversions', verbose_name="Na jednostkę")
+    ratio = models.DecimalField(max_digits=10, decimal_places=4, verbose_name="Współczynnik konwersji")
+    description = models.CharField(max_length=200, blank=True, verbose_name="Dodatkowy opis")
+    is_exact = models.BooleanField(default=True, verbose_name="Dokładna konwersja")
+    
+    class Meta:
+        verbose_name = "Konwersja składnika"
+        verbose_name_plural = "Konwersje składników"
+        unique_together = ['ingredient', 'from_unit', 'to_unit']
+        ordering = ['ingredient__name', 'from_unit__name', 'to_unit__name']
+    
+    def __str__(self):
+        return f"{self.ingredient.name}: {self.from_unit.symbol} → {self.to_unit.symbol} ({self.ratio})"
+    
+    def convert(self, amount):
+        """
+        Konwertuje podaną ilość z jednostki źródłowej na docelową używając współczynnika konwersji.
+        """
+        from decimal import Decimal
+        try:
+            amount = Decimal(str(amount))
+            return amount * self.ratio
+        except (ValueError, TypeError):
+            raise ValueError(f"Niepoprawna wartość do konwersji: {amount}")
+    
+    @classmethod
+    def get_conversion_ratio(cls, ingredient, from_unit, to_unit):
+        """
+        Zwraca współczynnik konwersji między dwiema jednostkami dla danego składnika.
+        Jeśli bezpośrednia konwersja nie istnieje, próbuje znaleźć pośrednią lub odwrotną.
+        """
+        # Sprawdź, czy jednostki nie są takie same
+        if from_unit == to_unit:
+            return 1
+            
+        # Próba znalezienia bezpośredniej konwersji
+        try:
+            conversion = cls.objects.get(ingredient=ingredient, from_unit=from_unit, to_unit=to_unit)
+            return conversion.ratio
+        except cls.DoesNotExist:
+            pass
+            
+        # Próba znalezienia odwrotnej konwersji
+        try:
+            conversion = cls.objects.get(ingredient=ingredient, from_unit=to_unit, to_unit=from_unit)
+            from decimal import Decimal
+            if conversion.ratio == 0:
+                raise ValueError("Współczynnik konwersji nie może być równy zero")
+            return Decimal(1) / conversion.ratio
+        except cls.DoesNotExist:
+            pass
+        
+        # Jeśli nie znaleziono bezpośredniej ani odwrotnej konwersji,
+        # próbujemy znaleźć pośrednią przez jednostki podstawowe
+        base_unit = None
+        
+        # Ustal jednostkę podstawową na podstawie typu jednostek
+        if from_unit.type == 'weight' and to_unit.type == 'weight':
+            # Dla wagi podstawową jednostką są gramy
+            try:
+                base_unit = MeasurementUnit.objects.get(symbol='g')
+            except MeasurementUnit.DoesNotExist:
+                pass
+        elif from_unit.type == 'volume' and to_unit.type == 'volume':
+            # Dla objętości podstawową jednostką są mililitry
+            try:
+                base_unit = MeasurementUnit.objects.get(symbol='ml')
+            except MeasurementUnit.DoesNotExist:
+                pass
+        
+        if base_unit:
+            # Próba konwersji przez jednostkę podstawową
+            try:
+                from_to_base = cls.get_conversion_ratio(ingredient, from_unit, base_unit)
+                base_to_to = cls.get_conversion_ratio(ingredient, base_unit, to_unit)
+                return from_to_base * base_to_to
+            except:
+                pass
+        
+        # Jeśli wszystkie metody zawiodły, zgłoś brak możliwości konwersji
+        raise ValueError(f"Brak możliwości konwersji z {from_unit.symbol} na {to_unit.symbol} dla {ingredient.name}")
+
+class ConversionTable(models.Model):
+    """
+    Model predefiniowanej tablicy konwersji, która może być przypisana do różnych składników.
+    Zawiera zestaw konwersji dla różnych typów produktów (np. mąka, płyny, owoce).
+    """
+    name = models.CharField(max_length=100, verbose_name="Nazwa tablicy")
+    description = models.TextField(blank=True, verbose_name="Opis")
+    product_type = models.CharField(max_length=50, verbose_name="Typ produktu")
+    is_approved = models.BooleanField(default=True, verbose_name="Zatwierdzona")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
+                                   related_name='created_conversion_tables', verbose_name="Utworzona przez")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data utworzenia")
+    
+    class Meta:
+        verbose_name = "Tablica konwersji"
+        verbose_name_plural = "Tablice konwersji"
+        ordering = ['name']
+    
+    def __str__(self):
+        return f"{self.name} ({self.product_type})"
+
+class ConversionTableEntry(models.Model):
+    """
+    Pojedynczy wpis w predefiniowanej tablicy konwersji.
+    """
+    table = models.ForeignKey(ConversionTable, on_delete=models.CASCADE, related_name='entries', 
+                             verbose_name="Tablica konwersji")
+    from_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE, related_name='+', 
+                                 verbose_name="Z jednostki")
+    to_unit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE, related_name='+', 
+                               verbose_name="Na jednostkę")
+    ratio = models.DecimalField(max_digits=10, decimal_places=4, verbose_name="Współczynnik konwersji")
+    is_exact = models.BooleanField(default=True, verbose_name="Dokładna konwersja")
+    notes = models.CharField(max_length=200, blank=True, verbose_name="Uwagi")
+    
+    class Meta:
+        verbose_name = "Wpis tablicy konwersji"
+        verbose_name_plural = "Wpisy tablicy konwersji"
+        unique_together = ['table', 'from_unit', 'to_unit']
+        ordering = ['table', 'from_unit__name', 'to_unit__name']
+    
+    def __str__(self):
+        return f"{self.from_unit.symbol} → {self.to_unit.symbol} ({self.ratio})"
+
+class UserIngredient(models.Model):
+    """
+    Model składnika zgłoszonego przez użytkownika, oczekującego na zatwierdzenie.
+    """
+    name = models.CharField(max_length=100, verbose_name="Nazwa składnika")
+    category = models.ForeignKey(IngredientCategory, on_delete=models.CASCADE, related_name='+', 
+                                verbose_name="Kategoria")
+    description = models.TextField(blank=True, null=True, verbose_name="Opis")
+    default_unit = models.ForeignKey(MeasurementUnit, on_delete=models.SET_NULL, null=True, 
+                                    related_name='+', verbose_name="Domyślna jednostka")
+    conversion_table = models.ForeignKey(ConversionTable, on_delete=models.SET_NULL, null=True, 
+                                         related_name='user_ingredients', verbose_name="Tablica konwersji")
+    density = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True, 
+                                 verbose_name="Gęstość [g/ml]")
+    piece_weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, 
+                                      verbose_name="Waga sztuki [g]")
+    unit_type = models.CharField(max_length=20, choices=[
+        ('weight_only', 'Tylko waga (g, kg)'),
+        ('volume_only', 'Tylko objętość (ml, l)'),
+        ('piece_only', 'Tylko sztuki'),
+        ('weight_volume', 'Waga i objętość'),
+        ('weight_piece', 'Waga i sztuki'),
+        ('weight_spoon', 'Waga i łyżki'),
+        ('volume_spoon', 'Objętość i łyżki'),
+        ('all', 'Wszystkie jednostki')
+    ], default='weight_only', verbose_name="Dozwolone jednostki")
+    
+    # Dane zgłoszenia
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submitted_ingredients', 
+                            verbose_name="Zgłoszone przez")
+    submitted_at = models.DateTimeField(auto_now_add=True, verbose_name="Data zgłoszenia")
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Oczekujący'),
+        ('approved', 'Zatwierdzony'),
+        ('rejected', 'Odrzucony')
+    ], default='pending', verbose_name="Status")
+    admin_notes = models.TextField(blank=True, verbose_name="Uwagi administratora")
+    
+    class Meta:
+        verbose_name = "Składnik użytkownika"
+        verbose_name_plural = "Składniki użytkowników"
+        ordering = ['-submitted_at']
+    
+    def __str__(self):
+        return f"{self.name} (zgłoszony przez {self.user.username})"
+    
+    def approve(self, admin_user=None):
+        """
+        Zatwierdza składnik i tworzy z niego normalny składnik w bazie.
+        """
+        # Utwórz nowy składnik na podstawie danych z UserIngredient
+        ingredient = Ingredient.objects.create(
+            name=self.name,
+            category=self.category,
+            description=self.description,
+            default_unit=self.default_unit,
+            density=self.density,
+            piece_weight=self.piece_weight,
+            unit_type=self.unit_type
+        )
+        
+        # Jeśli przypisano tablicę konwersji, utwórz wpisy IngredientConversion
+        if self.conversion_table:
+            for entry in self.conversion_table.entries.all():
+                IngredientConversion.objects.create(
+                    ingredient=ingredient,
+                    from_unit=entry.from_unit,
+                    to_unit=entry.to_unit,
+                    ratio=entry.ratio,
+                    is_exact=entry.is_exact,
+                    description=f"Z tablicy konwersji: {self.conversion_table.name}"
+                )
+        
+        # Zaktualizuj status
+        self.status = 'approved'
+        if admin_user:
+            self.admin_notes += f"\nZatwierdzono przez {admin_user.username} dnia {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        self.save()
+        
+        return ingredient
+    
+    def reject(self, reason="", admin_user=None):
+        """
+        Odrzuca składnik.
+        """
+        self.status = 'rejected'
+        if reason:
+            self.admin_notes += f"\nPowód odrzucenia: {reason}"
+        
+        if admin_user:
+            self.admin_notes += f"\nOdrzucono przez {admin_user.username} dnia {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        
+        self.save() 

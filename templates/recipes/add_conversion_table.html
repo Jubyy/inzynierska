@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj nową tablicę konwersji{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Utwórz nową tablicę konwersji</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Tablica konwersji zawiera zestaw współczynników do przeliczania między różnymi jednostkami dla konkretnego typu produktu.
+        Przykłady to: "Mąka", "Płyny", "Owoce" itp. Każdy wpis określa, jak przeliczyć jedną jednostkę na drugą.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h5 mb-0">Podstawowe informacje</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="{{ table_form.name.id_for_label }}" class="form-label">Nazwa tablicy</label>
+                                {{ table_form.name.errors }}
+                                <input type="text" name="{{ table_form.name.name }}" id="{{ table_form.name.id_for_label }}" 
+                                       class="form-control {% if table_form.name.errors %}is-invalid{% endif %}" 
+                                       value="{{ table_form.name.value|default:'' }}" required placeholder="np. Mąka pszenna, Mleko, Owoce...">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ table_form.product_type.id_for_label }}" class="form-label">Typ produktu</label>
+                                {{ table_form.product_type.errors }}
+                                <input type="text" name="{{ table_form.product_type.name }}" id="{{ table_form.product_type.id_for_label }}" 
+                                       class="form-control {% if table_form.product_type.errors %}is-invalid{% endif %}" 
+                                       value="{{ table_form.product_type.value|default:'' }}" required placeholder="np. Mąka, Płyny, Owoce">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="{{ table_form.description.id_for_label }}" class="form-label">Opis (opcjonalnie)</label>
+                                {{ table_form.description.errors }}
+                                <textarea name="{{ table_form.description.name }}" id="{{ table_form.description.id_for_label }}" 
+                                          class="form-control {% if table_form.description.errors %}is-invalid{% endif %}" 
+                                          rows="3" placeholder="Krótki opis dla jakiego rodzaju produktów jest ta tablica konwersji">{{ table_form.description.value|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">Wpisy konwersji</h2>
+                        <button type="button" id="add-entry" class="btn btn-sm btn-light">
+                            <i class="fas fa-plus"></i> Dodaj więcej wpisów
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {{ entry_formset.management_form }}
+                        
+                        <div id="entries-container">
+                            {% for form in entry_formset %}
+                                <div class="entry-form mb-4 {% if not forloop.first %}mt-4 pt-4 border-top{% endif %}">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.from_unit.id_for_label }}" class="form-label">Z jednostki</label>
+                                            {{ form.from_unit.errors }}
+                                            <select name="{{ form.from_unit.html_name }}" id="{{ form.from_unit.id_for_label }}" 
+                                                    class="form-select {% if form.from_unit.errors %}is-invalid{% endif %}">
+                                                <option value="">-- Wybierz jednostkę --</option>
+                                                {% for unit_type, units in measurement_units|regroup_by:"type" %}
+                                                    <optgroup label="{{ unit_type }}">
+                                                        {% for unit in units %}
+                                                            <option value="{{ unit.id }}" {% if form.from_unit.value|stringformat:"s" == unit.id|stringformat:"s" %}selected{% endif %}>
+                                                                {{ unit.name }} ({{ unit.symbol }})
+                                                            </option>
+                                                        {% endfor %}
+                                                    </optgroup>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <label for="{{ form.to_unit.id_for_label }}" class="form-label">Na jednostkę</label>
+                                            {{ form.to_unit.errors }}
+                                            <select name="{{ form.to_unit.html_name }}" id="{{ form.to_unit.id_for_label }}" 
+                                                    class="form-select {% if form.to_unit.errors %}is-invalid{% endif %}">
+                                                <option value="">-- Wybierz jednostkę --</option>
+                                                {% for unit_type, units in measurement_units|regroup_by:"type" %}
+                                                    <optgroup label="{{ unit_type }}">
+                                                        {% for unit in units %}
+                                                            <option value="{{ unit.id }}" {% if form.to_unit.value|stringformat:"s" == unit.id|stringformat:"s" %}selected{% endif %}>
+                                                                {{ unit.name }} ({{ unit.symbol }})
+                                                            </option>
+                                                        {% endfor %}
+                                                    </optgroup>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <label for="{{ form.ratio.id_for_label }}" class="form-label">Współczynnik</label>
+                                            {{ form.ratio.errors }}
+                                            <div class="input-group">
+                                                <input type="number" name="{{ form.ratio.html_name }}" id="{{ form.ratio.id_for_label }}" 
+                                                       class="form-control {% if form.ratio.errors %}is-invalid{% endif %}" 
+                                                       step="0.0001" min="0.0001" value="{{ form.ratio.value|default:'' }}" placeholder="np. 15.0">
+                                                <span class="input-group-text ratio-text">1:X</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-9">
+                                            <label for="{{ form.notes.id_for_label }}" class="form-label">Uwagi (opcjonalnie)</label>
+                                            {{ form.notes.errors }}
+                                            <input type="text" name="{{ form.notes.html_name }}" id="{{ form.notes.id_for_label }}" 
+                                                   class="form-control {% if form.notes.errors %}is-invalid{% endif %}" 
+                                                   value="{{ form.notes.value|default:'' }}" placeholder="np. Na podstawie pomiarów kuchennych">
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <div class="form-check mt-4">
+                                                <input class="form-check-input" type="checkbox" 
+                                                       name="{{ form.is_exact.html_name }}" id="{{ form.is_exact.id_for_label }}" 
+                                                       {% if form.is_exact.value %}checked{% endif %}>
+                                                <label class="form-check-label" for="{{ form.is_exact.id_for_label }}">
+                                                    Dokładna konwersja
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if not forloop.first %}
+                                        <div class="col-md-12 text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-entry">
+                                                <i class="fas fa-trash"></i> Usuń ten wpis
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i> Zapisz tablicę konwersji
+                                </button>
+                                <a href="{% url 'recipes:conversion_tables' %}" class="btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-times me-2"></i> Anuluj
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h2 class="h5 mb-0">Wskazówki</h2>
+                </div>
+                <div class="card-body">
+                    <h6>Jak działa tablica konwersji?</h6>
+                    <p>Każdy wpis w tablicy określa, jak przeliczyć jedną jednostkę na drugą dla danego typu produktu.</p>
+                    
+                    <h6 class="mt-3">Przykłady współczynników:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produkt</th>
+                                    <th>Z jednostki</th>
+                                    <th>Na jednostkę</th>
+                                    <th>Współczynnik</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mąka</td>
+                                    <td>łyżka (tbsp)</td>
+                                    <td>gram (g)</td>
+                                    <td>15</td>
+                                </tr>
+                                <tr>
+                                    <td>Olej</td>
+                                    <td>łyżka (tbsp)</td>
+                                    <td>mililitr (ml)</td>
+                                    <td>15</td>
+                                </tr>
+                                <tr>
+                                    <td>Mąka</td>
+                                    <td>szklanka (cup)</td>
+                                    <td>gram (g)</td>
+                                    <td>130</td>
+                                </tr>
+                                <tr>
+                                    <td>Mleko</td>
+                                    <td>szklanka (cup)</td>
+                                    <td>mililitr (ml)</td>
+                                    <td>250</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h6 class="mt-3">Co oznacza współczynnik?</h6>
+                    <p>Współczynnik określa, ile jednostek docelowych odpowiada jednej jednostce źródłowej:</p>
+                    <ul>
+                        <li>1 łyżka mąki = 15 gramów → współczynnik: <strong>15</strong></li>
+                        <li>1 szklanka mleka = 250ml → współczynnik: <strong>250</strong></li>
+                    </ul>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Nowa tablica konwersji będzie musiała zostać zatwierdzona przez administratora przed użyciem.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const entriesContainer = document.getElementById('entries-container');
+        const addEntryButton = document.getElementById('add-entry');
+        const totalFormsInput = document.getElementById('id_entries-TOTAL_FORMS');
+        const formPrefix = 'entries';
+        
+        // Inicjalizuj licznik formularzy
+        let formCount = parseInt(totalFormsInput.value);
+        
+        // Funkcja do aktualizacji objaśnienia współczynnika
+        function updateRatioText(fromSelect, ratioText) {
+            const toSelect = fromSelect.closest('.entry-form').querySelector('[id$="-to_unit"]');
+            
+            if (fromSelect.selectedIndex > 0 && toSelect.selectedIndex > 0) {
+                const fromText = fromSelect.options[fromSelect.selectedIndex].text;
+                const toText = toSelect.options[toSelect.selectedIndex].text;
+                
+                const fromSymbol = fromText.match(/\(([^)]+)\)/)?.[1] || '';
+                const toSymbol = toText.match(/\(([^)]+)\)/)?.[1] || '';
+                
+                if (fromSymbol && toSymbol) {
+                    ratioText.textContent = `1 ${fromSymbol} = X ${toSymbol}`;
+                }
+            }
+        }
+        
+        // Dodaj nasłuchiwacze dla istniejących formularzy
+        document.querySelectorAll('.entry-form select[id$="-from_unit"]').forEach(select => {
+            const ratioText = select.closest('.entry-form').querySelector('.ratio-text');
+            select.addEventListener('change', () => updateRatioText(select, ratioText));
+            
+            // Aktualizuj tekst dla istniejących wartości
+            updateRatioText(select, ratioText);
+        });
+        
+        document.querySelectorAll('.entry-form select[id$="-to_unit"]').forEach(select => {
+            const fromSelect = select.closest('.entry-form').querySelector('[id$="-from_unit"]');
+            const ratioText = select.closest('.entry-form').querySelector('.ratio-text');
+            select.addEventListener('change', () => updateRatioText(fromSelect, ratioText));
+        });
+        
+        // Obsługa przycisków usuwania
+        document.querySelectorAll('.remove-entry').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.entry-form').remove();
+                formCount--;
+                totalFormsInput.value = formCount;
+                
+                // Aktualizacja indeksów pozostałych formularzy
+                let forms = entriesContainer.querySelectorAll('.entry-form');
+                forms.forEach((form, index) => {
+                    form.querySelectorAll('input, select, textarea').forEach(input => {
+                        input.name = input.name.replace(/entries-\d+/, `entries-${index}`);
+                        input.id = input.id.replace(/id_entries-\d+/, `id_entries-${index}`);
+                    });
+                    
+                    form.querySelectorAll('label').forEach(label => {
+                        if (label.htmlFor) {
+                            label.htmlFor = label.htmlFor.replace(/id_entries-\d+/, `id_entries-${index}`);
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Obsługa dodawania nowego formularza
+        addEntryButton.addEventListener('click', function() {
+            // Klonuj pierwszy formularz
+            const firstForm = entriesContainer.querySelector('.entry-form');
+            const newForm = firstForm.cloneNode(true);
+            
+            // Aktualizuj indeksy i czyść wartości
+            newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                // Aktualizuj indeks
+                input.name = input.name.replace(/entries-\d+/, `entries-${formCount}`);
+                input.id = input.id.replace(/id_entries-\d+/, `id_entries-${formCount}`);
+                
+                // Czyść wartości
+                if (input.type === 'text' || input.type === 'number' || input.tagName === 'TEXTAREA') {
+                    input.value = '';
+                } else if (input.type === 'checkbox') {
+                    input.checked = true;  // Domyślnie "dokładna konwersja" zaznaczone
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                }
+            });
+            
+            // Aktualizuj atrybuty for etykiet
+            newForm.querySelectorAll('label').forEach(label => {
+                if (label.htmlFor) {
+                    label.htmlFor = label.htmlFor.replace(/id_entries-\d+/, `id_entries-${formCount}`);
+                }
+            });
+            
+            // Dodaj przycisk usuwania
+            if (!newForm.querySelector('.remove-entry')) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'col-md-12 text-end';
+                rowDiv.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-entry">
+                        <i class="fas fa-trash"></i> Usuń ten wpis
+                    </button>
+                `;
+                newForm.querySelector('.row.g-3').appendChild(rowDiv);
+            }
+            
+            // Dodaj klasę formatującą
+            newForm.classList.add('mt-4', 'pt-4', 'border-top');
+            
+            // Dodaj nasłuchiwacze dla nowego formularza
+            newForm.querySelector('select[id$="-from_unit"]').addEventListener('change', function() {
+                updateRatioText(this, newForm.querySelector('.ratio-text'));
+            });
+            
+            newForm.querySelector('select[id$="-to_unit"]').addEventListener('change', function() {
+                updateRatioText(newForm.querySelector('select[id$="-from_unit"]'), newForm.querySelector('.ratio-text'));
+            });
+            
+            // Dodaj nasłuchiwacz dla przycisku usuwania
+            newForm.querySelector('.remove-entry').addEventListener('click', function() {
+                this.closest('.entry-form').remove();
+                formCount--;
+                totalFormsInput.value = formCount;
+                
+                // Aktualizacja indeksów pozostałych formularzy
+                let forms = entriesContainer.querySelectorAll('.entry-form');
+                forms.forEach((form, index) => {
+                    form.querySelectorAll('input, select, textarea').forEach(input => {
+                        input.name = input.name.replace(/entries-\d+/, `entries-${index}`);
+                        input.id = input.id.replace(/id_entries-\d+/, `id_entries-${index}`);
+                    });
+                    
+                    form.querySelectorAll('label').forEach(label => {
+                        if (label.htmlFor) {
+                            label.htmlFor = label.htmlFor.replace(/id_entries-\d+/, `id_entries-${index}`);
+                        }
+                    });
+                });
+            });
+            
+            // Dodaj nowy formularz do kontenera
+            entriesContainer.appendChild(newForm);
+            
+            // Zwiększ licznik formularzy
+            formCount++;
+            totalFormsInput.value = formCount;
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

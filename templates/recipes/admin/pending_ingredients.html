@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel administratora - Oczekujące składniki{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel administratora - Oczekujące składniki</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Tu możesz zarządzać składnikami zgłoszonymi przez użytkowników. Sprawdź każdy składnik przed zatwierdzeniem.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h2 class="h5 mb-0">Składniki oczekujące na zatwierdzenie ({{ pending_ingredients|length }})</h2>
+                </div>
+                <div class="card-body">
+                    {% if pending_ingredients %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Kategoria</th>
+                                        <th>Zgłaszający</th>
+                                        <th>Data</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ingredient in pending_ingredients %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ ingredient.name }}</strong>
+                                                {% if ingredient.conversion_table %}
+                                                    <span class="badge bg-info ms-2">Tablica konwersji</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ ingredient.category.name }}</td>
+                                            <td>{{ ingredient.user.username }}</td>
+                                            <td>{{ ingredient.submitted_at|date:"d.m.Y H:i" }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                        data-bs-toggle="modal" data-bs-target="#detailModal{{ ingredient.id }}">
+                                                    <i class="fas fa-eye"></i> Szczegóły
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Modal ze szczegółami -->
+                                        <div class="modal fade" id="detailModal{{ ingredient.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{ ingredient.name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6>Informacje podstawowe</h6>
+                                                                <dl class="row">
+                                                                    <dt class="col-sm-4">Nazwa:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.name }}</dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Kategoria:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.category.name }}</dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Opis:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.description|default:"Brak opisu" }}</dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Domyślna jednostka:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        {% if ingredient.default_unit %}
+                                                                            {{ ingredient.default_unit.name }} ({{ ingredient.default_unit.symbol }})
+                                                                        {% else %}
+                                                                            Nie określono
+                                                                        {% endif %}
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Typ jednostek:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.get_unit_type_display }}</dd>
+                                                                </dl>
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6">
+                                                                <h6>Parametry konwersji</h6>
+                                                                <dl class="row">
+                                                                    <dt class="col-sm-4">Gęstość:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        {% if ingredient.density %}
+                                                                            {{ ingredient.density }} g/ml
+                                                                        {% else %}
+                                                                            Nie określono
+                                                                        {% endif %}
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Waga sztuki:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        {% if ingredient.piece_weight %}
+                                                                            {{ ingredient.piece_weight }} g
+                                                                        {% else %}
+                                                                            Nie określono
+                                                                        {% endif %}
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Tablica konwersji:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        {% if ingredient.conversion_table %}
+                                                                            {{ ingredient.conversion_table.name }} 
+                                                                            ({{ ingredient.conversion_table.product_type }})
+                                                                        {% else %}
+                                                                            Nie wybrano
+                                                                        {% endif %}
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Zgłaszający:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.user.username }}</dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Data zgłoszenia:</dt>
+                                                                    <dd class="col-sm-8">{{ ingredient.submitted_at|date:"d.m.Y H:i" }}</dd>
+                                                                </dl>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <hr>
+                                                        
+                                                        <div class="row mt-3">
+                                                            <div class="col-md-6">
+                                                                <form method="post" action="{% url 'recipes:admin_approve_ingredient' ingredient.id %}">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit" class="btn btn-success w-100">
+                                                                        <i class="fas fa-check-circle me-2"></i> Zatwierdź składnik
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <form method="post" action="{% url 'recipes:admin_reject_ingredient' ingredient.id %}">
+                                                                    {% csrf_token %}
+                                                                    <div class="input-group">
+                                                                        <input type="text" name="reason" class="form-control" 
+                                                                               placeholder="Podaj powód odrzucenia">
+                                                                        <button type="submit" class="btn btn-danger">
+                                                                            <i class="fas fa-times-circle me-2"></i> Odrzuć
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Nie ma żadnych oczekujących składników. Wszystko zatwierdzone!
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Ostatnio rozpatrzone składniki</h2>
+                </div>
+                <div class="card-body">
+                    {% if recent_ingredients %}
+                        <div class="list-group">
+                            {% for ingredient in recent_ingredients %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ ingredient.name }}</h6>
+                                        <small>{{ ingredient.submitted_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ ingredient.user.username }}</p>
+                                    <small>
+                                        {% if ingredient.status == 'approved' %}
+                                            <span class="badge bg-success">Zatwierdzony</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Odrzucony</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Brak ostatnio rozpatrzonych składników.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Przydatne linki</h2>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'recipes:conversion_tables' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-exchange-alt me-2"></i> Zarządzaj tablicami konwersji
+                        </a>
+                        <a href="{% url 'recipes:list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-utensils me-2"></i> Przeglądaj przepisy
+                        </a>
+                        <a href="/admin/recipes/useringredient/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-toolbox me-2"></i> Panel administracyjny składników
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

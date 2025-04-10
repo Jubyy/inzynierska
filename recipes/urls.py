@@ -34,4 +34,19 @@ urlpatterns = [
     path('ingredient/create/', views.IngredientCreateView.as_view(), name='ingredient_create'),
     path('ingredient/update/<int:pk>/', views.IngredientUpdateView.as_view(), name='ingredient_update'),
     path('ingredient/delete/<int:pk>/', views.IngredientDeleteView.as_view(), name='ingredient_delete'),
+    
+    # Tablice konwersji i składniki użytkowników
+    path('conversions/', views.conversion_tables_list, name='conversion_tables'),
+    path('conversions/add/', views.add_conversion_table, name='add_conversion_table'),
+    path('conversions/<int:table_id>/', views.conversion_table_detail, name='conversion_table_detail'),
+    path('ingredient/submit/', views.submit_ingredient, name='submit_ingredient'),
+    path('ingredient/my-submissions/', views.my_ingredient_submissions, name='my_submissions'),
+    
+    # Admin
+    path('admin/pending-ingredients/', views.admin_pending_ingredients, name='admin_pending_ingredients'),
+    path('admin/approve-ingredient/<int:ingredient_id>/', views.admin_approve_ingredient, name='admin_approve_ingredient'),
+    path('admin/reject-ingredient/<int:ingredient_id>/', views.admin_reject_ingredient, name='admin_reject_ingredient'),
+    
+    # AJAX
+    path('ajax/like/<int:pk>/', views.toggle_like, name='ajax_toggle_like'),
 ]

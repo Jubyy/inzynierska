@@ -87,7 +87,7 @@ class FridgeItem(models.Model):
             try:
                 # Spróbuj przekonwertować do jednostki podstawowej
                 from recipes.utils import convert_units
-                amount = convert_units(amount, unit, base_unit)
+                amount = convert_units(amount, unit, base_unit, ingredient=ingredient)
                 unit = base_unit
             except Exception as e:
                 # W przypadku błędu konwersji, zachowaj oryginalną jednostkę
@@ -324,7 +324,7 @@ class FridgeItem(models.Model):
                         # Jeśli jednostki są różne, przelicz ilość
                         if item.unit != unit:
                             # Konwertuj ilość potrzebną na jednostkę produktu w lodówce
-                            converted_amount = convert_units(amount_to_remove, unit, item.unit)
+                            converted_amount = convert_units(amount_to_remove, unit, item.unit, ingredient=ingredient)
                         else:
                             converted_amount = amount_to_remove
                             
@@ -350,7 +350,7 @@ class FridgeItem(models.Model):
                             # Zużywamy cały produkt i kontynuujemy usuwanie
                             # Konwertuj z powrotem na jednostkę przepisu
                             if item.unit != unit:
-                                amount_removed_in_recipe_unit = convert_units(item_amount, item.unit, unit)
+                                amount_removed_in_recipe_unit = convert_units(item_amount, item.unit, unit, ingredient=ingredient)
                             else:
                                 amount_removed_in_recipe_unit = item_amount
                             
@@ -417,6 +417,7 @@ class FridgeItem(models.Model):
             return False
         
         total_available = 0.0
+        debug_info = []
         
         for item in items:
             try:
@@ -424,8 +425,9 @@ class FridgeItem(models.Model):
                 if item.unit != unit:
                     try:
                         from recipes.utils import convert_units
-                        converted_amount = convert_units(float(item.amount), item.unit, unit)
+                        converted_amount = convert_units(float(item.amount), item.unit, unit, ingredient=ingredient)
                         total_available += converted_amount
+                        debug_info.append(f"Konwersja: {item.amount} {item.unit.symbol} -> {converted_amount} {unit.symbol}")
                     except (ValueError, TypeError) as e:
                         # Logowanie błędu dla debugowania
                         print(f"Błąd konwersji: {e} dla {item.ingredient.name} z {item.unit} na {unit}")

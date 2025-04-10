@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+{% block title %}Konwersje dla {{ ingredient.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-2">Konwersje jednostek dla {{ ingredient.name }}</h1>
+    <p class="text-muted mb-4">
+        <span class="badge bg-secondary">{{ ingredient.category.name }}</span>
+        <span class="ms-2">Typ jednostek: {{ ingredient.get_unit_type_display }}</span>
+    </p>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Tablica konwersji</h2>
+                    <a href="{% url 'fridge:add_conversion' ingredient.id %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus-circle me-1"></i> Dodaj konwersję
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if conversions %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Z jednostki</th>
+                                        <th>Na jednostkę</th>
+                                        <th>Współczynnik</th>
+                                        <th>Przykład</th>
+                                        <th>Dokładność</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for conversion in conversions %}
+                                        <tr>
+                                            <td>{{ conversion.from_unit.name }} ({{ conversion.from_unit.symbol }})</td>
+                                            <td>{{ conversion.to_unit.name }} ({{ conversion.to_unit.symbol }})</td>
+                                            <td>{{ conversion.ratio }}</td>
+                                            <td>
+                                                1 {{ conversion.from_unit.symbol }} = 
+                                                {{ conversion.ratio }} {{ conversion.to_unit.symbol }}
+                                            </td>
+                                            <td>
+                                                {% if conversion.is_exact %}
+                                                    <span class="badge bg-success">Dokładna</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Przybliżona</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'fridge:edit_conversion' conversion.id %}" class="btn btn-outline-primary">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="{% url 'fridge:delete_conversion' conversion.id %}" class="btn btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> Brak zdefiniowanych konwersji dla tego składnika. 
+                            <a href="{% url 'fridge:add_conversion' ingredient.id %}" class="alert-link">Dodaj pierwszą konwersję</a>.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if conversions %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="h5 mb-0">Kalkulator konwersji</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="conversion-calculator">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="amount" class="form-label">Ilość:</label>
+                                    <input type="number" id="amount" class="form-control" min="0.01" step="0.01" required value="1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="from-unit" class="form-label">Z jednostki:</label>
+                                    <select id="from-unit" class="form-select" required>
+                                        {% for unit in units %}
+                                            <option value="{{ unit.id }}" data-symbol="{{ unit.symbol }}">
+                                                {{ unit.name }} ({{ unit.symbol }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="to-unit" class="form-label">Na jednostkę:</label>
+                                    <select id="to-unit" class="form-select" required>
+                                        {% for unit in units %}
+                                            <option value="{{ unit.id }}" data-symbol="{{ unit.symbol }}">
+                                                {{ unit.name }} ({{ unit.symbol }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-calculator me-1"></i> Przelicz
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div id="result" class="mt-3 d-none">
+                            <div class="alert alert-success">
+                                <h4 class="alert-heading">Wynik konwersji:</h4>
+                                <p id="conversion-result" class="display-6 text-center mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if missing_params %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning">
+                        <h2 class="h5 mb-0">Brakujące parametry konwersji</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning mb-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i> Niektóre typy konwersji wymagają dodatkowych parametrów składnika.
+                        </div>
+                        
+                        <form method="post" action="{% url 'fridge:update_params' ingredient.id %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                {% for param in missing_params %}
+                                    <div class="col-md-6">
+                                        <label for="{{ param.name }}" class="form-label">{{ param.label }}:</label>
+                                        <div class="input-group">
+                                            <input type="number" id="{{ param.name }}" name="{{ param.name }}" 
+                                                class="form-control" min="0.01" step="0.01" 
+                                                placeholder="Podaj wartość" required>
+                                            <span class="input-group-text">
+                                                {% if param.name == 'density' %}g/ml{% else %}g{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="form-text">{{ param.description }}</div>
+                                    </div>
+                                {% endfor %}
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i> Zapisz parametry
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Informacje o składniku</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-5">Nazwa:</dt>
+                        <dd class="col-sm-7">{{ ingredient.name }}</dd>
+                        
+                        <dt class="col-sm-5">Kategoria:</dt>
+                        <dd class="col-sm-7">{{ ingredient.category.name }}</dd>
+                        
+                        <dt class="col-sm-5">Domyślna jednostka:</dt>
+                        <dd class="col-sm-7">
+                            {% if ingredient.default_unit %}
+                                {{ ingredient.default_unit.name }} ({{ ingredient.default_unit.symbol }})
+                            {% else %}
+                                <span class="text-muted">Nie określono</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-5">Gęstość:</dt>
+                        <dd class="col-sm-7">
+                            {% if ingredient.density %}
+                                {{ ingredient.density }} g/ml
+                            {% else %}
+                                <span class="text-muted">Nie określono</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-5">Waga sztuki:</dt>
+                        <dd class="col-sm-7">
+                            {% if ingredient.piece_weight %}
+                                {{ ingredient.piece_weight }} g
+                            {% else %}
+                                <span class="text-muted">Nie określono</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-5">Dozwolone jednostki:</dt>
+                        <dd class="col-sm-7">{{ ingredient.get_unit_type_display }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Wskazówki</h2>
+                </div>
+                <div class="card-body">
+                    <p>Współczynniki konwersji określają, jak przeliczyć jedną jednostkę na drugą:</p>
+                    <ul>
+                        <li>Współczynnik <strong>1.5</strong> oznacza, że <strong>1 jednostka źródłowa = 1.5 jednostki docelowej</strong></li>
+                        <li>Przykład: 1 łyżka mąki = 15g → współczynnik: <strong>15</strong></li>
+                        <li>Przykład: 1 szklanka mleka = 250ml → współczynnik: <strong>250</strong></li>
+                        <li>Przykład: 1 jabłko = 180g → współczynnik: <strong>180</strong></li>
+                    </ul>
+                    
+                    <p class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i> Definiując konwersje, zawsze myśl w kierunku: 
+                        <strong>1 [jednostka źródłowa] = X [jednostek docelowych]</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'fridge:conversion_dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Powrót do tablicy konwersji
+        </a>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculatorForm = document.getElementById('conversion-calculator');
+        if (calculatorForm) {
+            calculatorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const amount = parseFloat(document.getElementById('amount').value);
+                const fromUnitId = document.getElementById('from-unit').value;
+                const toUnitId = document.getElementById('to-unit').value;
+                const fromUnitSymbol = document.querySelector(`#from-unit option[value="${fromUnitId}"]`).dataset.symbol;
+                const toUnitSymbol = document.querySelector(`#to-unit option[value="${toUnitId}"]`).dataset.symbol;
+                
+                // Pobierz dane konwersji z serwera
+                fetch(`/fridge/ajax/convert?ingredient_id={{ ingredient.id }}&amount=${amount}&from_unit=${fromUnitId}&to_unit=${toUnitId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultDiv = document.getElementById('result');
+                        const resultText = document.getElementById('conversion-result');
+                        
+                        if (data.success) {
+                            resultText.textContent = `${amount} ${fromUnitSymbol} = ${data.converted_amount} ${toUnitSymbol}`;
+                            resultDiv.classList.remove('d-none');
+                        } else {
+                            resultText.textContent = `Błąd: ${data.error}`;
+                            resultDiv.classList.remove('d-none');
+                            resultDiv.querySelector('.alert').classList.remove('alert-success');
+                            resultDiv.querySelector('.alert').classList.add('alert-danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Błąd konwersji:', error);
+                    });
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 
