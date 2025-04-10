@@ -22,4 +22,5 @@ urlpatterns = [
     path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
     path('ajax/load-units/', views.ajax_load_units, name='ajax_load_units'),
     path('ajax/compatible-units/', views.ajax_compatible_units, name='ajax_compatible_units'),
+    path('consolidate/', views.consolidate_items, name='consolidate'),
 ]

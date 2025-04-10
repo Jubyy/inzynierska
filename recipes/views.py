@@ -23,20 +23,14 @@ class RecipeListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        # Pobierz wszystkie przepisy publiczne lub utworzone przez użytkownika
-        if self.request.user.is_authenticated:
-            queryset = Recipe.objects.filter(
-                Q(is_public=True) | Q(author=self.request.user)
-            ).distinct()
-        else:
-            queryset = Recipe.objects.filter(is_public=True)
+        queryset = Recipe.objects.select_related('author').prefetch_related('ingredients').all()
         
         # Filtrowanie po kategorii
         category = self.request.GET.get('category')
         if category and category != 'None':
             queryset = queryset.filter(categories__id=category)
         
-        # Filtrowanie po wyszukiwanej frazie
+        # Filtrowanie po frazie
         query = self.request.GET.get('q')
         if query and query != 'None':
             queryset = queryset.filter(
@@ -78,6 +72,16 @@ class RecipeListView(ListView):
                 if recipe.can_be_prepared_with_available_ingredients(self.request.user):
                     available_recipe_ids.append(recipe.id)
             queryset = queryset.filter(id__in=available_recipe_ids)
+            
+        # Filtrowanie po przepisach użytkowników, których śledzimy
+        if self.request.GET.get('followed') == 'true' and self.request.user.is_authenticated:
+            try:
+                # Pobierz ID użytkowników, których śledzi zalogowany użytkownik
+                followed_users = self.request.user.following.values_list('followed_user', flat=True)
+                queryset = queryset.filter(author__in=followed_users)
+            except AttributeError:
+                # Jeśli nie ma atrybutu following, wyświetl pusty queryset
+                queryset = queryset.none()
         
         return queryset
     
@@ -104,8 +108,23 @@ class RecipeListView(ListView):
         if ingredient_id and ingredient_id != 'None':
             context['ingredient_name'] = Ingredient.objects.filter(id=ingredient_id).first().name
         
+        # Obsługa parametru filtrowania po dostępnych składnikach
         available_only = self.request.GET.get('available_only')
         context['available_only'] = available_only if available_only and available_only != 'None' else None
+        
+        # Obsługa parametru filtrowania po śledzonych użytkownikach
+        followed = self.request.GET.get('followed')
+        context['followed'] = followed if followed and followed != 'None' else None
+        
+        # Dodaj liczbę śledzonych użytkowników do kontekstu
+        if self.request.user.is_authenticated:
+            try:
+                context['followed_users_count'] = self.request.user.following.count()
+            except AttributeError:
+                # Jeśli nie ma atrybutu following (prawdopodobnie model UsersFollowing nie istnieje)
+                context['followed_users_count'] = 0
+        else:
+            context['followed_users_count'] = 0
         
         # Sprawdź, czy użytkownik jest zalogowany
         if self.request.user.is_authenticated:

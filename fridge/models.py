@@ -51,7 +51,7 @@ class FridgeItem(models.Model):
     def add_to_fridge(cls, user, ingredient, amount, unit, expiry_date=None):
         """
         Dodaje produkt do lodówki lub aktualizuje istniejący.
-        Jeśli ten sam produkt już istnieje, jego ilość zostanie zwiększona.
+        Zawsze konwertuje do jednostek podstawowych: gramy (g) dla produktów stałych i mililitry (ml) dla płynów.
         """
         # Sprawdź poprawność danych wejściowych
         if not ingredient:
@@ -65,14 +65,36 @@ class FridgeItem(models.Model):
         except (ValueError, TypeError):
             raise ValueError("Nieprawidłowa wartość ilości")
             
-        # Sprawdź czy jednostka jest dozwolona dla tego składnika
-        allowed_units = list(ingredient.get_allowed_units())
-        compatible_units = list(ingredient.compatible_units.all())
-        if unit not in allowed_units and unit not in compatible_units:
-            # Automatyczna naprawa - dodaj jednostkę do kompatybilnych
-            ingredient.compatible_units.add(unit)
+        # Określ podstawową jednostkę dla składnika
+        from recipes.models import MeasurementUnit
+        
+        # Najpierw sprawdź czy składnik ma określony typ jednostki
+        unit_type = 'weight'  # domyślnie zakładamy wagę
+        if ingredient.unit_type.startswith('volume'):
+            unit_type = 'volume'
+        
+        # Pobierz jednostkę podstawową
+        if unit_type == 'weight':
+            base_unit = MeasurementUnit.objects.get(symbol='g')
+        else:
+            base_unit = MeasurementUnit.objects.get(symbol='ml')
             
-        # Sprawdź, czy produkt już istnieje w lodówce (o takim samym terminie ważności)
+        # Jeśli jednostka już jest podstawowa, nie ma potrzeby konwersji
+        original_amount = amount
+        original_unit = unit
+        
+        if unit != base_unit:
+            try:
+                # Spróbuj przekonwertować do jednostki podstawowej
+                from recipes.utils import convert_units
+                amount = convert_units(amount, unit, base_unit)
+                unit = base_unit
+            except Exception as e:
+                # W przypadku błędu konwersji, zachowaj oryginalną jednostkę
+                print(f"Nie można przekonwertować {original_amount} {original_unit} na {base_unit}: {str(e)}")
+                # Ale nadal próbujemy dodać produkt z oryginalną jednostką
+        
+        # Szukaj istniejącego wpisu z tą samą jednostką podstawową i datą ważności
         existing = cls.objects.filter(
             user=user,
             ingredient=ingredient,
@@ -84,16 +106,111 @@ class FridgeItem(models.Model):
             # Aktualizuj istniejący wpis
             existing.amount += amount
             existing.save()
-            return existing
+            return existing, original_unit != unit
         else:
             # Utwórz nowy wpis
-            return cls.objects.create(
+            new_item = cls.objects.create(
                 user=user,
                 ingredient=ingredient,
                 amount=amount,
                 unit=unit,
                 expiry_date=expiry_date
             )
+            return new_item, original_unit != unit
+    
+    @classmethod
+    def consolidate_fridge_items(cls, user):
+        """
+        Konsoliduje wszystkie produkty w lodówce, łącząc te same składniki
+        i konwertując je do jednostek podstawowych.
+        
+        Zwraca liczbę skonsolidowanych produktów.
+        """
+        from django.db.models import Count
+        from recipes.utils import convert_units
+        from recipes.models import MeasurementUnit
+        
+        # Pobierz podstawowe jednostki
+        try:
+            gram_unit = MeasurementUnit.objects.get(symbol='g')
+            ml_unit = MeasurementUnit.objects.get(symbol='ml')
+        except MeasurementUnit.DoesNotExist:
+            raise ValueError("Podstawowe jednostki (g/ml) nie istnieją w bazie danych")
+        
+        # Pobierz wszystkie składniki z lodówki użytkownika
+        ingredients_groups = cls.objects.filter(user=user).values('ingredient_id').distinct()
+        consolidated_count = 0
+        
+        # Dla każdego unikalnego składnika
+        for ing_data in ingredients_groups:
+            ingredient_id = ing_data['ingredient_id']
+            
+            # Pobierz wszystkie wpisy dla tego składnika
+            items = cls.objects.filter(
+                user=user,
+                ingredient_id=ingredient_id
+            ).select_related('ingredient', 'unit').order_by('expiry_date')
+            
+            if not items:
+                continue
+                
+            # Określ podstawową jednostkę dla tego składnika
+            first_item = items[0]
+            unit_type = 'weight'  # domyślnie zakładamy wagę
+            if first_item.ingredient.unit_type.startswith('volume'):
+                unit_type = 'volume'
+                base_unit = ml_unit
+            else:
+                base_unit = gram_unit
+            
+            # Znajdź wszystkie unikalne daty ważności dla tego składnika
+            expiry_dates = set()
+            for item in items:
+                if item.expiry_date:
+                    expiry_dates.add(item.expiry_date)
+                else:
+                    # Dodaj None jako osobną "datę" (brak daty)
+                    expiry_dates.add(None)
+            
+            # Dla każdej unikalnej daty ważności
+            for expiry_date in expiry_dates:
+                date_items = items.filter(expiry_date=expiry_date)
+                
+                if date_items.count() <= 1 and date_items.first().unit == base_unit:
+                    continue  # nie ma potrzeby konsolidacji jeśli jest tylko jeden wpis i już ma podstawową jednostkę
+                
+                # Skonsoliduj do jednego wpisu
+                total_amount = 0
+                for item in date_items:
+                    try:
+                        # Konwertuj do jednostki podstawowej i dodaj
+                        if item.unit != base_unit:
+                            converted = convert_units(item.amount, item.unit, base_unit)
+                            total_amount += converted
+                        else:
+                            total_amount += item.amount
+                    except Exception as e:
+                        print(f"Błąd konwersji dla {item.ingredient.name}: {str(e)}")
+                        # Jeśli konwersja się nie powiedzie, po prostu dodaj ilość (lepsze niż utrata danych)
+                        # To może nie być idealnie dokładne, ale pozwala zachować dane
+                        total_amount += item.amount
+                
+                # Usuń oryginalne wpisy
+                items_to_delete = list(date_items)  # tworzymy kopię, żeby nie usunąć oryginału przed utworzeniem nowego
+                date_items.delete()
+                
+                # Utwórz nowy skonsolidowany wpis
+                cls.objects.create(
+                    user=user,
+                    ingredient_id=ingredient_id,
+                    amount=total_amount,
+                    unit=base_unit,
+                    expiry_date=expiry_date
+                )
+                
+                consolidated_count += len(items_to_delete) - 1  # odejmujemy 1, bo tworzymy jeden nowy wpis
+        
+        return consolidated_count
     
     @classmethod
     def remove_from_fridge(cls, user, ingredient, amount, unit):
@@ -145,6 +262,7 @@ class FridgeItem(models.Model):
     def use_recipe_ingredients(cls, user, recipe, servings=None):
         """
         Usuwa z lodówki składniki potrzebne do przygotowania przepisu.
+        Używa produktów według reguły FIFO - najpierw najkrótszy termin ważności.
         
         Args:
             user (User): Użytkownik
@@ -188,13 +306,14 @@ class FridgeItem(models.Model):
                 amount_needed = float(ingredient_entry.amount) * scale_factor
                 unit = ingredient_entry.unit
                 
-                # Pobierz dostępne w lodówce produkty dla tego składnika
+                # Pobierz dostępne w lodówce produkty dla tego składnika, posortowane po dacie ważności (FIFO)
                 fridge_items = cls.objects.filter(
                     user=user,
                     ingredient=ingredient
-                ).order_by('expiry_date', 'purchase_date')
+                ).order_by('expiry_date', 'purchase_date')  # najpierw najkrótszy termin ważności, potem najstarsze zakupy
                 
                 amount_to_remove = amount_needed
+                removed_items = []
                 
                 for item in fridge_items:
                     # Jeśli już usunęliśmy całą potrzebną ilość, przerwij pętlę
@@ -218,6 +337,13 @@ class FridgeItem(models.Model):
                             item.amount = item_amount - converted_amount
                             item.save()
                             
+                            # Rejestruj użycie - ile i z jakiego produktu
+                            removed_items.append({
+                                'item': item,
+                                'amount': converted_amount,
+                                'unit': item.unit
+                            })
+                            
                             # Zaktualizuj ilość do usunięcia na 0
                             amount_to_remove = 0
                         else:
@@ -231,6 +357,14 @@ class FridgeItem(models.Model):
                             # Odejmij usuniętą ilość od ilości do usunięcia
                             amount_to_remove -= float(amount_removed_in_recipe_unit)
                             
+                            # Rejestruj użycie - ile i z jakiego produktu
+                            removed_items.append({
+                                'item': item,
+                                'amount': item_amount,
+                                'unit': item.unit,
+                                'fully_used': True
+                            })
+                            
                             # Usuń produkt z lodówki
                             item.delete()
                     except Exception as e:
@@ -242,7 +376,8 @@ class FridgeItem(models.Model):
                 result["used"].append({
                     "ingredient": ingredient,
                     "amount": amount_needed,
-                    "unit": unit
+                    "unit": unit,
+                    "items_used": removed_items
                 })
         
         return result

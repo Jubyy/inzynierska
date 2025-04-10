@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dodaj produkt do lodówki{% endblock %}
 
@@ -69,6 +70,14 @@
         text-align: center;
         margin: 1rem 0;
     }
+    
+    .debug-info {
+        background-color: #fff3cd;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ffeeba;
+    }
 </style>
 {% endblock %}
 
@@ -76,8 +85,14 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            <div class="debug-info">
+                <h5>Informacja o debugowaniu</h5>
+                <p>Jeśli nie widzisz składników w formularzu, kliknij przycisk "Napraw formularz" w prawym górnym rogu.</p>
+                <p>Jeśli problemy nadal występują, otwórz konsolę przeglądarki (F12) i sprawdź błędy.</p>
+            </div>
+            
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Dodaj produkt do lodówki</h2>
                 </div>
                 <div class="card-body">
@@ -158,6 +173,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'fridge/js/fridge_wizard.js' %}"></script>
 <script>
     $(document).ready(function() {
         let currentStep = 1;
@@ -212,11 +228,27 @@
             
             // Dostosuj kontrolki ilości w zależności od typu jednostki
             const amountInput = $('#amount-input');
-            if (selectedUnitType === 'piece') {
+            if (selectedUnitType === 'piece' || selectedUnitType === 'count') {
                 amountInput.attr('step', '1').attr('min', '1');
-                amountInput.val(Math.max(1, Math.round(amountInput.val())));
+                // Upewnij się, że wartość jest całkowita
+                amountInput.val(Math.floor(parseFloat(amountInput.val()) || 1));
+                // Zmień typ na text, aby wymusić niestandardową walidację
+                amountInput.attr('type', 'text').on('input', function() {
+                    // Usuń wszystkie znaki niebędące cyframi
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    // Upewnij się, że wartość nie jest pusta i jest co najmniej 1
+                    if (!this.value || parseInt(this.value) < 1) {
+                        this.value = '1';
+                    }
+                    $('#amount-value').text(this.value);
+                });
             } else {
                 amountInput.attr('step', '0.01').attr('min', '0.01');
+                // Przywróć typ number jeśli był zmieniony
+                amountInput.attr('type', 'number');
+                amountInput.off('input').on('input', function() {
+                    $('#amount-value').text($(this).val());
+                });
             }
         }).on('select2:clear', function() {
             $('.wizard-content[data-step="2"] .next-step').prop('disabled', true);
@@ -250,32 +282,48 @@
         // Obsługa kontrolek ilości
         $('.btn-decrease').click(function() {
             const input = $('#amount-input');
-            const currentValue = parseFloat(input.val());
-            const step = selectedUnitType === 'piece' ? 1 : 0.01;
-            const minValue = selectedUnitType === 'piece' ? 1 : 0.01;
+            let currentValue = parseFloat(input.val());
+            if (isNaN(currentValue)) currentValue = 1;
+            
+            const step = selectedUnitType === 'piece' || selectedUnitType === 'count' ? 1 : 0.01;
+            const minValue = selectedUnitType === 'piece' || selectedUnitType === 'count' ? 1 : 0.01;
             
             const newValue = Math.max(minValue, currentValue - step);
-            input.val(newValue);
-            $('#amount-value').text(newValue);
+            
+            if (selectedUnitType === 'piece' || selectedUnitType === 'count') {
+                input.val(Math.floor(newValue));
+                $('#amount-value').text(Math.floor(newValue));
+            } else {
+                input.val(newValue);
+                $('#amount-value').text(newValue);
+            }
         });
 
         $('.btn-increase').click(function() {
             const input = $('#amount-input');
-            const currentValue = parseFloat(input.val());
-            const step = selectedUnitType === 'piece' ? 1 : 0.01;
+            let currentValue = parseFloat(input.val());
+            if (isNaN(currentValue)) currentValue = 1;
+            
+            const step = selectedUnitType === 'piece' || selectedUnitType === 'count' ? 1 : 0.01;
             
             const newValue = currentValue + step;
-            input.val(newValue);
-            $('#amount-value').text(newValue);
+            
+            if (selectedUnitType === 'piece' || selectedUnitType === 'count') {
+                input.val(Math.floor(newValue));
+                $('#amount-value').text(Math.floor(newValue));
+            } else {
+                input.val(newValue);
+                $('#amount-value').text(newValue);
+            }
         });
 
         $('#amount-input').on('input', function() {
-            let value = $(this).val();
-            if (selectedUnitType === 'piece') {
-                value = Math.max(1, Math.round(parseFloat(value)));
+            if (selectedUnitType === 'piece' || selectedUnitType === 'count') {
+                // Ta obsługa jest już dodana powyżej przy zmianie typu jednostki
+                return;
             }
-            $(this).val(value);
-            $('#amount-value').text(value);
+            // Tylko dla jednostek innych niż piece/count
+            $('#amount-value').text($(this).val());
         });
 
         // Funkcja ładowania kompatybilnych jednostek
@@ -319,6 +367,24 @@
             if (!formData.ingredient || !formData.unit || !formData.amount) {
                 alert('Proszę wypełnić wszystkie wymagane pola.');
                 return;
+            }
+            
+            // Sprawdź czy dla jednostek typu piece (sztuki) podano liczbę całkowitą
+            if (selectedUnitType === 'piece' || selectedUnitType === 'count') {
+                const amount = parseInt(formData.amount);
+                if (isNaN(amount) || amount < 1) {
+                    alert('Dla jednostek typu sztuka można podać tylko liczby całkowite większe od zera.');
+                    return;
+                }
+                // Upewnij się, że wartość jest liczbą całkowitą
+                formData.amount = amount;
+            } else {
+                const amount = parseFloat(formData.amount);
+                if (isNaN(amount) || amount <= 0) {
+                    alert('Wprowadź poprawną wartość liczbową większą od zera.');
+                    return;
+                }
+                formData.amount = amount;
             }
 
             // Wyświetl informację o przetwarzaniu

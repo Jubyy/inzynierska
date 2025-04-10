@@ -24,10 +24,10 @@ def fridge_dashboard(request):
     fridge_items = FridgeItem.objects.filter(user=request.user)
     
     # Liczba produktów w lodówce
-    total_items = fridge_items.count()
+    item_count = fridge_items.count()
     
     # Liczba produktów przeterminowanych
-    expired_items = fridge_items.filter(expiry_date__lt=date.today()).count()
+    expired_count = fridge_items.filter(expiry_date__lt=date.today()).count()
     
     # Liczba produktów, które niedługo się przeterminują (w ciągu 3 dni)
     soon_expiring = fridge_items.filter(
@@ -35,21 +35,28 @@ def fridge_dashboard(request):
         expiry_date__lte=date.today() + timedelta(days=3)
     ).count()
     
-    # Ostatnio dodane produkty (5 najnowszych)
-    recent_items = fridge_items.order_by('-added_date')[:5]
+    # Pobierz przepisy, które można przygotować z produktów w lodówce
+    available_recipes = []
+    recipes = Recipe.objects.filter(Q(author=request.user) | Q(is_public=True)).distinct()[:20]  # Ogranicz do 20 najnowszych przepisów
     
-    # Przepisy, które można przygotować z produktów w lodówce
-    available_recipes_count = Recipe.objects.filter(user=request.user).count()
+    for recipe in recipes:
+        if recipe.can_be_prepared_with_available_ingredients(request.user):
+            available_recipes.append({
+                'recipe': recipe,
+                'available': True,
+            })
+            if len(available_recipes) >= 5:  # Ogranicz do 5 przepisów
+                break
     
     context = {
-        'total_items': total_items,
-        'expired_items': expired_items,
+        'item_count': item_count,
+        'expired_count': expired_count,
         'soon_expiring': soon_expiring,
-        'recent_items': recent_items,
-        'available_recipes_count': available_recipes_count
+        'fridge_items': fridge_items, # Dodaję bezpośrednio wszystkie produkty
+        'available_recipes': available_recipes
     }
     
-    return render(request, 'fridge/fridge_dashboard.html', context)
+    return render(request, 'fridge/dashboard.html', context)
 
 class FridgeItemListView(LoginRequiredMixin, ListView):
     """Lista wszystkich produktów w lodówce"""
@@ -103,7 +110,69 @@ class FridgeItemListView(LoginRequiredMixin, ListView):
         # Pobierz jednostki miary do legendy przeliczników
         context['measurement_units'] = self.get_measurement_units()
         
+        # Konwertuj wszystkie produkty do jednostek podstawowych dla wyświetlania
+        context['display_items'] = self.convert_to_base_units(context['fridge_items'])
+        
         return context
+    
+    def convert_to_base_units(self, items):
+        """
+        Konwertuje wszystkie produkty do jednostek podstawowych (g/ml) dla wyświetlania.
+        Nie zmienia oryginalnych danych w bazie.
+        
+        Returns:
+            list: Lista słowników z przekonwertowanymi danymi
+        """
+        from recipes.utils import convert_units
+        from recipes.models import MeasurementUnit
+        
+        # Pobierz podstawowe jednostki
+        try:
+            gram_unit = MeasurementUnit.objects.get(symbol='g')
+            ml_unit = MeasurementUnit.objects.get(symbol='ml')
+        except MeasurementUnit.DoesNotExist:
+            # Jeśli nie ma podstawowych jednostek, zwróć oryginalne dane
+            return list(items)
+        
+        display_items = []
+        
+        for item in items:
+            # Kopiujemy wartości z oryginalnego obiektu
+            display_item = {
+                'id': item.id,
+                'ingredient': item.ingredient,
+                'amount': item.amount,
+                'unit': item.unit,
+                'expiry_date': item.expiry_date,
+                'purchase_date': item.purchase_date,
+                'is_expired': item.is_expired,
+                'days_until_expiry': item.days_until_expiry,
+                'original_amount': item.amount,  # zachowujemy oryginalną ilość
+                'original_unit': item.unit,      # i oryginalną jednostkę
+                'was_converted': False           # flaga czy była konwersja
+            }
+            
+            # Określ jednostkę podstawową dla tego składnika
+            if item.ingredient.unit_type.startswith('volume'):
+                base_unit = ml_unit
+            else:
+                base_unit = gram_unit
+            
+            # Jeśli jednostka nie jest już podstawową, konwertuj
+            if item.unit != base_unit:
+                try:
+                    # Konwertuj do jednostki podstawowej
+                    converted_amount = convert_units(item.amount, item.unit, base_unit)
+                    display_item['amount'] = converted_amount
+                    display_item['unit'] = base_unit
+                    display_item['was_converted'] = True
+                except Exception as e:
+                    # W przypadku błędu konwersji, zachowaj oryginalne wartości
+                    print(f"Błąd konwersji dla {item.ingredient.name}: {str(e)}")
+            
+            display_items.append(display_item)
+        
+        return display_items
     
     def get_measurement_units(self):
         """
@@ -156,14 +225,8 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
             amount = form.cleaned_data['amount']
             expiry_date = form.cleaned_data['expiry_date']
             
-            # Sprawdzenie czy jednostka jest kompatybilna ze składnikiem
-            if unit not in ingredient.get_allowed_units().all() and unit not in ingredient.compatible_units.all():
-                # Próba naprawy - dodaj jednostkę do kompatybilnych
-                ingredient.compatible_units.add(unit)
-                self.request.session['unit_fixed'] = True
-            
-            # Dodaj produkt do lodówki
-            FridgeItem.add_to_fridge(
+            # Dodaj produkt do lodówki - metoda add_to_fridge zajmie się konwersją do jednostek podstawowych
+            added_item, was_converted = FridgeItem.add_to_fridge(
                 user=self.request.user,
                 ingredient=ingredient,
                 amount=amount,
@@ -171,7 +234,16 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
                 expiry_date=expiry_date
             )
             
-            messages.success(self.request, f'Produkt {ingredient.name} został dodany do lodówki.')
+            # Jeśli jednostka została zmieniona podczas dodawania, poinformuj użytkownika
+            if was_converted:
+                messages.info(
+                    self.request, 
+                    f'Produkt {ingredient.name} został dodany w jednostce {added_item.unit.name} '
+                    f'(skonwertowano z {unit.name}) dla zachowania standardu podstawowych jednostek.'
+                )
+            else:
+                messages.success(self.request, f'Produkt {ingredient.name} został dodany do lodówki.')
+            
             return JsonResponse({'success': True})
         except ValueError as e:
             # Błąd walidacji (np. nieprawidłowa ilość)
@@ -217,41 +289,84 @@ class FridgeItemDeleteView(LoginRequiredMixin, DeleteView):
 def bulk_add_to_fridge(request):
     """Dodawanie wielu produktów naraz do lodówki"""
     if request.method == 'POST':
-        form = BulkAddForm(request.POST)
-        
-        if form.is_valid():
+        try:
+            # Pobierz dane JSON z formularza
             items_data = request.POST.get('items_data', '[]')
-            try:
-                items = json.loads(items_data)
-                
-                for item in items:
+            
+            # Dekoduj JSON
+            items = json.loads(items_data)
+            
+            # Sprawdź czy lista nie jest pusta
+            if not items:
+                messages.warning(request, 'Nie dodano żadnych produktów. Formularz był pusty.')
+                return redirect('fridge:bulk_add')
+            
+            # Liczniki dla statystyk
+            added_count = 0
+            converted_count = 0
+            error_count = 0
+            
+            # Dodaj każdy produkt z listy
+            for item in items:
+                try:
                     ingredient_id = item.get('ingredient_id')
                     amount = item.get('amount')
                     unit_id = item.get('unit_id')
                     expiry_date = item.get('expiry_date') or None
                     
+                    # Sprawdź czy wszystkie wymagane pola są dostępne
+                    if not (ingredient_id and amount and unit_id):
+                        continue
+                    
+                    # Pobierz obiekty z bazy danych
                     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
                     unit = get_object_or_404(MeasurementUnit, pk=unit_id)
                     
-                    FridgeItem.add_to_fridge(
+                    # Przekonwertuj ilość na float
+                    try:
+                        amount = float(amount)
+                    except (ValueError, TypeError):
+                        # Jeśli nie da się przekonwertować, użyj wartości domyślnej 1
+                        amount = 1
+                    
+                    # Dodaj produkt do lodówki - metoda add_to_fridge zajmie się konwersją
+                    added_item, was_converted = FridgeItem.add_to_fridge(
                         user=request.user,
                         ingredient=ingredient,
-                        amount=float(amount),
+                        amount=amount,
                         unit=unit,
                         expiry_date=expiry_date
                     )
-                
-                messages.success(request, f'Dodano {len(items)} produktów do lodówki.')
-                return redirect('fridge:list')
+                    
+                    if was_converted:
+                        converted_count += 1
+                    
+                    added_count += 1
+                except Exception as e:
+                    error_count += 1
+                    print(f"Błąd dodawania produktu: {str(e)}")
             
-            except Exception as e:
-                messages.error(request, f'Wystąpił błąd podczas dodawania produktów: {str(e)}')
-    else:
-        form = BulkAddForm()
+            # Wyświetl odpowiedni komunikat na podstawie liczników
+            if added_count > 0:
+                success_msg = f'Dodano {added_count} produktów do lodówki.'
+                if converted_count > 0:
+                    success_msg += f' {converted_count} produktów zostało skonwertowanych do jednostek podstawowych.'
+                messages.success(request, success_msg)
+            else:
+                messages.warning(request, 'Nie udało się dodać żadnych produktów do lodówki.')
+            
+            if error_count > 0:
+                messages.warning(request, f'Podczas dodawania wystąpiło {error_count} błędów.')
+            
+            return redirect('fridge:list')
+        
+        except json.JSONDecodeError:
+            messages.error(request, 'Nieprawidłowy format danych. Spróbuj ponownie.')
+        except Exception as e:
+            messages.error(request, f'Wystąpił nieoczekiwany błąd: {str(e)}')
     
-    return render(request, 'fridge/bulk_add.html', {
-        'form': form,
-    })
+    # Renderuj pusty formularz dla żądania GET
+    return render(request, 'fridge/bulk_add.html')
 
 @login_required
 def clean_expired(request):
@@ -460,3 +575,41 @@ def check_ingredient_availability(cls, user, ingredient, amount, unit):
     
     # Porównanie dostępnej ilości z potrzebną ilością
     return total_available >= float(amount)
+
+@login_required
+def consolidate_items(request):
+    """Widok do konsolidacji produktów w lodówce do jednostek podstawowych"""
+    if request.method == 'POST':
+        try:
+            # Wykonaj konsolidację
+            consolidated_count = FridgeItem.consolidate_fridge_items(request.user)
+            
+            if consolidated_count > 0:
+                messages.success(request, f'Skonsolidowano {consolidated_count} produktów w lodówce do jednostek podstawowych.')
+            else:
+                messages.info(request, 'Nie było potrzeby konsolidacji - wszystkie produkty są już w jednostkach podstawowych.')
+                
+        except Exception as e:
+            messages.error(request, f'Wystąpił błąd podczas konsolidacji: {str(e)}')
+            
+        return redirect('fridge:list')
+    
+    # Pobierz produkty, które mogą być skonsolidowane (duplikaty składników)
+    from django.db.models import Count
+    
+    duplicate_ingredients = FridgeItem.objects.filter(user=request.user).values(
+        'ingredient__name'
+    ).annotate(
+        count=Count('ingredient')
+    ).filter(count__gt=1).order_by('-count')
+    
+    ingredients_to_consolidate = []
+    for item in duplicate_ingredients:
+        ingredients_to_consolidate.append({
+            'name': item['ingredient__name'],
+            'count': item['count']
+        })
+    
+    return render(request, 'fridge/consolidate_confirm.html', {
+        'ingredients_to_consolidate': ingredients_to_consolidate
+    })

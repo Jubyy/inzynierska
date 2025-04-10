@@ -14,13 +14,15 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage
 from django.db.models.query_utils import Q
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import Count
+from django.db.models import Count, Avg
+from django.http import JsonResponse, HttpResponseRedirect
+from django.views.decorators.http import require_POST
 
-from recipes.models import Recipe
+from recipes.models import Recipe, RecipeLike
 from fridge.models import FridgeItem
 from shopping.models import ShoppingList
 
-from .models import UserProfile
+from .models import UserProfile, RecipeHistory, UserFollowing
 from .forms import UserProfileForm, CustomUserCreationForm, CustomPasswordChangeForm
 
 # Funkcja pomocnicza do wysyłania emaili
@@ -156,97 +158,196 @@ def custom_logout(request):
     return redirect('login')
 
 @login_required
-def profile(request):
-    """Widok profilu użytkownika"""
-    if request.method == 'POST':
-        user_form = CustomUserCreationForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, 'Twój profil został zaktualizowany!')
-            return redirect('profile')
-    else:
-        user_form = CustomUserCreationForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
+def profile_view(request):
+    """Wyświetla profil użytkownika"""
+    # Pobierz ulubione przepisy użytkownika
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
     
-    # Pobierz przepisy użytkownika
-    user_recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')[:5]
+    # Pobierz ostatnio dodane przepisy użytkownika
+    recent_recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')[:5]
     
-    # Pobierz statystyki
-    recipes_count = Recipe.objects.filter(author=request.user).count()
-    fridge_count = FridgeItem.objects.filter(user=request.user).count()
-    shopping_lists_count = ShoppingList.objects.filter(user=request.user).count()
+    # Pobierz historię przygotowania przepisów
+    recipe_history = RecipeHistory.objects.filter(user=request.user)[:5]
+    
+    # Pobierz liczbę obserwowanych i obserwujących
+    following_count = UserFollowing.objects.filter(user=request.user).count()
+    followers_count = UserFollowing.objects.filter(followed_user=request.user).count()
     
     context = {
-        'user_form': user_form,
-        'profile_form': profile_form,
-        'recipes': user_recipes,
-        'recipes_count': recipes_count,
-        'fridge_count': fridge_count,
-        'shopping_lists_count': shopping_lists_count
+        'user': request.user,
+        'favorite_recipes': favorite_recipes,
+        'recent_recipes': recent_recipes,
+        'recipe_history': recipe_history,
+        'following_count': following_count,
+        'followers_count': followers_count,
     }
     
     return render(request, 'accounts/profile.html', context)
 
 @login_required
-def change_password(request):
-    """Zmiana hasła użytkownika"""
+def profile_edit(request):
+    """Widok do edycji profilu użytkownika"""
     if request.method == 'POST':
-        form = CustomPasswordChangeForm(request.user, request.POST)
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
-            user = form.save()
-            # Zachowaj sesję użytkownika po zmianie hasła
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Hasło zostało zmienione pomyślnie!')
+            form.save()
+            messages.success(request, 'Twój profil został zaktualizowany.')
             return redirect('accounts:profile')
-        else:
-            messages.error(request, 'Popraw błędy w formularzu.')
     else:
-        form = CustomPasswordChangeForm(request.user)
+        form = UserProfileForm(instance=request.user.profile)
     
-    return render(request, 'accounts/change_password.html', {'form': form})
+    return render(request, 'accounts/profile_edit.html', {'form': form})
+
+@login_required
+def user_profile_view(request, username):
+    """Wyświetla profil innego użytkownika"""
+    user = get_object_or_404(User, username=username)
+    
+    # Sprawdź, czy zalogowany użytkownik obserwuje tego użytkownika
+    is_following = UserFollowing.objects.filter(
+        user=request.user, 
+        followed_user=user
+    ).exists() if request.user.is_authenticated else False
+    
+    # Pobierz publiczne przepisy użytkownika
+    recipes = Recipe.objects.filter(author=user, is_public=True)
+    
+    # Pobierz liczbę obserwowanych i obserwujących
+    following_count = UserFollowing.objects.filter(user=user).count()
+    followers_count = UserFollowing.objects.filter(followed_user=user).count()
+    
+    context = {
+        'profile_user': user,
+        'recipes': recipes,
+        'is_following': is_following,
+        'following_count': following_count,
+        'followers_count': followers_count,
+    }
+    
+    return render(request, 'accounts/user_profile.html', context)
+
+@login_required
+def toggle_follow(request, username):
+    """Obserwuj/przestań obserwować użytkownika"""
+    user_to_follow = get_object_or_404(User, username=username)
+    
+    # Nie można obserwować samego siebie
+    if request.user == user_to_follow:
+        messages.error(request, 'Nie możesz obserwować samego siebie.')
+        return redirect('accounts:user_profile', username=username)
+    
+    # Sprawdź, czy już obserwujesz tego użytkownika
+    following_obj = UserFollowing.objects.filter(
+        user=request.user, 
+        followed_user=user_to_follow
+    ).first()
+    
+    if following_obj:
+        # Usuń obserwację
+        following_obj.delete()
+        is_following = False
+        messages.success(request, f'Przestałeś obserwować użytkownika {username}.')
+    else:
+        # Dodaj obserwację
+        UserFollowing.objects.create(
+            user=request.user,
+            followed_user=user_to_follow
+        )
+        is_following = True
+        messages.success(request, f'Zacząłeś obserwować użytkownika {username}.')
+    
+    # Jeśli to żądanie AJAX, zwróć JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'status': 'success',
+            'is_following': is_following,
+            'followers_count': UserFollowing.objects.filter(followed_user=user_to_follow).count()
+        })
+    
+    # W przeciwnym razie przekieruj z powrotem do profilu użytkownika
+    return redirect('accounts:user_profile', username=username)
 
 @login_required
 def user_recipes(request):
-    """Lista przepisów użytkownika"""
+    """Wyświetla przepisy użytkownika"""
     recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')
-    return render(request, 'accounts/user_recipes.html', {'recipes': recipes})
+    
+    context = {
+        'recipes': recipes,
+        'title': 'Moje przepisy'
+    }
+    
+    return render(request, 'accounts/user_recipes.html', context)
 
-class UserProfileDetailView(LoginRequiredMixin, DetailView):
-    """Szczegółowy widok profilu użytkownika"""
-    model = UserProfile
-    template_name = 'accounts/user_detail.html'
-    context_object_name = 'profile'
+@login_required
+def followed_users(request):
+    """Wyświetla listę śledzonych użytkowników"""
+    # Pobierz użytkowników, których śledzi zalogowany użytkownik
+    followed = UserFollowing.objects.filter(user=request.user).select_related('followed_user')
     
-    def get_object(self):
-        username = self.kwargs.get('username')
-        return UserProfile.objects.get(user__username=username)
+    context = {
+        'followed_users': followed,
+        'title': 'Obserwowani użytkownicy'
+    }
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        user = self.get_object().user
-        
-        # Dodaj publiczne przepisy użytkownika
-        context['recipes'] = Recipe.objects.filter(author=user).order_by('-created_at')
-        
-        return context
+    return render(request, 'accounts/followed_users.html', context)
 
-class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
-    """Edycja profilu użytkownika"""
-    model = UserProfile
-    form_class = UserProfileForm
-    template_name = 'accounts/profile_edit.html'
-    success_url = reverse_lazy('accounts:profile')
+@login_required
+def followers(request):
+    """Wyświetla listę użytkowników obserwujących zalogowanego użytkownika"""
+    # Pobierz użytkowników, którzy śledzą zalogowanego użytkownika
+    followers = UserFollowing.objects.filter(followed_user=request.user).select_related('user')
     
-    def get_object(self):
-        return self.request.user.profile
+    # Pobierz ID użytkowników, których obecnie obserwuje zalogowany użytkownik
+    following_ids = UserFollowing.objects.filter(user=request.user).values_list('followed_user_id', flat=True)
     
-    def form_valid(self, form):
-        messages.success(self.request, 'Profil został zaktualizowany!')
-        return super().form_valid(form)
+    context = {
+        'followers': followers,
+        'following_ids': following_ids,
+        'title': 'Obserwujący'
+    }
+    
+    return render(request, 'accounts/followers.html', context)
+
+@login_required
+def top_users_list(request):
+    """Wyświetla listę najpopularniejszych użytkowników"""
+    # Użytkownicy z największą liczbą polubień przepisów
+    top_liked_users = User.objects.annotate(
+        likes_count=Count('recipe__likes')
+    ).exclude(
+        likes_count=0
+    ).order_by('-likes_count')[:10]
+    
+    # Użytkownicy z największą liczbą przepisów
+    most_recipes_users = User.objects.annotate(
+        recipes_count=Count('recipe')
+    ).exclude(
+        recipes_count=0
+    ).order_by('-recipes_count')[:10]
+    
+    # Użytkownicy z największą liczbą obserwujących
+    most_followers_users = User.objects.annotate(
+        followers_count=Count('followers')
+    ).exclude(
+        followers_count=0
+    ).order_by('-followers_count')[:10]
+    
+    # Sprawdź, których użytkowników śledzi zalogowany użytkownik
+    if request.user.is_authenticated:
+        followed_users = UserFollowing.objects.filter(user=request.user).values_list('followed_user_id', flat=True)
+    else:
+        followed_users = []
+    
+    context = {
+        'top_liked_users': top_liked_users,
+        'most_recipes_users': most_recipes_users,
+        'most_followers_users': most_followers_users,
+        'followed_users': followed_users,
+        'title': 'Najpopularniejsi użytkownicy'
+    }
+    
+    return render(request, 'accounts/top_users.html', context)
 
 @login_required
 def delete_account(request):

@@ -159,7 +159,7 @@
                     </div>
                     <div class="recipe-stat-item">
                         <i class="bi bi-person"></i> 
-                        Autor: <a href="{% url 'accounts:user_detail' recipe.author.username %}" class="user-profile-link">{{ recipe.author.username }}</a>
+                        Autor: <a href="{% url 'accounts:user_profile' recipe.author.username %}" class="user-profile-link">{{ recipe.author.username }}</a>
                     </div>
                 </div>
             </div>
@@ -391,14 +391,14 @@
                     <div class="comment mb-4" id="comment-{{ comment.id }}">
                         <div class="d-flex">
                             <div class="flex-shrink-0">
-                                <a href="{% url 'accounts:user_detail' comment.user.username %}">
+                                <a href="{% url 'accounts:user_profile' comment.user.username %}">
                                     <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ comment.user.username }}&background=random" width="50" height="50" alt="{{ comment.user.username }}">
                                 </a>
                             </div>
                             <div class="ms-3 flex-grow-1">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="mb-1">
-                                        <a href="{% url 'accounts:user_detail' comment.user.username %}" class="user-profile-link">
+                                        <a href="{% url 'accounts:user_profile' comment.user.username %}" class="user-profile-link">
                                             {{ comment.user.username }}
                                         </a>
                                     </h5>
@@ -443,14 +443,14 @@
                                             <div class="reply mb-3" id="comment-{{ reply.id }}">
                                                 <div class="d-flex">
                                                     <div class="flex-shrink-0">
-                                                        <a href="{% url 'accounts:user_detail' reply.user.username %}">
+                                                        <a href="{% url 'accounts:user_profile' reply.user.username %}">
                                                             <img class="rounded-circle" src="https://ui-avatars.com/api/?name={{ reply.user.username }}&background=random" width="40" height="40" alt="{{ reply.user.username }}">
                                                         </a>
                                                     </div>
                                                     <div class="ms-2 flex-grow-1">
                                                         <div class="d-flex justify-content-between">
                                                             <h6 class="mb-1">
-                                                                <a href="{% url 'accounts:user_detail' reply.user.username %}" class="user-profile-link">
+                                                                <a href="{% url 'accounts:user_profile' reply.user.username %}" class="user-profile-link">
                                                                     {{ reply.user.username }}
                                                                 </a>
                                                             </h6>

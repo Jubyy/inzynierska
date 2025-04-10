@@ -104,7 +104,10 @@ class FridgeItemForm(forms.ModelForm):
             
             # Sprawdź, czy dla jednostek wymagających liczb całkowitych podano liczbę całkowitą
             if unit.symbol in whole_number_units and not float(amount).is_integer():
-                self.add_error('amount', 'Dla tej jednostki można podać tylko liczby całkowite.')
+                # Zamiast dodawać błąd, automatycznie zaokrąglamy wartość
+                cleaned_data['amount'] = round(float(amount))
+                # Dodaj komunikat informujący użytkownika o automatycznym zaokrągleniu
+                self.add_error('amount', f'Wartość została automatycznie zaokrąglona do {cleaned_data["amount"]} (jednostka wymaga liczby całkowitej).')
             
             # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
             # Ale tylko dla nowo dodawanych produktów, nie dla edytowanych
@@ -114,7 +117,10 @@ class FridgeItemForm(forms.ModelForm):
                     compatible_units = [ingredient.default_unit]
                 
                 if unit not in compatible_units:
-                    self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
+                    # Zamiast dodawać błąd, dodaj jednostkę do kompatybilnych
+                    ingredient.compatible_units.add(unit)
+                    # Dodaj informację dla użytkownika
+                    self.add_error('unit', f'Automatycznie dodano {unit.name} jako kompatybilną jednostkę dla {ingredient.name}.')
         
         return cleaned_data
 

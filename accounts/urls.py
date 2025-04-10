@@ -20,14 +20,16 @@ urlpatterns = [
     path('activation-sent/', views.activation_sent, name='activation_sent'),
     
     # Profil użytkownika
-    path('profile/', views.profile, name='profile'),
-    path('profile/edit/', views.UserProfileUpdateView.as_view(), name='profile_edit'),
-    path('profile/change-password/', views.change_password, name='change_password'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('profile/recipes/', views.user_recipes, name='user_recipes'),
-    path('profile/delete/', views.delete_account, name='delete_account'),
     
-    # Przeglądanie innych użytkowników
-    path('user/<str:username>/', views.UserProfileDetailView.as_view(), name='user_detail'),
+    # Śledzenie użytkowników
+    path('community/', views.top_users_list, name='top_users'),
+    path('user/<str:username>/', views.user_profile_view, name='user_profile'),
+    path('user/<str:username>/follow/', views.toggle_follow, name='toggle_follow'),
+    path('following/', views.followed_users, name='following'),
+    path('followers/', views.followers, name='followers'),
     
     # Resetowanie hasła
     path('password-reset/', 

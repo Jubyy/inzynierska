@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil {{ profile_user.username }} {% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if profile_user.profile.avatar %}
+                            <img src="{{ profile_user.profile.avatar.url }}" 
+                                 alt="{{ profile_user.username }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background: linear-gradient(45deg, #6a11cb, #2575fc); color: white; font-weight: bold; font-size: 2.5rem;">
+                                {{ profile_user.first_name|slice:":1"|default:profile_user.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                        <h3 class="h4 mb-1">{{ profile_user.username }}</h3>
+                        <p class="text-muted mb-2">{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+                        
+                        <!-- Przycisk obserwowania -->
+                        {% if profile_user.id != request.user.id and request.user.is_authenticated %}
+                            {% if is_following %}
+                            <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-danger btn-sm follow-button" id="followButton">
+                                <i class="bi bi-person-dash me-1"></i>Przestań obserwować
+                            </a>
+                            {% else %}
+                            <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-success btn-sm follow-button" id="followButton">
+                                <i class="bi bi-person-plus me-1"></i>Obserwuj
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-around mb-4">
+                        <div class="text-center">
+                            <div class="h5 mb-0">{{ recipes.count }}</div>
+                            <div class="small text-muted">Przepisy</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h5 mb-0" id="followersCount">{{ followers_count }}</div>
+                            <div class="small text-muted">Obserwujący</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="h5 mb-0">{{ following_count }}</div>
+                            <div class="small text-muted">Obserwowani</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bio użytkownika -->
+                    {% if profile_user.profile.bio %}
+                    <div class="border-top pt-3 mb-3">
+                        <h5 class="mb-2">O mnie</h5>
+                        <p class="text-muted small">{{ profile_user.profile.bio }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Ulubiona kuchnia -->
+                    {% if profile_user.profile.favorite_cuisine %}
+                    <div class="mb-3">
+                        <h5 class="mb-2">Ulubiona kuchnia</h5>
+                        <p class="text-muted small">{{ profile_user.profile.favorite_cuisine }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Dołączył -->
+                    <div class="text-muted small">
+                        <i class="bi bi-calendar3 me-1"></i>Dołączył: {{ profile_user.date_joined|date:"d.m.Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Przepisy użytkownika</h4>
+                </div>
+                <div class="card-body">
+                    {% if recipes %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for recipe in recipes %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none">
+                                    {% if recipe.image %}
+                                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 180px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{% static 'img/default-recipe.jpg' %}" class="card-img-top" alt="{{ recipe.title }}" style="height: 180px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{% url 'recipes:detail' recipe.id %}" class="text-decoration-none text-dark">{{ recipe.title }}</a>
+                                    </h5>
+                                    <p class="card-text small text-muted mb-2">{{ recipe.description|truncatechars:100 }}</p>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted"><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</small>
+                                        <small class="text-muted"><i class="bi bi-calendar"></i> {{ recipe.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>Ten użytkownik nie ma jeszcze publicznych przepisów.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript dla akcji śledzenia użytkownika -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obsługa przycisku śledzenia AJAX
+    const followButton = document.getElementById('followButton');
+    
+    if (followButton) {
+        followButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const url = this.getAttribute('href');
+            
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Aktualizuj wygląd przycisku
+                    if (data.is_following) {
+                        this.innerHTML = '<i class="bi bi-person-dash me-1"></i>Przestań obserwować';
+                        this.classList.remove('btn-outline-success');
+                        this.classList.add('btn-outline-danger');
+                    } else {
+                        this.innerHTML = '<i class="bi bi-person-plus me-1"></i>Obserwuj';
+                        this.classList.remove('btn-outline-danger');
+                        this.classList.add('btn-outline-success');
+                    }
+                    
+                    // Aktualizuj licznik obserwujących
+                    document.getElementById('followersCount').innerText = data.followers_count;
+                }
+            })
+            .catch(error => {
+                console.error('Błąd:', error);
+            });
+        });
+    }
+    
+    // Funkcja do pobierania wartości ciasteczka
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %} 

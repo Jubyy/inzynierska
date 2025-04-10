@@ -314,9 +314,7 @@
                                             {% if recipe.image %}
                                                 <img src="{{ recipe.image.url }}" class="img-fluid rounded-start" alt="{{ recipe.title }}" style="height: 100%; object-fit: cover;">
                                             {% else %}
-                                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 100%; min-height: 200px;">
-                                                    <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
-                                                </div>
+                                                <img src="{% static 'img/recipe-placeholder.svg' %}" class="img-fluid rounded-start" alt="{{ recipe.title }}" style="height: 100%; object-fit: cover;">
                                             {% endif %}
                                         </div>
                                         <div class="col-md-8">
@@ -372,9 +370,7 @@
                                     {% if recipe.image %}
                                         <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
                                     {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 120px;">
-                                            <i class="bi bi-camera text-muted" style="font-size: 1.5rem;"></i>
-                                        </div>
+                                        <img src="{% static 'img/recipe-placeholder.svg' %}" class="card-img-top" alt="{{ recipe.title }}">
                                     {% endif %}
                                     <div class="card-body">
                                         <h6 class="card-title text-truncate" title="{{ recipe.title }}">{{ recipe.title }}</h6>

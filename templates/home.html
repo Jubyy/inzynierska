@@ -395,7 +395,7 @@
                                     {% if recipe.image %}
                                         <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
                                     {% else %}
-                                        <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia" class="card-img-top" alt="{{ recipe.title }}">
+                                        <img src="{% static 'img/recipe-placeholder.svg' %}" class="card-img-top" alt="{{ recipe.title }}">
                                     {% endif %}
                                     {% if recipe.is_vegetarian %}
                                         <span class="position-absolute top-0 end-0 bg-primary text-white px-3 py-1 m-2 rounded-pill">Wegetariańskie</span>
@@ -469,7 +469,7 @@
         <div class="swiper-wrapper">
             <div class="swiper-slide">
                 <div class="testimonial-card">
-                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Anna Kowalska">
+                    <img src="{% static 'img/testimonial-1.jpg' %}" alt="Anna Kowalska">
                     <div class="stars">
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
@@ -484,7 +484,7 @@
             
             <div class="swiper-slide">
                 <div class="testimonial-card">
-                    <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="Piotr Nowak">
+                    <img src="{% static 'img/testimonial-2.jpg' %}" alt="Piotr Nowak">
                     <div class="stars">
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
@@ -499,7 +499,7 @@
             
             <div class="swiper-slide">
                 <div class="testimonial-card">
-                    <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Kasia Wiśniewska">
+                    <img src="{% static 'img/testimonial-3.jpg' %}" alt="Kasia Wiśniewska">
                     <div class="stars">
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>
@@ -514,7 +514,7 @@
             
             <div class="swiper-slide">
                 <div class="testimonial-card">
-                    <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Tomasz Lis">
+                    <img src="{% static 'img/testimonial-4.jpg' %}" alt="Tomasz Lis">
                     <div class="stars">
                         <i class="bi bi-star-fill"></i>
                         <i class="bi bi-star-fill"></i>

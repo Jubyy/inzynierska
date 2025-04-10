@@ -126,7 +126,8 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="alert alert-info">
+                        <div class="alert alert-info" style="display: block !important;">
+                            <i class="bi bi-info-circle me-2"></i>
                             Twoja lodówka jest pusta. <a href="{% url 'fridge:add' %}">Dodaj produkty</a>.
                         </div>
                     {% endif %}
@@ -157,7 +158,8 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="alert alert-info">
+                        <div class="alert alert-info" style="display: block !important;">
+                            <i class="bi bi-info-circle me-2"></i>
                             Nie masz wystarczającej ilości składników aby przygotować dostępne przepisy.
                         </div>
                     {% endif %}

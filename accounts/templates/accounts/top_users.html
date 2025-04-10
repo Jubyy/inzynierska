@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Najlepsi użytkownicy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h2">Społeczność - Najlepsi użytkownicy</h1>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="most-recipes-tab" data-bs-toggle="tab" data-bs-target="#most-recipes" type="button" role="tab" aria-controls="most-recipes" aria-selected="true">
+                                <i class="bi bi-journal-plus me-1"></i>Najwięcej przepisów
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="most-followers-tab" data-bs-toggle="tab" data-bs-target="#most-followers" type="button" role="tab" aria-controls="most-followers" aria-selected="false">
+                                <i class="bi bi-people-fill me-1"></i>Najpopularniejsi
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="top-rated-tab" data-bs-toggle="tab" data-bs-target="#top-rated" type="button" role="tab" aria-controls="top-rated" aria-selected="false">
+                                <i class="bi bi-star-fill me-1"></i>Najczęściej lubiani
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content mt-4" id="userTabsContent">
+                        <!-- Użytkownicy z największą liczbą przepisów -->
+                        <div class="tab-pane fade show active" id="most-recipes" role="tabpanel" aria-labelledby="most-recipes-tab">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                {% for user in most_recipes_users %}
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                {% if user.profile.avatar %}
+                                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: linear-gradient(45deg, #6a11cb, #2575fc); color: white; font-weight: bold; font-size: 1.5rem;">
+                                                        {{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                                    <p class="text-muted small mb-0">{{ user.first_name }} {{ user.last_name }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-3">
+                                                <div>
+                                                    <span class="badge bg-primary rounded-pill">{{ user.recipes_count }} przepisów</span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <a href="{% url 'accounts:user_profile' user.username %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-person me-1"></i>Profil
+                                                </a>
+                                                {% if user.id != request.user.id %}
+                                                    {% if user.id in followed_users %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-danger follow-button">
+                                                        <i class="bi bi-person-dash me-1"></i>Przestań obserwować
+                                                    </a>
+                                                    {% else %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-success follow-button">
+                                                        <i class="bi bi-person-plus me-1"></i>Obserwuj
+                                                    </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Nie znaleziono użytkowników z przepisami.
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Użytkownicy z największą liczbą obserwujących -->
+                        <div class="tab-pane fade" id="most-followers" role="tabpanel" aria-labelledby="most-followers-tab">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                {% for user in most_followers_users %}
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                {% if user.profile.avatar %}
+                                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: linear-gradient(45deg, #6a11cb, #2575fc); color: white; font-weight: bold; font-size: 1.5rem;">
+                                                        {{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                                    <p class="text-muted small mb-0">{{ user.first_name }} {{ user.last_name }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-3">
+                                                <div>
+                                                    <span class="badge bg-primary rounded-pill">{{ user.followers_count }} obserwujących</span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <a href="{% url 'accounts:user_profile' user.username %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-person me-1"></i>Profil
+                                                </a>
+                                                {% if user.id != request.user.id %}
+                                                    {% if user.id in followed_users %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-danger follow-button">
+                                                        <i class="bi bi-person-dash me-1"></i>Przestań obserwować
+                                                    </a>
+                                                    {% else %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-success follow-button">
+                                                        <i class="bi bi-person-plus me-1"></i>Obserwuj
+                                                    </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Nie znaleziono popularnych użytkowników.
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Użytkownicy z największą liczbą polubień przepisów -->
+                        <div class="tab-pane fade" id="top-rated" role="tabpanel" aria-labelledby="top-rated-tab">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                {% for user in top_liked_users %}
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                {% if user.profile.avatar %}
+                                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: linear-gradient(45deg, #6a11cb, #2575fc); color: white; font-weight: bold; font-size: 1.5rem;">
+                                                        {{ user.first_name|slice:":1"|default:user.username|slice:":1"|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                                    <p class="text-muted small mb-0">{{ user.first_name }} {{ user.last_name }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-3">
+                                                <div>
+                                                    <span class="badge bg-primary rounded-pill">{{ user.likes_count }} polubień</span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <a href="{% url 'accounts:user_profile' user.username %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-person me-1"></i>Profil
+                                                </a>
+                                                {% if user.id != request.user.id %}
+                                                    {% if user.id in followed_users %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-danger follow-button">
+                                                        <i class="bi bi-person-dash me-1"></i>Przestań obserwować
+                                                    </a>
+                                                    {% else %}
+                                                    <a href="{% url 'accounts:toggle_follow' user.username %}" class="btn btn-sm btn-outline-success follow-button">
+                                                        <i class="bi bi-person-plus me-1"></i>Obserwuj
+                                                    </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Nie znaleziono użytkowników z ocenionymi przepisami.
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript dla akcji śledzenia użytkownika -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Funkcja do obsługi przycisku obserwowania
+        document.querySelectorAll('.follow-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const url = this.getAttribute('href');
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.is_following) {
+                            this.innerHTML = '<i class="bi bi-person-dash me-1"></i>Przestań obserwować';
+                            this.classList.remove('btn-outline-success');
+                            this.classList.add('btn-outline-danger');
+                        } else {
+                            this.innerHTML = '<i class="bi bi-person-plus me-1"></i>Obserwuj';
+                            this.classList.remove('btn-outline-danger');
+                            this.classList.add('btn-outline-success');
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Funkcja do pobierania wartości cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %} 

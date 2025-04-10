@@ -95,17 +95,15 @@ class UserProfileForm(forms.ModelForm):
     """Formularz do edycji profilu użytkownika"""
     class Meta:
         model = UserProfile
-        fields = ('avatar', 'bio', 'favorite_cuisine', 'fridge_name')
+        fields = ('avatar', 'bio', 'favorite_cuisine')
         widgets = {
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Napisz coś o sobie...'}),
-            'favorite_cuisine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Twoja ulubiona kuchnia'}),
-            'fridge_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa Twojej lodówki'})
+            'favorite_cuisine': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Twoja ulubiona kuchnia'})
         }
         labels = {
             'avatar': 'Zdjęcie profilowe',
             'bio': 'O mnie',
-            'favorite_cuisine': 'Ulubiona kuchnia',
-            'fridge_name': 'Nazwa lodówki'
+            'favorite_cuisine': 'Ulubiona kuchnia'
         }
 
 class CustomPasswordChangeForm(PasswordChangeForm):

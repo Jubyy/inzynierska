@@ -6,7 +6,6 @@ from django.utils import timezone
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    fridge_name = models.CharField(max_length=100, default="Moja Lodówka", verbose_name="Nazwa lodówki")
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name="Zdjęcie profilowe")
     bio = models.TextField(blank=True, verbose_name="O sobie")
     favorite_cuisine = models.CharField(max_length=100, blank=True, verbose_name="Ulubiona kuchnia")
@@ -27,6 +26,30 @@ class UserProfile(models.Model):
     def fridge_items_count(self):
         """Zwraca liczbę produktów w lodówce użytkownika"""
         return self.user.fridge_items.count()
+    
+    @property
+    def followers_count(self):
+        """Zwraca liczbę użytkowników śledzących tego użytkownika"""
+        return UserFollowing.objects.filter(followed_user=self.user).count()
+    
+    @property
+    def following_count(self):
+        """Zwraca liczbę użytkowników, których śledzi ten użytkownik"""
+        return UserFollowing.objects.filter(user=self.user).count()
+
+class UserFollowing(models.Model):
+    """Model do śledzenia użytkowników"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following', verbose_name="Śledzący użytkownik")
+    followed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers', verbose_name="Śledzony użytkownik")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data rozpoczęcia śledzenia")
+    
+    class Meta:
+        verbose_name = "Śledzony użytkownik"
+        verbose_name_plural = "Śledzeni użytkownicy"
+        unique_together = ('user', 'followed_user')  # użytkownik może śledzić innego użytkownika tylko raz
+        
+    def __str__(self):
+        return f"{self.user.username} śledzi {self.followed_user.username}"
 
 class RecipeHistory(models.Model):
     """Model przechowujący historię przygotowanych przepisów przez użytkownika"""

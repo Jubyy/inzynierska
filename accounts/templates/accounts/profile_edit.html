@@ -38,17 +38,6 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="{{ form.fridge_name.id_for_label }}" class="form-label">{{ form.fridge_name.label }}</label>
-                            {{ form.fridge_name }}
-                            {% if form.fridge_name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.fridge_name.errors }}
-                                </div>
-                            {% endif %}
-                            <div class="form-text">Nazwa Twojej wirtualnej lodówki.</div>
-                        </div>
-                        
-                        <div class="mb-3">
                             <label for="{{ form.favorite_cuisine.id_for_label }}" class="form-label">{{ form.favorite_cuisine.label }}</label>
                             {{ form.favorite_cuisine }}
                             {% if form.favorite_cuisine.errors %}

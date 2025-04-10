@@ -149,13 +149,13 @@ INGREDIENTS = {
         "Czekolada", "Batony", "Cukierki", "Żelki", "Herbatniki", 
         "Wafle", "Ciastka", "Lizaki", "Lody", "Guma do żucia", 
         "Miód", "Dżem", "Nutella", "Krówki", "Ptasie mleczko",
-        "Torty", "Ciasta", "Pierniki", "Marcepan", "Chalwa",
+        "Torty", "Ciasta", "Pierniki", "Marcepan", "Chałwa",
         "Beza", "Karmel", "Pralinki", "Trufle", "Toffi",
         "Pianki", "Lukrecja", "Galaretki", "Rachatłukum", "Ciasto francuskie",
         "Rogaliki", "Praliny", "Sernik", "Szarlotka", "Makowiec",
         "Babka", "Pączki", "Drożdżówki", "Rurki z kremem", "Eklerki",
         "Bezy", "Croissanty", "Napoleonka", "Murzynek", "Delicje",
-        "Mazurki", "Sękacz", "Chałwa", "Krowki", "Michałki"
+        "Mazurki", "Sękacz", "Chałwa", "Krówki", "Michałki"
     ],
     "Napoje": [
         "Woda", "Herbata", "Kawa", "Sok pomarańczowy", "Sok jabłkowy", 

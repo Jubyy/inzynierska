@@ -64,6 +64,17 @@
                         </label>
                     </div>
                 </div>
+                
+                {% if followed_users_count > 0 %}
+                <div class="col-12 mt-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="followed" name="followed" value="true" {% if followed == 'true' %}checked{% endif %}>
+                        <label class="form-check-label" for="followed">
+                            <i class="bi bi-people-fill me-1"></i>Pokaż tylko przepisy od śledzonych użytkowników
+                        </label>
+                    </div>
+                </div>
+                {% endif %}
                 {% endif %}
                 
                 <!-- Popularne składniki -->
@@ -72,7 +83,7 @@
                     <h5>Popularne składniki:</h5>
                     <div class="ingredient-tags">
                         {% for ingredient in popular_ingredients %}
-                            <a href="?ingredient={{ ingredient.id }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=true{% endif %}" 
+                            <a href="?ingredient={{ ingredient.id }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}" 
                                class="badge rounded-pill bg-light text-dark border {% if selected_ingredient == ingredient.id|stringformat:'i' %}bg-primary text-white{% endif %} m-1">
                                 {{ ingredient.name }}
                             </a>
@@ -86,7 +97,7 @@
                 <div class="col-12 mt-3">
                     <div class="alert alert-info">
                         <span>Filtrujesz przepisy ze składnikiem: <strong>{{ ingredient_name }}</strong></span>
-                        <a href="?{% if query %}q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=true{% endif %}" class="btn btn-sm btn-outline-secondary ms-2">
+                        <a href="?{% if query %}q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}" class="btn btn-sm btn-outline-secondary ms-2">
                             <i class="bi bi-x-circle"></i> Usuń filtr
                         </a>
                     </div>
@@ -104,10 +115,10 @@
             <div class="card h-100 recipe-card">
                 <div class="position-relative">
                     <a href="{% url 'recipes:detail' recipe.pk %}" class="text-decoration-none">
-                {% if recipe.image %}
-                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 160px; object-fit: cover;">
                         {% else %}
-                            <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia" class="card-img-top" alt="{{ recipe.title }}">
+                            <img src="{% static 'img/default-recipe.jpg' %}" class="card-img-top" alt="{{ recipe.title }}" style="height: 160px; object-fit: cover;">
                         {% endif %}
                     </a>
                     
@@ -211,12 +222,12 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}">
                         <i class="bi bi-chevron-double-left"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
@@ -227,19 +238,19 @@
                     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_diet %}&diet={{ selected_diet }}{% endif %}{% if selected_ingredient %}&ingredient={{ selected_ingredient }}{% endif %}{% if available_only %}&available_only=true{% endif %}{% if followed %}&followed={{ followed }}{% endif %}">
                         <i class="bi bi-chevron-double-right"></i>
                     </a>
             </li>
@@ -312,7 +323,9 @@ document.addEventListener('DOMContentLoaded', function() {
             button.classList.add('active');
         }
         
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const recipeId = this.getAttribute('data-recipe-id');
             
             // Wyślij żądanie AJAX
@@ -356,6 +369,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const availableOnlyCheckbox = document.getElementById('available_only');
     if (availableOnlyCheckbox) {
         availableOnlyCheckbox.addEventListener('change', function() {
+            this.value = this.checked ? 'true' : '';
+            this.closest('form').submit();
+        });
+    }
+    
+    // Automatycznie odświeżaj formularz po zmianie checkboxa followed
+    const followedCheckbox = document.getElementById('followed');
+    if (followedCheckbox) {
+        followedCheckbox.addEventListener('change', function() {
             this.value = this.checked ? 'true' : '';
             this.closest('form').submit();
         });
