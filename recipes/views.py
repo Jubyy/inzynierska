@@ -8,7 +8,7 @@ from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
 from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, ConversionTableForm, ConversionEntryForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
@@ -1303,44 +1303,13 @@ def ajax_unit_info(request):
 
 @login_required
 def conversion_tables_list(request):
-    """Lista dostępnych tablic konwersji"""
-    # Pobierz zatwierdzone tablice konwersji
-    approved_tables = ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
-    
-    # Jeśli użytkownik jest zalogowany, pobierz również jego własne tablice
-    user_tables = []
-    if request.user.is_authenticated:
-        user_tables = ConversionTable.objects.filter(
-            created_by=request.user, 
-            is_approved=False
-        ).order_by('-created_at')
-    
-    # Pogrupuj tablice według typu produktu
-    grouped_tables = {}
-    for table in approved_tables:
-        if table.product_type not in grouped_tables:
-            grouped_tables[table.product_type] = []
-        grouped_tables[table.product_type].append(table)
-    
-    return render(request, 'recipes/conversion_tables_list.html', {
-        'grouped_tables': grouped_tables,
-        'user_tables': user_tables
-    })
+    """Przekierowanie do zgłaszania nowego składnika"""
+    return redirect('recipes:submit_ingredient')
 
 @login_required
 def add_conversion_table(request):
     """Tworzenie nowej tablicy konwersji"""
-    from django import forms
-    
-    class ConversionTableForm(forms.ModelForm):
-        class Meta:
-            model = ConversionTable
-            fields = ['name', 'description', 'product_type']
-    
-    class ConversionEntryForm(forms.ModelForm):
-        class Meta:
-            model = ConversionTableEntry
-            fields = ['from_unit', 'to_unit', 'ratio', 'is_exact', 'notes']
+    from django.forms import formset_factory
     
     ConversionEntryFormSet = formset_factory(ConversionEntryForm, extra=3)
     
@@ -1408,16 +1377,16 @@ def submit_ingredient(request):
     class UserIngredientForm(forms.ModelForm):
         class Meta:
             model = UserIngredient
-            fields = ['name', 'category', 'description', 'default_unit', 
-                     'conversion_table', 'density', 'piece_weight', 'unit_type']
+            fields = ['name', 'category', 'description', 'piece_weight']
             widgets = {
                 'description': forms.Textarea(attrs={'rows': 3}),
             }
-        
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            # Ogranicz wybór tablic konwersji do zatwierdzonych
-            self.fields['conversion_table'].queryset = ConversionTable.objects.filter(is_approved=True)
+            labels = {
+                'piece_weight': 'Średnia waga sztuki',
+            }
+            help_texts = {
+                'piece_weight': 'Opcjonalne - podaj jeśli wiesz ile waży jedna sztuka składnika (w gramach)',
+            }
     
     if request.method == 'POST':
         form = UserIngredientForm(request.POST)
@@ -1425,16 +1394,25 @@ def submit_ingredient(request):
             ingredient = form.save(commit=False)
             ingredient.user = request.user
             ingredient.status = 'pending'
+            # Domyślne wartości dla pól, które zostaną uzupełnione przez administratora
+            ingredient.conversion_table = None
+            ingredient.default_unit = None
+            ingredient.unit_type = 'weight_volume'  # domyślny typ jednostek
+            ingredient.density = None
             ingredient.save()
             
             messages.success(request, f'Składnik "{ingredient.name}" został zgłoszony i oczekuje na zatwierdzenie przez administratora.')
             return redirect('recipes:my_submissions')
+        else:
+            # Jeśli formularz zawiera błędy, pokaż je użytkownikowi
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Błąd w polu {field}: {error}")
     else:
         form = UserIngredientForm()
     
     return render(request, 'recipes/submit_ingredient.html', {
-        'form': form,
-        'conversion_tables': ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
+        'form': form
     })
 
 @login_required
@@ -1461,9 +1439,36 @@ def admin_pending_ingredients(request):
     pending = UserIngredient.objects.filter(status='pending').order_by('-submitted_at')
     recent = UserIngredient.objects.exclude(status='pending').order_by('-submitted_at')[:10]
     
+    # Pogrupowane tablice konwersji
+    conversion_tables = ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
+    grouped_tables = []
+    
+    from itertools import groupby
+    for product_type, tables in groupby(conversion_tables, key=lambda x: x.product_type):
+        grouped_tables.append({
+            'grouper': product_type,
+            'list': list(tables)
+        })
+    
+    # Pogrupowane jednostki miary
+    measurement_units = MeasurementUnit.objects.all().order_by('type', 'name')
+    grouped_units = []
+    
+    for unit_type, units in groupby(measurement_units, key=lambda x: x.get_type_display()):
+        grouped_units.append({
+            'grouper': unit_type,
+            'list': list(units)
+        })
+    
+    # Lista typów jednostek
+    unit_types = UserIngredient._meta.get_field('unit_type').choices
+    
     return render(request, 'recipes/admin/pending_ingredients.html', {
         'pending_ingredients': pending,
-        'recent_ingredients': recent
+        'recent_ingredients': recent,
+        'conversion_tables': grouped_tables,
+        'measurement_units': grouped_units,
+        'unit_types': unit_types
     })
 
 @user_passes_test(is_admin)
@@ -1473,8 +1478,54 @@ def admin_approve_ingredient(request, ingredient_id):
     
     if request.method == 'POST':
         try:
+            # Pobierz parametry z formularza
+            conversion_table_id = request.POST.get('conversion_table')
+            default_unit_id = request.POST.get('default_unit')
+            unit_type = request.POST.get('unit_type')
+            density = request.POST.get('density')
+            piece_weight = request.POST.get('piece_weight')
+            admin_comment = request.POST.get('admin_comment', '')
+            
+            # Sprawdź czy wymagane pola są wypełnione
+            if not conversion_table_id or not default_unit_id or not unit_type:
+                messages.error(request, 'Musisz wypełnić wszystkie wymagane pola, aby zatwierdzić składnik.')
+                return redirect('recipes:admin_pending_ingredients')
+            
+            # Sprawdź czy piece_weight jest wymagane dla unit_type z piece
+            if 'piece' in unit_type.lower() and not piece_weight:
+                messages.error(request, 'Dla składnika mierzonego w sztukach musisz podać wagę sztuki (piece_weight).')
+                return redirect('recipes:admin_pending_ingredients')
+            
+            # Przypisz wartości do składnika
+            user_ingredient.conversion_table = get_object_or_404(ConversionTable, id=conversion_table_id)
+            user_ingredient.default_unit = get_object_or_404(MeasurementUnit, id=default_unit_id)
+            user_ingredient.unit_type = unit_type
+            
+            # Przypisz gęstość jeśli podana (opcjonalna)
+            if density:
+                try:
+                    user_ingredient.density = float(density)
+                except ValueError:
+                    user_ingredient.density = None
+            
+            # Przypisz wagę sztuki jeśli podana
+            if piece_weight:
+                try:
+                    user_ingredient.piece_weight = float(piece_weight)
+                except ValueError:
+                    user_ingredient.piece_weight = None
+            
+            # Dodaj komentarz administratora jeśli podany
+            if admin_comment:
+                user_ingredient.admin_notes = admin_comment
+                
+            # Zapisz zmiany przed wywołaniem metody approve
+            user_ingredient.save()
+            
+            # Zatwierdź składnik
             ingredient = user_ingredient.approve(admin_user=request.user)
             messages.success(request, f'Składnik "{ingredient.name}" został zatwierdzony i dodany do bazy.')
+            
         except Exception as e:
             messages.error(request, f'Błąd podczas zatwierdzania składnika: {str(e)}')
     
@@ -1493,4 +1544,36 @@ def admin_reject_ingredient(request, ingredient_id):
         except Exception as e:
             messages.error(request, f'Błąd podczas odrzucania składnika: {str(e)}')
     
-    return redirect('recipes:admin_pending_ingredients') 
+    return redirect('recipes:admin_pending_ingredients')
+
+def ajax_ingredient_details(request):
+    """Widok AJAX do pobierania szczegółów składnika"""
+    ingredient_id = request.GET.get('ingredient_id')
+    
+    if not ingredient_id:
+        return JsonResponse({
+            'success': False,
+            'error': 'Brak ID składnika'
+        })
+    
+    try:
+        ingredient = get_object_or_404(Ingredient, id=ingredient_id)
+        
+        # Przygotuj dane o składniku
+        data = {
+            'id': ingredient.id,
+            'name': ingredient.name,
+            'category': ingredient.category.name if ingredient.category else None,
+            'unit_type': ingredient.get_unit_type_display(),
+            'default_unit': ingredient.default_unit.name if ingredient.default_unit else None,
+            'density': float(ingredient.density) if ingredient.density else None,
+            'piece_weight': float(ingredient.piece_weight) if ingredient.piece_weight else None,
+            'success': True
+        }
+        
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }) 

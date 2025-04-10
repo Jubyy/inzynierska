@@ -175,6 +175,22 @@
 {% block extra_js %}
 <script src="{% static 'fridge/js/fridge_wizard.js' %}"></script>
 <script>
+    // Przechwytywanie wszystkich błędów JavaScript
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("Błąd JavaScript:", message);
+        console.error("Miejsce:", source, "linia:", lineno, "kolumna:", colno);
+        console.error("Obiekt błędu:", error);
+        
+        // Wyświetl informację w elemencie debug-info
+        const debugInfo = $('.debug-info');
+        debugInfo.append(`<div class="alert alert-danger mt-2">
+            <p><strong>Błąd JavaScript:</strong> ${message}</p>
+            <p><strong>Linia:</strong> ${lineno}, <strong>Kolumna:</strong> ${colno}</p>
+        </div>`);
+        
+        return false; // pozwala na domyślną obsługę błędu
+    };
+    
     $(document).ready(function() {
         let currentStep = 1;
         let selectedUnitType = null;
@@ -393,27 +409,36 @@
             submitBtn.html('<i class="spinner-border spinner-border-sm"></i> Dodawanie...').prop('disabled', true);
 
             $.ajax({
-                url: "{% url 'fridge:add' %}",
+                url: "{% url 'fridge:ajax_add_to_fridge' %}",
                 method: 'POST',
                 data: formData,
                 headers: {
                     'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
                 },
                 success: function(response) {
+                    console.log("Odpowiedź:", response);
                     if (response.success) {
-                        window.location.href = "{% url 'fridge:list' %}";
+                        // Wyświetl sukces i przekieruj
+                        window.location.href = response.redirect_url || "{% url 'fridge:list' %}";
                     } else {
+                        // Wyświetl błąd
                         alert('Wystąpił błąd: ' + (response.error || 'Nieznany błąd'));
+                        // Przywróć przycisk
                         submitBtn.html(originalText).prop('disabled', false);
                     }
                 },
-                error: function(xhr) {
+                error: function(xhr, status, error) {
+                    console.error("Błąd AJAX:", status, error);
+                    console.error("Odpowiedź:", xhr.responseText);
+                    
                     try {
                         const response = JSON.parse(xhr.responseText);
                         alert('Błąd: ' + (response.error || xhr.statusText || 'Nieznany błąd'));
                     } catch (e) {
-                        alert('Wystąpił błąd podczas dodawania produktu: ' + xhr.statusText);
+                        alert('Wystąpił błąd podczas dodawania produktu: ' + xhr.statusText || 'Nieznany błąd');
                     }
+                    
+                    // Przywróć przycisk
                     submitBtn.html(originalText).prop('disabled', false);
                 }
             });

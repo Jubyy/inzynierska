@@ -1,0 +1,641 @@
+INFO 2025-04-11 01:02:03,869 autoreload 19152 1676 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:04,082 autoreload 7160 18560 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:05,503 autoreload 20996 23260 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:05,518 autoreload 9428 24224 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:05,519 autoreload 12424 17628 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:05,663 autoreload 4624 21192 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:05,694 autoreload 8940 8680 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:24,776 basehttp 19152 18280 "GET /recipes/missing-ingredients/6/ HTTP/1.1" 200 16628
+INFO 2025-04-11 01:02:32,399 autoreload 8940 8680 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:32,448 autoreload 4624 21192 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:32,624 autoreload 19152 1676 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:33,241 autoreload 15380 16328 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:33,255 autoreload 20396 1544 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:33,274 autoreload 12424 17628 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:33,293 autoreload 20996 23260 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:33,353 autoreload 7160 18560 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:33,355 autoreload 9428 24224 D:\praca_inzynierska\recipes\utils.py changed, reloading.
+INFO 2025-04-11 01:02:33,605 autoreload 21516 12732 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:34,580 autoreload 17808 5376 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:34,616 autoreload 21336 14068 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:34,737 autoreload 16112 19476 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:34,849 autoreload 21596 15616 Watching for file changes with StatReloader
+INFO 2025-04-11 01:02:35,477 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:35,477 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:35,478 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:35,479 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:35,483 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:35,483 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:35,484 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:35,484 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:35,515 basehttp 15380 524 "POST /recipes/missing-ingredients/6/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:02:35,639 basehttp 15380 524 "GET /shopping/5/ HTTP/1.1" 200 27291
+INFO 2025-04-11 01:02:39,041 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:39,041 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:39,042 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:39,042 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:39,048 basehttp 15380 524 "GET /recipes/missing-ingredients/6/ HTTP/1.1" 200 13370
+INFO 2025-04-11 01:02:43,501 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:43,501 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:43,502 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:43,503 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:43,506 basehttp 15380 524 "GET /recipes/missing-ingredients/6/ HTTP/1.1" 200 13370
+INFO 2025-04-11 01:02:45,858 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:45,858 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:45,859 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:45,875 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:45,880 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,880 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:45,881 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,881 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:45,888 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:02:45,890 utils 15380 524 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:02:45,891 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:02:45,892 utils 15380 524 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:02:45,901 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,902 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:45,903 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,903 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:45,913 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,914 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:45,914 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,915 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:45,926 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,926 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:45,927 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:45,927 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:02:45,937 utils 15380 524 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:02:45,954 basehttp 15380 524 "GET /fridge/ HTTP/1.1" 200 21753
+INFO 2025-04-11 01:02:50,597 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:50,598 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:50,599 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:50,599 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:50,602 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:50,603 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:50,603 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:50,604 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:50,625 basehttp 15380 524 "GET /recipes/detail/6/ HTTP/1.1" 200 24484
+INFO 2025-04-11 01:02:50,660 basehttp 15380 524 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+INFO 2025-04-11 01:02:51,888 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:51,889 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:51,890 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:51,891 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:51,898 basehttp 15380 524 "GET /recipes/prepare/6/ HTTP/1.1" 200 15977
+INFO 2025-04-11 01:02:51,932 basehttp 15380 524 "GET /static/img/user-placeholder.svg HTTP/1.1" 304 0
+INFO 2025-04-11 01:02:53,370 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,371 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:53,372 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,372 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:53,376 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,377 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:53,377 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,378 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:53,381 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,382 utils 15380 524 Konwersja: 4.0 szt -> 800.0 g -> 800.0 g
+INFO 2025-04-11 01:02:53,382 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,383 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:53,386 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,386 utils 15380 524 Konwersja: 200.0 g -> 200.0 g -> 1.0 szt
+INFO 2025-04-11 01:02:53,421 basehttp 15380 524 "POST /recipes/prepare/6/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:02:53,434 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,434 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:02:53,435 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,436 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:53,440 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,442 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:02:53,442 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:53,442 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:53,454 basehttp 15380 524 "GET /recipes/detail/6/ HTTP/1.1" 200 25815
+INFO 2025-04-11 01:02:53,644 basehttp 15380 524 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-11 01:02:54,673 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:54,674 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:02:54,675 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:54,675 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:54,682 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,682 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:54,683 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,683 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:54,691 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:02:54,691 utils 15380 524 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:02:54,692 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:02:54,693 utils 15380 524 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:02:54,702 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,703 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:54,704 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,704 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:54,714 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,715 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:54,715 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,716 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:02:54,727 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,728 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:02:54,728 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:02:54,729 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:02:54,743 utils 15380 524 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:02:54,754 basehttp 15380 524 "GET /accounts/dashboard/ HTTP/1.1" 200 25223
+INFO 2025-04-11 01:02:55,934 basehttp 15380 524 "GET /recipes/recipes/history/ HTTP/1.1" 200 14051
+INFO 2025-04-11 01:02:58,274 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:58,274 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:02:58,275 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:58,275 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:58,279 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:58,279 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:02:58,280 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:02:58,280 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:02:58,290 basehttp 15380 524 "GET /recipes/detail/6/ HTTP/1.1" 200 24484
+INFO 2025-04-11 01:02:58,320 basehttp 15380 524 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+INFO 2025-04-11 01:03:01,300 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:01,300 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:03:01,301 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:01,301 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:01,306 basehttp 15380 524 "GET /recipes/prepare/6/ HTTP/1.1" 200 15977
+INFO 2025-04-11 01:03:02,602 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,602 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:03:02,603 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,604 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,607 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,607 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:03:02,608 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,609 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,612 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,612 utils 15380 524 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:03:02,613 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,613 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,616 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,616 utils 15380 524 Konwersja: 200.0 g -> 200.0 g -> 1.0 szt
+INFO 2025-04-11 01:03:02,634 basehttp 15380 524 "POST /recipes/prepare/6/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:03:02,647 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,647 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,648 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,648 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,652 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,652 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,652 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:02,653 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:02,666 basehttp 15380 524 "GET /recipes/detail/6/ HTTP/1.1" 200 25815
+INFO 2025-04-11 01:03:03,023 basehttp 15380 524 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-11 01:03:04,691 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:04,692 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:04,693 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:04,693 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:04,698 basehttp 15380 524 "GET /recipes/prepare/6/ HTTP/1.1" 200 15977
+INFO 2025-04-11 01:03:05,546 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,546 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,547 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,547 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,550 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,551 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,552 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,552 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,555 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,556 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,557 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,558 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,561 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,561 utils 15380 524 Konwersja: 200.0 g -> 200.0 g -> 1.0 szt
+INFO 2025-04-11 01:03:05,581 basehttp 15380 524 "POST /recipes/prepare/6/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:03:05,593 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,594 utils 15380 524 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:03:05,595 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,595 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,598 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,598 utils 15380 524 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:03:05,599 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:05,599 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:05,611 basehttp 15380 524 "GET /recipes/detail/6/ HTTP/1.1" 200 25815
+INFO 2025-04-11 01:03:05,640 basehttp 15380 524 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+INFO 2025-04-11 01:03:05,793 basehttp 15380 524 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-11 01:03:07,348 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:07,349 utils 15380 524 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:03:07,350 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:03:07,351 utils 15380 524 Konwersja: 2.0 szt -> 400.0 g -> 400.0 g
+INFO 2025-04-11 01:03:07,357 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,357 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:07,358 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,359 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:07,366 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:07,366 utils 15380 524 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:07,367 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:07,368 utils 15380 524 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:07,379 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,379 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:07,380 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,380 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:07,389 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,389 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:07,390 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,391 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:07,402 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,402 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:07,403 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:07,404 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:07,416 utils 15380 524 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:07,431 basehttp 15380 524 "GET /fridge/ HTTP/1.1" 200 21753
+INFO 2025-04-11 01:03:16,345 basehttp 15380 524 "GET /fridge/list/ HTTP/1.1" 200 41267
+INFO 2025-04-11 01:03:23,442 basehttp 15380 524 "GET /fridge/consolidate/ HTTP/1.1" 200 14698
+INFO 2025-04-11 01:03:24,669 basehttp 15380 524 "POST /fridge/consolidate/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:03:24,695 basehttp 15380 524 "GET /fridge/list/ HTTP/1.1" 200 41740
+INFO 2025-04-11 01:03:29,396 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,396 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:29,396 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,396 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:29,403 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:29,404 utils 15380 524 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:29,405 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:29,405 utils 15380 524 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:29,416 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,416 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:29,417 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,417 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:29,427 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,428 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:29,428 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,428 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:29,440 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,441 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:29,442 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:29,442 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:29,453 utils 15380 524 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:29,467 basehttp 15380 524 "GET /fridge/ HTTP/1.1" 200 21445
+INFO 2025-04-11 01:03:32,063 basehttp 15380 524 "GET /accounts/community/ HTTP/1.1" 200 42514
+INFO 2025-04-11 01:03:33,104 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,105 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:33,106 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,106 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:33,113 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:33,113 utils 15380 524 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:33,114 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:33,114 utils 15380 524 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:33,125 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,125 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:33,126 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,126 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:33,134 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,134 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:33,135 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,135 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:33,146 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,146 utils 15380 524 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:33,147 utils 15380 524 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:33,147 utils 15380 524 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:33,159 utils 15380 524 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:33,186 basehttp 15380 524 "GET /recipes/list/ HTTP/1.1" 200 46995
+INFO 2025-04-11 01:03:33,219 basehttp 15380 524 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+WARNING 2025-04-11 01:03:33,223 basehttp 15380 22720 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-11 01:03:33,325 basehttp 15380 524 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-11 01:03:34,330 basehttp 15380 18896 "GET /recipes/detail/6/ HTTP/1.1" 200 25761
+INFO 2025-04-11 01:03:37,651 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,652 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:37,652 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,652 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:37,660 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:37,660 utils 15380 18896 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:37,661 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:37,662 utils 15380 18896 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:37,672 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,672 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:37,673 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,674 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:37,683 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,683 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:37,684 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,684 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:37,695 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,696 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:37,696 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:37,697 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:37,708 utils 15380 18896 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:37,721 basehttp 15380 18896 "GET /fridge/ HTTP/1.1" 200 21445
+INFO 2025-04-11 01:03:46,316 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,317 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:46,317 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,318 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:46,325 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:46,326 utils 15380 18896 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:46,326 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:46,327 utils 15380 18896 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:46,337 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,337 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:46,338 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,338 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:46,349 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,349 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:46,350 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,350 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:46,363 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,363 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:46,363 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:46,363 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:46,375 utils 15380 18896 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:46,388 basehttp 15380 18896 "GET /fridge/ HTTP/1.1" 200 21445
+INFO 2025-04-11 01:03:47,563 basehttp 15380 18896 "GET /accounts/community/ HTTP/1.1" 200 42514
+INFO 2025-04-11 01:03:48,210 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,211 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:48,212 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,212 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:48,220 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:48,220 utils 15380 18896 Konwersja: 7.0 g -> 7.0 g -> 0.058333333333333334 szt
+INFO 2025-04-11 01:03:48,221 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:03:48,221 utils 15380 18896 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:03:48,233 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,233 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:48,234 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,234 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:48,243 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,243 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:48,244 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,245 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:03:48,256 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,257 utils 15380 18896 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:03:48,258 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:03:48,259 utils 15380 18896 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:03:48,269 utils 15380 18896 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:03:48,283 basehttp 15380 18896 "GET /fridge/ HTTP/1.1" 200 21445
+INFO 2025-04-11 01:03:51,084 basehttp 15380 18896 "GET /fridge/list/ HTTP/1.1" 200 41259
+INFO 2025-04-11 01:04:00,494 basehttp 15380 18896 "GET /fridge/delete/28/ HTTP/1.1" 200 12977
+INFO 2025-04-11 01:04:01,881 basehttp 15380 18896 "POST /fridge/delete/28/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:04:01,905 basehttp 15380 18896 "GET /fridge/list/ HTTP/1.1" 200 38474
+INFO 2025-04-11 01:04:03,250 basehttp 15380 18896 "GET /fridge/add/ HTTP/1.1" 200 29051
+INFO 2025-04-11 01:04:04,595 basehttp 15380 18896 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:04:05,711 basehttp 15380 18896 "GET /fridge/ajax/ingredient-search/?term=a&list_all=false HTTP/1.1" 200 629
+INFO 2025-04-11 01:04:06,749 basehttp 15380 18896 "GET /fridge/ajax/ingredient-search/?term=amara&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:04:08,066 basehttp 15380 18896 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:04:15,872 models 15380 18896 Dodawanie do lodówki: 1.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:04:15,873 models 15380 18896 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:04:15,873 models 15380 18896 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:04:15,874 models 15380 18896 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:04:15,874 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:04:15,875 utils 15380 18896 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:04:15,875 models 15380 18896 Po konwersji: 200.0 g
+INFO 2025-04-11 01:04:15,887 basehttp 15380 18896 "POST /fridge/add/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:04:15,912 basehttp 15380 18896 "GET /fridge/list/ HTTP/1.1" 200 41720
+INFO 2025-04-11 01:04:31,280 models 15380 18896 Dodawanie do lodówki: 1.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:04:31,280 models 15380 18896 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:04:31,280 models 15380 18896 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:04:31,280 models 15380 18896 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:04:31,280 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:04:31,281 utils 15380 18896 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:04:31,281 models 15380 18896 Po konwersji: 200.0 g
+INFO 2025-04-11 01:04:31,291 basehttp 15380 18896 "POST /fridge/add/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:04:31,316 basehttp 15380 18896 "GET /fridge/list/ HTTP/1.1" 200 41720
+INFO 2025-04-11 01:04:46,736 autoreload 884 19984 Watching for file changes with StatReloader
+INFO 2025-04-11 01:04:49,240 models 15380 18896 Dodawanie do lodówki: 1.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:04:49,240 models 15380 18896 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:04:49,240 models 15380 18896 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:04:49,241 models 15380 18896 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:04:49,241 utils 15380 18896 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:04:49,241 utils 15380 18896 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:04:49,242 models 15380 18896 Po konwersji: 200.0 g
+INFO 2025-04-11 01:04:49,252 basehttp 15380 18896 "POST /fridge/add/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:04:49,280 basehttp 15380 18896 "GET /fridge/list/ HTTP/1.1" 200 41720
+INFO 2025-04-11 01:05:52,270 autoreload 884 19984 D:\praca_inzynierska\ksiazkakucharska\settings.py changed, reloading.
+INFO 2025-04-11 01:05:52,344 autoreload 15380 16328 D:\praca_inzynierska\ksiazkakucharska\settings.py changed, reloading.
+INFO 2025-04-11 01:05:52,953 autoreload 21336 14068 D:\praca_inzynierska\ksiazkakucharska\settings.py changed, reloading.
+INFO 2025-04-11 01:05:52,995 autoreload 21516 12732 D:\praca_inzynierska\ksiazkakucharska\settings.py changed, reloading.
+INFO 2025-04-11 01:05:53,018 autoreload 17808 5376 D:\praca_inzynierska\ksiazkakucharska\settings.py changed, reloading.
+INFO 2025-04-11 01:05:53,351 autoreload 21792 15416 Watching for file changes with StatReloader
+INFO 2025-04-11 01:05:53,369 autoreload 5588 17524 Watching for file changes with StatReloader
+INFO 2025-04-11 01:05:54,611 autoreload 9916 17592 Watching for file changes with StatReloader
+INFO 2025-04-11 01:05:54,667 autoreload 19232 6432 Watching for file changes with StatReloader
+INFO 2025-04-11 01:05:54,787 autoreload 9068 22928 Watching for file changes with StatReloader
+INFO 2025-04-11 01:05:57,199 basehttp 21792 6500 "GET /fridge/add/ HTTP/1.1" 200 29051
+INFO 2025-04-11 01:06:01,510 basehttp 21792 6500 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:06:04,804 basehttp 21792 6500 "GET /fridge/ajax/ingredient-search/?term=a&list_all=false HTTP/1.1" 200 629
+INFO 2025-04-11 01:06:05,848 basehttp 21792 6500 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:06:07,551 basehttp 21792 6500 "GET /fridge/ajax/load-units/?ingredient_id=2 HTTP/1.1" 200 450
+INFO 2025-04-11 01:06:21,082 models 21792 6500 Dodawanie do lodówki: 1.0 szt sk³adnika Banan
+INFO 2025-04-11 01:06:21,083 models 21792 6500 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:06:21,083 models 21792 6500 Waga sztuki dla Banan: 120.00g
+INFO 2025-04-11 01:06:21,084 models 21792 6500 Próba konwersji z szt na g dla Banan
+INFO 2025-04-11 01:06:21,084 utils 21792 6500 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:06:21,085 utils 21792 6500 Konwersja: 1.0 szt -> 120.0 g -> 120.0 g
+INFO 2025-04-11 01:06:21,085 models 21792 6500 Po konwersji: 120.0 g
+INFO 2025-04-11 01:06:21,096 basehttp 21792 6500 "POST /fridge/add/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:06:21,128 basehttp 21792 6500 "GET /fridge/list/ HTTP/1.1" 200 42188
+INFO 2025-04-11 01:06:38,302 autoreload 5588 17524 D:\praca_inzynierska\fridge\views.py changed, reloading.
+INFO 2025-04-11 01:06:38,613 autoreload 9916 17592 D:\praca_inzynierska\fridge\views.py changed, reloading.
+INFO 2025-04-11 01:06:38,701 autoreload 9068 22928 D:\praca_inzynierska\fridge\views.py changed, reloading.
+INFO 2025-04-11 01:06:38,711 autoreload 19232 6432 D:\praca_inzynierska\fridge\views.py changed, reloading.
+INFO 2025-04-11 01:06:39,052 autoreload 15364 21616 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:39,086 autoreload 21792 15416 D:\praca_inzynierska\fridge\views.py changed, reloading.
+INFO 2025-04-11 01:06:39,415 autoreload 17072 10816 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:39,491 autoreload 19160 21668 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:39,515 autoreload 1980 17812 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:39,952 autoreload 19952 24452 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:49,796 autoreload 19952 24452 D:\praca_inzynierska\fridge\urls.py changed, reloading.
+INFO 2025-04-11 01:06:50,294 autoreload 15364 21616 D:\praca_inzynierska\fridge\urls.py changed, reloading.
+INFO 2025-04-11 01:06:50,512 autoreload 4536 7004 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:50,618 autoreload 19160 21668 D:\praca_inzynierska\fridge\urls.py changed, reloading.
+INFO 2025-04-11 01:06:50,633 autoreload 1980 17812 D:\praca_inzynierska\fridge\urls.py changed, reloading.
+INFO 2025-04-11 01:06:50,658 autoreload 17072 10816 D:\praca_inzynierska\fridge\urls.py changed, reloading.
+INFO 2025-04-11 01:06:51,047 autoreload 18336 7036 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:51,418 autoreload 18024 2052 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:51,427 autoreload 20228 9668 Watching for file changes with StatReloader
+INFO 2025-04-11 01:06:51,468 autoreload 10800 20844 Watching for file changes with StatReloader
+INFO 2025-04-11 01:07:26,437 basehttp 4536 7720 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:07:28,412 basehttp 4536 7720 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:08:27,381 autoreload 10800 20844 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-11 01:08:27,431 autoreload 20228 9668 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-11 01:08:27,451 autoreload 18024 2052 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-11 01:08:27,625 autoreload 18336 7036 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-11 01:08:27,632 autoreload 4536 7004 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-11 01:08:28,483 autoreload 22208 372 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:28,494 autoreload 22964 2992 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:28,565 autoreload 22480 9276 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:28,713 autoreload 16072 12484 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:28,764 autoreload 23032 2088 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:35,601 autoreload 22964 2992 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-11 01:08:35,679 autoreload 22208 372 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-11 01:08:35,931 autoreload 22480 9276 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-11 01:08:35,962 autoreload 16072 12484 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-11 01:08:35,978 autoreload 23032 2088 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-11 01:08:36,486 autoreload 24476 19088 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:36,583 autoreload 15656 11328 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:36,886 autoreload 1840 10480 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:36,903 autoreload 22304 24372 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:37,451 autoreload 4008 21512 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:43,102 autoreload 24136 6140 Watching for file changes with StatReloader
+INFO 2025-04-11 01:08:48,805 basehttp 24476 23168 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:08:49,415 basehttp 24476 23168 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:08:51,335 basehttp 24476 23168 "GET /fridge/ajax/ingredient-search/?term=amara&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:08:52,515 basehttp 24476 23168 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:09:01,512 models 24476 20108 Dodawanie do lodówki: 1.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:09:01,513 models 24476 20108 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:09:01,513 models 24476 20108 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:09:01,514 models 24476 20108 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:09:01,514 utils 24476 20108 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:09:01,514 utils 24476 20108 Konwersja: 1.0 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-11 01:09:01,514 models 24476 20108 Po konwersji: 200.0 g
+INFO 2025-04-11 01:09:01,529 basehttp 24476 20108 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 131
+INFO 2025-04-11 01:09:01,574 basehttp 24476 20108 "GET /fridge/list/ HTTP/1.1" 200 44513
+INFO 2025-04-11 01:09:08,442 basehttp 24476 20108 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:09:09,721 basehttp 24476 20108 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:09:10,620 basehttp 24476 20108 "GET /fridge/ajax/ingredient-search/?term=a&list_all=false HTTP/1.1" 200 629
+INFO 2025-04-11 01:09:11,398 basehttp 24476 20108 "GET /fridge/ajax/ingredient-search/?term=amara&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:09:12,770 basehttp 24476 20108 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:09:21,033 models 24476 20108 Dodawanie do lodówki: 6.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:09:21,034 models 24476 20108 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:09:21,034 models 24476 20108 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:09:21,035 models 24476 20108 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:09:21,035 utils 24476 20108 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:09:21,035 utils 24476 20108 Konwersja: 6.0 szt -> 1200.0 g -> 1200.0 g
+INFO 2025-04-11 01:09:21,036 models 24476 20108 Po konwersji: 1200.0 g
+INFO 2025-04-11 01:09:21,046 basehttp 24476 20108 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 132
+INFO 2025-04-11 01:09:21,085 basehttp 24476 20108 "GET /fridge/list/ HTTP/1.1" 200 47305
+INFO 2025-04-11 01:09:30,148 basehttp 24476 20108 "GET /fridge/delete/30/ HTTP/1.1" 200 12979
+INFO 2025-04-11 01:09:31,336 basehttp 24476 20108 "POST /fridge/delete/30/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:09:31,364 basehttp 24476 20108 "GET /fridge/list/ HTTP/1.1" 200 44058
+INFO 2025-04-11 01:09:32,847 basehttp 24476 20000 "GET /fridge/delete/29/ HTTP/1.1" 200 12979
+INFO 2025-04-11 01:09:33,874 basehttp 24476 20000 "POST /fridge/delete/29/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:09:33,899 basehttp 24476 20000 "GET /fridge/list/ HTTP/1.1" 200 41269
+INFO 2025-04-11 01:09:35,802 basehttp 24476 20000 "GET /fridge/delete/27/ HTTP/1.1" 200 12977
+INFO 2025-04-11 01:09:36,693 basehttp 24476 20000 "POST /fridge/delete/27/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:09:36,716 basehttp 24476 20000 "GET /fridge/list/ HTTP/1.1" 200 38643
+INFO 2025-04-11 01:09:38,834 basehttp 24476 20000 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:09:40,082 basehttp 24476 20000 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:09:42,411 basehttp 24476 20000 "GET /fridge/ajax/ingredient-search/?term=amarantus&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:09:44,612 basehttp 24476 20000 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:09:56,612 models 24476 20000 Dodawanie do lodówki: 20.0 szt sk³adnika amarantus
+INFO 2025-04-11 01:09:56,612 models 24476 20000 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:09:56,613 models 24476 20000 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:09:56,613 models 24476 20000 Próba konwersji z szt na g dla amarantus
+INFO 2025-04-11 01:09:56,614 utils 24476 20000 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:09:56,614 utils 24476 20000 Konwersja: 20.0 szt -> 4000.0 g -> 4000.0 g
+INFO 2025-04-11 01:09:56,615 models 24476 20000 Po konwersji: 4000.0 g
+INFO 2025-04-11 01:09:56,626 basehttp 24476 20000 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 133
+INFO 2025-04-11 01:09:56,663 basehttp 24476 20000 "GET /fridge/list/ HTTP/1.1" 200 39102
+INFO 2025-04-11 01:10:03,539 basehttp 24476 9772 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:10:04,453 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:10:06,460 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=a&list_all=false HTTP/1.1" 200 629
+INFO 2025-04-11 01:10:07,002 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=amara&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:10:08,587 basehttp 24476 9772 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:10:17,667 models 24476 9772 Dodawanie do lodówki: 3.0 z¹bek sk³adnika amarantus
+INFO 2025-04-11 01:10:17,667 models 24476 9772 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-11 01:10:17,667 models 24476 9772 Waga sztuki dla amarantus: 200.00g
+INFO 2025-04-11 01:10:17,667 models 24476 9772 Próba konwersji z z¹bek na g dla amarantus
+INFO 2025-04-11 01:10:17,668 utils 24476 9772 Konwersja miêdzy sztukami a wag¹ dla amarantus, piece_weight: 200.00
+INFO 2025-04-11 01:10:17,668 utils 24476 9772 Konwersja: 3.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-11 01:10:17,668 models 24476 9772 Po konwersji: 600.0 g
+INFO 2025-04-11 01:10:17,678 basehttp 24476 9772 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 138
+INFO 2025-04-11 01:10:17,714 basehttp 24476 9772 "GET /fridge/list/ HTTP/1.1" 200 41892
+INFO 2025-04-11 01:10:23,940 basehttp 24476 9772 "GET /fridge/delete/32/ HTTP/1.1" 200 12979
+INFO 2025-04-11 01:10:25,001 basehttp 24476 9772 "POST /fridge/delete/32/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:10:25,026 basehttp 24476 9772 "GET /fridge/list/ HTTP/1.1" 200 38643
+INFO 2025-04-11 01:10:26,331 basehttp 24476 9772 "GET /fridge/add/ HTTP/1.1" 200 30293
+INFO 2025-04-11 01:10:27,996 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 590
+INFO 2025-04-11 01:10:29,841 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=amra&list_all=false HTTP/1.1" 200 15
+INFO 2025-04-11 01:10:31,493 basehttp 24476 9772 "GET /fridge/ajax/ingredient-search/?term=ama&list_all=false HTTP/1.1" 200 67
+INFO 2025-04-11 01:10:33,435 basehttp 24476 17604 "GET /fridge/ajax/load-units/?ingredient_id=30 HTTP/1.1" 200 450
+INFO 2025-04-11 01:10:43,402 models 24476 17604 Dodawanie do lodówki: 1.01 kg sk³adnika amarantus
+INFO 2025-04-11 01:10:43,403 models 24476 17604 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-11 01:10:43,403 models 24476 17604 Próba konwersji z kg na g dla amarantus
+INFO 2025-04-11 01:10:43,408 models 24476 17604 Po konwersji: 1010.0 g
+INFO 2025-04-11 01:10:43,416 basehttp 24476 17604 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 132
+INFO 2025-04-11 01:10:43,452 basehttp 24476 17604 "GET /fridge/list/ HTTP/1.1" 200 41733
+INFO 2025-04-11 01:10:52,032 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,032 utils 24476 21200 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:52,033 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,033 utils 24476 21200 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:52,041 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:10:52,041 utils 24476 21200 Konwersja: 127.0 g -> 127.0 g -> 1.0583333333333333 szt
+INFO 2025-04-11 01:10:52,042 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:10:52,042 utils 24476 21200 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:10:52,052 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,053 utils 24476 21200 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:52,054 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,055 utils 24476 21200 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:52,063 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,064 utils 24476 21200 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:52,064 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,065 utils 24476 21200 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:52,077 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,078 utils 24476 21200 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:52,079 utils 24476 21200 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:52,079 utils 24476 21200 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:10:52,089 utils 24476 21200 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:10:52,117 basehttp 24476 21200 "GET /recipes/list/ HTTP/1.1" 200 47266
+INFO 2025-04-11 01:10:52,151 basehttp 24476 21200 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+WARNING 2025-04-11 01:10:52,155 basehttp 24476 24056 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-11 01:10:52,255 basehttp 24476 21200 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-11 01:10:53,118 basehttp 24476 4812 "GET /recipes/detail/6/ HTTP/1.1" 200 24484
+INFO 2025-04-11 01:10:57,360 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,361 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:57,362 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,362 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:57,371 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:10:57,371 utils 24476 4812 Konwersja: 127.0 g -> 127.0 g -> 1.0583333333333333 szt
+INFO 2025-04-11 01:10:57,372 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:10:57,373 utils 24476 4812 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:10:57,383 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,383 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:57,384 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,384 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:57,394 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,395 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:57,395 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,395 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:10:57,407 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,408 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:10:57,408 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:10:57,409 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:10:57,419 utils 24476 4812 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:10:57,434 basehttp 24476 4812 "GET /fridge/ HTTP/1.1" 200 21757
+INFO 2025-04-11 01:10:59,630 basehttp 24476 4812 "GET /fridge/list/ HTTP/1.1" 200 41275
+INFO 2025-04-11 01:11:06,930 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,931 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:06,931 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,932 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:06,940 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:11:06,940 utils 24476 4812 Konwersja: 127.0 g -> 127.0 g -> 1.0583333333333333 szt
+INFO 2025-04-11 01:11:06,941 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:11:06,941 utils 24476 4812 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:11:06,950 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,951 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:06,951 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,952 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:06,961 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,961 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:06,961 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,962 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:06,973 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,973 utils 24476 4812 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:06,974 utils 24476 4812 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:06,975 utils 24476 4812 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:11:06,985 utils 24476 4812 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:11:07,009 basehttp 24476 4812 "GET /recipes/list/ HTTP/1.1" 200 47266
+WARNING 2025-04-11 01:11:07,047 basehttp 24476 4812 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-11 01:11:07,158 basehttp 24476 9992 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-11 01:11:07,865 basehttp 24476 23600 "GET /recipes/detail/6/ HTTP/1.1" 200 24484
+INFO 2025-04-11 01:11:10,879 basehttp 24476 23600 "GET /recipes/prepare/6/ HTTP/1.1" 200 15977
+INFO 2025-04-11 01:11:11,993 basehttp 24476 23600 "POST /recipes/prepare/6/ HTTP/1.1" 302 0
+INFO 2025-04-11 01:11:12,018 basehttp 24476 23600 "GET /recipes/detail/6/ HTTP/1.1" 200 25815
+INFO 2025-04-11 01:11:12,192 basehttp 24476 23600 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-11 01:11:13,984 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:13,985 utils 24476 23600 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:13,986 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:13,986 utils 24476 23600 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:13,993 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:11:13,993 utils 24476 23600 Konwersja: 127.0 g -> 127.0 g -> 1.0583333333333333 szt
+INFO 2025-04-11 01:11:13,994 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-11 01:11:13,994 utils 24476 23600 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-11 01:11:14,006 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,007 utils 24476 23600 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:14,007 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,008 utils 24476 23600 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:14,016 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,017 utils 24476 23600 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:14,017 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,018 utils 24476 23600 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-11 01:11:14,030 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,030 utils 24476 23600 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-11 01:11:14,030 utils 24476 23600 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-11 01:11:14,030 utils 24476 23600 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-11 01:11:14,041 utils 24476 23600 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-11 01:11:14,056 basehttp 24476 23600 "GET /fridge/ HTTP/1.1" 200 21757
+INFO 2025-04-11 01:11:16,298 basehttp 24476 23600 "GET /fridge/list/ HTTP/1.1" 200 41275
+INFO 2025-04-11 01:11:19,953 basehttp 24476 23600 "GET / HTTP/1.1" 200 39078
+INFO 2025-04-11 01:11:19,990 basehttp 24476 23600 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 304 0
+WARNING 2025-04-11 01:11:20,100 basehttp 24476 23600 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-11 01:11:20,103 basehttp 24476 17280 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-11 01:11:20,111 basehttp 24476 14504 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-11 01:11:20,111 basehttp 24476 6780 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877

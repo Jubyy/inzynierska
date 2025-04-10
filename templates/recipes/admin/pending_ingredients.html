@@ -8,7 +8,7 @@
     
     <div class="alert alert-info">
         <i class="fas fa-info-circle me-2"></i>
-        Tu możesz zarządzać składnikami zgłoszonymi przez użytkowników. Sprawdź każdy składnik przed zatwierdzeniem.
+        Tu możesz zarządzać składnikami zgłoszonymi przez użytkowników. Przed zatwierdzeniem musisz przypisać tablicę konwersji oraz ustawić parametry jednostek.
     </div>
     
     <div class="row">
@@ -35,9 +35,6 @@
                                         <tr>
                                             <td>
                                                 <strong>{{ ingredient.name }}</strong>
-                                                {% if ingredient.conversion_table %}
-                                                    <span class="badge bg-info ms-2">Tablica konwersji</span>
-                                                {% endif %}
                                             </td>
                                             <td>{{ ingredient.category.name }}</td>
                                             <td>{{ ingredient.user.username }}</td>
@@ -45,111 +42,195 @@
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-primary" 
                                                         data-bs-toggle="modal" data-bs-target="#detailModal{{ ingredient.id }}">
-                                                    <i class="fas fa-eye"></i> Szczegóły
+                                                    <i class="fas fa-edit"></i> Konfiguruj i zatwierdź
                                                 </button>
                                             </td>
                                         </tr>
                                         
-                                        <!-- Modal ze szczegółami -->
+                                        <!-- Modal ze szczegółami i konfiguracją -->
                                         <div class="modal fade" id="detailModal{{ ingredient.id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title">{{ ingredient.name }}</h5>
+                                                        <h5 class="modal-title">Konfiguracja składnika: {{ ingredient.name }}</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <h6>Informacje podstawowe</h6>
-                                                                <dl class="row">
-                                                                    <dt class="col-sm-4">Nazwa:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.name }}</dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Kategoria:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.category.name }}</dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Opis:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.description|default:"Brak opisu" }}</dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Domyślna jednostka:</dt>
-                                                                    <dd class="col-sm-8">
-                                                                        {% if ingredient.default_unit %}
-                                                                            {{ ingredient.default_unit.name }} ({{ ingredient.default_unit.symbol }})
-                                                                        {% else %}
-                                                                            Nie określono
-                                                                        {% endif %}
-                                                                    </dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Typ jednostek:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.get_unit_type_display }}</dd>
-                                                                </dl>
+                                                    <form method="post" action="{% url 'recipes:admin_approve_ingredient' ingredient.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <div class="row mb-4">
+                                                                <div class="col-md-6">
+                                                                    <h6>Informacje podstawowe</h6>
+                                                                    <dl class="row">
+                                                                        <dt class="col-sm-4">Nazwa:</dt>
+                                                                        <dd class="col-sm-8">{{ ingredient.name }}</dd>
+                                                                        
+                                                                        <dt class="col-sm-4">Kategoria:</dt>
+                                                                        <dd class="col-sm-8">{{ ingredient.category.name }}</dd>
+                                                                        
+                                                                        <dt class="col-sm-4">Opis:</dt>
+                                                                        <dd class="col-sm-8">{{ ingredient.description|default:"Brak opisu" }}</dd>
+                                                                    </dl>
+                                                                </div>
+                                                                
+                                                                <div class="col-md-6">
+                                                                    <h6>Dodatkowe informacje</h6>
+                                                                    <dl class="row">
+                                                                        <dt class="col-sm-4">Średnia waga sztuki:</dt>
+                                                                        <dd class="col-sm-8">
+                                                                            {% if ingredient.piece_weight %}
+                                                                                {{ ingredient.piece_weight }} g
+                                                                            {% else %}
+                                                                                Nie określono
+                                                                            {% endif %}
+                                                                        </dd>
+                                                                        
+                                                                        <dt class="col-sm-4">Zgłaszający:</dt>
+                                                                        <dd class="col-sm-8">{{ ingredient.user.username }}</dd>
+                                                                        
+                                                                        <dt class="col-sm-4">Data zgłoszenia:</dt>
+                                                                        <dd class="col-sm-8">{{ ingredient.submitted_at|date:"d.m.Y H:i" }}</dd>
+                                                                    </dl>
+                                                                </div>
                                                             </div>
                                                             
-                                                            <div class="col-md-6">
-                                                                <h6>Parametry konwersji</h6>
-                                                                <dl class="row">
-                                                                    <dt class="col-sm-4">Gęstość:</dt>
-                                                                    <dd class="col-sm-8">
-                                                                        {% if ingredient.density %}
-                                                                            {{ ingredient.density }} g/ml
-                                                                        {% else %}
-                                                                            Nie określono
-                                                                        {% endif %}
-                                                                    </dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Waga sztuki:</dt>
-                                                                    <dd class="col-sm-8">
-                                                                        {% if ingredient.piece_weight %}
-                                                                            {{ ingredient.piece_weight }} g
-                                                                        {% else %}
-                                                                            Nie określono
-                                                                        {% endif %}
-                                                                    </dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Tablica konwersji:</dt>
-                                                                    <dd class="col-sm-8">
-                                                                        {% if ingredient.conversion_table %}
-                                                                            {{ ingredient.conversion_table.name }} 
-                                                                            ({{ ingredient.conversion_table.product_type }})
-                                                                        {% else %}
-                                                                            Nie wybrano
-                                                                        {% endif %}
-                                                                    </dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Zgłaszający:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.user.username }}</dd>
-                                                                    
-                                                                    <dt class="col-sm-4">Data zgłoszenia:</dt>
-                                                                    <dd class="col-sm-8">{{ ingredient.submitted_at|date:"d.m.Y H:i" }}</dd>
-                                                                </dl>
+                                                            <hr>
+                                                            
+                                                            <h5 class="mb-3">Konfiguracja parametrów składnika</h5>
+                                                            
+                                                            <!-- Wybór tablicy konwersji -->
+                                                            <div class="form-group mb-3">
+                                                                <label for="conversion_table_{{ ingredient.id }}" class="form-label fw-bold">
+                                                                    Tablica konwersji <span class="text-danger">*</span>
+                                                                </label>
+                                                                <select name="conversion_table" id="conversion_table_{{ ingredient.id }}" 
+                                                                        class="form-select" required>
+                                                                    <option value="">-- Wybierz tablicę konwersji --</option>
+                                                                    {% for table in conversion_tables %}
+                                                                        <optgroup label="{{ table.grouper }}">
+                                                                            {% for ct in table.list %}
+                                                                                <option value="{{ ct.id }}">
+                                                                                    {{ ct.name }} ({{ ct.entries.count }} przeliczników)
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </optgroup>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <div class="form-text">
+                                                                    Wybierz odpowiednią tablicę konwersji dla tego składnika, która zawiera przeliczniki między różnymi jednostkami.
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Wybór domyślnej jednostki -->
+                                                            <div class="form-group mb-3">
+                                                                <label for="default_unit_{{ ingredient.id }}" class="form-label fw-bold">
+                                                                    Domyślna jednostka <span class="text-danger">*</span>
+                                                                </label>
+                                                                <select name="default_unit" id="default_unit_{{ ingredient.id }}" 
+                                                                        class="form-select" required>
+                                                                    <option value="">-- Wybierz domyślną jednostkę --</option>
+                                                                    {% for unit_group in measurement_units %}
+                                                                        <optgroup label="{{ unit_group.grouper }}">
+                                                                            {% for unit in unit_group.list %}
+                                                                                <option value="{{ unit.id }}">
+                                                                                    {{ unit.name }} ({{ unit.symbol }})
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </optgroup>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <div class="form-text">
+                                                                    Wybierz jednostkę, która będzie domyślnie używana dla tego składnika w przepisach.
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Wybór typu jednostek -->
+                                                            <div class="form-group mb-3">
+                                                                <label for="unit_type_{{ ingredient.id }}" class="form-label fw-bold">
+                                                                    Dozwolone jednostki <span class="text-danger">*</span>
+                                                                </label>
+                                                                <select name="unit_type" id="unit_type_{{ ingredient.id }}" 
+                                                                        class="form-select" required
+                                                                        onchange="togglePieceWeightRequired(this, '{{ ingredient.id }}')">
+                                                                    <option value="">-- Wybierz typ jednostek --</option>
+                                                                    {% for unit_type in unit_types %}
+                                                                        <option value="{{ unit_type.0 }}">{{ unit_type.1 }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <div class="form-text">
+                                                                    Określa, jakie rodzaje jednostek będą dostępne dla tego składnika w przepisach.
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Edycja wagi sztuki -->
+                                                            <div class="form-group mb-3" id="piece_weight_group_{{ ingredient.id }}">
+                                                                <label for="piece_weight_{{ ingredient.id }}" class="form-label fw-bold">
+                                                                    Waga sztuki (g) <span class="text-danger piece-weight-required d-none">*</span>
+                                                                </label>
+                                                                <div class="input-group">
+                                                                    <input type="number" name="piece_weight" id="piece_weight_{{ ingredient.id }}" 
+                                                                           class="form-control" step="0.01" min="0.01" 
+                                                                           value="{{ ingredient.piece_weight|default:'' }}"
+                                                                           placeholder="np. 250 dla jednej sztuki">
+                                                                    <span class="input-group-text">g</span>
+                                                                </div>
+                                                                <div class="form-text">
+                                                                    Średnia waga jednej sztuki. Wymagane jeśli składnik może być mierzony w sztukach.
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Ustawienie gęstości (dla konwersji waga-objętość) -->
+                                                            <div class="form-group mb-3">
+                                                                <label for="density_{{ ingredient.id }}" class="form-label fw-bold">
+                                                                    Gęstość (g/ml)
+                                                                </label>
+                                                                <div class="input-group">
+                                                                    <input type="number" name="density" id="density_{{ ingredient.id }}" 
+                                                                           class="form-control" step="0.001" min="0.001" 
+                                                                           placeholder="np. 1.03 dla mleka">
+                                                                    <span class="input-group-text">g/ml</span>
+                                                                </div>
+                                                                <div class="form-text">
+                                                                    Potrzebne do konwersji między wagą a objętością. Wymagane tylko dla składników, które mogą być mierzone zarówno wagą jak i objętością.
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Pole komentarza administratora -->
+                                                            <div class="form-group mb-3">
+                                                                <label for="admin_comment_{{ ingredient.id }}" class="form-label">Komentarz administratora (opcjonalnie)</label>
+                                                                <textarea name="admin_comment" id="admin_comment_{{ ingredient.id }}" 
+                                                                          class="form-control" rows="2" 
+                                                                          placeholder="Dodatkowe informacje dla użytkownika..."></textarea>
                                                             </div>
                                                         </div>
-                                                        
-                                                        <hr>
-                                                        
-                                                        <div class="row mt-3">
-                                                            <div class="col-md-6">
-                                                                <form method="post" action="{% url 'recipes:admin_approve_ingredient' ingredient.id %}">
-                                                                    {% csrf_token %}
+                                                        <div class="modal-footer">
+                                                            <div class="row w-100">
+                                                                <div class="col-md-6">
+                                                                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">
+                                                                        <i class="fas fa-times me-2"></i> Anuluj
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-md-6">
                                                                     <button type="submit" class="btn btn-success w-100">
                                                                         <i class="fas fa-check-circle me-2"></i> Zatwierdź składnik
                                                                     </button>
-                                                                </form>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <form method="post" action="{% url 'recipes:admin_reject_ingredient' ingredient.id %}">
-                                                                    {% csrf_token %}
-                                                                    <div class="input-group">
-                                                                        <input type="text" name="reason" class="form-control" 
-                                                                               placeholder="Podaj powód odrzucenia">
-                                                                        <button type="submit" class="btn btn-danger">
-                                                                            <i class="fas fa-times-circle me-2"></i> Odrzuć
-                                                                        </button>
-                                                                    </div>
-                                                                </form>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                    </form>
+                                                    
+                                                    <!-- Przycisk odrzucenia składnika -->
+                                                    <div class="modal-footer border-top-0 pt-0">
+                                                        <form method="post" action="{% url 'recipes:admin_reject_ingredient' ingredient.id %}" class="w-100">
+                                                            {% csrf_token %}
+                                                            <div class="input-group">
+                                                                <input type="text" name="reason" class="form-control" 
+                                                                      placeholder="Podaj powód odrzucenia...">
+                                                                <button type="submit" class="btn btn-danger">
+                                                                    <i class="fas fa-times-circle me-2"></i> Odrzuć składnik
+                                                                </button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -220,4 +301,25 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePieceWeightRequired(selectElement, ingredientId) {
+    const pieceWeightGroup = document.getElementById(`piece_weight_group_${ingredientId}`);
+    const pieceWeightInput = document.getElementById(`piece_weight_${ingredientId}`);
+    const requiredBadge = pieceWeightGroup.querySelector('.piece-weight-required');
+    
+    // Sprawdź czy wybrano typ jednostek zawierający "piece" (sztuki)
+    const allowsPieces = selectElement.value.toLowerCase().includes('piece');
+    
+    if (allowsPieces) {
+        pieceWeightInput.required = true;
+        requiredBadge.classList.remove('d-none');
+    } else {
+        pieceWeightInput.required = false;
+        requiredBadge.classList.add('d-none');
+    }
+}
+</script>
 {% endblock %} 

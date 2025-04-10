@@ -4,6 +4,7 @@ from recipes.models import Ingredient, MeasurementUnit
 from recipes.utils import convert_units
 from django.utils import timezone
 from datetime import date
+import logging
 
 class FridgeItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fridge_items', verbose_name="Użytkownik")
@@ -78,7 +79,19 @@ class FridgeItem(models.Model):
             base_unit = MeasurementUnit.objects.get(symbol='g')
         else:
             base_unit = MeasurementUnit.objects.get(symbol='ml')
-            
+        
+        # Dodajemy dodatkowe logowanie do debugowania
+        logger = logging.getLogger(__name__)
+        logger.info(f"Dodawanie do lodówki: {amount} {unit.symbol} składnika {ingredient.name}")
+        logger.info(f"Typ jednostki: {unit.type}, Typ podstawowy: {unit_type}")
+        
+        if unit.type == 'piece' and 'piece' in ingredient.unit_type:
+            # Sprawdzenie wagi sztuki
+            if not ingredient.piece_weight:
+                logger.error(f"BŁĄD: Brak wagi sztuki dla {ingredient.name}")
+            else:
+                logger.info(f"Waga sztuki dla {ingredient.name}: {ingredient.piece_weight}g")
+        
         # Jeśli jednostka już jest podstawowa, nie ma potrzeby konwersji
         original_amount = amount
         original_unit = unit
@@ -87,11 +100,19 @@ class FridgeItem(models.Model):
             try:
                 # Spróbuj przekonwertować do jednostki podstawowej
                 from recipes.utils import convert_units
+                
+                # Dodatkowe logowanie przed konwersją
+                logger.info(f"Próba konwersji z {unit.symbol} na {base_unit.symbol} dla {ingredient.name}")
+                
                 amount = convert_units(amount, unit, base_unit, ingredient=ingredient)
+                
+                # Dodatkowe logowanie po konwersji
+                logger.info(f"Po konwersji: {amount} {base_unit.symbol}")
+                
                 unit = base_unit
             except Exception as e:
                 # W przypadku błędu konwersji, zachowaj oryginalną jednostkę
-                print(f"Nie można przekonwertować {original_amount} {original_unit} na {base_unit}: {str(e)}")
+                logger.error(f"Nie można przekonwertować {original_amount} {original_unit} na {base_unit}: {str(e)}")
                 # Ale nadal próbujemy dodać produkt z oryginalną jednostką
         
         # Szukaj istniejącego wpisu z tą samą jednostką podstawową i datą ważności

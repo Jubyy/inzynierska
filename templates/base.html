@@ -21,6 +21,30 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <style>
+        /* Zapobieganie znikaniu treści i migotaniu elementów */
+        .content-container {
+            min-height: 500px;
+            opacity: 1;
+            transition: opacity 0.2s ease-in-out;
+        }
+        
+        /* Minimalna wysokość dla głównego kontenera */
+        main .container {
+            min-height: 500px;
+        }
+        
+        /* Ukrycie zawartości podczas ładowania */
+        .js-loading {
+            opacity: 0;
+        }
+        
+        /* Stabilizacja układu */
+        .card, .alert {
+            min-height: 40px;
+        }
+    </style>
+    
     {% block extra_css %}
     {% endblock %}
 </head>
@@ -41,30 +65,28 @@
                                 <i class="bi bi-house-door me-1"></i>Strona główna
                             </a>
                         </li>
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipes:list' %}">
-                                    <i class="bi bi-book me-1"></i>Przepisy
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if 'top_users' in request.path %}active{% endif %}" href="{% url 'accounts:top_users' %}">
-                                    <i class="bi bi-people me-1"></i>Społeczność
-                                </a>
-                            </li>
-                            {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'fridge' %}active{% endif %}" href="{% url 'fridge:dashboard' %}">
-                                    <i class="bi bi-basket me-1"></i>Lodówka
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'shopping_list' %}active{% endif %}" href="{% url 'shopping:list' %}">
-                                    <i class="bi bi-cart me-1"></i>Lista zakupów
-                                </a>
-                            </li>
-                            {% endif %}
-                        </ul>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'recipe_list' %}active{% endif %}" href="{% url 'recipes:list' %}">
+                                <i class="bi bi-book me-1"></i>Przepisy
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'top_users' in request.path %}active{% endif %}" href="{% url 'accounts:top_users' %}">
+                                <i class="bi bi-people me-1"></i>Społeczność
+                            </a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'fridge' %}active{% endif %}" href="{% url 'fridge:dashboard' %}">
+                                <i class="bi bi-basket me-1"></i>Lodówka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'shopping_list' %}active{% endif %}" href="{% url 'shopping:list' %}">
+                                <i class="bi bi-cart me-1"></i>Lista zakupów
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                     
                     <div class="d-flex align-items-center">
@@ -72,6 +94,13 @@
                             <a href="{% url 'dashboard' %}" class="dashboard-button me-2">
                                 <i class="bi bi-speedometer2 me-1"></i>Panel
                             </a>
+                            {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-primary me-2" href="{% url 'recipes:admin_pending_ingredients' %}">
+                                    <i class="fas fa-tools"></i> Panel Administratora
+                                </a>
+                            </li>
+                            {% endif %}
                             <div class="dropdown">
                                 <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center w-100 justify-content-center justify-content-lg-start" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
                                     <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/user-placeholder.svg' %}{% endif %}" alt="{{ user.username }}" class="user-avatar">
@@ -104,7 +133,7 @@
     </header>
 
     <main>
-        <div class="container">
+        <div class="container js-loading content-container">
             {% if messages %}
                 <div class="messages mb-4">
                     {% for message in messages %}
@@ -195,6 +224,31 @@
     <script>
         // Domyślne funkcje dla całej aplikacji
         document.addEventListener('DOMContentLoaded', function() {
+            // Rozwiązanie problemu znikającej treści
+            const contentContainer = document.querySelector('.content-container');
+            if (contentContainer) {
+                // Usunięcie klasy js-loading po pełnym załadowaniu
+                contentContainer.classList.remove('js-loading');
+                
+                // Dodatkowe zabezpieczenie przed zmianami DOM
+                const observer = new MutationObserver(function(mutations) {
+                    // W przypadku zmian w DOM upewnij się, że kontener zachowa swoją strukturę
+                    if (contentContainer.style.display === 'none') {
+                        contentContainer.style.display = 'block';
+                    }
+                    if (contentContainer.style.visibility === 'hidden') {
+                        contentContainer.style.visibility = 'visible';
+                    }
+                });
+                
+                // Rozpocznij obserwację kontenera
+                observer.observe(contentContainer, {
+                    attributes: true,
+                    childList: true,
+                    subtree: true
+                });
+            }
+            
             // Automatyczne zamykanie powiadomień po 5 sekundach
             setTimeout(function() {
                 $('.alert').alert('close');

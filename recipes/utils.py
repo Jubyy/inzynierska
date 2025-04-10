@@ -15,6 +15,8 @@ def convert_units(amount, from_unit, to_unit, ingredient=None):
         ValueError: Jeśli konwersja nie jest możliwa
     """
     from decimal import Decimal
+    import logging
+    logger = logging.getLogger(__name__)
     
     # Sprawdź, czy jednostki nie są None
     if from_unit is None or to_unit is None:
@@ -41,10 +43,59 @@ def convert_units(amount, from_unit, to_unit, ingredient=None):
     # Jeśli podano składnik, spróbuj użyć specyficznej konwersji dla niego
     if ingredient is not None:
         try:
+            # Konwersja między sztukami a wagą
+            if (from_unit.type == 'piece' and to_unit.type == 'weight') or \
+               (to_unit.type == 'piece' and from_unit.type == 'weight'):
+                if not ingredient.piece_weight:
+                    logger.error(f"Brak wagi sztuki dla składnika {ingredient.name} (id: {ingredient.id})")
+                    raise ValueError(f"Brak zdefiniowanej wagi sztuki dla {ingredient.name}")
+                
+                logger.info(f"Konwersja między sztukami a wagą dla {ingredient.name}, piece_weight: {ingredient.piece_weight}")
+                
+                if from_unit.type == 'piece':
+                    # Konwersja ze sztuk na gramy: liczba sztuk * waga jednej sztuki
+                    base_amount = float(amount) * float(ingredient.piece_weight)
+                    # Następnie konwertujemy z gramów na jednostkę docelową
+                    result = base_amount / float(to_unit.base_ratio)
+                    logger.info(f"Konwersja: {amount} szt -> {base_amount} g -> {result} {to_unit.symbol}")
+                    return result
+                else:
+                    # Konwersja z jednostki wagowej na sztuki
+                    # Najpierw konwertujemy na gramy
+                    base_amount = float(amount) * float(from_unit.base_ratio)
+                    # Następnie dzielimy przez wagę sztuki
+                    result = base_amount / float(ingredient.piece_weight)
+                    logger.info(f"Konwersja: {amount} {from_unit.symbol} -> {base_amount} g -> {result} szt")
+                    return result
+            
+            # Konwersja między wagą a objętością
+            if (from_unit.type == 'weight' and to_unit.type == 'volume') or \
+               (from_unit.type == 'volume' and to_unit.type == 'weight'):
+                if not ingredient.density:
+                    logger.error(f"Brak gęstości dla składnika {ingredient.name} (id: {ingredient.id})")
+                    raise ValueError(f"Brak zdefiniowanej gęstości dla {ingredient.name}")
+                
+                if from_unit.type == 'weight':
+                    # Konwersja z wagi na objętość: najpierw na gramy, potem na ml
+                    base_amount = float(amount) * float(from_unit.base_ratio)
+                    result = base_amount / float(ingredient.density)
+                    # Konwersja z ml na jednostkę docelową
+                    result = result / float(to_unit.base_ratio)
+                    return result
+                else:
+                    # Konwersja z objętości na wagę: najpierw na ml, potem na gramy
+                    base_amount = float(amount) * float(from_unit.base_ratio)
+                    result = base_amount * float(ingredient.density)
+                    # Konwersja z gramów na jednostkę docelową
+                    result = result / float(to_unit.base_ratio)
+                    return result
+                
+            # Spróbuj użyć zapisanej konwersji dla składnika
             from recipes.models import IngredientConversion
             ratio = IngredientConversion.get_conversion_ratio(ingredient, from_unit, to_unit)
             return float(amount) * float(ratio)
         except (ValueError, Exception) as e:
+            logger.warning(f"Błąd podczas konwersji specyficznej dla składnika: {str(e)}")
             # Jeśli nie można wykonać konwersji dla składnika, pomiń i spróbuj ogólnej konwersji
             pass
     

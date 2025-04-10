@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/load-units/', views.ajax_load_units, name='ajax_load_units'),
     path('api/add-ingredient/', views.ajax_add_ingredient, name='ajax_add_ingredient'),
     path('api/unit-info/', views.ajax_unit_info, name='ajax_unit_info'),
+    path('ajax/ingredient-details/', views.ajax_ingredient_details, name='ajax_ingredient_details'),
     
     # Zarządzanie składnikami
     path('ingredient/list/', views.IngredientListView.as_view(), name='ingredient_list'),

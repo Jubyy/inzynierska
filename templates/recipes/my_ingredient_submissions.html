@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Moje zgłoszone składniki{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Moje zgłoszone składniki</h1>
+    
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{% url 'recipes:submit_ingredient' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Zgłoś nowy składnik
+        </a>
+        <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Powrót do przepisów
+        </a>
+    </div>
+    
+    {% if page_obj %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Zgłoszone składniki</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Kategoria</th>
+                            <th>Data zgłoszenia</th>
+                            <th>Status</th>
+                            <th>Komentarz admina</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in page_obj %}
+                        <tr>
+                            <td>{{ submission.name }}</td>
+                            <td>{{ submission.category.name }}</td>
+                            <td>{{ submission.submitted_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                {% if submission.status == 'pending' %}
+                                    <span class="badge bg-warning">Oczekuje</span>
+                                {% elif submission.status == 'approved' %}
+                                    <span class="badge bg-success">Zatwierdzony</span>
+                                {% elif submission.status == 'rejected' %}
+                                    <span class="badge bg-danger">Odrzucony</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if submission.admin_comment %}
+                                    {{ submission.admin_comment }}
+                                {% else %}
+                                    <span class="text-muted">Brak komentarza</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% include 'partials/pagination.html' with page_obj=page_obj %}
+        
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Nie zgłosiłeś jeszcze żadnych składników. Użyj przycisku "Zgłoś nowy składnik", aby to zrobić.
+        </div>
+    {% endif %}
+    
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            <h2 class="h5 mb-0">Proces zatwierdzania składników</h2>
+        </div>
+        <div class="card-body">
+            <p>Po zgłoszeniu składnika, administrator:</p>
+            <ol>
+                <li>Sprawdza poprawność danych</li>
+                <li>Przypisuje odpowiednią tablicę konwersji</li>
+                <li>Ustawia domyślne jednostki i parametry</li>
+                <li>Zatwierdza lub odrzuca składnik</li>
+            </ol>
+            <p>Po zatwierdzeniu składnik będzie dostępny dla wszystkich użytkowników w systemie.</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

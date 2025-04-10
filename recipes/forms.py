@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment
+from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, ConversionTable, ConversionTableEntry
 from django.db import models
 
 class RecipeForm(forms.ModelForm):
@@ -208,3 +208,32 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+
+class ConversionTableForm(forms.ModelForm):
+    """Formularz do tworzenia i edycji tablicy konwersji"""
+    class Meta:
+        model = ConversionTable
+        fields = ['name', 'description', 'product_type']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 
+                                           'placeholder': 'np. Mąka pszenna, Mleko, Owoce...'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 
+                                                 'placeholder': 'Krótki opis dla jakiego rodzaju produktów jest ta tablica konwersji'}),
+            'product_type': forms.TextInput(attrs={'class': 'form-control', 
+                                                  'placeholder': 'np. Mąka, Płyny, Owoce'})
+        }
+
+class ConversionEntryForm(forms.ModelForm):
+    """Formularz dla pojedynczego wpisu w tablicy konwersji"""
+    class Meta:
+        model = ConversionTableEntry
+        fields = ['from_unit', 'to_unit', 'ratio', 'is_exact', 'notes']
+        widgets = {
+            'from_unit': forms.Select(attrs={'class': 'form-select'}),
+            'to_unit': forms.Select(attrs={'class': 'form-select'}),
+            'ratio': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.0001', 'min': '0.0001',
+                                              'placeholder': 'np. 15.0'}),
+            'notes': forms.TextInput(attrs={'class': 'form-control', 
+                                             'placeholder': 'np. Na podstawie pomiarów kuchennych'}),
+            'is_exact': forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        }

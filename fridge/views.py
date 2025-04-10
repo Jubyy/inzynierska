@@ -987,3 +987,90 @@ def update_ingredient_params(request, ingredient_id):
     return render(request, 'fridge/update_params.html', {
         'ingredient': ingredient
     })
+
+@login_required
+def ajax_add_to_fridge(request):
+    """Widok AJAX do dodawania produktu do lodówki"""
+    if request.method == 'POST':
+        try:
+            # Pobierz dane z żądania
+            ingredient_id = request.POST.get('ingredient')
+            amount = request.POST.get('amount')
+            unit_id = request.POST.get('unit')
+            expiry_date = request.POST.get('expiry_date') or None
+            
+            # Sprawdź czy dane są kompletne
+            if not ingredient_id or not amount or not unit_id:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Brakujące dane formularza. Wypełnij wszystkie wymagane pola.'
+                })
+            
+            # Pobierz obiekty z bazy danych
+            ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+            unit = get_object_or_404(MeasurementUnit, pk=unit_id)
+            
+            # Przekonwertuj amount na float
+            try:
+                amount = float(amount)
+                if amount <= 0:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Ilość musi być większa od zera.'
+                    })
+            except (ValueError, TypeError):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Nieprawidłowa wartość ilości.'
+                })
+            
+            # Dodaj produkt do lodówki
+            try:
+                item, was_converted = FridgeItem.add_to_fridge(
+                    user=request.user,
+                    ingredient=ingredient,
+                    amount=amount,
+                    unit=unit,
+                    expiry_date=expiry_date
+                )
+                
+                # Przygotuj komunikat
+                if was_converted:
+                    message = f'Dodano {ingredient.name} w ilości {amount} {unit.symbol} (skonwertowano do {item.amount:.2f} {item.unit.symbol})'
+                else:
+                    message = f'Dodano {ingredient.name} w ilości {amount} {unit.symbol}'
+                
+                # Dodaj komunikat do sesji, który zostanie wyświetlony po przekierowaniu
+                messages.success(request, message)
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': message,
+                    'redirect_url': reverse('fridge:list')
+                })
+            except ValueError as e:
+                # Błąd konwersji jednostek
+                return JsonResponse({
+                    'success': False,
+                    'error': str(e)
+                })
+            except Exception as e:
+                # Inne nieoczekiwane błędy
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Nieoczekiwany błąd: {str(e)}'
+                })
+        except Exception as e:
+            # Złap wszystkie inne błędy
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({
+                'success': False,
+                'error': f'Nieoczekiwany błąd: {str(e)}'
+            })
+    
+    # Jeśli nie POST, zwróć błąd
+    return JsonResponse({
+        'success': False,
+        'error': 'Nieprawidłowe żądanie. Wymagane jest żądanie POST.'
+    })

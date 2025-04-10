@@ -25,6 +25,7 @@ urlpatterns = [
     path('ajax/load-units/', views.ajax_load_units, name='ajax_load_units'),
     path('ajax/compatible-units/', views.ajax_compatible_units, name='ajax_compatible_units'),
     path('ajax/convert/', views.ajax_convert_units, name='ajax_convert_units'),
+    path('ajax/add-to-fridge/', views.ajax_add_to_fridge, name='ajax_add_to_fridge'),
     path('consolidate/', views.consolidate_items, name='consolidate'),
     
     # Przekierowania dla starych ścieżek konwersji

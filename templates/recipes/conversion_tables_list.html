@@ -78,8 +78,8 @@
                     {% for product_type, tables in grouped_tables.items %}
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" 
-                                    data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="true">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
                                 {{ product_type }} ({{ tables|length }})
                             </button>
                         </h2>
@@ -106,7 +106,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-warning">
+                <div class="alert alert-warning" id="no-tables-message">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     Brak dostępnych tablic konwersji. Bądź pierwszy i utwórz nową tablicę!
                 </div>
@@ -114,4 +114,29 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    // Oczekiwanie na pełne załadowanie DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stabilizacja widoku - zapobiega znikaniu treści
+        const contentContainer = document.querySelector('.container');
+        if (contentContainer) {
+            contentContainer.style.minHeight = '500px'; // Zapewnia minimalną wysokość kontenera
+        }
+        
+        // Zabezpieczenie przed migotaniem treści
+        const noTablesMessage = document.getElementById('no-tables-message');
+        if (noTablesMessage) {
+            // Ukryj wiadomość tylko jeśli faktycznie są tablice
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            if (accordionItems.length > 0) {
+                // Unikaj ukrywania gdy są tablice
+                noTablesMessage.style.display = 'block';
+            }
+        }
+    });
+</script>
+{% endblock %}
+
 {% endblock %} 
