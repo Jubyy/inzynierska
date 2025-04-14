@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .forms import CustomAuthenticationForm
+from .forms import CustomAuthenticationForm, CustomPasswordChangeForm
 
 app_name = 'accounts'
 
@@ -23,6 +23,15 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('profile/recipes/', views.user_recipes, name='user_recipes'),
+    
+    # Zmiana hasła
+    path('profile/change-password/', 
+         auth_views.PasswordChangeView.as_view(
+             template_name='accounts/change_password.html',
+             form_class=CustomPasswordChangeForm,
+             success_url='/accounts/profile/'
+         ), 
+         name='change_password'),
     
     # Śledzenie użytkowników
     path('community/', views.top_users_list, name='top_users'),

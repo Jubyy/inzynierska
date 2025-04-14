@@ -43,16 +43,16 @@ II. TESTY MODUŁU UŻYTKOWNIKÓW
    [x] Przekierowanie po udanej rejestracji
 
 2. Logowanie
-   [ ] Poprawne logowanie z prawidłowymi danymi
-   [ ] Obsługa błędnych danych logowania
-   [ ] Funkcja "Zapamiętaj mnie"
-   [ ] Przekierowanie po udanym logowaniu
+   [x] Poprawne logowanie z prawidłowymi danymi
+   [x] Obsługa błędnych danych logowania
+   [x] Funkcja "Zapamiętaj mnie"
+   [x] Przekierowanie po udanym logowaniu
 
 3. Zarządzanie profilem
-   [ ] Przeglądanie profilu
-   [ ] Edycja danych profilu
-   [ ] Zmiana hasła
-   [ ] Dodawanie/zmiana zdjęcia profilowego
+   [x] Przeglądanie profilu
+   [x] Edycja danych profilu
+   [x] Zmiana hasła
+   [x] Dodawanie/zmiana zdjęcia profilowego
 
 4. Funkcje społecznościowe
    [ ] Obserwowanie innych użytkowników
@@ -202,5 +202,29 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - POPRAWKA: Dodano lepsze wyświetlanie błędów walidacji - komunikaty są teraz wyraźniejsze i pojawiają się bezpośrednio przy polach.
    - POPRAWKA: Wprowadzono walidację w czasie rzeczywistym dla pól email i zgodności haseł.
    - POPRAWKA: Ulepszono testy automatyczne, aby działały niezawodnie w różnych środowiskach.
+
+3. Testy modułu użytkownika - Logowanie:
+   - WNIOSKI: Formularz logowania działa poprawnie, obsługuje zarówno prawidłowe jak i błędne dane.
+   - WNIOSKI: Funkcja "Zapamiętaj mnie" działa prawidłowo, utrzymując sesję użytkownika.
+   - WNIOSKI: Przekierowanie po udanym logowaniu działa poprawnie, kierując na dashboard.
+   - ZALECENIE: Warto dodać licznik nieudanych prób logowania dla zwiększenia bezpieczeństwa.
+   - ZALECENIE: Rozważyć implementację dwuskładnikowego uwierzytelniania (2FA) jako opcji dla użytkowników.
+   - ZALECENIE: Dodać walidację JavaScript po stronie klienta dla szybszej informacji zwrotnej.
+   - ZALECENIE: Poprawić widoczność komunikatów o błędach dla lepszej czytelności.
+   - ZALECENIE: Dodać wskaźnik siły hasła dla użytkowników przy zmianie hasła.
+
+4. Testy modułu użytkownika - Zarządzanie profilem:
+   - BŁĄD: Formularz zmiany hasła nie był dostępny w oczekiwanej lokalizacji z powodu braku odpowiedniej ścieżki w konfiguracji URL.
+   - WNIOSKI: Funkcjonalność przeglądania profilu działa poprawnie, wyświetlając podstawowe informacje o użytkowniku.
+   - WNIOSKI: Edycja danych profilu działa poprawnie, umożliwiając aktualizację informacji takich jak biografia czy ulubiona kuchnia.
+   - WNIOSKI: Funkcjonalność zmiany zdjęcia profilowego jest dostępna i działa prawidłowo.
+   - POPRAWKA: Dodano ścieżkę 'profile/change-password/' w konfiguracji URL dla formularza zmiany hasła.
+   - POPRAWKA: Zaimplementowano wskaźnik siły hasła w formularzu zmiany hasła, który dynamicznie informuje użytkownika o mocy hasła.
+   - POPRAWKA: Dodano walidację JavaScript po stronie klienta dla formularza zmiany hasła, aby zapewnić natychmiastową informację zwrotną.
+   - POPRAWKA: Ulepszono wygląd i użyteczność formularza zmiany hasła, dodając ikony oraz lepsze formatowanie.
+   - ZALECENIE: Dodać możliwość usunięcia zdjęcia profilowego.
+   - ZALECENIE: Zaimplementować walidację plików zdjęć (format, rozmiar).
+   - ZALECENIE: Poprawić informacje zwrotne po dokonaniu zmian w profilu.
+   - ZALECENIE: Umożliwić podgląd profilu z perspektywy innych użytkowników.
 
 [TUTAJ BĘDĄ DOKUMENTOWANE ZNALEZIONE BŁĘDY I POPRAWKI] 

@@ -1358,3 +1358,305 @@ INFO 2025-04-14 22:00:46,690 basehttp 24228 16388 "GET /accounts/register/ HTTP/
 INFO 2025-04-14 22:00:48,315 basehttp 24228 15100 "POST /accounts/register/ HTTP/1.1" 200 29038
 INFO 2025-04-14 22:00:50,864 basehttp 24228 15100 - Broken pipe from ('127.0.0.1', 52595)
 INFO 2025-04-14 22:00:50,864 basehttp 24228 4016 - Broken pipe from ('127.0.0.1', 52600)
+INFO 2025-04-14 22:03:37,832 basehttp 24228 13304 "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:03:37,870 basehttp 24228 13304 "GET /login/ HTTP/1.1" 200 18763
+INFO 2025-04-14 22:03:41,676 basehttp 24228 5160 "GET /register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:06:10,508 basehttp 24228 24428 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:06:10,522 basehttp 24228 24428 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:06:12,547 basehttp 24228 24428 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:06:12,668 basehttp 24228 24428 "GET /dashboard/ HTTP/1.1" 200 23223
+INFO 2025-04-14 22:06:12,679 basehttp 24228 24428 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+INFO 2025-04-14 22:06:14,187 basehttp 24228 24428 "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:06:14,193 basehttp 24228 24428 "GET /login/ HTTP/1.1" 200 18763
+INFO 2025-04-14 22:06:14,224 basehttp 24228 24428 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:06:15,254 basehttp 24228 24428 "POST /accounts/login/ HTTP/1.1" 200 18562
+INFO 2025-04-14 22:06:16,299 basehttp 24228 24428 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:06:17,365 basehttp 24228 24428 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:06:17,435 basehttp 24228 24428 "GET /dashboard/ HTTP/1.1" 200 23223
+INFO 2025-04-14 22:06:17,480 basehttp 24228 24428 - Broken pipe from ('127.0.0.1', 53154)
+INFO 2025-04-14 22:06:17,481 basehttp 24228 14992 - Broken pipe from ('127.0.0.1', 53163)
+INFO 2025-04-14 22:13:59,503 basehttp 24228 21592 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:13:59,520 basehttp 24228 21592 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:14:03,213 basehttp 24228 21592 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:14:03,307 basehttp 24228 21592 "GET /dashboard/ HTTP/1.1" 200 23222
+INFO 2025-04-14 22:14:03,322 basehttp 24228 21592 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+ERROR 2025-04-14 22:14:04,912 log 24228 22704 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:14:04,928 basehttp 24228 22704 "GET /accounts/profile/ HTTP/1.1" 500 121199
+INFO 2025-04-14 22:14:05,224 basehttp 24228 22704 "GET /accounts/profile/edit/ HTTP/1.1" 200 14768
+INFO 2025-04-14 22:14:05,555 basehttp 24228 22704 "POST /accounts/profile/edit/ HTTP/1.1" 302 0
+ERROR 2025-04-14 22:14:05,608 log 24228 22704 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:14:05,638 basehttp 24228 22704 "GET /accounts/profile/ HTTP/1.1" 500 121758
+WARNING 2025-04-14 22:14:05,932 log 24228 22704 Not Found: /accounts/password_change/
+WARNING 2025-04-14 22:14:05,933 basehttp 24228 22704 "GET /accounts/password_change/ HTTP/1.1" 404 9556
+INFO 2025-04-14 22:14:06,111 basehttp 24228 22704 "GET /accounts/profile/edit/ HTTP/1.1" 200 15261
+INFO 2025-04-14 22:14:06,362 basehttp 24228 22704 - Broken pipe from ('127.0.0.1', 53782)
+INFO 2025-04-14 22:14:06,362 basehttp 24228 18504 - Broken pipe from ('127.0.0.1', 53783)
+INFO 2025-04-14 22:14:55,809 autoreload 21816 11592 D:\praca_inzynierska\accounts\urls.py changed, reloading.
+INFO 2025-04-14 22:14:56,066 autoreload 9860 8264 D:\praca_inzynierska\accounts\urls.py changed, reloading.
+INFO 2025-04-14 22:14:56,758 autoreload 2604 2788 D:\praca_inzynierska\accounts\urls.py changed, reloading.
+INFO 2025-04-14 22:14:56,019 autoreload 24228 13808 D:\praca_inzynierska\accounts\urls.py changed, reloading.
+INFO 2025-04-14 22:14:56,713 autoreload 18268 5352 D:\praca_inzynierska\accounts\urls.py changed, reloading.
+INFO 2025-04-14 22:14:57,346 autoreload 11208 3624 Watching for file changes with StatReloader
+INFO 2025-04-14 22:14:59,028 autoreload 13792 24224 Watching for file changes with StatReloader
+INFO 2025-04-14 22:14:59,434 autoreload 14216 1900 Watching for file changes with StatReloader
+INFO 2025-04-14 22:15:00,827 autoreload 18492 10656 Watching for file changes with StatReloader
+INFO 2025-04-14 22:15:03,477 autoreload 1060 5872 Watching for file changes with StatReloader
+INFO 2025-04-14 22:16:08,220 basehttp 11208 7740 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:16:08,413 basehttp 11208 7740 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:16:09,872 basehttp 11208 7740 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:16:09,943 basehttp 11208 7740 "GET /dashboard/ HTTP/1.1" 200 23222
+INFO 2025-04-14 22:16:09,949 basehttp 11208 7740 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+ERROR 2025-04-14 22:16:11,093 log 11208 7740 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:16:11,106 basehttp 11208 7740 "GET /accounts/profile/ HTTP/1.1" 500 121199
+INFO 2025-04-14 22:16:11,615 basehttp 11208 7740 "GET /accounts/profile/edit/ HTTP/1.1" 200 14830
+INFO 2025-04-14 22:16:11,882 basehttp 11208 7740 "POST /accounts/profile/edit/ HTTP/1.1" 302 0
+ERROR 2025-04-14 22:16:11,913 log 11208 7740 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:16:11,920 basehttp 11208 7740 "GET /accounts/profile/ HTTP/1.1" 500 121758
+WARNING 2025-04-14 22:16:12,418 log 11208 11676 Not Found: /accounts/password_change/
+WARNING 2025-04-14 22:16:12,419 basehttp 11208 11676 "GET /accounts/password_change/ HTTP/1.1" 404 9846
+INFO 2025-04-14 22:16:12,580 basehttp 11208 11676 "GET /accounts/profile/edit/ HTTP/1.1" 200 15261
+INFO 2025-04-14 22:16:13,003 basehttp 11208 11676 - Broken pipe from ('127.0.0.1', 53976)
+INFO 2025-04-14 22:16:13,003 basehttp 11208 2116 - Broken pipe from ('127.0.0.1', 53978)
+INFO 2025-04-14 22:16:58,733 basehttp 11208 13548 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:16:58,758 basehttp 11208 13548 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:17:00,130 basehttp 11208 13548 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:17:00,197 basehttp 11208 13548 "GET /dashboard/ HTTP/1.1" 200 23222
+INFO 2025-04-14 22:17:00,222 basehttp 11208 13548 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+ERROR 2025-04-14 22:17:01,376 log 11208 13548 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:17:01,386 basehttp 11208 13548 "GET /accounts/profile/ HTTP/1.1" 500 121199
+INFO 2025-04-14 22:17:01,623 basehttp 11208 13548 "GET /accounts/profile/edit/ HTTP/1.1" 200 14830
+INFO 2025-04-14 22:17:01,924 basehttp 11208 13548 "POST /accounts/profile/edit/ HTTP/1.1" 302 0
+ERROR 2025-04-14 22:17:01,962 log 11208 13548 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 164, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-14 22:17:01,970 basehttp 11208 13548 "GET /accounts/profile/ HTTP/1.1" 500 121758
+INFO 2025-04-14 22:17:02,188 basehttp 11208 13548 "GET /accounts/profile/change-password/ HTTP/1.1" 200 29118
+INFO 2025-04-14 22:17:03,544 basehttp 11208 13548 "POST /accounts/profile/change-password/ HTTP/1.1" 200 29654
+INFO 2025-04-14 22:17:05,728 basehttp 11208 13548 "GET /accounts/profile/edit/ HTTP/1.1" 200 14830
+INFO 2025-04-14 22:17:05,995 basehttp 11208 13548 - Broken pipe from ('127.0.0.1', 54206)
