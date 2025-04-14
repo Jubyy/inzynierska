@@ -55,6 +55,79 @@
                     <button type="submit" class="btn btn-primary w-100">Filtruj</button>
                 </div>
                 
+                <!-- Sortowanie -->
+                <div class="col-12 mt-3">
+                    <div class="card bg-light">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <label class="mb-0"><i class="bi bi-sort-alpha-down me-1"></i>Sortuj według:</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="sort_by" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        {% for option in sort_options %}
+                                            <option value="{{ option.value }}" {% if sort_by == option.value %}selected{% endif %}>{{ option.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="sort_order" id="sort_asc" value="asc" {% if sort_order == "asc" %}checked{% endif %} onchange="this.form.submit()">
+                                        <label class="form-check-label" for="sort_asc">Rosnąco <i class="bi bi-arrow-up"></i></label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="sort_order" id="sort_desc" value="desc" {% if sort_order == "desc" %}checked{% endif %} onchange="this.form.submit()">
+                                        <label class="form-check-label" for="sort_desc">Malejąco <i class="bi bi-arrow-down"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Zaawansowane filtry -->
+                <div class="col-12 mt-3">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+                                <i class="bi bi-funnel"></i> Filtry zaawansowane
+                            </button>
+                        </div>
+                        <div id="advancedFilters" class="collapse">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Filtrowanie po czasie przygotowania -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="prep_time" class="form-label">Czas przygotowania:</label>
+                                        <select name="prep_time" id="prep_time" class="form-select">
+                                            <option value="">Dowolny czas</option>
+                                            <option value="quick" {% if selected_prep_time == 'quick' %}selected{% endif %}>Szybkie (do 30 min)</option>
+                                            <option value="medium" {% if selected_prep_time == 'medium' %}selected{% endif %}>Średnie (30-60 min)</option>
+                                            <option value="long" {% if selected_prep_time == 'long' %}selected{% endif %}>Długie (powyżej 60 min)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Filtrowanie po poziomie trudności -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="difficulty" class="form-label">Poziom trudności:</label>
+                                        <select name="difficulty" id="difficulty" class="form-select">
+                                            <option value="">Dowolny poziom</option>
+                                            <option value="easy" {% if selected_difficulty == 'easy' %}selected{% endif %}>Łatwy</option>
+                                            <option value="medium" {% if selected_difficulty == 'medium' %}selected{% endif %}>Średni</option>
+                                            <option value="hard" {% if selected_difficulty == 'hard' %}selected{% endif %}>Trudny</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-filter"></i> Zastosuj filtry zaawansowane
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 {% if user.is_authenticated %}
                 <div class="col-12 mt-3">
                     <div class="form-check form-switch">

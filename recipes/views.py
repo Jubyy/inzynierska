@@ -84,6 +84,44 @@ class RecipeListView(ListView):
                 # Jeśli nie ma atrybutu following, wyświetl pusty queryset
                 queryset = queryset.none()
         
+        # Filtrowanie po czasie przygotowania
+        prep_time = self.request.GET.get('prep_time')
+        if prep_time and prep_time != 'None':
+            if prep_time == 'quick':
+                # Przepisy szybkie (do 30 minut)
+                queryset = queryset.filter(preparation_time__lte=30)
+            elif prep_time == 'medium':
+                # Przepisy średnie (30-60 minut)
+                queryset = queryset.filter(preparation_time__gt=30, preparation_time__lte=60)
+            elif prep_time == 'long':
+                # Przepisy długie (powyżej 60 minut)
+                queryset = queryset.filter(preparation_time__gt=60)
+        
+        # Filtrowanie po poziomie trudności
+        difficulty = self.request.GET.get('difficulty')
+        if difficulty and difficulty in ['easy', 'medium', 'hard'] and difficulty != 'None':
+            queryset = queryset.filter(difficulty=difficulty)
+        
+        # Sortowanie
+        sort_by = self.request.GET.get('sort_by', 'created_at')  # Domyślnie sortowanie po dacie utworzenia
+        sort_order = self.request.GET.get('sort_order', 'desc')  # Domyślnie malejąco
+        
+        # Mapowanie parametrów sortowania na pola modelu
+        sort_fields = {
+            'created_at': 'created_at',
+            'title': 'title',
+            'preparation_time': 'preparation_time',
+            'servings': 'servings',
+            'difficulty': 'difficulty',
+        }
+        
+        sort_field = sort_fields.get(sort_by, 'created_at')
+        
+        if sort_order == 'asc':
+            queryset = queryset.order_by(sort_field)
+        else:
+            queryset = queryset.order_by(f'-{sort_field}')
+        
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -116,6 +154,29 @@ class RecipeListView(ListView):
         # Obsługa parametru filtrowania po śledzonych użytkownikach
         followed = self.request.GET.get('followed')
         context['followed'] = followed if followed and followed != 'None' else None
+        
+        # Obsługa parametru filtrowania po czasie przygotowania
+        prep_time = self.request.GET.get('prep_time')
+        context['selected_prep_time'] = prep_time if prep_time and prep_time != 'None' else None
+        
+        # Obsługa parametru filtrowania po poziomie trudności
+        difficulty = self.request.GET.get('difficulty')
+        context['selected_difficulty'] = difficulty if difficulty and difficulty != 'None' else None
+        
+        # Dodaj opcje sortowania do kontekstu
+        sort_by = self.request.GET.get('sort_by', 'created_at')
+        sort_order = self.request.GET.get('sort_order', 'desc')
+        context['sort_by'] = sort_by
+        context['sort_order'] = sort_order
+        
+        # Dodaj dostępne opcje sortowania do kontekstu
+        context['sort_options'] = [
+            {'value': 'created_at', 'label': 'Data dodania'},
+            {'value': 'title', 'label': 'Nazwa przepisu'},
+            {'value': 'preparation_time', 'label': 'Czas przygotowania'},
+            {'value': 'servings', 'label': 'Liczba porcji'},
+            {'value': 'difficulty', 'label': 'Poziom trudności'},
+        ]
         
         # Dodaj liczbę śledzonych użytkowników do kontekstu
         if self.request.user.is_authenticated:
