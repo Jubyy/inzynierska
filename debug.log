@@ -2393,3 +2393,6 @@ WARNING 2025-04-15 00:52:11,375 basehttp 23452 16740 "GET /static/img/default-re
 INFO 2025-04-15 00:52:11,509 basehttp 23452 16296 "GET /media/recipes/brak.jpg HTTP/1.1" 200 10498
 INFO 2025-04-15 00:52:29,424 basehttp 23452 16296 "GET /recipes/detail/14/ HTTP/1.1" 200 26147
 INFO 2025-04-15 00:52:29,468 basehttp 23452 16296 "GET /media/recipes/brak.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 00:59:49,067 autoreload 18328 2852 Watching for file changes with StatReloader
+INFO 2025-04-15 01:00:08,415 autoreload 18328 2852 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 01:00:09,052 autoreload 20008 15756 Watching for file changes with StatReloader

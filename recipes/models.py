@@ -420,6 +420,28 @@ class Recipe(models.Model):
         except (ValueError, TypeError) as e:
             raise ValueError(f"Błąd skalowania przepisu: {str(e)}")
 
+    @property
+    def average_rating(self):
+        """Zwraca średnią ocenę przepisu"""
+        ratings = self.ratings.all()
+        if not ratings:
+            return 0
+        return sum(rating.rating for rating in ratings) / len(ratings)
+    
+    @property
+    def ratings_count(self):
+        """Zwraca liczbę ocen dla przepisu"""
+        return self.ratings.count()
+    
+    def get_user_rating(self, user):
+        """Zwraca ocenę danego użytkownika dla przepisu"""
+        if not user.is_authenticated:
+            return None
+        try:
+            return self.ratings.get(user=user)
+        except RecipeRating.DoesNotExist:
+            return None
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='ingredients', on_delete=models.CASCADE, verbose_name="Przepis")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Składnik")
@@ -771,4 +793,29 @@ class UserIngredient(models.Model):
         self.status = 'rejected'
         if reason:
             self.admin_notes = reason
-        self.save() 
+        self.save()
+
+class RecipeRating(models.Model):
+    """Model do przechowywania ocen przepisów (gwiazdki)"""
+    RATING_CHOICES = [
+        (1, '1 - Bardzo słabo'),
+        (2, '2 - Słabo'),
+        (3, '3 - Przeciętnie'),
+        (4, '4 - Dobrze'),
+        (5, '5 - Bardzo dobrze')
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipe_ratings', verbose_name="Użytkownik")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings', verbose_name="Przepis")
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, verbose_name="Ocena")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Data aktualizacji")
+    comment = models.TextField(blank=True, null=True, verbose_name="Komentarz do oceny")
+    
+    class Meta:
+        verbose_name = "Ocena przepisu"
+        verbose_name_plural = "Oceny przepisów"
+        unique_together = ('user', 'recipe')  # Użytkownik może dać tylko jedną ocenę dla przepisu
+        
+    def __str__(self):
+        return f"Ocena {self.rating}/5 od {self.user.username} dla {self.recipe.title}" 

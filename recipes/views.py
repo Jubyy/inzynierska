@@ -6,9 +6,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating
 from .utils import convert_units, get_common_units, get_common_conversions
-from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, ConversionTableForm, ConversionEntryForm
+from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, ConversionTableForm, ConversionEntryForm, RecipeRatingForm
 from shopping.models import ShoppingItem, ShoppingList
 from fridge.models import FridgeItem
 from django.views.decorators.http import require_POST
@@ -387,7 +387,7 @@ def add_missing_to_shopping_list(request, pk):
                 # Oblicz brakującą ilość
                 missing_amount = max(0, float(amount) - total_available)
                 
-                missing_ingredients.append({
+                scaled_missing_ingredients.append({
                     'ingredient': ingredient,
                     'unit': unit,
                     'required': float(amount),
@@ -643,6 +643,16 @@ class RecipeDetailView(DetailView):
             
             # Dodaj informację, czy przepis jest polubiony przez użytkownika
             context['is_liked'] = self.object.is_liked_by(self.request.user)
+            
+            # Dodaj ocenę użytkownika, jeśli istnieje
+            user_rating = self.object.get_user_rating(self.request.user)
+            context['user_rating'] = user_rating
+            
+            # Dodaj formularz oceny
+            if user_rating:
+                context['rating_form'] = RecipeRatingForm(instance=user_rating)
+            else:
+                context['rating_form'] = RecipeRatingForm()
         
         # Dodaj drobne informacje o przepisie
         context['can_be_prepared'] = False
@@ -665,8 +675,12 @@ class RecipeDetailView(DetailView):
         # Sprawdź, czy to formularz zmiany porcji (ma parametr servings)
         if 'servings' in request.POST:
             return self.post_servings(request)
+            
+        # Sprawdź, czy to formularz oceny (ma parametr rating)
+        if 'rating' in request.POST and request.user.is_authenticated:
+            return self.post_rating(request)
         
-        # Jeśli to nie formularz zmiany porcji, obsłuż dodawanie komentarzy
+        # Jeśli to nie formularz zmiany porcji ani oceny, obsłuż dodawanie komentarzy
         if not request.user.is_authenticated:
             messages.error(request, "Musisz być zalogowany, aby dodawać komentarze.")
             return HttpResponseRedirect(self.object.get_absolute_url())
@@ -692,6 +706,38 @@ class RecipeDetailView(DetailView):
         context = self.get_context_data(object=self.object)
         context['comment_form'] = comment_form
         return self.render_to_response(context)
+        
+    def post_rating(self, request):
+        """Obsługa formularza oceny przepisu"""
+        try:
+            # Pobierz istniejącą ocenę lub utwórz nową
+            rating_obj, created = RecipeRating.objects.get_or_create(
+                user=request.user,
+                recipe=self.object,
+                defaults={'rating': int(request.POST.get('rating'))}
+            )
+            
+            # Jeśli ocena już istniała, zaktualizuj ją
+            if not created:
+                rating_obj.rating = int(request.POST.get('rating'))
+                
+            # Dodaj komentarz do oceny, jeśli został podany
+            comment = request.POST.get('comment')
+            if comment:
+                rating_obj.comment = comment
+            
+            # Zapisz ocenę
+            rating_obj.save()
+            
+            if created:
+                messages.success(request, "Ocena została dodana.")
+            else:
+                messages.success(request, "Ocena została zaktualizowana.")
+                
+        except (ValueError, TypeError):
+            messages.error(request, "Wystąpił błąd podczas zapisywania oceny.")
+        
+        return HttpResponseRedirect(self.object.get_absolute_url())
     
     def post_servings(self, request):
         """Obsługa formularza zmiany liczby porcji"""

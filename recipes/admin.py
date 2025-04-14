@@ -4,7 +4,7 @@ from .models import (
     Ingredient, IngredientCategory, MeasurementUnit, UnitConversion,
     RecipeStep, RecipeImage, FavoriteRecipe, RecipeLike,
     Comment, IngredientUnit, IngredientConversion,
-    ConversionTable, ConversionTableEntry, UserIngredient
+    ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating
 )
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -196,3 +196,10 @@ class UserIngredientAdmin(admin.ModelAdmin):
             except Exception as e:
                 self.message_user(request, f'Błąd podczas odrzucania {user_ingredient.name}: {str(e)}', level='error')
     reject_ingredients.short_description = "Odrzuć wybrane składniki"
+
+@admin.register(RecipeRating)
+class RecipeRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'recipe__title', 'comment')
+    autocomplete_fields = ('user', 'recipe')

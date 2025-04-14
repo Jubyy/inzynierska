@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
-from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, ConversionTable, ConversionTableEntry
+from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, ConversionTable, ConversionTableEntry, RecipeRating
 from django.db import models
 
 class RecipeForm(forms.ModelForm):
@@ -283,4 +283,22 @@ class ConversionEntryForm(forms.ModelForm):
             'notes': forms.TextInput(attrs={'class': 'form-control', 
                                              'placeholder': 'np. Na podstawie pomiarów kuchennych'}),
             'is_exact': forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        }
+
+class RecipeRatingForm(forms.ModelForm):
+    """Formularz do oceniania przepisów"""
+    class Meta:
+        model = RecipeRating
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Dodaj komentarz do oceny (opcjonalnie)',
+                'rows': 3
+            })
+        }
+        labels = {
+            'rating': 'Ocena',
+            'comment': 'Komentarz'
         }

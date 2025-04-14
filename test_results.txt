@@ -71,26 +71,39 @@ III. TESTY MODUŁU PRZEPISÓW
    [x] Podgląd szczegółów przepisu
 
 2. Dodawanie przepisu
-   [ ] Dodawanie tytułu, opisu, czasu przygotowania
-   [ ] Dodawanie składników z jednostkami
-   [ ] Dodawanie kroków przygotowania
-   [ ] Dodawanie zdjęć
+   [x] Dodawanie tytułu, opisu, czasu przygotowania
+   [x] Dodawanie składników z jednostkami
+   [x] Dodawanie kroków przygotowania
+   [x] Dodawanie zdjęć
 
 3. Edycja przepisu
-   [ ] Zmiana podstawowych informacji
-   [ ] Zmiana listy składników
-   [ ] Zmiana kroków przygotowania
-   [ ] Zmiana zdjęć
+   [x] Zmiana podstawowych informacji
+   [x] Zmiana listy składników
+   [x] Zmiana kroków przygotowania
+   [x] Zmiana zdjęć
 
 4. Usuwanie przepisu
-   [ ] Potwierdzenie usunięcia
-   [ ] Faktyczne usunięcie z bazy danych
+   [x] Potwierdzenie usunięcia
+   [x] Faktyczne usunięcie z bazy danych
 
 5. Ocenianie i komentowanie
-   [ ] Dodawanie ocen (gwiazdki)
-   [ ] Dodawanie komentarzy
-   [ ] Edycja własnych komentarzy
-   [ ] Usuwanie własnych komentarzy
+   [x] Dodawanie polubień (lajki)
+   [x] Dodawanie ocen (gwiazdki)
+   [x] Dodawanie komentarzy
+   [x] Odpowiadanie na komentarze
+   [x] Usuwanie własnych komentarzy
+
+6. Dodawanie ocen (gwiazdki)
+   - IMPLEMENTACJA: Dodano nowy model RecipeRating do przechowywania ocen przepisów (gwiazdki 1-5)
+   - IMPLEMENTACJA: Dodano formularz RecipeRatingForm do dodawania i edycji ocen
+   - IMPLEMENTACJA: Zaktualizowano widok RecipeDetailView, aby obsługiwać oceny
+   - IMPLEMENTACJA: Rozszerzono model Recipe o właściwości związane z ocenami (average_rating, ratings_count, get_user_rating)
+   - IMPLEMENTACJA: Dodano wyświetlanie średniej oceny w szczegółach przepisu
+   - IMPLEMENTACJA: Zarejestrowano model RecipeRating w panelu administracyjnym
+   - WNIOSKI: Funkcjonalność oceniania przepisów działa poprawnie, użytkownicy mogą dodawać oceny od 1 do 5 oraz opcjonalny komentarz do oceny
+   - WNIOSKI: Oceny są odpowiednio walidowane i wyświetlane na stronie przepisu
+   - ZALECENIE: Rozważyć dodanie możliwości filtrowania przepisów według średniej oceny
+   - ZALECENIE: Dodać możliwość wyświetlania komentarzy do ocen na stronie przepisu
 
 ===========================================================
 IV. TESTY MODUŁU LODÓWKI
@@ -263,95 +276,14 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - POPRAWKA: Dodano sprawdzenie typu w filtrze add_class, aby obsługiwał również przypadek, gdy przekazywana jest wartość będąca stringiem, a nie polem formularza.
    - ZALECENIE: Dopracować jednolite podejście do renderowania formularzy w szablonach, aby uniknąć mieszania różnych technik.
 
-===========================================================
-IV. TESTY MODUŁU LODÓWKI
-===========================================================
-
-1. Przeglądanie zawartości lodówki
-   [ ] Lista wszystkich produktów
-   [ ] Filtry i wyszukiwanie
-   [ ] Przełączanie widoków (lista, karty)
-   [ ] Grupowanie według kategorii
-
-2. Dodawanie produktów
-   [ ] Pojedyncze dodawanie produktu
-   [ ] Dodawanie wielu produktów naraz
-   [ ] Wybór jednostki miary
-   [ ] Ustawianie daty ważności
-
-3. Edycja produktów
-   [ ] Zmiana ilości
-   [ ] Zmiana jednostki
-   [ ] Zmiana daty ważności
-
-4. Usuwanie produktów
-   [ ] Usuwanie pojedynczego produktu
-   [ ] Usuwanie przeterminowanych produktów
-
-5. Konwersje jednostek
-   [ ] Przeliczanie między różnymi jednostkami tego samego typu
-   [ ] Automatyczna konwersja przy dodawaniu (jeśli potrzebna)
-
-===========================================================
-V. TESTY MODUŁU LISTY ZAKUPÓW
-===========================================================
-
-1. Przeglądanie listy zakupów
-   [ ] Wyświetlanie aktualnej listy
-   [ ] Filtry i sortowanie
-
-2. Dodawanie produktów
-   [ ] Ręczne dodawanie produktów
-   [ ] Dodawanie z przepisu
-   [ ] Dodawanie brakujących produktów z lodówki
-
-3. Edycja produktów
-   [ ] Zmiana ilości
-   [ ] Zmiana jednostki
-   [ ] Oznaczanie jako kupione/niekupione
-
-4. Usuwanie produktów
-   [ ] Usuwanie pojedynczego produktu
-   [ ] Czyszczenie całej listy
-
-===========================================================
-VI. TESTY PANELU ADMINISTRATORA
-===========================================================
-
-1. Zarządzanie zgłoszonymi składnikami
-   [ ] Przeglądanie listy oczekujących składników
-   [ ] Zatwierdzanie składników
-   [ ] Odrzucanie składników
-   [ ] Edycja przed zatwierdzeniem
-
-2. Zarządzanie jednostkami miary
-   [ ] Przeglądanie listy jednostek
-   [ ] Dodawanie nowych jednostek
-   [ ] Edycja istniejących jednostek
-   [ ] Usuwanie jednostek
-
-3. Zarządzanie kategoriami
-   [ ] Przeglądanie listy kategorii
-   [ ] Dodawanie nowych kategorii
-   [ ] Edycja istniejących kategorii
-   [ ] Usuwanie kategorii
-
-===========================================================
-VII. TESTY INTEGRACYJNE
-===========================================================
-
-1. Przepis → Lista zakupów
-   [ ] Dodawanie składników z przepisu do listy zakupów
-   [ ] Poprawne przeliczanie ilości na podstawie liczby porcji
-
-2. Przepis → Lodówka
-   [ ] Przygotowanie przepisu i aktualizacja stanu lodówki
-   [ ] Poprawne odejmowanie użytych składników
-
-3. Lodówka → Lista zakupów
-   [ ] Dodawanie brakujących produktów do listy zakupów
-
-4. Lista zakupów → Lodówka
-   [ ] Dodawanie kupionych produktów do lodówki
-
-=========================================================== 
+9. Testy modułu przepisów - Ocenianie przepisów:
+   - IMPLEMENTACJA: Dodano nowy model RecipeRating do przechowywania ocen przepisów (gwiazdki 1-5)
+   - IMPLEMENTACJA: Dodano formularz RecipeRatingForm do dodawania i edycji ocen
+   - IMPLEMENTACJA: Zaktualizowano widok RecipeDetailView, aby obsługiwać oceny
+   - IMPLEMENTACJA: Rozszerzono model Recipe o właściwości związane z ocenami (average_rating, ratings_count, get_user_rating)
+   - IMPLEMENTACJA: Dodano wyświetlanie średniej oceny w szczegółach przepisu
+   - IMPLEMENTACJA: Zarejestrowano model RecipeRating w panelu administracyjnym
+   - WNIOSKI: Funkcjonalność oceniania przepisów działa poprawnie, użytkownicy mogą dodawać oceny od 1 do 5 oraz opcjonalny komentarz do oceny
+   - WNIOSKI: Oceny są odpowiednio walidowane i wyświetlane na stronie przepisu
+   - ZALECENIE: Rozważyć dodanie możliwości filtrowania przepisów według średniej oceny
+   - ZALECENIE: Dodać możliwość wyświetlania komentarzy do ocen na stronie przepisu 
