@@ -50,4 +50,5 @@ urlpatterns = [
     
     # AJAX
     path('ajax/like/<int:pk>/', views.toggle_like, name='ajax_toggle_like'),
+    path('api/search-suggestions/', views.ajax_search_suggestions, name='ajax_search_suggestions'),
 ]

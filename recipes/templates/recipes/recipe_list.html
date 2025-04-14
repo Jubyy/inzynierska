@@ -29,7 +29,10 @@
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" name="q" value="{% if query and query != 'None' %}{{ query }}{% endif %}" class="form-control" placeholder="Szukaj przepisu...">
+                        <input type="text" name="q" id="search_query" value="{% if query and query != 'None' %}{{ query }}{% endif %}" class="form-control" placeholder="Szukaj przepisu..." list="search_suggestions" autocomplete="off">
+                        <datalist id="search_suggestions">
+                            <!-- Opcje autouzupełniania będą dodane przez JavaScript -->
+                        </datalist>
                     </div>
                 </div>
                 
@@ -384,7 +387,7 @@
     }
 </style>
 
-<!-- JavaScript dla funkcji dodawania do ulubionych -->
+<!-- JavaScript dla funkcji dodawania do ulubionych i autouzupełniania -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Obsługa przycisku dodawania do ulubionych
@@ -454,6 +457,90 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = this.checked ? 'true' : '';
             this.closest('form').submit();
         });
+    }
+    
+    // Obsługa autouzupełniania
+    const searchInput = document.getElementById('search_query');
+    const datalist = document.getElementById('search_suggestions');
+    
+    if (searchInput && datalist) {
+        // Lista wszystkich tytułów przepisów na stronie (jako początkowe sugestie)
+        const recipeTitles = [];
+        document.querySelectorAll('.recipe-card .card-title').forEach(title => {
+            recipeTitles.push(title.textContent.trim());
+        });
+        
+        // Dodawanie unikanych tytułów do datalist
+        const uniqueTitles = [...new Set(recipeTitles)];
+        uniqueTitles.forEach(title => {
+            const option = document.createElement('option');
+            option.value = title;
+            datalist.appendChild(option);
+        });
+        
+        // Zmienna do przechowywania timeoutu - zapobiega zbyt częstym zapytaniom
+        let typingTimer;
+        const doneTypingInterval = 300; // czas w ms po zakończeniu pisania
+        
+        // Obsługa wprowadzania tekstu
+        searchInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            
+            // Automatycznie wyczyść sugestie, gdy pole jest puste
+            if (this.value === '') {
+                while (datalist.firstChild) {
+                    datalist.removeChild(datalist.firstChild);
+                }
+                
+                // Przywróć wszystkie lokalne sugestie
+                uniqueTitles.forEach(title => {
+                    const option = document.createElement('option');
+                    option.value = title;
+                    datalist.appendChild(option);
+                });
+                return;
+            }
+            
+            // Ustaw timer, aby ograniczyć liczbę zapytań do API
+            typingTimer = setTimeout(() => {
+                // Pobierz sugestie z API, jeśli wprowadzono co najmniej 2 znaki
+                if (this.value.length >= 2) {
+                    fetch(`/recipes/api/search-suggestions/?q=${encodeURIComponent(this.value)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Wyczyść obecne sugestie
+                            while (datalist.firstChild) {
+                                datalist.removeChild(datalist.firstChild);
+                            }
+                            
+                            // Dodaj nowe sugestie z API
+                            data.suggestions.forEach(suggestion => {
+                                const option = document.createElement('option');
+                                option.value = suggestion;
+                                datalist.appendChild(option);
+                            });
+                            
+                            // Jeśli nie ma sugestii z API, użyj lokalnych
+                            if (data.suggestions.length === 0) {
+                                const filteredTitles = uniqueTitles.filter(title => 
+                                    title.toLowerCase().includes(searchInput.value.toLowerCase())
+                                );
+                                
+                                filteredTitles.forEach(title => {
+                                    const option = document.createElement('option');
+                                    option.value = title;
+                                    datalist.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Błąd podczas pobierania sugestii:', error);
+                        });
+                }
+            }, doneTypingInterval);
+        });
+        
+        console.log('Autouzupełnianie wyszukiwania zostało zainicjalizowane');
     }
     
     // Funkcja do pobierania tokenu CSRF

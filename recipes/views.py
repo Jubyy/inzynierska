@@ -1683,4 +1683,21 @@ def ajax_ingredient_details(request):
         return JsonResponse({
             'success': False,
             'error': str(e)
-        }) 
+        })
+
+def ajax_search_suggestions(request):
+    """Widok AJAX do pobierania sugestii wyszukiwania"""
+    query = request.GET.get('q', '')
+    
+    # Jeśli zapytanie jest puste, zwróć pusty wynik
+    if not query or len(query) < 2:
+        return JsonResponse({'suggestions': []})
+    
+    # Pobierz tytuły przepisów pasujące do zapytania
+    suggestions = Recipe.objects.filter(
+        Q(title__icontains=query) |
+        Q(description__icontains=query) |
+        Q(ingredients__ingredient__name__icontains=query)
+    ).distinct().values_list('title', flat=True)[:10]
+    
+    return JsonResponse({'suggestions': list(suggestions)}) 

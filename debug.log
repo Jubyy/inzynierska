@@ -1863,3 +1863,102 @@ WARNING 2025-04-14 23:05:05,682 log 19924 22148 Not Found: /recipes/
 WARNING 2025-04-14 23:05:05,683 basehttp 19924 22148 "GET /recipes/ HTTP/1.1" 404 13427
 INFO 2025-04-14 23:05:06,747 basehttp 19924 1232 - Broken pipe from ('127.0.0.1', 1951)
 INFO 2025-04-14 23:05:06,748 basehttp 19924 22148 - Broken pipe from ('127.0.0.1', 1950)
+INFO 2025-04-14 23:07:49,366 autoreload 16364 4556 Watching for file changes with StatReloader
+WARNING 2025-04-14 23:07:52,462 log 16364 1904 Not Found: /recipes/
+WARNING 2025-04-14 23:07:52,462 basehttp 16364 1904 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:07:53,529 basehttp 16364 4152 - Broken pipe from ('127.0.0.1', 2063)
+INFO 2025-04-14 23:07:53,530 basehttp 16364 1904 - Broken pipe from ('127.0.0.1', 2062)
+INFO 2025-04-14 23:09:23,543 basehttp 16364 9664 "GET /accounts/community/ HTTP/1.1" 200 46089
+INFO 2025-04-14 23:09:27,259 basehttp 16364 9664 "GET /accounts/followers/ HTTP/1.1" 200 15712
+INFO 2025-04-14 23:09:29,217 basehttp 16364 9664 "GET /accounts/following/ HTTP/1.1" 200 17530
+INFO 2025-04-14 23:09:31,323 basehttp 16364 9664 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 20055
+WARNING 2025-04-14 23:09:31,369 basehttp 16364 9664 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:10:12,844 basehttp 16364 15920 "GET /recipes/list/ HTTP/1.1" 200 51828
+WARNING 2025-04-14 23:10:12,896 basehttp 16364 15920 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:10:13,029 basehttp 16364 12616 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:12:58,935 log 16364 10880 Not Found: /recipes/
+WARNING 2025-04-14 23:12:58,936 basehttp 16364 10880 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:12:59,995 basehttp 16364 10880 - Broken pipe from ('127.0.0.1', 2178)
+INFO 2025-04-14 23:12:59,995 basehttp 16364 12340 - Broken pipe from ('127.0.0.1', 2179)
+INFO 2025-04-14 23:13:07,579 autoreload 13316 17224 Watching for file changes with StatReloader
+WARNING 2025-04-14 23:13:12,034 log 16364 8392 Not Found: /recipes/
+WARNING 2025-04-14 23:13:12,035 basehttp 16364 8392 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:13:12,179 basehttp 16364 8392 - Broken pipe from ('127.0.0.1', 2199)
+INFO 2025-04-14 23:13:18,099 autoreload 4584 18132 Watching for file changes with StatReloader
+INFO 2025-04-14 23:13:53,520 basehttp 16364 15436 "GET /recipes/list/ HTTP/1.1" 200 72080
+WARNING 2025-04-14 23:13:53,562 basehttp 16364 15436 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:13:53,699 basehttp 16364 10124 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:13:54,915 basehttp 16364 16752 "GET /recipes/list/ HTTP/1.1" 200 72080
+WARNING 2025-04-14 23:13:54,951 basehttp 16364 16752 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:13:55,177 basehttp 16364 4628 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:13:58,497 basehttp 16364 22712 "GET /recipes/detail/13/ HTTP/1.1" 200 36407
+WARNING 2025-04-14 23:14:17,007 log 16364 18932 Not Found: /recipes/
+WARNING 2025-04-14 23:14:17,008 basehttp 16364 18932 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:14:18,075 basehttp 16364 13260 - Broken pipe from ('127.0.0.1', 2241)
+INFO 2025-04-14 23:14:18,075 basehttp 16364 18932 - Broken pipe from ('127.0.0.1', 2240)
+WARNING 2025-04-14 23:14:55,071 log 16364 1008 Not Found: /recipes/
+WARNING 2025-04-14 23:14:55,072 basehttp 16364 1008 "GET /recipes/ HTTP/1.1" 404 13427
+WARNING 2025-04-14 23:15:01,504 log 16364 5336 Not Found: /recipes/
+WARNING 2025-04-14 23:15:01,505 basehttp 16364 5336 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:15:24,573 basehttp 16364 14920 "GET /recipes/list/ HTTP/1.1" 200 62564
+WARNING 2025-04-14 23:15:24,763 basehttp 16364 9776 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:15:24,764 basehttp 16364 14920 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 23:15:24,769 basehttp 16364 14920 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+INFO 2025-04-14 23:15:29,798 basehttp 16364 14920 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=quick&difficulty= HTTP/1.1" 200 48161
+WARNING 2025-04-14 23:15:29,808 basehttp 16364 14920 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:15:31,844 log 16364 6324 Not Found: /recipes/
+WARNING 2025-04-14 23:15:31,845 basehttp 16364 6324 "GET /recipes/ HTTP/1.1" 404 13427
+INFO 2025-04-14 23:15:33,241 basehttp 16364 8896 - Broken pipe from ('127.0.0.1', 2279)
+INFO 2025-04-14 23:15:33,242 basehttp 16364 6324 - Broken pipe from ('127.0.0.1', 2278)
+INFO 2025-04-14 23:16:31,445 basehttp 16364 21956 "GET /recipes/list/ HTTP/1.1" 200 62564
+INFO 2025-04-14 23:16:31,457 basehttp 16364 21956 "GET /static/css/style.css HTTP/1.1" 200 10258
+WARNING 2025-04-14 23:16:31,462 basehttp 16364 21956 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:31,640 basehttp 16364 11376 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+INFO 2025-04-14 23:16:33,085 basehttp 16364 11376 "GET /recipes/list/?q=&category=1&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 37476
+WARNING 2025-04-14 23:16:33,096 basehttp 16364 11376 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:35,163 basehttp 16364 10008 "GET /recipes/list/ HTTP/1.1" 200 62564
+WARNING 2025-04-14 23:16:35,172 basehttp 16364 10008 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:37,359 basehttp 16364 2432 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=quick&difficulty= HTTP/1.1" 200 48161
+WARNING 2025-04-14 23:16:37,368 basehttp 16364 2432 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:39,765 basehttp 16364 20552 "GET /recipes/list/ HTTP/1.1" 200 62564
+WARNING 2025-04-14 23:16:39,774 basehttp 16364 20552 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:42,930 basehttp 16364 760 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty=easy HTTP/1.1" 200 37222
+WARNING 2025-04-14 23:16:42,938 basehttp 16364 760 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:45,324 basehttp 16364 23852 "GET /recipes/list/ HTTP/1.1" 200 62564
+WARNING 2025-04-14 23:16:45,338 basehttp 16364 23852 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:46,487 basehttp 16364 19924 "GET /recipes/list/?q=&category=&diet=&sort_by=title&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 62583
+WARNING 2025-04-14 23:16:46,494 basehttp 16364 19924 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:51,083 basehttp 16364 1200 "GET /recipes/list/ HTTP/1.1" 200 62564
+WARNING 2025-04-14 23:16:51,091 basehttp 16364 1200 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:16:52,254 basehttp 16364 10000 "GET /recipes/list/?q=a&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 62657
+WARNING 2025-04-14 23:16:52,262 basehttp 16364 10000 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:17:56,666 autoreload 16364 4556 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:17:57,358 autoreload 13316 17224 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:17:57,444 autoreload 14548 9704 Watching for file changes with StatReloader
+INFO 2025-04-14 23:17:58,109 autoreload 16976 22784 Watching for file changes with StatReloader
+INFO 2025-04-14 23:18:08,051 autoreload 16976 22784 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-14 23:18:08,538 autoreload 14548 9704 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-14 23:18:08,799 autoreload 5536 15376 Watching for file changes with StatReloader
+INFO 2025-04-14 23:18:09,291 autoreload 22856 9356 Watching for file changes with StatReloader
+INFO 2025-04-14 23:18:36,275 basehttp 5536 21300 "GET /recipes/list/ HTTP/1.1" 200 66724
+WARNING 2025-04-14 23:18:36,430 basehttp 5536 9832 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:36,503 basehttp 5536 21300 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 23:18:36,506 basehttp 5536 21300 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+INFO 2025-04-14 23:18:37,535 basehttp 5536 21300 "GET /recipes/list/?q=&category=1&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 41636
+WARNING 2025-04-14 23:18:37,548 basehttp 5536 21300 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:39,654 basehttp 5536 15008 "GET /recipes/list/ HTTP/1.1" 200 66724
+WARNING 2025-04-14 23:18:39,665 basehttp 5536 15008 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:41,870 basehttp 5536 22252 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=quick&difficulty= HTTP/1.1" 200 52321
+WARNING 2025-04-14 23:18:41,878 basehttp 5536 22252 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:44,284 basehttp 5536 572 "GET /recipes/list/ HTTP/1.1" 200 66724
+WARNING 2025-04-14 23:18:44,332 basehttp 5536 572 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:47,552 basehttp 5536 20504 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty=easy HTTP/1.1" 200 41382
+WARNING 2025-04-14 23:18:47,559 basehttp 5536 20504 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:49,957 basehttp 5536 8788 "GET /recipes/list/ HTTP/1.1" 200 66724
+WARNING 2025-04-14 23:18:49,966 basehttp 5536 8788 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:51,116 basehttp 5536 16144 "GET /recipes/list/?q=&category=&diet=&sort_by=title&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 66743
+WARNING 2025-04-14 23:18:51,124 basehttp 5536 16144 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:55,669 basehttp 5536 10412 "GET /recipes/list/ HTTP/1.1" 200 66724
+WARNING 2025-04-14 23:18:55,679 basehttp 5536 10412 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:18:56,871 basehttp 5536 14620 "GET /recipes/list/?q=a&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 66817
+WARNING 2025-04-14 23:18:56,881 basehttp 5536 14620 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880

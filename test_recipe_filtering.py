@@ -56,7 +56,7 @@ def test_recipe_filters_and_sorting():
     try:
         # Próba połączenia z serwerem
         try:
-            driver.get("http://localhost:8000/recipes/")
+            driver.get("http://localhost:8000/recipes/list/")
             print("Otworzono stronę z listą przepisów")
             time.sleep(1)
         except Exception as e:
@@ -88,7 +88,7 @@ def test_recipe_filters_and_sorting():
         # 1. Test filtrowania według kategorii
         print("\n=== TEST 1: FILTROWANIE WEDŁUG KATEGORII ===")
         try:
-            category_select = driver.find_element(By.ID, "id_category")
+            category_select = driver.find_element(By.NAME, "category")
             select = Select(category_select)
             options = select.options
             
@@ -112,7 +112,7 @@ def test_recipe_filters_and_sorting():
                 print("✓ Filtrowanie według kategorii działa poprawnie")
                 
                 # Powrót do wszystkich przepisów
-                driver.get("http://localhost:8000/recipes/")
+                driver.get("http://localhost:8000/recipes/list/")
                 time.sleep(1)
             else:
                 print("UWAGA: Brak kategorii do testowania")
@@ -153,7 +153,7 @@ def test_recipe_filters_and_sorting():
             print("✓ Filtrowanie według czasu przygotowania działa poprawnie")
             
             # Powrót do wszystkich przepisów
-            driver.get("http://localhost:8000/recipes/")
+            driver.get("http://localhost:8000/recipes/list/")
             time.sleep(1)
         except Exception as e:
             print(f"BŁĄD podczas testowania filtrów czasu przygotowania: {e}")
@@ -165,10 +165,14 @@ def test_recipe_filters_and_sorting():
             # Rozwiń zaawansowane filtry, jeśli są zwinięte
             try:
                 advanced_filters_button = driver.find_element(By.CSS_SELECTOR, "button[data-bs-target='#advancedFilters']")
-                advanced_filters_button.click()
+                driver.execute_script("arguments[0].click();", advanced_filters_button)  # Użyj JavaScript do kliknięcia
                 time.sleep(1)
             except:
                 print("Filtry zaawansowane mogą być już rozwinięte lub mają inną strukturę")
+            
+            # Upewnij się, że sekcja zaawansowanych filtrów jest widoczna
+            driver.execute_script("document.getElementById('advancedFilters').classList.add('show')")
+            time.sleep(1)
             
             difficulty_select = driver.find_element(By.ID, "difficulty")
             select = Select(difficulty_select)
@@ -192,7 +196,7 @@ def test_recipe_filters_and_sorting():
             print("✓ Filtrowanie według poziomu trudności działa poprawnie")
             
             # Powrót do wszystkich przepisów
-            driver.get("http://localhost:8000/recipes/")
+            driver.get("http://localhost:8000/recipes/list/")
             time.sleep(1)
         except Exception as e:
             print(f"BŁĄD podczas testowania filtrów poziomu trudności: {e}")
@@ -230,7 +234,7 @@ def test_recipe_filters_and_sorting():
             print("✓ Sortowanie przepisów działa poprawnie")
             
             # Powrót do wszystkich przepisów
-            driver.get("http://localhost:8000/recipes/")
+            driver.get("http://localhost:8000/recipes/list/")
             time.sleep(1)
         except Exception as e:
             print(f"BŁĄD podczas testowania sortowania: {e}")
@@ -239,7 +243,7 @@ def test_recipe_filters_and_sorting():
         # 5. Test wyszukiwania przepisów
         print("\n=== TEST 5: WYSZUKIWANIE PRZEPISÓW ===")
         try:
-            search_input = driver.find_element(By.ID, "id_query")
+            search_input = driver.find_element(By.NAME, "q")
             
             # Wyszukaj frazę, która powinna dać wyniki (używamy ogólnej frazy)
             search_input.send_keys("a")  # Używamy popularnej litery, która prawdopodobnie da wyniki

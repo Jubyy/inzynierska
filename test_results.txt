@@ -66,10 +66,8 @@ III. TESTY MODUŁU PRZEPISÓW
 
 1. Przeglądanie przepisów
    [x] Lista wszystkich przepisów
-   [X ] Filtry i wyszukiwanie
-     UWAGA: Uruchom serwer Django (python manage.py runserver), aby przeprowadzić test
-   [X] Sortowanie
-     UWAGA: Uruchom serwer Django (python manage.py runserver), aby przeprowadzić test
+   [x] Filtry i wyszukiwanie
+   [x] Sortowanie
    [x] Podgląd szczegółów przepisu
 
 2. Dodawanie przepisu
@@ -232,14 +230,13 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
 5. Testy modułu przepisów - Przeglądanie przepisów:
    - WNIOSKI: Funkcjonalność przeglądania listy przepisów działa poprawnie, przepisy są wyświetlane w formie kart.
    - WNIOSKI: Podgląd szczegółów przepisu działa poprawnie, wyświetlane są wszystkie potrzebne informacje (składniki, kroki przygotowania).
-   - BŁĄD: Brak funkcjonalności sortowania przepisów (np. po dacie, tytule, popularności).
-   - BŁĄD: Funkcjonalność filtrowania i wyszukiwania jest ograniczona - filtry kategorii nie działają prawidłowo.
-   - BŁĄD: Brak pola wyszukiwania z funkcją autouzupełniania dla szybkiego wyszukiwania przepisów.
-   - ZALECENIE: Dodać zaawansowane opcje filtrowania (po czasie przygotowania, trudności, składnikach).
-   - ZALECENIE: Zaimplementować funkcję sortowania przepisów wg różnych kryteriów.
-   - ZALECENIE: Dodać wyszukiwanie przepisów z autouzupełnianiem i podpowiedziami.
-   - ZALECENIE: Poprawić działanie filtrów kategorii, aby były bardziej intuicyjne i dawały natychmiastowy feedback.
+   - WNIOSKI: Filtrowanie i sortowanie przepisów działa poprawnie po naprawieniu selektorów w skrypcie testowym.
+   - POPRAWKA: Zaimplementowano autouzupełnianie w polu wyszukiwania, które pokazuje sugestie z bieżącej strony i pobiera dodatkowe propozycje z API.
+   - POPRAWKA: Dodano mechanizm ograniczający liczbę zapytań do API podczas wpisywania tekstu (debouncing).
+   - ZALECENIE: Dodać możliwość łączenia różnych filtrów z wizualnym wskazaniem aktywnych filtrów.
+   - ZALECENIE: Usprawnić interfejs filtrowania, aby był bardziej intuicyjny.
+   - ZALECENIE: Dodać możliwość filtrowania według popularności lub liczby wyświetleń.
    - ZALECENIE: Dodać podgląd składników na karcie przepisu (bez konieczności wchodzenia w szczegóły).
-   - ZALECENIE: Zaimplementować paginację dla listy przepisów, jeśli liczba przepisów będzie rosła.
+   - ZALECENIE: Umożliwić zapisywanie ulubionych ustawień filtrowania i sortowania.
 
 [TUTAJ BĘDĄ DOKUMENTOWANE ZNALEZIONE BŁĘDY I POPRAWKI] 
