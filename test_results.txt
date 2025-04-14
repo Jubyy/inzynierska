@@ -55,10 +55,10 @@ II. TESTY MODUŁU UŻYTKOWNIKÓW
    [x] Dodawanie/zmiana zdjęcia profilowego
 
 4. Funkcje społecznościowe
-   [ ] Obserwowanie innych użytkowników
-   [ ] Przeglądanie listy obserwowanych
-   [ ] Przeglądanie listy obserwujących
-   [ ] Przeglądanie publicznych profili
+   [x] Obserwowanie innych użytkowników
+   [x] Przeglądanie listy obserwowanych
+   [x] Przeglądanie listy obserwujących
+   [x] Przeglądanie publicznych profili
 
 ===========================================================
 III. TESTY MODUŁU PRZEPISÓW
@@ -205,8 +205,8 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
 
 3. Testy modułu użytkownika - Logowanie:
    - WNIOSKI: Formularz logowania działa poprawnie, obsługuje zarówno prawidłowe jak i błędne dane.
-   - WNIOSKI: Funkcja "Zapamiętaj mnie" działa prawidłowo, utrzymując sesję użytkownika.
-   - WNIOSKI: Przekierowanie po udanym logowaniu działa poprawnie, kierując na dashboard.
+   [x] Funkcja "Zapamiętaj mnie"
+   [x] Przekierowanie po udanym logowaniu
    - ZALECENIE: Warto dodać licznik nieudanych prób logowania dla zwiększenia bezpieczeństwa.
    - ZALECENIE: Rozważyć implementację dwuskładnikowego uwierzytelniania (2FA) jako opcji dla użytkowników.
    - ZALECENIE: Dodać walidację JavaScript po stronie klienta dla szybszej informacji zwrotnej.

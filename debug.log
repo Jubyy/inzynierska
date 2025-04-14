@@ -1660,3 +1660,119 @@ INFO 2025-04-14 22:17:02,188 basehttp 11208 13548 "GET /accounts/profile/change-
 INFO 2025-04-14 22:17:03,544 basehttp 11208 13548 "POST /accounts/profile/change-password/ HTTP/1.1" 200 29654
 INFO 2025-04-14 22:17:05,728 basehttp 11208 13548 "GET /accounts/profile/edit/ HTTP/1.1" 200 14830
 INFO 2025-04-14 22:17:05,995 basehttp 11208 13548 - Broken pipe from ('127.0.0.1', 54206)
+INFO 2025-04-14 22:21:38,310 basehttp 11208 10140 "GET /login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:21:40,259 basehttp 11208 10140 "GET /recipes/list/ HTTP/1.1" 200 39939
+WARNING 2025-04-14 22:21:40,313 basehttp 11208 10140 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 22:21:40,430 basehttp 11208 4704 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:21:41,655 basehttp 11208 9884 "GET /accounts/community/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:21:41,666 basehttp 11208 9884 "GET /login/?next=/accounts/community/ HTTP/1.1" 200 18044
+INFO 2025-04-14 22:21:42,656 basehttp 11208 9884 "GET / HTTP/1.1" 200 33137
+INFO 2025-04-14 22:21:43,883 basehttp 11208 9884 "GET /accounts/community/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:21:43,893 basehttp 11208 9884 "GET /login/?next=/accounts/community/ HTTP/1.1" 200 18044
+INFO 2025-04-14 22:21:45,393 basehttp 11208 9884 "GET / HTTP/1.1" 200 33137
+INFO 2025-04-14 22:21:46,241 basehttp 11208 9884 "GET / HTTP/1.1" 200 33137
+INFO 2025-04-14 22:22:06,447 basehttp 11208 23992 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:22:06,468 basehttp 11208 23992 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:22:07,996 basehttp 11208 23992 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:22:08,086 basehttp 11208 23992 "GET /dashboard/ HTTP/1.1" 200 23223
+INFO 2025-04-14 22:22:08,101 basehttp 11208 23992 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+INFO 2025-04-14 22:22:09,391 basehttp 11208 23992 "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:22:09,405 basehttp 11208 23992 "GET /login/ HTTP/1.1" 200 18763
+INFO 2025-04-14 22:22:09,473 basehttp 11208 23992 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:22:10,474 basehttp 11208 23992 "POST /accounts/login/ HTTP/1.1" 200 18562
+INFO 2025-04-14 22:22:11,830 basehttp 11208 19976 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:22:13,368 basehttp 11208 19976 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:22:13,441 basehttp 11208 19976 "GET /dashboard/ HTTP/1.1" 200 23223
+INFO 2025-04-14 22:22:13,512 basehttp 11208 20372 - Broken pipe from ('127.0.0.1', 54597)
+INFO 2025-04-14 22:22:13,523 basehttp 11208 19976 - Broken pipe from ('127.0.0.1', 54596)
+INFO 2025-04-14 22:22:24,523 basehttp 11208 3556 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:22:24,537 basehttp 11208 3556 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:22:28,220 basehttp 11208 3556 "POST /accounts/register/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:22:28,236 basehttp 11208 3556 "GET /accounts/activation-sent/ HTTP/1.1" 200 13030
+INFO 2025-04-14 22:22:28,345 basehttp 11208 3556 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:22:29,724 basehttp 11208 22792 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:22:31,069 basehttp 11208 22792 "POST /accounts/register/ HTTP/1.1" 200 29028
+INFO 2025-04-14 22:22:33,115 basehttp 11208 22792 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:22:34,390 basehttp 11208 22792 "POST /accounts/register/ HTTP/1.1" 200 29038
+INFO 2025-04-14 22:22:36,459 basehttp 11208 11988 - Broken pipe from ('127.0.0.1', 54645)
+INFO 2025-04-14 22:22:36,459 basehttp 11208 22792 - Broken pipe from ('127.0.0.1', 54644)
+INFO 2025-04-14 22:23:36,969 basehttp 11208 22260 "GET /accounts/community/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:23:36,980 basehttp 11208 22260 "GET /login/?next=/accounts/community/ HTTP/1.1" 200 18044
+INFO 2025-04-14 22:23:42,177 basehttp 11208 3188 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:23:59,415 basehttp 11208 14248 "POST /accounts/register/ HTTP/1.1" 200 29061
+INFO 2025-04-14 22:24:11,480 basehttp 11208 21804 "POST /accounts/register/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:24:11,490 basehttp 11208 21804 "GET /accounts/activation-sent/ HTTP/1.1" 200 13030
+INFO 2025-04-14 22:25:39,077 basehttp 11208 22472 "GET /accounts/activate/MTI/co9swb-869e78af8538645e7d9c0e7f5d96ad9b/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:25:39,184 basehttp 11208 22472 "GET /accounts/dashboard/ HTTP/1.1" 200 23678
+INFO 2025-04-14 22:25:42,127 basehttp 11208 1508 "GET /accounts/community/ HTTP/1.1" 200 43472
+INFO 2025-04-14 22:25:49,895 basehttp 11208 1508 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 19365
+WARNING 2025-04-14 22:25:49,997 basehttp 11208 1508 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:25:56,275 basehttp 11208 4808 "POST /accounts/user/testuser/follow/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:25:56,299 basehttp 11208 4808 "GET /accounts/user/testuser/ HTTP/1.1" 200 19787
+INFO 2025-04-14 22:25:57,675 basehttp 11208 4808 "POST /accounts/user/testuser/follow/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:25:57,691 basehttp 11208 4808 "GET /accounts/user/testuser/ HTTP/1.1" 200 19776
+INFO 2025-04-14 22:25:58,992 basehttp 11208 4808 "POST /accounts/user/jankowalski/follow/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:25:59,009 basehttp 11208 4808 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 19821
+INFO 2025-04-14 22:26:02,903 basehttp 11208 2272 "POST /accounts/user/jankowalski/follow/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:26:02,921 basehttp 11208 2272 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 19810
+INFO 2025-04-14 22:26:06,333 basehttp 11208 2272 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 19365
+WARNING 2025-04-14 22:26:06,409 basehttp 11208 2272 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:27:48,920 basehttp 11208 13584 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:27:49,164 basehttp 11208 13584 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:27:50,576 basehttp 11208 13584 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:27:50,783 basehttp 11208 13584 "GET /dashboard/ HTTP/1.1" 200 23221
+INFO 2025-04-14 22:27:50,826 basehttp 11208 13584 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+INFO 2025-04-14 22:27:51,435 basehttp 11208 13584 "GET /accounts/community/ HTTP/1.1" 200 43480
+INFO 2025-04-14 22:27:52,155 basehttp 11208 13584 "GET /accounts/user/testsocial2/ HTTP/1.1" 200 17816
+INFO 2025-04-14 22:27:54,409 basehttp 11208 13584 "GET /accounts/following/ HTTP/1.1" 200 16120
+INFO 2025-04-14 22:27:54,904 basehttp 11208 13584 "GET /accounts/followers/ HTTP/1.1" 200 15594
+INFO 2025-04-14 22:27:55,269 basehttp 11208 13584 "GET /accounts/user/testsocial3/ HTTP/1.1" 200 17823
+INFO 2025-04-14 22:28:38,166 autoreload 1060 5872 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:28:38,248 autoreload 11208 3624 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:28:38,438 autoreload 13792 24224 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:28:38,767 autoreload 18492 10656 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:28:39,802 autoreload 4052 15508 Watching for file changes with StatReloader
+INFO 2025-04-14 22:28:39,817 autoreload 18972 1692 Watching for file changes with StatReloader
+INFO 2025-04-14 22:28:41,603 autoreload 22492 9636 Watching for file changes with StatReloader
+INFO 2025-04-14 22:28:41,933 autoreload 6988 4612 Watching for file changes with StatReloader
+INFO 2025-04-14 22:29:20,491 basehttp 18972 20864 "GET /accounts/login/ HTTP/1.1" 200 18024
+INFO 2025-04-14 22:29:20,722 basehttp 18972 20864 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:29:22,036 basehttp 18972 20864 "POST /accounts/login/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:29:22,127 basehttp 18972 20864 "GET /dashboard/ HTTP/1.1" 200 23221
+INFO 2025-04-14 22:29:22,137 basehttp 18972 20864 "GET /static/img/user-placeholder.svg HTTP/1.1" 200 557
+INFO 2025-04-14 22:29:22,258 basehttp 18972 20864 "GET /accounts/community/ HTTP/1.1" 200 43480
+INFO 2025-04-14 22:29:22,601 basehttp 18972 20864 "GET /accounts/user/testsocial2/ HTTP/1.1" 200 17942
+INFO 2025-04-14 22:29:25,164 basehttp 18972 9772 "GET /accounts/following/ HTTP/1.1" 200 16120
+INFO 2025-04-14 22:29:25,399 basehttp 18972 9772 "GET /accounts/followers/ HTTP/1.1" 200 15720
+INFO 2025-04-14 22:29:25,583 basehttp 18972 9772 "GET /accounts/user/testsocial3/ HTTP/1.1" 200 17949
+INFO 2025-04-14 22:29:27,774 basehttp 18972 23732 - Broken pipe from ('127.0.0.1', 63624)
+INFO 2025-04-14 22:29:27,775 basehttp 18972 9772 - Broken pipe from ('127.0.0.1', 63623)
+INFO 2025-04-14 22:30:08,480 autoreload 18972 1692 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:30:08,716 autoreload 6988 4612 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:30:09,168 autoreload 4052 15508 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:30:09,750 autoreload 10896 21760 Watching for file changes with StatReloader
+INFO 2025-04-14 22:30:09,839 autoreload 22492 9636 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:30:10,630 autoreload 21388 5936 Watching for file changes with StatReloader
+INFO 2025-04-14 22:30:12,433 autoreload 12588 5592 Watching for file changes with StatReloader
+INFO 2025-04-14 22:30:14,038 autoreload 11852 4580 Watching for file changes with StatReloader
+INFO 2025-04-14 22:31:08,404 autoreload 21388 5936 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:31:08,635 autoreload 11852 4580 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:31:09,039 autoreload 10896 21760 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:31:09,063 autoreload 12588 5592 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-14 22:31:10,387 autoreload 10224 21000 Watching for file changes with StatReloader
+INFO 2025-04-14 22:31:10,440 autoreload 5200 7260 Watching for file changes with StatReloader
+INFO 2025-04-14 22:31:10,502 autoreload 5160 3784 Watching for file changes with StatReloader
+INFO 2025-04-14 22:31:10,572 autoreload 23784 7132 Watching for file changes with StatReloader
+INFO 2025-04-14 22:33:46,261 basehttp 10224 8004 "GET /accounts/user/jankowalski/ HTTP/1.1" 200 20043
+WARNING 2025-04-14 22:33:46,466 basehttp 10224 8004 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:33:49,836 basehttp 10224 18192 "GET /accounts/community/ HTTP/1.1" 200 46065
+INFO 2025-04-14 22:33:51,742 basehttp 10224 9764 "POST /accounts/user/jankowalski/follow/ HTTP/1.1" 200 82
+INFO 2025-04-14 22:33:54,597 basehttp 10224 9764 "GET /recipes/list/ HTTP/1.1" 200 46895
+WARNING 2025-04-14 22:33:54,641 basehttp 10224 9764 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 22:33:54,902 basehttp 10224 6968 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:33:56,593 basehttp 10224 4120 "GET /recipes/list/?q=&category=&diet=&followed=true HTTP/1.1" 200 30581
+WARNING 2025-04-14 22:33:57,010 basehttp 10224 4120 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:33:58,907 basehttp 10224 15164 "GET /recipes/list/?q=&category=&diet= HTTP/1.1" 200 46451
+WARNING 2025-04-14 22:33:58,969 basehttp 10224 15164 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 22:33:59,190 basehttp 10224 20748 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 22:33:59,470 basehttp 10224 16204 "GET /accounts/community/ HTTP/1.1" 200 46089

@@ -88,15 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('href');
             
             fetch(url, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
             })
             .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
+                if (data.status === 'success' || data.success === true) {
                     // Aktualizuj wygląd przycisku
                     if (data.is_following) {
                         this.innerHTML = '<i class="bi bi-person-dash me-1"></i>Przestań obserwować';

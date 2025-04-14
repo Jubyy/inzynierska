@@ -198,16 +198,20 @@ def profile_edit(request):
     
     return render(request, 'accounts/profile_edit.html', {'form': form})
 
-@login_required
 def user_profile_view(request, username):
     """Wyświetla profil innego użytkownika"""
     user = get_object_or_404(User, username=username)
     
     # Sprawdź, czy zalogowany użytkownik obserwuje tego użytkownika
-    is_following = UserFollowing.objects.filter(
-        user=request.user, 
-        followed_user=user
-    ).exists() if request.user.is_authenticated else False
+    is_following = False
+    if request.user.is_authenticated:
+        is_following = UserFollowing.objects.filter(
+            user=request.user, 
+            followed_user=user
+        ).exists()
+    
+    # Dodanie debugowania
+    print(f"DEBUG: Username: {username}, is_following: {is_following}, user authenticated: {request.user.is_authenticated}")
     
     # Pobierz publiczne przepisy użytkownika
     recipes = Recipe.objects.filter(author=user, is_public=True)
@@ -256,10 +260,11 @@ def toggle_follow(request, username):
         is_following = True
         messages.success(request, f'Zacząłeś obserwować użytkownika {username}.')
     
-    # Jeśli to żądanie AJAX, zwróć JSON
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    # Jeśli to żądanie AJAX lub POST, zwróć JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.method == 'POST':
         return JsonResponse({
             'status': 'success',
+            'success': True,  # Dodajemy dla kompatybilności z różnymi szablonami
             'is_following': is_following,
             'followers_count': UserFollowing.objects.filter(followed_user=user_to_follow).count()
         })

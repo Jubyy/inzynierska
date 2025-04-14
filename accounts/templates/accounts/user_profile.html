@@ -22,16 +22,22 @@
                         <p class="text-muted mb-2">{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
                         
                         <!-- Przycisk obserwowania -->
-                        {% if profile_user.id != request.user.id and request.user.is_authenticated %}
-                            {% if is_following %}
-                            <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-danger btn-sm follow-button" id="followButton">
-                                <i class="bi bi-person-dash me-1"></i>Przestań obserwować
-                            </a>
-                            {% else %}
-                            <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-success btn-sm follow-button" id="followButton">
-                                <i class="bi bi-person-plus me-1"></i>Obserwuj
-                            </a>
+                        {% if request.user.is_authenticated %}
+                            {% if profile_user.id != request.user.id %}
+                                {% if is_following %}
+                                <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-danger btn-sm follow-button" id="followButton">
+                                    <i class="bi bi-person-dash me-1"></i>Przestań obserwować
+                                </a>
+                                {% else %}
+                                <a href="{% url 'accounts:toggle_follow' profile_user.username %}" class="btn btn-outline-success btn-sm follow-button" id="followButton">
+                                    <i class="bi bi-person-plus me-1"></i>Obserwuj
+                                </a>
+                                {% endif %}
                             {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'accounts:user_profile' profile_user.username %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-person-plus me-1"></i>Zaloguj się, aby obserwować
+                            </a>
                         {% endif %}
                     </div>
                     
@@ -120,25 +126,34 @@
 <!-- JavaScript dla akcji śledzenia użytkownika -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Debugowanie przycisków obserwowania
+    console.log("Inicjalizacja skryptu dla przycisku obserwowania");
+    
     // Obsługa przycisku śledzenia AJAX
     const followButton = document.getElementById('followButton');
+    console.log("Przycisk obserwowania:", followButton);
     
     if (followButton) {
+        console.log("Znaleziono przycisk obserwowania, dodaję event listener");
         followButton.addEventListener('click', function(e) {
             e.preventDefault();
             
             const url = this.getAttribute('href');
+            console.log("Kliknięto przycisk obserwowania, URL:", url);
             
             fetch(url, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
             })
             .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
+                console.log("Odpowiedź z serwera:", data);
+                if (data.status === 'success' || data.success === true) {
                     // Aktualizuj wygląd przycisku
                     if (data.is_following) {
                         this.innerHTML = '<i class="bi bi-person-dash me-1"></i>Przestań obserwować';
@@ -158,6 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Błąd:', error);
             });
         });
+    } else {
+        console.log("Nie znaleziono przycisku obserwowania na stronie");
     }
     
     // Funkcja do pobierania wartości ciasteczka
