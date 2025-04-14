@@ -1334,3 +1334,27 @@ WARNING 2025-04-14 21:49:45,344 basehttp 3624 19280 "GET /static/img/testimonial
 WARNING 2025-04-14 21:49:45,348 basehttp 3624 15804 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
 INFO 2025-04-14 21:54:00,782 autoreload 23032 23908 Watching for file changes with StatReloader
 INFO 2025-04-14 21:54:24,078 basehttp 3624 10972 "GET / HTTP/1.1" 200 35490
+INFO 2025-04-14 21:57:41,423 basehttp 24228 512 "GET /accounts/register/ HTTP/1.1" 200 18322
+INFO 2025-04-14 21:57:42,214 basehttp 24228 512 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:59:09,970 basehttp 24228 12892 "GET /accounts/register/ HTTP/1.1" 200 18322
+INFO 2025-04-14 21:59:10,008 basehttp 24228 12892 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:59:13,730 basehttp 24228 12892 "POST /accounts/register/ HTTP/1.1" 302 0
+INFO 2025-04-14 21:59:13,759 basehttp 24228 12892 "GET /accounts/activation-sent/ HTTP/1.1" 200 13030
+INFO 2025-04-14 21:59:13,859 basehttp 24228 12892 "GET /accounts/register/ HTTP/1.1" 200 18322
+INFO 2025-04-14 21:59:15,428 basehttp 24228 23196 "GET /accounts/register/ HTTP/1.1" 200 18322
+INFO 2025-04-14 21:59:16,775 basehttp 24228 23196 "POST /accounts/register/ HTTP/1.1" 200 19856
+INFO 2025-04-14 21:59:18,832 basehttp 24228 23196 "GET /accounts/register/ HTTP/1.1" 200 18322
+INFO 2025-04-14 21:59:20,190 basehttp 24228 23196 "POST /accounts/register/ HTTP/1.1" 200 19866
+INFO 2025-04-14 21:59:22,286 basehttp 24228 23196 - Broken pipe from ('127.0.0.1', 52470)
+INFO 2025-04-14 21:59:22,287 basehttp 24228 22760 - Broken pipe from ('127.0.0.1', 52472)
+INFO 2025-04-14 22:00:38,350 basehttp 24228 22856 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:00:38,514 basehttp 24228 22856 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 22:00:41,646 basehttp 24228 22856 "POST /accounts/register/ HTTP/1.1" 302 0
+INFO 2025-04-14 22:00:41,662 basehttp 24228 22856 "GET /accounts/activation-sent/ HTTP/1.1" 200 13030
+INFO 2025-04-14 22:00:42,174 basehttp 24228 16388 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:00:43,245 basehttp 24228 16388 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:00:44,530 basehttp 24228 16388 "POST /accounts/register/ HTTP/1.1" 200 29028
+INFO 2025-04-14 22:00:46,690 basehttp 24228 16388 "GET /accounts/register/ HTTP/1.1" 200 27494
+INFO 2025-04-14 22:00:48,315 basehttp 24228 15100 "POST /accounts/register/ HTTP/1.1" 200 29038
+INFO 2025-04-14 22:00:50,864 basehttp 24228 15100 - Broken pipe from ('127.0.0.1', 52595)
+INFO 2025-04-14 22:00:50,864 basehttp 24228 4016 - Broken pipe from ('127.0.0.1', 52600)

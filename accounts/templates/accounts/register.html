@@ -16,7 +16,7 @@
                         <span>Uzupełnij poniższy formularz, aby utworzyć nowe konto. Wszystkie pola oznaczone * są wymagane.</span>
                     </div>
                     
-<form method="post">
+<form method="post" id="registrationForm" novalidate>
     {% csrf_token %}
                         
                         {% if form.errors %}
@@ -38,18 +38,24 @@
                         
                         <div class="mb-3">
                             <label for="{{ form.username.id_for_label }}" class="form-label">Nazwa użytkownika*</label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="bi bi-person"></i></span>
                                 {{ form.username }}
+                                <div class="invalid-feedback" id="usernameError">
+                                    Pole nazwa użytkownika jest wymagane
+                                </div>
                             </div>
                             <div class="form-text">Wybierz unikalną nazwę użytkownika (bez spacji i znaków specjalnych).</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="{{ form.email.id_for_label }}" class="form-label">Adres e-mail*</label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                 {{ form.email }}
+                                <div class="invalid-feedback" id="emailError">
+                                    Pole adres e-mail jest wymagane
+                                </div>
                             </div>
                             <div class="form-text">Podaj działający adres email, na który wyślemy link aktywacyjny.</div>
                         </div>
@@ -77,18 +83,33 @@
                         
                         <div class="mb-3">
                             <label for="{{ form.password1.id_for_label }}" class="form-label">Hasło*</label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                 {{ form.password1 }}
+                                <div class="invalid-feedback" id="password1Error">
+                                    Pole hasło jest wymagane
+                                </div>
                             </div>
                             <div class="form-text">{{ form.password1.help_text|safe }}</div>
+                            
+                            <!-- Wskaźnik siły hasła -->
+                            <div class="mt-2 d-none" id="passwordStrength">
+                                <span class="form-text mb-1">Siła hasła:</span>
+                                <div class="progress" style="height: 5px;">
+                                    <div id="passwordStrengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small id="passwordStrengthText" class="form-text text-muted">Hasło nie zostało wprowadzone</small>
+                            </div>
                         </div>
                         
                         <div class="mb-4">
                             <label for="{{ form.password2.id_for_label }}" class="form-label">Powtórz hasło*</label>
-                            <div class="input-group">
+                            <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                                 {{ form.password2 }}
+                                <div class="invalid-feedback" id="password2Error">
+                                    Pole powtórz hasło jest wymagane
+                                </div>
                             </div>
                             <div class="form-text">Wprowadź to samo hasło ponownie dla weryfikacji.</div>
                         </div>
@@ -98,6 +119,9 @@
                             <label class="form-check-label" for="termsCheck">
                                 Akceptuję <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">regulamin</a> i <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">politykę prywatności</a>
                             </label>
+                            <div class="invalid-feedback" id="termsError">
+                                Musisz zaakceptować regulamin i politykę prywatności
+                            </div>
                         </div>
                         
                         <div class="d-grid gap-2">
@@ -156,4 +180,186 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const usernameInput = document.getElementById('id_username');
+    const emailInput = document.getElementById('id_email');
+    const password1Input = document.getElementById('id_password1');
+    const password2Input = document.getElementById('id_password2');
+    const termsCheck = document.getElementById('termsCheck');
+    
+    // Wyświetlanie wskaźnika siły hasła
+    const passwordStrength = document.getElementById('passwordStrength');
+    const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+    
+    // Funkcja mierząca siłę hasła
+    function measurePasswordStrength(password) {
+        let strength = 0;
+        
+        // Jeśli hasło jest puste, zwróć 0
+        if (password.length === 0) {
+            return 0;
+        }
+        
+        // Sprawdź długość
+        strength += password.length * 4;
+        
+        // Sprawdź różnorodność znaków
+        const lowercase = /[a-z]/.test(password);
+        const uppercase = /[A-Z]/.test(password);
+        const numbers = /\d/.test(password);
+        const specialChars = /[^a-zA-Z0-9]/.test(password);
+        
+        if (lowercase) strength += 10;
+        if (uppercase) strength += 15;
+        if (numbers) strength += 15;
+        if (specialChars) strength += 20;
+        
+        // Ograniczenie wyniku do 100
+        return Math.min(100, strength);
+    }
+    
+    // Aktualizacja wskaźnika siły hasła
+    function updatePasswordStrength() {
+        const password = password1Input.value;
+        const strength = measurePasswordStrength(password);
+        
+        // Pokaż wskaźnik jeśli hasło nie jest puste
+        if (password.length > 0) {
+            passwordStrength.classList.remove('d-none');
+            passwordStrengthBar.style.width = strength + '%';
+            
+            // Ustaw kolor i tekst w zależności od siły
+            if (strength < 30) {
+                passwordStrengthBar.className = 'progress-bar bg-danger';
+                passwordStrengthText.textContent = 'Bardzo słabe';
+            } else if (strength < 50) {
+                passwordStrengthBar.className = 'progress-bar bg-warning';
+                passwordStrengthText.textContent = 'Słabe';
+            } else if (strength < 70) {
+                passwordStrengthBar.className = 'progress-bar bg-info';
+                passwordStrengthText.textContent = 'Średnie';
+            } else {
+                passwordStrengthBar.className = 'progress-bar bg-success';
+                passwordStrengthText.textContent = 'Mocne';
+            }
+        } else {
+            passwordStrength.classList.add('d-none');
+        }
+    }
+    
+    // Nasłuchuj zmian w polu hasła
+    password1Input.addEventListener('input', updatePasswordStrength);
+    
+    // Walidacja formularza przed wysłaniem
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Resetuj poprzednie błędy
+        form.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        
+        // Sprawdź nazwę użytkownika
+        if (!usernameInput.value.trim()) {
+            usernameInput.classList.add('is-invalid');
+            document.getElementById('usernameError').textContent = 'Pole nazwa użytkownika jest wymagane';
+            isValid = false;
+        } else if (usernameInput.value.length < 3) {
+            usernameInput.classList.add('is-invalid');
+            document.getElementById('usernameError').textContent = 'Nazwa użytkownika musi mieć co najmniej 3 znaki';
+            isValid = false;
+        }
+        
+        // Sprawdź email
+        if (!emailInput.value.trim()) {
+            emailInput.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Pole adres e-mail jest wymagane';
+            isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(emailInput.value)) {
+            emailInput.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Podaj prawidłowy adres e-mail';
+            isValid = false;
+        }
+        
+        // Sprawdź hasło
+        if (!password1Input.value) {
+            password1Input.classList.add('is-invalid');
+            document.getElementById('password1Error').textContent = 'Pole hasło jest wymagane';
+            isValid = false;
+        } else if (password1Input.value.length < 8) {
+            password1Input.classList.add('is-invalid');
+            document.getElementById('password1Error').textContent = 'Hasło musi mieć co najmniej 8 znaków';
+            isValid = false;
+        }
+        
+        // Sprawdź powtórzone hasło
+        if (!password2Input.value) {
+            password2Input.classList.add('is-invalid');
+            document.getElementById('password2Error').textContent = 'Pole powtórz hasło jest wymagane';
+            isValid = false;
+        } else if (password1Input.value !== password2Input.value) {
+            password2Input.classList.add('is-invalid');
+            document.getElementById('password2Error').textContent = 'Hasła nie są identyczne';
+            isValid = false;
+        }
+        
+        // Sprawdź akceptację regulaminu
+        if (!termsCheck.checked) {
+            termsCheck.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Wyświetl ogólny komunikat o błędach na górze formularza
+            if (!document.querySelector('.alert-danger')) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger mb-4';
+                alertDiv.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i><span>Popraw poniższe błędy:</span>';
+                form.insertBefore(alertDiv, form.firstChild);
+            }
+            
+            // Przewiń do formularza
+            form.scrollIntoView({behavior: 'smooth'});
+        }
+    });
+    
+    // Walidacja nazwy użytkownika na bieżąco
+    usernameInput.addEventListener('blur', function() {
+        if (this.value.trim() && this.value.length < 3) {
+            this.classList.add('is-invalid');
+            document.getElementById('usernameError').textContent = 'Nazwa użytkownika musi mieć co najmniej 3 znaki';
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    // Walidacja email na bieżąco
+    emailInput.addEventListener('blur', function() {
+        if (this.value.trim() && !/\S+@\S+\.\S+/.test(this.value)) {
+            this.classList.add('is-invalid');
+            document.getElementById('emailError').textContent = 'Podaj prawidłowy adres e-mail';
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+    
+    // Walidacja zgodności haseł na bieżąco
+    password2Input.addEventListener('input', function() {
+        if (password1Input.value && this.value && password1Input.value !== this.value) {
+            this.classList.add('is-invalid');
+            document.getElementById('password2Error').textContent = 'Hasła nie są identyczne';
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+});
+</script>
 {% endblock %}

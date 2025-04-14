@@ -37,10 +37,10 @@ II. TESTY MODUŁU UŻYTKOWNIKÓW
 ===========================================================
 
 1. Rejestracja
-   [ ] Poprawna rejestracja z poprawnymi danymi
-   [ ] Walidacja pól formularza
-   [ ] Obsługa błędów (np. zajęty login/email)
-   [ ] Przekierowanie po udanej rejestracji
+   [x] Poprawna rejestracja z poprawnymi danymi
+   [x] Walidacja pól formularza
+   [x] Obsługa błędów (np. zajęty login/email)
+   [x] Przekierowanie po udanej rejestracji
 
 2. Logowanie
    [ ] Poprawne logowanie z prawidłowymi danymi
@@ -192,5 +192,15 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - Menu jest responsywne i prawidłowo dostosowuje się do różnych szerokości ekranu (testowano na desktop, tablet, mobile)
    - Rozwijane menu użytkownika zawiera wszystkie potrzebne opcje i działa poprawnie
    - Elementy dla zalogowanych/niezalogowanych użytkowników wyświetlają się zgodnie z oczekiwaniami
+
+2. Testy modułu użytkownika - Rejestracja:
+   - BŁĄD: Formularz rejestracji miał słabą walidację pól formularza po stronie klienta, co mogło prowadzić do rejestracji z niewłaściwymi danymi.
+   - BŁĄD: Brak wizualnego wskaźnika siły hasła dla użytkownika.
+   - BŁĄD: Podczas testów automatycznych elementy strony mogły być niedostępne do kliknięcia.
+   - POPRAWKA: Dodano rozbudowaną walidację JavaScript po stronie klienta, która sprawdza poprawność danych.
+   - POPRAWKA: Zaimplementowano wizualny wskaźnik siły hasła, który zmienia kolor w zależności od mocy hasła.
+   - POPRAWKA: Dodano lepsze wyświetlanie błędów walidacji - komunikaty są teraz wyraźniejsze i pojawiają się bezpośrednio przy polach.
+   - POPRAWKA: Wprowadzono walidację w czasie rzeczywistym dla pól email i zgodności haseł.
+   - POPRAWKA: Ulepszono testy automatyczne, aby działały niezawodnie w różnych środowiskach.
 
 [TUTAJ BĘDĄ DOKUMENTOWANE ZNALEZIONE BŁĘDY I POPRAWKI] 
