@@ -300,7 +300,7 @@ class RecipeAvailabilityTest(TestCase):
         
         # Sprawdzenie czy lista brakujących składników jest pusta
         missing_ingredients = self.potato_recipe.get_missing_ingredients(self.user)
-        self.assertIsNone(missing_ingredients)
+        self.assertEqual(missing_ingredients, [])
 
 
 class RecipeFilteringTest(TestCase):

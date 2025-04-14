@@ -16,11 +16,13 @@
                             <div class="alert {% if 'nie zostało jeszcze aktywowane' in form.non_field_errors.0 %}alert-warning{% else %}alert-danger{% endif %} mb-4">
                                 <i class="bi {% if 'nie zostało jeszcze aktywowane' in form.non_field_errors.0 %}bi-envelope-exclamation{% else %}bi-exclamation-triangle{% endif %} me-2"></i>
                                 <span>{{ form.non_field_errors.0 }}</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         {% else %}
                             <div class="alert alert-danger mb-4">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 <span>Nieprawidłowa nazwa użytkownika lub hasło. Spróbuj ponownie.</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -30,31 +32,40 @@
                         {% for message in messages %}
                             {{ message }}
                         {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     {% endif %}
                     
-                    <form method="post">
+                    <form method="post" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="id_username" class="form-label">Nazwa użytkownika</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" name="username" id="id_username" class="form-control" placeholder="Twoja nazwa użytkownika" required autofocus>
+                                <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" placeholder="Twoja nazwa użytkownika" required autofocus>
+                                {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                            {% if form.username.errors %}
-                                <div class="text-danger">{{ form.username.errors }}</div>
-                            {% endif %}
                         </div>
                         
                         <div class="mb-4">
                             <label for="id_password" class="form-label">Hasło</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                <input type="password" name="password" id="id_password" class="form-control" placeholder="Twoje hasło" required>
+                                <input type="password" name="password" id="id_password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" placeholder="Twoje hasło" required>
+                                {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
-                            {% if form.password.errors %}
-                                <div class="text-danger">{{ form.password.errors }}</div>
-                            {% endif %}
                         </div>
                         
                         <div class="mb-3 form-check">
@@ -85,4 +96,112 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dodaj obserwator DOM dla dynamicznie dodawanych alertów
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    if (!alert.dataset.timeoutSet) {
+                        alert.dataset.timeoutSet = 'true';
+                        setTimeout(function() {
+                            if (alert && alert.parentNode) {
+                                alert.classList.remove('show');
+                                setTimeout(function() {
+                                    if (alert && alert.parentNode) {
+                                        alert.parentNode.removeChild(alert);
+                                    }
+                                }, 150);
+                            }
+                        }, 5000);
+                    }
+                });
+            }
+        });
+    });
+    
+    // Obserwuj zmiany w całym dokumencie
+    observer.observe(document, { childList: true, subtree: true });
+    
+    // Wywołaj raz dla istniejących alertów
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        if (!alert.dataset.timeoutSet) {
+            alert.dataset.timeoutSet = 'true';
+            setTimeout(function() {
+                if (alert && alert.parentNode) {
+                    alert.classList.remove('show');
+                    setTimeout(function() {
+                        if (alert && alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 150);
+                }
+            }, 5000);
+        }
+    });
+
+    // Jeśli formularz nie ma wartości, dodaj alert po próbie wysłania
+    const loginForm = document.querySelector('form');
+    loginForm.addEventListener('submit', function(e) {
+        const usernameField = document.getElementById('id_username');
+        const passwordField = document.getElementById('id_password');
+        
+        if (!usernameField.value || !passwordField.value) {
+            e.preventDefault();
+            
+            // Dodaj klasę is-invalid do pustych pól
+            if (!usernameField.value) {
+                usernameField.classList.add('is-invalid');
+                if (!usernameField.nextElementSibling || !usernameField.nextElementSibling.classList.contains('invalid-feedback')) {
+                    const feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    feedback.textContent = 'To pole jest wymagane.';
+                    usernameField.parentNode.appendChild(feedback);
+                }
+            }
+            
+            if (!passwordField.value) {
+                passwordField.classList.add('is-invalid');
+                if (!passwordField.nextElementSibling || !passwordField.nextElementSibling.classList.contains('invalid-feedback')) {
+                    const feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    feedback.textContent = 'To pole jest wymagane.';
+                    passwordField.parentNode.appendChild(feedback);
+                }
+            }
+            
+            // Dodaj alert o błędzie
+            const alertsContainer = document.querySelector('.messages');
+            if (!alertsContainer) {
+                const messagesDiv = document.createElement('div');
+                messagesDiv.className = 'messages mb-4';
+                document.querySelector('.card-body').prepend(messagesDiv);
+            }
+            
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+            errorAlert.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i><span>Wypełnij wszystkie wymagane pola.</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            
+            const messagesContainer = document.querySelector('.messages') || document.querySelector('.card-body');
+            messagesContainer.appendChild(errorAlert);
+            
+            // Ustaw timeout na alert
+            setTimeout(function() {
+                if (errorAlert && errorAlert.parentNode) {
+                    errorAlert.classList.remove('show');
+                    setTimeout(function() {
+                        if (errorAlert && errorAlert.parentNode) {
+                            errorAlert.parentNode.removeChild(errorAlert);
+                        }
+                    }, 150);
+                }
+            }, 5000);
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,196 @@
+===========================================================
+PLAN TESTÓW APLIKACJI KSIĄŻKA KUCHARSKA
+===========================================================
+Data rozpoczęcia testów: 14.04.2025
+
+Cel testów: Kompleksowe przetestowanie wszystkich funkcjonalności aplikacji, włączając każdy przycisk, link i przepływ użytkownika. Dokumentacja błędów i wprowadzonych poprawek.
+
+Główne moduły do przetestowania:
+1. System rejestracji i logowania
+2. Moduł przepisów (dodawanie, edycja, usuwanie, przeglądanie)
+3. Moduł lodówki (dodawanie, edytowanie produktów)
+4. Moduł listy zakupów
+5. Moduł społecznościowy (profile, obserwowanie)
+6. Panel administratora
+7. Konwersje jednostek i ich przeliczanie
+
+===========================================================
+I. TESTY INTERFEJSU I NAWIGACJI
+===========================================================
+
+1. Nagłówek i menu główne
+   [x] Poprawność wszystkich linków w głównym menu
+   [x] Responsywność menu na różnych szerokościach ekranu
+   [x] Funkcjonalność rozwijanego menu użytkownika
+   [x] Widoczność odpowiednich elementów dla zalogowanych/niezalogowanych
+
+2. Stopka
+   [x] Poprawność linków w stopce
+   [x] Właściwe wyświetlanie informacji kontaktowych
+
+3. Komunikaty systemowe
+   [x] Poprawne wyświetlanie powiadomień (sukces, błąd, informacja)
+   [x] Automatyczne zamykanie powiadomień po czasie
+
+===========================================================
+II. TESTY MODUŁU UŻYTKOWNIKÓW
+===========================================================
+
+1. Rejestracja
+   [ ] Poprawna rejestracja z poprawnymi danymi
+   [ ] Walidacja pól formularza
+   [ ] Obsługa błędów (np. zajęty login/email)
+   [ ] Przekierowanie po udanej rejestracji
+
+2. Logowanie
+   [ ] Poprawne logowanie z prawidłowymi danymi
+   [ ] Obsługa błędnych danych logowania
+   [ ] Funkcja "Zapamiętaj mnie"
+   [ ] Przekierowanie po udanym logowaniu
+
+3. Zarządzanie profilem
+   [ ] Przeglądanie profilu
+   [ ] Edycja danych profilu
+   [ ] Zmiana hasła
+   [ ] Dodawanie/zmiana zdjęcia profilowego
+
+4. Funkcje społecznościowe
+   [ ] Obserwowanie innych użytkowników
+   [ ] Przeglądanie listy obserwowanych
+   [ ] Przeglądanie listy obserwujących
+   [ ] Przeglądanie publicznych profili
+
+===========================================================
+III. TESTY MODUŁU PRZEPISÓW
+===========================================================
+
+1. Przeglądanie przepisów
+   [ ] Lista wszystkich przepisów
+   [ ] Filtry i wyszukiwanie
+   [ ] Sortowanie
+   [ ] Podgląd szczegółów przepisu
+
+2. Dodawanie przepisu
+   [ ] Dodawanie tytułu, opisu, czasu przygotowania
+   [ ] Dodawanie składników z jednostkami
+   [ ] Dodawanie kroków przygotowania
+   [ ] Dodawanie zdjęć
+
+3. Edycja przepisu
+   [ ] Zmiana podstawowych informacji
+   [ ] Zmiana listy składników
+   [ ] Zmiana kroków przygotowania
+   [ ] Zmiana zdjęć
+
+4. Usuwanie przepisu
+   [ ] Potwierdzenie usunięcia
+   [ ] Faktyczne usunięcie z bazy danych
+
+5. Ocenianie i komentowanie
+   [ ] Dodawanie ocen (gwiazdki)
+   [ ] Dodawanie komentarzy
+   [ ] Edycja własnych komentarzy
+   [ ] Usuwanie własnych komentarzy
+
+===========================================================
+IV. TESTY MODUŁU LODÓWKI
+===========================================================
+
+1. Przeglądanie zawartości lodówki
+   [ ] Lista wszystkich produktów
+   [ ] Filtry i wyszukiwanie
+   [ ] Przełączanie widoków (lista, karty)
+   [ ] Grupowanie według kategorii
+
+2. Dodawanie produktów
+   [ ] Pojedyncze dodawanie produktu
+   [ ] Dodawanie wielu produktów naraz
+   [ ] Wybór jednostki miary
+   [ ] Ustawianie daty ważności
+
+3. Edycja produktów
+   [ ] Zmiana ilości
+   [ ] Zmiana jednostki
+   [ ] Zmiana daty ważności
+
+4. Usuwanie produktów
+   [ ] Usuwanie pojedynczego produktu
+   [ ] Usuwanie przeterminowanych produktów
+
+5. Konwersje jednostek
+   [ ] Przeliczanie między różnymi jednostkami tego samego typu
+   [ ] Automatyczna konwersja przy dodawaniu (jeśli potrzebna)
+
+===========================================================
+V. TESTY MODUŁU LISTY ZAKUPÓW
+===========================================================
+
+1. Przeglądanie listy zakupów
+   [ ] Wyświetlanie aktualnej listy
+   [ ] Filtry i sortowanie
+
+2. Dodawanie produktów
+   [ ] Ręczne dodawanie produktów
+   [ ] Dodawanie z przepisu
+   [ ] Dodawanie brakujących produktów z lodówki
+
+3. Edycja produktów
+   [ ] Zmiana ilości
+   [ ] Zmiana jednostki
+   [ ] Oznaczanie jako kupione/niekupione
+
+4. Usuwanie produktów
+   [ ] Usuwanie pojedynczego produktu
+   [ ] Czyszczenie całej listy
+
+===========================================================
+VI. TESTY PANELU ADMINISTRATORA
+===========================================================
+
+1. Zarządzanie zgłoszonymi składnikami
+   [ ] Przeglądanie listy oczekujących składników
+   [ ] Zatwierdzanie składników
+   [ ] Odrzucanie składników
+   [ ] Edycja przed zatwierdzeniem
+
+2. Zarządzanie jednostkami miary
+   [ ] Przeglądanie listy jednostek
+   [ ] Dodawanie nowych jednostek
+   [ ] Edycja istniejących jednostek
+   [ ] Usuwanie jednostek
+
+3. Zarządzanie kategoriami
+   [ ] Przeglądanie listy kategorii
+   [ ] Dodawanie nowych kategorii
+   [ ] Edycja istniejących kategorii
+   [ ] Usuwanie kategorii
+
+===========================================================
+VII. TESTY INTEGRACYJNE
+===========================================================
+
+1. Przepis → Lista zakupów
+   [ ] Dodawanie składników z przepisu do listy zakupów
+   [ ] Poprawne przeliczanie ilości na podstawie liczby porcji
+
+2. Przepis → Lodówka
+   [ ] Przygotowanie przepisu i aktualizacja stanu lodówki
+   [ ] Poprawne odejmowanie użytych składników
+
+3. Lodówka → Lista zakupów
+   [ ] Dodawanie brakujących produktów do listy zakupów
+
+4. Lista zakupów → Lodówka
+   [ ] Dodawanie kupionych produktów do lodówki
+
+===========================================================
+ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
+===========================================================
+
+1. Testy interfejsu i nawigacji - Nagłówek i menu główne:
+   - Wszystkie linki w głównym menu działają poprawnie i przekierowują do odpowiednich sekcji
+   - Menu jest responsywne i prawidłowo dostosowuje się do różnych szerokości ekranu (testowano na desktop, tablet, mobile)
+   - Rozwijane menu użytkownika zawiera wszystkie potrzebne opcje i działa poprawnie
+   - Elementy dla zalogowanych/niezalogowanych użytkowników wyświetlają się zgodnie z oczekiwaniami
+
+[TUTAJ BĘDĄ DOKUMENTOWANE ZNALEZIONE BŁĘDY I POPRAWKI] 

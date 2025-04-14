@@ -136,10 +136,11 @@ class ConversionTableEntryInline(admin.TabularInline):
 
 @admin.register(ConversionTable)
 class ConversionTableAdmin(admin.ModelAdmin):
-    list_display = ['name', 'product_type', 'is_approved', 'created_by', 'created_at']
-    search_fields = ['name', 'product_type']
-    list_filter = ['product_type', 'is_approved', 'created_at']
+    list_display = ['name', 'category', 'is_for_liquids', 'is_approved', 'created_by', 'created_at']
+    search_fields = ['name', 'category__name']
+    list_filter = ['category', 'is_for_liquids', 'is_approved', 'created_at']
     inlines = [ConversionTableEntryInline]
+    autocomplete_fields = ['category', 'created_by']
     actions = ['mark_as_approved', 'mark_as_not_approved']
     
     def mark_as_approved(self, request, queryset):

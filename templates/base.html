@@ -95,11 +95,9 @@
                                 <i class="bi bi-speedometer2 me-1"></i>Panel
                             </a>
                             {% if user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-outline-primary me-2" href="{% url 'recipes:admin_pending_ingredients' %}">
-                                    <i class="fas fa-tools"></i> Panel Administratora
-                                </a>
-                            </li>
+                            <a class="btn btn-outline-danger me-2" href="{% url 'recipes:admin_pending_ingredients' %}">
+                                <i class="bi bi-tools me-1"></i> Panel Administratora
+                            </a>
                             {% endif %}
                             <div class="dropdown">
                                 <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center w-100 justify-content-center justify-content-lg-start" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -197,11 +195,9 @@
                 </div>
                 <div class="col-lg-4">
                     <h5 class="text-uppercase mb-4">Kontakt</h5>
-                    <p><i class="bi bi-envelope me-2"></i>kontakt@ksiazkakucharska.pl</p>
+                    <p><i class="bi bi-envelope me-2"></i>zywicafilip08@gmail.com</p>
                     <div class="d-flex mt-4">
-                        <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
-                        <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
-                        <a href="#" class="text-white"><i class="bi bi-youtube fs-5"></i></a>
+                        <a href="https://www.linkedin.com/in/filip-żywica-aa9941232/" target="_blank" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
                     </div>
                 </div>
             </div>
@@ -250,31 +246,44 @@
             }
             
             // Automatyczne zamykanie powiadomień po 5 sekundach
-            setTimeout(function() {
-                $('.alert').alert('close');
-            }, 5000);
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                alerts.forEach(function(alert) {
+                    // Użyj jQuery do zamykania powiadomień, kompatybilne z Bootstrap 5
+                    setTimeout(function() {
+                        $(alert).alert('close');
+                    }, 5000);
+                });
+            }
             
-            {% if request.session.recipe_prepared %}
-            var recipeData = {
-                title: "{{ request.session.recipe_prepared.recipe_title|escapejs }}",
-                servings: "{{ request.session.recipe_prepared.servings|escapejs }}",
-                timestamp: "{{ request.session.recipe_prepared.timestamp|escapejs }}"
-            };
+            // Obsługa modalu dla przygotowanych przepisów - safe JS bez problemów z składnią szablonów
+            const recipeNameElement = document.getElementById('recipe-name');
+            const recipeServingsElement = document.getElementById('recipe-servings');
+            const recipeTimestampElement = document.getElementById('recipe-timestamp');
+            const recipeModal = document.getElementById('recipeSuccessModal');
             
-            document.getElementById('recipe-name').textContent = recipeData.title;
-            document.getElementById('recipe-servings').textContent = recipeData.servings;
-            document.getElementById('recipe-timestamp').textContent = recipeData.timestamp;
-            
-            var successModal = new bootstrap.Modal(document.getElementById('recipeSuccessModal'));
-            successModal.show();
-            
-            fetch("{% url 'recipes:clear_prepared_recipe' %}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': "{{ csrf_token }}"
-                }
-            });
-            {% endif %}
+            if (recipeNameElement && recipeServingsElement && recipeTimestampElement && recipeModal) {
+                // Dane zostaną wstawione przez szablon Django, jeśli są dostępne
+                var hasRecipeData = false;
+                
+                {% if request.session.recipe_prepared %}
+                hasRecipeData = true;
+                recipeNameElement.textContent = "{{ request.session.recipe_prepared.recipe_title|escapejs }}";
+                recipeServingsElement.textContent = "{{ request.session.recipe_prepared.servings|escapejs }}";
+                recipeTimestampElement.textContent = "{{ request.session.recipe_prepared.timestamp|escapejs }}";
+                
+                var successModal = new bootstrap.Modal(recipeModal);
+                successModal.show();
+                
+                // Wyślij żądanie o wyczyszczenie sesji
+                fetch("{% url 'recipes:clear_prepared_recipe' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': "{{ csrf_token }}"
+                    }
+                });
+                {% endif %}
+            }
         });
     </script>
     

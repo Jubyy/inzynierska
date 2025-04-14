@@ -58,24 +58,23 @@
                                                     <form method="post" action="{% url 'recipes:admin_approve_ingredient' ingredient.id %}">
                                                         {% csrf_token %}
                                                         <div class="modal-body">
-                                                            <div class="row mb-4">
+                                                            <div class="row">
                                                                 <div class="col-md-6">
-                                                                    <h6>Informacje podstawowe</h6>
-                                                                    <dl class="row">
-                                                                        <dt class="col-sm-4">Nazwa:</dt>
-                                                                        <dd class="col-sm-8">{{ ingredient.name }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-4">Kategoria:</dt>
-                                                                        <dd class="col-sm-8">{{ ingredient.category.name }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-4">Opis:</dt>
-                                                                        <dd class="col-sm-8">{{ ingredient.description|default:"Brak opisu" }}</dd>
-                                                                    </dl>
+                                                                    <h6>Podstawowe informacje</h6>
+                                                                    <p>{{ ingredient.description|default:"Brak opisu" }}</p>
                                                                 </div>
-                                                                
                                                                 <div class="col-md-6">
                                                                     <h6>Dodatkowe informacje</h6>
                                                                     <dl class="row">
+                                                                        <dt class="col-sm-4">Wybrana tablica konwersji:</dt>
+                                                                        <dd class="col-sm-8">
+                                                                            {% if ingredient.conversion_table %}
+                                                                                <span class="badge bg-info">{{ ingredient.conversion_table.name }}</span>
+                                                                            {% else %}
+                                                                                <span class="text-muted">Nie wybrano</span>
+                                                                            {% endif %}
+                                                                        </dd>
+                                                                        
                                                                         <dt class="col-sm-4">Średnia waga sztuki:</dt>
                                                                         <dd class="col-sm-8">
                                                                             {% if ingredient.piece_weight %}
@@ -107,17 +106,19 @@
                                                                         class="form-select" required>
                                                                     <option value="">-- Wybierz tablicę konwersji --</option>
                                                                     {% for table in conversion_tables %}
-                                                                        <optgroup label="{{ table.grouper }}">
-                                                                            {% for ct in table.list %}
-                                                                                <option value="{{ ct.id }}">
-                                                                                    {{ ct.name }} ({{ ct.entries.count }} przeliczników)
-                                                                                </option>
-                                                                            {% endfor %}
-                                                                        </optgroup>
+                                                                        <option value="{{ table.id }}" {% if ingredient.conversion_table and ingredient.conversion_table.id == table.id %}selected{% endif %}>
+                                                                            {{ table.category.name }} - {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %} ({{ table.entries.count }} przeliczników)
+                                                                        </option>
                                                                     {% endfor %}
                                                                 </select>
                                                                 <div class="form-text">
-                                                                    Wybierz odpowiednią tablicę konwersji dla tego składnika, która zawiera przeliczniki między różnymi jednostkami.
+                                                                    Wybierz tablicę konwersji powiązaną z kategorią produktu. Każda kategoria ma swoje dedykowane tablice konwersji.
+                                                                    {% if ingredient.conversion_table %}
+                                                                    <div class="mt-1 text-success">
+                                                                        <i class="fas fa-info-circle"></i> 
+                                                                        Użytkownik wybrał tablicę konwersji: {{ ingredient.conversion_table.name }}
+                                                                    </div>
+                                                                    {% endif %}
                                                                 </div>
                                                             </div>
                                                             
@@ -286,14 +287,17 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        <a href="{% url 'recipes:conversion_tables' %}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-exchange-alt me-2"></i> Zarządzaj tablicami konwersji
+                        <a href="{% url 'recipes:submit_ingredient' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle me-2"></i> Zgłoś nowy składnik
                         </a>
                         <a href="{% url 'recipes:list' %}" class="list-group-item list-group-item-action">
                             <i class="fas fa-utensils me-2"></i> Przeglądaj przepisy
                         </a>
-                        <a href="/admin/recipes/useringredient/" class="list-group-item list-group-item-action">
-                            <i class="fas fa-toolbox me-2"></i> Panel administracyjny składników
+                        <a href="{% url 'fridge:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-basket me-2"></i> Zarządzaj lodówką
+                        </a>
+                        <a href="/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-home me-2"></i> Strona główna
                         </a>
                     </div>
                 </div>

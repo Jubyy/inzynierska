@@ -1377,15 +1377,17 @@ def submit_ingredient(request):
     class UserIngredientForm(forms.ModelForm):
         class Meta:
             model = UserIngredient
-            fields = ['name', 'category', 'description', 'piece_weight']
+            fields = ['name', 'category', 'description', 'piece_weight', 'conversion_table']
             widgets = {
                 'description': forms.Textarea(attrs={'rows': 3}),
             }
             labels = {
                 'piece_weight': 'Średnia waga sztuki',
+                'conversion_table': 'Tablica konwersji',
             }
             help_texts = {
                 'piece_weight': 'Opcjonalne - podaj jeśli wiesz ile waży jedna sztuka składnika (w gramach)',
+                'conversion_table': 'Wybierz odpowiednią tablicę konwersji dla tego składnika',
             }
     
     if request.method == 'POST':
@@ -1394,11 +1396,47 @@ def submit_ingredient(request):
             ingredient = form.save(commit=False)
             ingredient.user = request.user
             ingredient.status = 'pending'
-            # Domyślne wartości dla pól, które zostaną uzupełnione przez administratora
-            ingredient.conversion_table = None
-            ingredient.default_unit = None
-            ingredient.unit_type = 'weight_volume'  # domyślny typ jednostek
-            ingredient.density = None
+            
+            # Podstawowe parametry
+            conversion_table = form.cleaned_data.get('conversion_table')
+            ingredient.conversion_table = conversion_table
+            
+            # Ustaw domyślną jednostkę i typ jednostek na podstawie tablicy konwersji
+            if conversion_table:
+                # Znajdź domyślną jednostkę na podstawie product_type
+                default_unit = None
+                unit_type = 'weight_volume'  # domyślnie
+                
+                if 'Płyny' in conversion_table.product_type:
+                    # Dla płynów, ustaw domyślną jednostkę ml
+                    try:
+                        default_unit = MeasurementUnit.objects.get(symbol='ml')
+                        unit_type = 'volume_spoon'
+                    except MeasurementUnit.DoesNotExist:
+                        pass
+                elif ingredient.piece_weight:
+                    # Jeśli podano wagę sztuki, prawdopodobnie to produkt liczony w sztukach
+                    try:
+                        default_unit = MeasurementUnit.objects.get(symbol='szt')
+                        unit_type = 'weight_piece'
+                    except MeasurementUnit.DoesNotExist:
+                        pass
+                else:
+                    # Dla innych produktów, ustaw domyślną jednostkę g
+                    try:
+                        default_unit = MeasurementUnit.objects.get(symbol='g')
+                        unit_type = 'weight_volume'
+                    except MeasurementUnit.DoesNotExist:
+                        pass
+                
+                ingredient.default_unit = default_unit
+                ingredient.unit_type = unit_type
+            else:
+                # Brak tablicy konwersji - ustaw domyślne wartości
+                ingredient.default_unit = None
+                ingredient.unit_type = 'weight_volume'  # domyślny typ jednostek
+            
+            ingredient.density = None  # domyślnie brak gęstości
             ingredient.save()
             
             messages.success(request, f'Składnik "{ingredient.name}" został zgłoszony i oczekuje na zatwierdzenie przez administratora.')
@@ -1411,8 +1449,23 @@ def submit_ingredient(request):
     else:
         form = UserIngredientForm()
     
+    # Pobierz tablice konwersji pogrupowane według kategorii
+    conversion_tables = ConversionTable.objects.filter(is_approved=True).order_by('category__name', 'name')
+    grouped_tables = []
+    
+    # Grupuję według kategorii produktów
+    categories = IngredientCategory.objects.all()
+    for category in categories:
+        tables = conversion_tables.filter(category=category)
+        if tables.exists():
+            grouped_tables.append({
+                'category_name': category.name,
+                'tables': list(tables)
+            })
+    
     return render(request, 'recipes/submit_ingredient.html', {
-        'form': form
+        'form': form,
+        'grouped_tables': grouped_tables
     })
 
 @login_required
@@ -1439,21 +1492,14 @@ def admin_pending_ingredients(request):
     pending = UserIngredient.objects.filter(status='pending').order_by('-submitted_at')
     recent = UserIngredient.objects.exclude(status='pending').order_by('-submitted_at')[:10]
     
-    # Pogrupowane tablice konwersji
-    conversion_tables = ConversionTable.objects.filter(is_approved=True).order_by('product_type', 'name')
-    grouped_tables = []
-    
-    from itertools import groupby
-    for product_type, tables in groupby(conversion_tables, key=lambda x: x.product_type):
-        grouped_tables.append({
-            'grouper': product_type,
-            'list': list(tables)
-        })
+    # Pobierz wszystkie zatwierdzone tablice konwersji
+    conversion_tables = ConversionTable.objects.filter(is_approved=True).order_by('category__name', 'name')
     
     # Pogrupowane jednostki miary
     measurement_units = MeasurementUnit.objects.all().order_by('type', 'name')
     grouped_units = []
     
+    from itertools import groupby
     for unit_type, units in groupby(measurement_units, key=lambda x: x.get_type_display()):
         grouped_units.append({
             'grouper': unit_type,
@@ -1466,7 +1512,7 @@ def admin_pending_ingredients(request):
     return render(request, 'recipes/admin/pending_ingredients.html', {
         'pending_ingredients': pending,
         'recent_ingredients': recent,
-        'conversion_tables': grouped_tables,
+        'conversion_tables': conversion_tables,
         'measurement_units': grouped_units,
         'unit_types': unit_types
     })

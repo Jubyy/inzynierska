@@ -639,3 +639,698 @@ WARNING 2025-04-11 01:11:20,100 basehttp 24476 23600 "GET /static/img/testimonia
 WARNING 2025-04-11 01:11:20,103 basehttp 24476 17280 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
 WARNING 2025-04-11 01:11:20,111 basehttp 24476 14504 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
 WARNING 2025-04-11 01:11:20,111 basehttp 24476 6780 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 19:29:30,509 autoreload 15336 14408 Watching for file changes with StatReloader
+INFO 2025-04-14 19:41:32,821 autoreload 15336 14408 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 19:41:35,396 autoreload 13448 4216 Watching for file changes with StatReloader
+WARNING 2025-04-14 19:52:41,903 log 13448 3712 Not Found: /favicon.ico
+WARNING 2025-04-14 19:52:41,956 basehttp 13448 3712 "GET /favicon.ico HTTP/1.1" 404 4613
+INFO 2025-04-14 19:52:43,608 basehttp 13448 3712 "GET /shopping/ HTTP/1.1" 200 14558
+INFO 2025-04-14 19:52:43,735 basehttp 13448 3712 "GET /static/css/style.css HTTP/1.1" 304 0
+INFO 2025-04-14 19:52:43,736 basehttp 13448 2332 "GET /static/img/user-placeholder.svg HTTP/1.1" 304 0
+INFO 2025-04-14 19:52:45,373 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,422 utils 13448 11564 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-14 19:52:45,436 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,436 utils 13448 11564 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 19:52:45,446 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 19:52:45,447 utils 13448 11564 Konwersja: 127.0 g -> 127.0 g -> 1.0583333333333333 szt
+INFO 2025-04-14 19:52:45,448 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 19:52:45,448 utils 13448 11564 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 19:52:45,462 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,476 utils 13448 11564 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-14 19:52:45,478 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,479 utils 13448 11564 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 19:52:45,488 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,501 utils 13448 11564 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-14 19:52:45,502 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,502 utils 13448 11564 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 19:52:45,525 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,525 utils 13448 11564 Konwersja: 400.0 g -> 400.0 g -> 5.333333333333333 szt
+INFO 2025-04-14 19:52:45,527 utils 13448 11564 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 19:52:45,528 utils 13448 11564 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+WARNING 2025-04-14 19:52:45,540 utils 13448 11564 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Bazylia
+INFO 2025-04-14 19:52:45,578 basehttp 13448 11564 "GET /fridge/ HTTP/1.1" 200 22543
+INFO 2025-04-14 19:52:47,773 basehttp 13448 11564 "GET /fridge/clean-expired/ HTTP/1.1" 200 14746
+INFO 2025-04-14 19:52:49,086 basehttp 13448 11564 "POST /fridge/clean-expired/ HTTP/1.1" 302 0
+INFO 2025-04-14 19:52:49,114 basehttp 13448 11564 "GET /fridge/list/ HTTP/1.1" 200 30556
+INFO 2025-04-14 19:52:52,545 basehttp 13448 11564 "GET /recipes/ingredient/submit/ HTTP/1.1" 200 24395
+INFO 2025-04-14 19:53:17,995 basehttp 13448 3788 "POST /recipes/ingredient/submit/ HTTP/1.1" 302 0
+INFO 2025-04-14 19:53:18,016 basehttp 13448 3788 "GET /recipes/ingredient/my-submissions/ HTTP/1.1" 200 16781
+INFO 2025-04-14 19:53:23,048 basehttp 13448 3788 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 200 83346
+INFO 2025-04-14 19:58:44,906 autoreload 13448 4216 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-14 19:58:47,454 autoreload 23756 18724 Watching for file changes with StatReloader
+INFO 2025-04-14 20:04:11,770 autoreload 23756 18724 D:\praca_inzynierska\recipes\admin.py changed, reloading.
+INFO 2025-04-14 20:04:12,483 autoreload 19308 6620 Watching for file changes with StatReloader
+ERROR 2025-04-14 20:05:14,961 log 19308 13744 Internal Server Error: /recipes/admin/pending-ingredients/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: recipes_conversiontable.category_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 1499, in admin_pending_ingredients
+    for category in categories:
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 384, in __iter__
+    self._fetch_all()
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1937, in _fetch_all
+    self._prefetch_related_objects()
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1325, in _prefetch_related_objects
+    prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 2383, in prefetch_related_objects
+    obj_list, additional_lookups = prefetch_one_level(
+                                   ^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 2547, in prefetch_one_level
+    ) = prefetcher.get_prefetch_querysets(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 797, in get_prefetch_querysets
+    for rel_obj in queryset:
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 384, in __iter__
+    self._fetch_all()
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1935, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1622, in execute_sql
+    cursor.execute(sql, params)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: recipes_conversiontable.category_id
+ERROR 2025-04-14 20:05:14,995 basehttp 19308 13744 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 500 177830
+INFO 2025-04-14 20:05:19,537 autoreload 19308 6620 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-14 20:05:20,565 autoreload 16240 17304 Watching for file changes with StatReloader
+INFO 2025-04-14 20:07:15,036 basehttp 16240 12148 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 200 88184
+INFO 2025-04-14 20:07:18,465 basehttp 16240 12148 "GET /accounts/community/ HTTP/1.1" 200 42514
+INFO 2025-04-14 20:07:19,339 utils 16240 12148 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:19,341 utils 16240 12148 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:19,350 utils 16240 12148 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:19,350 utils 16240 12148 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:19,362 utils 16240 12148 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:19,362 utils 16240 12148 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:19,375 utils 16240 12148 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:19,381 utils 16240 12148 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:19,399 utils 16240 12148 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:19,399 utils 16240 12148 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:19,453 basehttp 16240 12148 "GET /recipes/list/ HTTP/1.1" 200 47266
+INFO 2025-04-14 20:07:19,505 basehttp 16240 12148 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+WARNING 2025-04-14 20:07:19,520 basehttp 16240 12148 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:07:19,721 basehttp 16240 4816 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:07:21,703 basehttp 16240 17712 "GET /accounts/community/ HTTP/1.1" 200 42514
+INFO 2025-04-14 20:07:23,027 utils 16240 17712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:23,028 utils 16240 17712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:23,038 utils 16240 17712 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:23,038 utils 16240 17712 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:23,065 utils 16240 17712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:23,066 utils 16240 17712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:23,083 utils 16240 17712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:23,083 utils 16240 17712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:23,105 utils 16240 17712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:23,105 utils 16240 17712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:23,156 basehttp 16240 17712 "GET /fridge/ HTTP/1.1" 200 20219
+INFO 2025-04-14 20:07:25,047 utils 16240 13900 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:25,048 utils 16240 13900 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:25,055 utils 16240 13900 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:25,057 utils 16240 13900 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:25,084 utils 16240 13900 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:25,084 utils 16240 13900 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:25,098 utils 16240 13900 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:25,098 utils 16240 13900 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:25,115 utils 16240 13900 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:25,115 utils 16240 13900 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:25,155 basehttp 16240 13900 "GET /recipes/list/ HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:07:25,193 basehttp 16240 13900 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:07:25,459 basehttp 16240 10824 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:07:26,019 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:26,019 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:26,029 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:26,029 utils 16240 19880 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:26,042 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:26,044 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:26,088 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:26,090 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:26,118 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:26,118 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:26,153 basehttp 16240 19880 "GET /fridge/ HTTP/1.1" 200 20219
+INFO 2025-04-14 20:07:27,938 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:27,939 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:27,948 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:27,948 utils 16240 19880 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:27,962 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:27,963 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:27,978 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:27,978 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:27,994 utils 16240 19880 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:27,995 utils 16240 19880 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:28,033 basehttp 16240 19880 "GET /recipes/list/ HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:07:28,227 basehttp 16240 19880 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:07:28,469 basehttp 16240 7652 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:07:29,763 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:29,763 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:29,770 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:29,770 utils 16240 15312 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:29,783 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:29,784 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:29,797 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:29,797 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:29,812 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:29,813 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:29,844 basehttp 16240 15312 "GET /recipes/list/?q=&category=&diet=&available_only=true HTTP/1.1" 200 31467
+INFO 2025-04-14 20:07:31,020 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:31,020 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:31,031 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:31,031 utils 16240 15312 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:31,042 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:31,043 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:31,054 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:31,054 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:31,071 utils 16240 15312 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:31,071 utils 16240 15312 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:31,112 basehttp 16240 15312 "GET /recipes/list/?q=&category=&diet= HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:07:31,154 basehttp 16240 15312 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:07:31,419 basehttp 16240 17228 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:07:31,811 utils 16240 17692 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:31,811 utils 16240 17692 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:31,832 basehttp 16240 17692 "GET /recipes/list/?q=&category=&diet=&followed=true HTTP/1.1" 200 30059
+WARNING 2025-04-14 20:07:31,882 basehttp 16240 17692 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:07:33,478 utils 16240 20264 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:33,479 utils 16240 20264 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:33,486 utils 16240 20264 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:07:33,487 utils 16240 20264 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:07:33,501 utils 16240 20264 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:33,502 utils 16240 20264 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:33,514 utils 16240 20264 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:33,515 utils 16240 20264 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:33,531 utils 16240 20264 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:07:33,531 utils 16240 20264 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:07:33,570 basehttp 16240 20264 "GET /recipes/list/?q=&category=&diet= HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:07:33,831 basehttp 16240 20264 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:10:24,450 utils 16240 11652 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:10:24,451 utils 16240 11652 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:10:24,463 utils 16240 11652 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:10:24,463 utils 16240 11652 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:10:24,481 utils 16240 11652 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:10:24,481 utils 16240 11652 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:10:24,496 utils 16240 11652 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:10:24,497 utils 16240 11652 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:10:24,517 utils 16240 11652 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:10:24,517 utils 16240 11652 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:10:24,546 basehttp 16240 11652 "GET /fridge/ HTTP/1.1" 200 20219
+INFO 2025-04-14 20:10:26,212 basehttp 16240 11652 "GET /fridge/list/ HTTP/1.1" 200 30117
+INFO 2025-04-14 20:10:27,629 basehttp 16240 11652 "GET /recipes/ingredient/submit/ HTTP/1.1" 200 26110
+INFO 2025-04-14 20:10:59,314 basehttp 16240 12672 "POST /recipes/ingredient/submit/ HTTP/1.1" 302 0
+INFO 2025-04-14 20:10:59,345 basehttp 16240 12672 "GET /recipes/ingredient/my-submissions/ HTTP/1.1" 200 17437
+INFO 2025-04-14 20:11:04,246 utils 16240 12672 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:04,247 utils 16240 12672 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:04,254 utils 16240 12672 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:11:04,256 utils 16240 12672 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:11:04,273 utils 16240 12672 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:04,279 utils 16240 12672 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:04,301 utils 16240 12672 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:04,302 utils 16240 12672 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:04,328 utils 16240 12672 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:04,328 utils 16240 12672 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:04,380 basehttp 16240 12672 "GET /recipes/list/ HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:11:04,434 basehttp 16240 12672 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:11:04,703 basehttp 16240 23436 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:11:05,894 basehttp 16240 6480 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 200 124064
+INFO 2025-04-14 20:11:09,770 basehttp 16240 11052 "GET /recipes/conversions/ HTTP/1.1" 302 0
+INFO 2025-04-14 20:11:09,810 basehttp 16240 11052 "GET /recipes/ingredient/submit/ HTTP/1.1" 200 26110
+INFO 2025-04-14 20:11:18,272 basehttp 16240 11052 "GET /recipes/conversions/ HTTP/1.1" 302 0
+INFO 2025-04-14 20:11:18,307 basehttp 16240 11052 "GET /recipes/ingredient/submit/ HTTP/1.1" 200 26110
+INFO 2025-04-14 20:11:20,604 utils 16240 21784 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:20,606 utils 16240 21784 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:20,630 utils 16240 21784 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:11:20,633 utils 16240 21784 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:11:20,657 utils 16240 21784 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:20,660 utils 16240 21784 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:20,671 utils 16240 21784 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:20,677 utils 16240 21784 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:20,699 utils 16240 21784 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:11:20,699 utils 16240 21784 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:11:20,765 basehttp 16240 21784 "GET /recipes/list/ HTTP/1.1" 200 47266
+WARNING 2025-04-14 20:11:20,816 basehttp 16240 21784 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:11:20,970 basehttp 16240 12836 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:11:23,716 basehttp 16240 18064 "GET /admin/recipes/useringredient/ HTTP/1.1" 200 27632
+INFO 2025-04-14 20:11:24,427 basehttp 16240 17124 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2808
+INFO 2025-04-14 20:11:24,444 basehttp 16240 17124 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-04-14 20:11:24,451 basehttp 16240 23012 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-04-14 20:11:24,465 basehttp 16240 23012 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-04-14 20:11:24,471 basehttp 16240 15364 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-04-14 20:11:24,475 basehttp 16240 17124 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-04-14 20:11:24,482 basehttp 16240 23012 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+INFO 2025-04-14 20:11:24,508 basehttp 16240 15364 "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+INFO 2025-04-14 20:11:24,508 basehttp 16240 17124 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-04-14 20:11:24,540 basehttp 16240 23012 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-04-14 20:11:24,563 basehttp 16240 23012 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-04-14 20:11:24,565 basehttp 16240 17124 "GET /admin/jsi18n/ HTTP/1.1" 200 8717
+INFO 2025-04-14 20:11:24,567 basehttp 16240 15364 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-04-14 20:11:24,625 basehttp 16240 18064 "GET /static/admin/css/base.css HTTP/1.1" 200 22154
+INFO 2025-04-14 20:11:24,649 basehttp 16240 21396 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6878
+INFO 2025-04-14 20:11:24,664 basehttp 16240 21396 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-04-14 20:11:24,679 basehttp 16240 21396 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-04-14 20:11:24,718 basehttp 16240 23592 "GET /static/admin/css/responsive.css HTTP/1.1" 200 16632
+INFO 2025-04-14 20:11:24,773 basehttp 16240 23592 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-04-14 20:11:24,774 basehttp 16240 15364 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-04-14 20:11:24,774 basehttp 16240 21396 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-04-14 20:11:24,774 basehttp 16240 18064 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+ERROR 2025-04-14 20:18:12,717 log 16240 1916 Internal Server Error: /recipes/admin/pending-ingredients/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 1521, in admin_pending_ingredients
+    return render(request, 'recipes/admin/pending_ingredients.html', {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'index' not found. 'index' is not a valid view function or pattern name.
+ERROR 2025-04-14 20:18:12,771 basehttp 16240 1916 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 500 221940
+ERROR 2025-04-14 20:18:14,985 log 16240 1916 Internal Server Error: /recipes/admin/pending-ingredients/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 1521, in admin_pending_ingredients
+    return render(request, 'recipes/admin/pending_ingredients.html', {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'index' not found. 'index' is not a valid view function or pattern name.
+ERROR 2025-04-14 20:18:15,045 basehttp 16240 1916 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 500 221940
+INFO 2025-04-14 20:23:20,683 basehttp 16240 16824 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 200 124842
+INFO 2025-04-14 20:23:23,450 utils 16240 16824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:23,452 utils 16240 16824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:23,465 utils 16240 16824 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:23:23,472 utils 16240 16824 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:23:23,494 utils 16240 16824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:23,495 utils 16240 16824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:23,509 utils 16240 16824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:23,509 utils 16240 16824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:23,527 utils 16240 16824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:23,528 utils 16240 16824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:23,582 basehttp 16240 16824 "GET /recipes/list/ HTTP/1.1" 200 47885
+WARNING 2025-04-14 20:23:23,697 basehttp 16240 16824 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:23:25,823 utils 16240 6572 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:25,823 utils 16240 6572 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:25,832 utils 16240 6572 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:23:25,832 utils 16240 6572 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:23:25,854 utils 16240 6572 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:25,854 utils 16240 6572 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:25,867 utils 16240 6572 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:25,870 utils 16240 6572 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:25,901 utils 16240 6572 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:23:25,904 utils 16240 6572 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:23:25,942 basehttp 16240 6572 "GET /fridge/ HTTP/1.1" 200 20838
+INFO 2025-04-14 20:28:09,235 utils 16240 18688 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:09,245 utils 16240 18688 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:09,269 utils 16240 18688 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:28:09,270 utils 16240 18688 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:28:09,291 utils 16240 18688 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:09,292 utils 16240 18688 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:09,304 utils 16240 18688 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:09,304 utils 16240 18688 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:09,327 utils 16240 18688 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:09,327 utils 16240 18688 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:09,415 basehttp 16240 18688 "GET /fridge/ HTTP/1.1" 200 23459
+INFO 2025-04-14 20:28:20,358 utils 16240 12368 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:20,369 utils 16240 12368 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:20,395 utils 16240 12368 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:28:20,396 utils 16240 12368 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:28:20,410 utils 16240 12368 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:20,411 utils 16240 12368 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:20,422 utils 16240 12368 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:20,423 utils 16240 12368 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:20,443 utils 16240 12368 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:28:20,443 utils 16240 12368 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:28:20,511 basehttp 16240 12368 "GET /recipes/list/ HTTP/1.1" 200 47885
+WARNING 2025-04-14 20:28:20,596 basehttp 16240 12368 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:28:20,872 basehttp 16240 15844 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:30:01,358 basehttp 16240 24108 "GET /shopping/ HTTP/1.1" 200 15177
+INFO 2025-04-14 20:30:03,665 basehttp 16240 24108 "GET /shopping/create/ HTTP/1.1" 200 13909
+INFO 2025-04-14 20:30:05,109 basehttp 16240 19408 "GET /shopping/ HTTP/1.1" 200 15177
+INFO 2025-04-14 20:30:06,011 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:06,011 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:06,022 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:30:06,022 utils 16240 19408 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:30:06,035 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:06,036 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:06,056 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:06,056 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:06,077 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:06,077 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:06,112 basehttp 16240 19408 "GET /fridge/ HTTP/1.1" 200 23459
+INFO 2025-04-14 20:30:07,265 basehttp 16240 19408 "GET /accounts/community/ HTTP/1.1" 200 43133
+INFO 2025-04-14 20:30:13,705 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:13,706 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:13,717 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:30:13,720 utils 16240 19408 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:30:13,750 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:13,753 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:13,774 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:13,775 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:13,790 utils 16240 19408 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:13,803 utils 16240 19408 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:13,853 basehttp 16240 19408 "GET /recipes/list/ HTTP/1.1" 200 47885
+WARNING 2025-04-14 20:30:13,935 basehttp 16240 19408 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:30:14,693 basehttp 16240 9920 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:30:15,428 basehttp 16240 22824 "GET /accounts/community/ HTTP/1.1" 200 43133
+INFO 2025-04-14 20:30:23,326 utils 16240 22824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:23,327 utils 16240 22824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:23,336 utils 16240 22824 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:30:23,336 utils 16240 22824 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:30:23,346 utils 16240 22824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:23,347 utils 16240 22824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:23,361 utils 16240 22824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:23,361 utils 16240 22824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:23,377 utils 16240 22824 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:30:23,378 utils 16240 22824 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:30:23,416 basehttp 16240 22824 "GET /recipes/list/ HTTP/1.1" 200 47885
+WARNING 2025-04-14 20:30:23,458 basehttp 16240 22824 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:30:23,709 basehttp 16240 15664 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:32:02,029 basehttp 16240 3768 "GET /accounts/community/ HTTP/1.1" 200 43133
+INFO 2025-04-14 20:32:03,247 utils 16240 3768 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:03,261 utils 16240 3768 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:03,271 utils 16240 3768 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:32:03,271 utils 16240 3768 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:32:03,286 utils 16240 3768 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:03,286 utils 16240 3768 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:03,298 utils 16240 3768 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:03,303 utils 16240 3768 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:03,332 utils 16240 3768 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:03,337 utils 16240 3768 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:03,424 basehttp 16240 3768 "GET /recipes/list/ HTTP/1.1" 200 47885
+WARNING 2025-04-14 20:32:03,519 basehttp 16240 3768 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 20:32:03,815 basehttp 16240 14056 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 20:32:04,235 utils 16240 5712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:04,242 utils 16240 5712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:04,252 utils 16240 5712 Konwersja miêdzy sztukami a wag¹ dla Banan, piece_weight: 120.00
+INFO 2025-04-14 20:32:04,252 utils 16240 5712 Konwersja: 25.0 g -> 25.0 g -> 0.20833333333333334 szt
+INFO 2025-04-14 20:32:04,268 utils 16240 5712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:04,269 utils 16240 5712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:04,283 utils 16240 5712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:04,284 utils 16240 5712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:04,315 utils 16240 5712 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-14 20:32:04,316 utils 16240 5712 Konwersja: 2.0 g -> 2.0 g -> 0.02666666666666667 szt
+INFO 2025-04-14 20:32:04,361 basehttp 16240 5712 "GET /fridge/ HTTP/1.1" 200 23459
+INFO 2025-04-14 20:32:07,725 basehttp 16240 7744 "GET /fridge/bulk-add/ HTTP/1.1" 200 21723
+INFO 2025-04-14 20:32:08,123 basehttp 16240 7744 "GET /fridge/ajax/ingredient-search/?list_all=true HTTP/1.1" 200 590
+INFO 2025-04-14 20:32:09,729 basehttp 16240 7744 "GET /fridge/ajax/load-units/?ingredient_id=21 HTTP/1.1" 200 492
+INFO 2025-04-14 20:32:14,838 basehttp 16240 13228 "GET /fridge/ajax/ingredient-search/?list_all=true HTTP/1.1" 200 590
+INFO 2025-04-14 20:32:15,915 basehttp 16240 13228 "GET /fridge/ajax/load-units/?ingredient_id=21 HTTP/1.1" 200 492
+INFO 2025-04-14 20:32:25,807 models 16240 21140 Dodawanie do lodówki: 20.0 g sk³adnika Bazylia
+INFO 2025-04-14 20:32:25,808 models 16240 21140 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:32:25,829 models 16240 21140 Dodawanie do lodówki: 40.0 g sk³adnika Bazylia
+INFO 2025-04-14 20:32:25,829 models 16240 21140 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:32:25,841 basehttp 16240 21140 "POST /fridge/bulk-add/ HTTP/1.1" 302 0
+INFO 2025-04-14 20:32:26,245 basehttp 16240 21140 "GET /fridge/list/ HTTP/1.1" 200 36594
+INFO 2025-04-14 20:32:31,452 basehttp 16240 21140 "GET /fridge/consolidate/ HTTP/1.1" 200 15144
+INFO 2025-04-14 20:32:33,728 basehttp 16240 21140 "POST /fridge/consolidate/ HTTP/1.1" 302 0
+INFO 2025-04-14 20:32:33,759 basehttp 16240 21140 "GET /fridge/list/ HTTP/1.1" 200 36648
+INFO 2025-04-14 20:40:50,270 autoreload 9088 19148 Watching for file changes with StatReloader
+INFO 2025-04-14 20:41:05,604 models 19220 16048 Dodawanie do lodówki: 500.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:05,736 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:05,800 models 19220 16048 Dodawanie do lodówki: 2.0 szt sk³adnika Cebula
+INFO 2025-04-14 20:41:05,801 models 19220 16048 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-14 20:41:05,803 models 19220 16048 Próba konwersji z szt na g dla Cebula
+ERROR 2025-04-14 20:41:05,806 utils 19220 16048 Brak wagi sztuki dla sk³adnika Cebula (id: 2)
+WARNING 2025-04-14 20:41:05,806 utils 19220 16048 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Cebula
+ERROR 2025-04-14 20:41:05,808 models 19220 16048 Nie mo¿na przekonwertowaæ 2.0 Sztuka na Gram: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki
+INFO 2025-04-14 20:41:05,810 models 19220 16048 Dodawanie do lodówki: 100.0 g sk³adnika Sól
+INFO 2025-04-14 20:41:05,811 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:08,124 models 19220 16048 Dodawanie do lodówki: 500.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:08,125 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:08,126 models 19220 16048 Dodawanie do lodówki: 100.0 g sk³adnika Sól
+INFO 2025-04-14 20:41:08,126 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:09,288 models 19220 16048 Dodawanie do lodówki: 1000.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:09,289 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:09,290 models 19220 16048 Dodawanie do lodówki: 100.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:09,291 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:10,289 models 19220 16048 Dodawanie do lodówki: 1000.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:10,314 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:10,327 models 19220 16048 Dodawanie do lodówki: 100.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:10,340 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:10,361 models 19220 16048 Dodawanie do lodówki: 300.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:10,366 models 19220 16048 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:43,894 models 9644 14800 Dodawanie do lodówki: 500.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:43,895 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:43,903 models 9644 14800 Dodawanie do lodówki: 2.0 szt sk³adnika Cebula
+INFO 2025-04-14 20:41:43,904 models 9644 14800 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-14 20:41:43,904 models 9644 14800 Próba konwersji z szt na g dla Cebula
+ERROR 2025-04-14 20:41:43,904 utils 9644 14800 Brak wagi sztuki dla sk³adnika Cebula (id: 2)
+WARNING 2025-04-14 20:41:43,905 utils 9644 14800 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Cebula
+ERROR 2025-04-14 20:41:43,906 models 9644 14800 Nie mo¿na przekonwertowaæ 2.0 Sztuka na Gram: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki
+INFO 2025-04-14 20:41:43,909 models 9644 14800 Dodawanie do lodówki: 100.0 g sk³adnika Sól
+INFO 2025-04-14 20:41:43,910 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:46,103 models 9644 14800 Dodawanie do lodówki: 500.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:46,115 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:46,119 models 9644 14800 Dodawanie do lodówki: 100.0 g sk³adnika Sól
+INFO 2025-04-14 20:41:46,119 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:47,499 models 9644 14800 Dodawanie do lodówki: 1000.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:47,541 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:47,543 models 9644 14800 Dodawanie do lodówki: 100.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:47,544 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:49,045 models 9644 14800 Dodawanie do lodówki: 1000.0 g sk³adnika Ziemniaki
+INFO 2025-04-14 20:41:49,055 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:49,071 models 9644 14800 Dodawanie do lodówki: 100.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:49,071 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:41:49,082 models 9644 14800 Dodawanie do lodówki: 300.0 g sk³adnika Marchew
+INFO 2025-04-14 20:41:49,092 models 9644 14800 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-14 20:43:49,792 autoreload 9088 19148 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 20:43:49,735 autoreload 16240 17304 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 20:43:51,902 autoreload 12936 23016 Watching for file changes with StatReloader
+INFO 2025-04-14 20:43:51,903 autoreload 12556 524 Watching for file changes with StatReloader
+INFO 2025-04-14 20:44:49,218 autoreload 12936 23016 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 20:44:49,312 autoreload 12556 524 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 20:44:52,594 autoreload 24228 13808 Watching for file changes with StatReloader
+INFO 2025-04-14 20:44:52,742 autoreload 3624 14840 Watching for file changes with StatReloader
+INFO 2025-04-14 20:49:24,490 autoreload 18268 5352 Watching for file changes with StatReloader
+INFO 2025-04-14 20:53:47,758 autoreload 9860 8264 Watching for file changes with StatReloader
+WARNING 2025-04-14 20:55:30,019 log 3624 16552 Not Found: /recipes/submit-ingredient/
+WARNING 2025-04-14 20:55:30,044 basehttp 3624 16552 "GET /recipes/submit-ingredient/ HTTP/1.1" 404 13481
+INFO 2025-04-14 20:59:54,620 basehttp 3624 15704 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 20:59:54,987 basehttp 3624 15704 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:00:00,080 basehttp 3624 16428 "POST /accounts/login/ HTTP/1.1" 200 13352
+INFO 2025-04-14 21:00:00,123 basehttp 3624 16428 "GET /recipes/ingredient/submit/ HTTP/1.1" 302 0
+INFO 2025-04-14 21:00:00,131 basehttp 3624 16428 "GET /login/?next=/recipes/ingredient/submit/ HTTP/1.1" 200 12966
+INFO 2025-04-14 21:15:00,959 autoreload 2604 2788 Watching for file changes with StatReloader
+INFO 2025-04-14 21:16:47,498 basehttp 3624 9208 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 21:16:47,566 basehttp 3624 9208 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:16:51,247 basehttp 3624 9208 "POST /accounts/login/ HTTP/1.1" 200 13352
+INFO 2025-04-14 21:16:51,284 basehttp 3624 9208 "GET /recipes/admin/pending-ingredients/ HTTP/1.1" 302 0
+INFO 2025-04-14 21:16:51,290 basehttp 3624 9208 "GET /login/?next=/recipes/admin/pending-ingredients/ HTTP/1.1" 200 12974
+INFO 2025-04-14 21:17:50,657 autoreload 21816 11592 Watching for file changes with StatReloader
+INFO 2025-04-14 21:21:32,927 basehttp 3624 20368 "GET /fridge/list/ HTTP/1.1" 200 35966
+INFO 2025-04-14 21:21:43,825 basehttp 3624 16716 "GET / HTTP/1.1" 200 37344
+INFO 2025-04-14 21:21:43,839 basehttp 3624 16716 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:21:43,842 basehttp 3624 16716 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 200 651
+INFO 2025-04-14 21:21:43,846 basehttp 3624 16716 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+WARNING 2025-04-14 21:21:43,854 basehttp 3624 16716 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:21:44,031 basehttp 3624 11132 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:21:44,170 basehttp 3624 16128 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:21:44,171 basehttp 3624 20860 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:21:45,860 basehttp 3624 12092 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 21:21:55,093 basehttp 3624 12092 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 21:21:56,015 basehttp 3624 12092 "POST /accounts/login/ HTTP/1.1" 200 13352
+INFO 2025-04-14 21:21:59,172 basehttp 3624 12092 - Broken pipe from ('127.0.0.1', 61317)
+INFO 2025-04-14 21:21:59,173 basehttp 3624 22832 - Broken pipe from ('127.0.0.1', 61318)
+INFO 2025-04-14 21:23:23,635 basehttp 3624 14268 "GET / HTTP/1.1" 200 37344
+INFO 2025-04-14 21:23:23,651 basehttp 3624 14268 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:23:23,654 basehttp 3624 14268 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 200 651
+INFO 2025-04-14 21:23:23,659 basehttp 3624 14268 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+WARNING 2025-04-14 21:23:23,675 basehttp 3624 14268 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:23:23,849 basehttp 3624 24132 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:23:23,957 basehttp 3624 11160 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:23:23,958 basehttp 3624 13340 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:23:25,273 basehttp 3624 4704 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 21:23:25,441 basehttp 3624 4704 "GET /accounts/login/ HTTP/1.1" 200 12939
+INFO 2025-04-14 21:23:26,320 basehttp 3624 4704 "POST /accounts/login/ HTTP/1.1" 200 13352
+INFO 2025-04-14 21:23:37,584 basehttp 3624 6108 - Broken pipe from ('127.0.0.1', 61378)
+INFO 2025-04-14 21:23:37,584 basehttp 3624 4704 - Broken pipe from ('127.0.0.1', 61377)
+INFO 2025-04-14 21:24:56,438 basehttp 3624 22820 "GET / HTTP/1.1" 200 37639
+INFO 2025-04-14 21:24:56,446 basehttp 3624 22820 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:24:56,449 basehttp 3624 22820 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 200 651
+INFO 2025-04-14 21:24:56,455 basehttp 3624 22820 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+WARNING 2025-04-14 21:24:56,459 basehttp 3624 22820 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:24:56,668 basehttp 3624 22308 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:24:56,756 basehttp 3624 17964 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:24:56,757 basehttp 3624 20140 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:24:58,188 basehttp 3624 23632 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:24:58,399 basehttp 3624 23632 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:24:59,281 basehttp 3624 23632 "POST /accounts/login/ HTTP/1.1" 200 18699
+INFO 2025-04-14 21:25:10,533 basehttp 3624 9492 - Broken pipe from ('127.0.0.1', 61494)
+INFO 2025-04-14 21:25:10,533 basehttp 3624 23632 - Broken pipe from ('127.0.0.1', 61493)
+INFO 2025-04-14 21:26:22,044 basehttp 3624 16396 "GET / HTTP/1.1" 200 37639
+INFO 2025-04-14 21:26:22,056 basehttp 3624 16396 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:26:22,058 basehttp 3624 16396 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 200 651
+INFO 2025-04-14 21:26:22,064 basehttp 3624 16396 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+WARNING 2025-04-14 21:26:22,068 basehttp 3624 16396 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:26:22,264 basehttp 3624 5640 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:26:22,362 basehttp 3624 16868 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:26:22,362 basehttp 3624 17432 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:26:23,801 basehttp 3624 15384 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:26:23,984 basehttp 3624 15384 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:26:24,857 basehttp 3624 15384 "POST /accounts/login/ HTTP/1.1" 200 18699
+INFO 2025-04-14 21:26:36,267 basehttp 3624 11172 - Broken pipe from ('127.0.0.1', 61559)
+INFO 2025-04-14 21:26:36,270 basehttp 3624 15384 - Broken pipe from ('127.0.0.1', 61558)
+INFO 2025-04-14 21:27:52,427 basehttp 3624 20912 "GET / HTTP/1.1" 200 37639
+INFO 2025-04-14 21:27:52,443 basehttp 3624 20912 "GET /static/css/style.css HTTP/1.1" 200 10258
+INFO 2025-04-14 21:27:52,445 basehttp 3624 20912 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 200 651
+INFO 2025-04-14 21:27:52,450 basehttp 3624 20912 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 200 188413
+WARNING 2025-04-14 21:27:52,455 basehttp 3624 20912 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:27:52,645 basehttp 3624 2432 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:27:52,746 basehttp 3624 12164 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:27:52,747 basehttp 3624 20372 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:27:54,127 basehttp 3624 2588 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:27:54,276 basehttp 3624 2588 "GET /accounts/login/ HTTP/1.1" 200 18161
+INFO 2025-04-14 21:27:55,178 basehttp 3624 2588 "POST /accounts/login/ HTTP/1.1" 200 18699
+INFO 2025-04-14 21:28:01,266 basehttp 3624 2588 "POST /accounts/login/ HTTP/1.1" 200 18699
+INFO 2025-04-14 21:28:12,736 basehttp 3624 2588 - Broken pipe from ('127.0.0.1', 61624)
+INFO 2025-04-14 21:28:12,736 basehttp 3624 13764 - Broken pipe from ('127.0.0.1', 61625)
+INFO 2025-04-14 21:49:44,937 basehttp 3624 15804 "GET / HTTP/1.1" 200 39992
+INFO 2025-04-14 21:49:45,020 basehttp 3624 15804 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 304 0
+WARNING 2025-04-14 21:49:45,341 basehttp 3624 3832 "GET /static/img/testimonial-4.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:49:45,344 basehttp 3624 12556 "GET /static/img/testimonial-3.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:49:45,344 basehttp 3624 19280 "GET /static/img/testimonial-2.jpg HTTP/1.1" 404 1877
+WARNING 2025-04-14 21:49:45,348 basehttp 3624 15804 "GET /static/img/testimonial-1.jpg HTTP/1.1" 404 1877
+INFO 2025-04-14 21:54:00,782 autoreload 23032 23908 Watching for file changes with StatReloader
+INFO 2025-04-14 21:54:24,078 basehttp 3624 10972 "GET / HTTP/1.1" 200 35490

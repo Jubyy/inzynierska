@@ -9,7 +9,7 @@
     /* Hero Section */
     .hero-section {
         height: 600px;
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80') no-repeat center center;
+        background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80') no-repeat center center;
         background-size: cover;
         color: white;
         position: relative;
@@ -27,22 +27,27 @@
     }
     
     .hero-title {
-        font-size: 3.5rem;
+        font-size: 3.8rem;
         font-weight: 800;
         margin-bottom: 1.5rem;
         line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        animation: fadeInDown 1s;
     }
     
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         margin-bottom: 2rem;
-        line-height: 1.5;
+        line-height: 1.6;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        animation: fadeInUp 1s;
     }
     
     /* Sekcje */
     .section-heading {
         text-align: center;
         margin-bottom: 3rem;
+        animation: fadeIn 1.2s;
     }
     
     .section-title {
@@ -61,21 +66,21 @@
     
     /* Karty przepisów */
     .recipe-card {
-        border-radius: 12px;
+        border-radius: 15px;
         overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         height: 100%;
         background-color: white;
     }
     
     .recipe-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
     }
     
     .recipe-card img {
-        height: 200px;
+        height: 220px;
         object-fit: cover;
         width: 100%;
     }
@@ -90,37 +95,42 @@
         padding: 5rem 0;
         background-color: #f8f9fa;
         margin: 4rem 0;
+        animation: fadeIn 1.5s;
     }
     
     .feature-card {
         background-color: white;
-        border-radius: 12px;
-        padding: 2rem;
+        border-radius: 15px;
+        padding: 2.5rem;
         height: 100%;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-top: 5px solid var(--primary-color);
     }
     
     .feature-card:hover {
         transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
     }
     
     .feature-icon {
-        font-size: 3rem;
+        font-size: 3.5rem;
         color: var(--primary-color);
         margin-bottom: 1.5rem;
     }
     
     .cta-section {
-        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(135deg, #0d6efd, #1e47b9);
         color: white;
-        padding: 4rem 2rem;
-        border-radius: 15px;
+        padding: 4.5rem 2rem;
+        border-radius: 20px;
         text-align: center;
         position: relative;
         overflow: hidden;
         z-index: 1;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        margin: 6rem 0;
+        animation: fadeIn 1.5s;
     }
     
     .cta-section::before {
@@ -130,20 +140,21 @@
         left: -50%;
         width: 200%;
         height: 200%;
-        background: linear-gradient(to bottom right, transparent, rgba(255, 255, 255, 0.1), transparent);
+        background: linear-gradient(to bottom right, transparent, rgba(255, 255, 255, 0.12), transparent);
         transform: rotate(30deg);
         z-index: -1;
     }
     
     .cta-title {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .cta-text {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
         max-width: 700px;
         margin-left: auto;
         margin-right: auto;
@@ -151,22 +162,24 @@
     
     /* Karuzele */
     .carousel-section {
-        margin: 5rem 0;
+        margin: 6rem 0;
+        animation: fadeIn 1.5s;
     }
     
     .carousel-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: 700;
         color: var(--dark-color);
     }
     
     .swiper {
         width: 100%;
-        padding-bottom: 50px;
+        padding-bottom: 60px;
     }
     
     .swiper-slide {
         height: auto;
+        transition: transform 0.3s ease;
     }
     
     .swiper-pagination-bullet-active {
@@ -175,65 +188,27 @@
     
     .swiper-button-next, .swiper-button-prev {
         color: var(--primary-color);
-    }
-    
-    /* Testimonials */
-    .testimonial-card {
-        background-color: white;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        height: 100%;
-    }
-    
-    .testimonial-card img {
-        width: 80px;
-        height: 80px;
+        background: rgba(255, 255, 255, 0.8);
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        margin: 0 auto 1.5rem;
-        border: 3px solid var(--primary-color);
+        transition: all 0.3s ease;
     }
     
-    .stars {
-        color: var(--accent-color);
-        margin-bottom: 1.5rem;
+    .swiper-button-next:hover, .swiper-button-prev:hover {
+        background: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        transform: scale(1.05);
     }
     
-    .quote {
-        font-style: italic;
-        margin-bottom: 1.5rem;
-        color: #495057;
-    }
-    
-    .author {
-        font-weight: 700;
-        color: var(--dark-color);
-    }
-    
-    /* Statystyki */
-    .stats-section {
-        background-color: var(--dark-color);
-        color: white;
-        padding: 5rem 0;
-        margin: 5rem 0;
-        text-align: center;
-    }
-    
-    .stat-number {
-        font-size: 3.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: var(--primary-color);
-    }
-    
-    .stat-label {
+    .swiper-button-next:after, .swiper-button-prev:after {
         font-size: 1.2rem;
+        font-weight: bold;
     }
     
     /* Przyciski */
     .btn-hero {
-        padding: 0.75rem 2rem;
+        padding: 0.85rem 2.5rem;
         font-size: 1.1rem;
         border-radius: 50px;
         text-transform: uppercase;
@@ -242,6 +217,7 @@
         border: none;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
+        animation: fadeIn 1.5s;
     }
     
     .btn-hero:hover {
@@ -265,21 +241,54 @@
         color: var(--primary-color);
     }
     
+    /* Animacje */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeInDown {
+        from { 
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsywność */
     @media (max-width: 768px) {
         .hero-section {
-            height: 500px;
+            height: 520px;
         }
         
         .hero-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
         }
         
         .hero-subtitle {
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
         
         .section-title {
             font-size: 2rem;
+        }
+        
+        .cta-title {
+            font-size: 2.2rem;
         }
     }
 </style>
@@ -334,7 +343,7 @@
         <div class="col">
             <div class="feature-card text-center">
                 <div class="feature-icon">
-                    <i class="bi bi-refrigerator"></i>
+                    <i class="bi bi-basket"></i>
                 </div>
                 <h3 class="mb-3">Zarządzaj zawartością lodówki</h3>
                 <p>Śledź, co masz w swojej lodówce i otrzymuj powiadomienia o zbliżających się terminach ważności, aby nic się nie zmarnowało.</p>
@@ -348,30 +357,6 @@
                 </div>
                 <h3 class="mb-3">Inteligentne listy zakupów</h3>
                 <p>Automatycznie generuj listy zakupów na podstawie wybranych przepisów lub brakujących składników, których potrzebujesz.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Statystyki -->
-<section class="stats-section">
-    <div class="container">
-        <div class="row row-cols-1 row-cols-md-4 g-4">
-            <div class="col">
-                <div class="stat-number">500+</div>
-                <div class="stat-label">Przepisów</div>
-            </div>
-            <div class="col">
-                <div class="stat-number">15k+</div>
-                <div class="stat-label">Użytkowników</div>
-            </div>
-            <div class="col">
-                <div class="stat-number">120k+</div>
-                <div class="stat-label">Ugotowanych dań</div>
-            </div>
-            <div class="col">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Zadowolonych kucharzy</div>
             </div>
         </div>
     </div>
@@ -404,7 +389,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ recipe.title }}</h5>
+                                    <h5 class="card-title fw-bold">{{ recipe.title }}</h5>
                                     <p class="card-text">{{ recipe.description|truncatechars:100 }}</p>
                                     <div class="d-flex justify-content-between recipe-stats mb-3">
                                         <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
@@ -457,81 +442,6 @@
         </div>
     </div>
 </section>
-
-<!-- Opinie użytkowników -->
-<section class="carousel-section container">
-    <div class="section-heading">
-        <h2 class="section-title">Co mówią nasi użytkownicy</h2>
-        <p class="section-subtitle">Poznaj opinie osób, które codziennie korzystają z naszej aplikacji</p>
-    </div>
-    
-    <div class="swiper testimonials">
-        <div class="swiper-wrapper">
-            <div class="swiper-slide">
-                <div class="testimonial-card">
-                    <img src="{% static 'img/testimonial-1.jpg' %}" alt="Anna Kowalska">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="quote">"Ta aplikacja zmieniła sposób, w jaki planuję posiłki dla całej rodziny. Teraz zawsze wiem, jakie składniki mam w lodówce i co mogę z nich przygotować!"</p>
-                    <p class="author">Anna Kowalska</p>
-                </div>
-            </div>
-            
-            <div class="swiper-slide">
-                <div class="testimonial-card">
-                    <img src="{% static 'img/testimonial-2.jpg' %}" alt="Piotr Nowak">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star"></i>
-                    </div>
-                    <p class="quote">"Wreszcie przestałem marnować jedzenie! Aplikacja przypomina mi o terminach ważności produktów i podpowiada, co mogę z nich zrobić przed upływem terminu."</p>
-                    <p class="author">Piotr Nowak</p>
-                </div>
-            </div>
-            
-            <div class="swiper-slide">
-                <div class="testimonial-card">
-                    <img src="{% static 'img/testimonial-3.jpg' %}" alt="Kasia Wiśniewska">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                    </div>
-                    <p class="quote">"Dzięki tej aplikacji odkryłam mnóstwo nowych przepisów i technik gotowania. Listy zakupów generowane na podstawie wybranych przepisów to strzał w dziesiątkę!"</p>
-                    <p class="author">Kasia Wiśniewska</p>
-                </div>
-            </div>
-            
-            <div class="swiper-slide">
-                <div class="testimonial-card">
-                    <img src="{% static 'img/testimonial-4.jpg' %}" alt="Tomasz Lis">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
-                    </div>
-                    <p class="quote">"Jako student, zawsze miałem problem z planowaniem posiłków i zarządzaniem budżetem na jedzenie. Ta aplikacja rozwiązała wszystkie moje problemy!"</p>
-                    <p class="author">Tomasz Lis</p>
-                </div>
-            </div>
-        </div>
-        <div class="swiper-pagination"></div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-    </div>
-</section>
 {% endblock %}
 
 {% block extra_js %}
@@ -565,32 +475,23 @@
                 delay: 5000,
                 disableOnInteraction: false,
             },
+            loop: true,
+            effect: 'slide',
         });
         
-        // Inicjalizacja karuzeli z opiniami
-        const testimonials = new Swiper('.testimonials', {
-            slidesPerView: 1,
-            spaceBetween: 20,
-            pagination: {
-                el: '.testimonials .swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.testimonials .swiper-button-next',
-                prevEl: '.testimonials .swiper-button-prev',
-            },
-            breakpoints: {
-                640: {
-                    slidesPerView: 2,
-                },
-                1024: {
-                    slidesPerView: 3,
+        // Podświetlaj aktywne karty funkcji przy przewijaniu
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
                 }
-            },
-            autoplay: {
-                delay: 7000,
-                disableOnInteraction: false,
-            },
+            });
+        }, {
+            threshold: 0.2
+        });
+        
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
         });
     });
 </script>

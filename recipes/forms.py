@@ -213,14 +213,14 @@ class ConversionTableForm(forms.ModelForm):
     """Formularz do tworzenia i edycji tablicy konwersji"""
     class Meta:
         model = ConversionTable
-        fields = ['name', 'description', 'product_type']
+        fields = ['name', 'description', 'category', 'is_for_liquids']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 
                                            'placeholder': 'np. Mąka pszenna, Mleko, Owoce...'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 
                                                  'placeholder': 'Krótki opis dla jakiego rodzaju produktów jest ta tablica konwersji'}),
-            'product_type': forms.TextInput(attrs={'class': 'form-control', 
-                                                  'placeholder': 'np. Mąka, Płyny, Owoce'})
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'is_for_liquids': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }
 
 class ConversionEntryForm(forms.ModelForm):

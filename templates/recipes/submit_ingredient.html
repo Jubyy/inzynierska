@@ -8,7 +8,7 @@
     
     <div class="alert alert-info">
         <i class="fas fa-info-circle me-2"></i>
-        <strong>Ważne:</strong> Dziękujemy za zgłaszanie nowych składników. Administrator przypisze odpowiednią tablicę konwersji oraz jednostki do Twojego składnika podczas procesu zatwierdzania.
+        <strong>Ważne:</strong> Dziękujemy za zgłaszanie nowych składników. Wybierz odpowiednią tablicę konwersji dla Twojego składnika, aby zapewnić poprawne przeliczanie jednostek.
     </div>
     
     <div class="row">
@@ -61,11 +61,25 @@
                                           rows="3" placeholder="Krótki opis składnika, np. jego zastosowanie, pochodzenie lub szczególne cechy">{{ form.description.value|default:'' }}</textarea>
                             </div>
                             
-                            <!-- Ukryte pole dla conversion_table, ale wciąż wysyłane w formularzu -->
-                            <input type="hidden" name="{{ form.conversion_table.name }}" value="">
-                            <input type="hidden" name="{{ form.default_unit.name }}" value="">
-                            <input type="hidden" name="{{ form.unit_type.name }}" value="">
-                            <input type="hidden" name="{{ form.density.name }}" value="">
+                            <!-- Pole wyboru tablicy konwersji -->
+                            <div class="col-md-12">
+                                <label for="{{ form.conversion_table.id_for_label }}" class="form-label">Tablica konwersji</label>
+                                {{ form.conversion_table.errors }}
+                                <select name="{{ form.conversion_table.name }}" id="{{ form.conversion_table.id_for_label }}" 
+                                        class="form-select {% if form.conversion_table.errors %}is-invalid{% endif %}">
+                                    <option value="">-- Wybierz tablicę konwersji --</option>
+                                    {% for group in grouped_tables %}
+                                    <optgroup label="{{ group.category_name }}">
+                                        {% for table in group.tables %}
+                                        <option value="{{ table.id }}" {% if form.conversion_table.value|stringformat:"s" == table.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %}
+                                        </option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Wybierz tablicę konwersji odpowiednią dla kategorii tego składnika</div>
+                            </div>
                             
                             <div class="col-md-6">
                                 <label for="{{ form.piece_weight.id_for_label }}" class="form-label">Średnia waga sztuki</label>
@@ -96,23 +110,28 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-success text-white">
-                    <h2 class="h5 mb-0">Proces akceptacji</h2>
+                    <h2 class="h5 mb-0">Jak wybrać tablicę konwersji?</h2>
                 </div>
                 <div class="card-body">
-                    <p>Po zgłoszeniu, Twój składnik zostanie przesłany do administratora, który:</p>
+                    <p>Wybór odpowiedniej tablicy konwersji jest kluczowy dla poprawnego przeliczania jednostek:</p>
                     
-                    <ol>
-                        <li>Sprawdzi poprawność danych</li>
-                        <li>Przypisze odpowiednią tablicę konwersji</li>
-                        <li>Ustawi domyślne jednostki i parametry</li>
-                        <li>Zatwierdzi lub odrzuci składnik</li>
-                    </ol>
+                    <ul>
+                        <li><strong>Warzywa</strong> - dla wszystkich warzyw (np. marchew, ziemniaki, cebula)</li>
+                        <li><strong>Owoce</strong> - dla wszystkich owoców (np. jabłka, banany, truskawki)</li>
+                        <li><strong>Mąka i produkty sypkie</strong> - dla mąki, kaszy, ryżu</li>
+                        <li><strong>Nabiał</strong> - dla mleka, śmietany, jogurtu</li>
+                        <li><strong>Mięso</strong> - dla różnych rodzajów mięsa i wędlin</li>
+                        <li><strong>Przyprawy</strong> - dla ziół i przypraw</li>
+                    </ul>
                     
-                    <p>Po zatwierdzeniu, składnik zostanie dodany do bazy danych wraz z wszystkimi niezbędnymi przelicznikami.</p>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Uwaga:</strong> Dla składników liczonych w sztukach (np. jabłka, ziemniaki), pamiętaj o podaniu wagi sztuki.
+                    </div>
                     
                     <div class="alert alert-info mb-0 mt-3">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Wskazówka:</strong> Podaj jak najwięcej informacji w opisie, aby ułatwić administratorowi prawidłową konfigurację składnika.
+                        <strong>Wskazówka:</strong> Wybierz tablicę konwersji przypisaną do kategorii, do której należy Twój składnik.
                     </div>
                 </div>
             </div>

@@ -639,7 +639,10 @@ class ConversionTable(models.Model):
     """
     name = models.CharField(max_length=100, verbose_name="Nazwa tablicy")
     description = models.TextField(blank=True, verbose_name="Opis")
-    product_type = models.CharField(max_length=50, verbose_name="Typ produktu")
+    category = models.ForeignKey(IngredientCategory, on_delete=models.CASCADE, related_name='conversion_tables',
+                                verbose_name="Kategoria produktów", null=True)
+    is_for_liquids = models.BooleanField(default=False, verbose_name="Dla płynów", 
+                                       help_text="Zaznacz, jeśli ta tablica jest przeznaczona dla produktów płynnych")
     is_approved = models.BooleanField(default=True, verbose_name="Zatwierdzona")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
                                    related_name='created_conversion_tables', verbose_name="Utworzona przez")
@@ -648,10 +651,16 @@ class ConversionTable(models.Model):
     class Meta:
         verbose_name = "Tablica konwersji"
         verbose_name_plural = "Tablice konwersji"
-        ordering = ['name']
+        ordering = ['category__name', 'name']
     
     def __str__(self):
-        return f"{self.name} ({self.product_type})"
+        category_name = self.category.name if self.category else "Bez kategorii"
+        return f"{self.name} ({category_name})"
+    
+    @property
+    def product_type(self):
+        """Dla zachowania kompatybilności ze starym kodem"""
+        return self.category.name if self.category else "Inne"
 
 class ConversionTableEntry(models.Model):
     """
@@ -748,24 +757,18 @@ class UserIngredient(models.Model):
                     is_exact=entry.is_exact,
                     description=f"Z tablicy konwersji: {self.conversion_table.name}"
                 )
-        
-        # Zaktualizuj status
+                
+        # Aktualizuj status na zatwierdzony
         self.status = 'approved'
-        if admin_user:
-            self.admin_notes += f"\nZatwierdzono przez {admin_user.username} dnia {datetime.now().strftime('%Y-%m-%d %H:%M')}"
         self.save()
         
         return ingredient
     
-    def reject(self, reason="", admin_user=None):
+    def reject(self, reason=None, admin_user=None):
         """
-        Odrzuca składnik.
+        Odrzuca składnik
         """
         self.status = 'rejected'
         if reason:
-            self.admin_notes += f"\nPowód odrzucenia: {reason}"
-        
-        if admin_user:
-            self.admin_notes += f"\nOdrzucono przez {admin_user.username} dnia {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-        
+            self.admin_notes = reason
         self.save() 
