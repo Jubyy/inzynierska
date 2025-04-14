@@ -26,6 +26,7 @@ urlpatterns = [
     # Widoki AJAX
     path('api/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
     path('api/load-units/', views.ajax_load_units, name='ajax_load_units'),
+    path('api/load-units-by-type/', views.ajax_load_units_by_type, name='ajax_load_units_by_type'),
     path('api/add-ingredient/', views.ajax_add_ingredient, name='ajax_add_ingredient'),
     path('api/unit-info/', views.ajax_unit_info, name='ajax_unit_info'),
     path('ajax/ingredient-details/', views.ajax_ingredient_details, name='ajax_ingredient_details'),

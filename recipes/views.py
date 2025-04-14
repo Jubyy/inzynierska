@@ -734,68 +734,82 @@ class RecipeCreateView(LoginRequiredMixin, CreateView):
         return context
     
     def form_valid(self, form):
+        print("\n[DEBUG] RecipeCreateView.form_valid - Kompleksowa przebudowa metody")
+        
+        # Najpierw sprawdzamy czy główny formularz jest poprawny
+        if not form.is_valid():
+            print("[DEBUG] Główny formularz zawiera błędy")
+            return self.form_invalid(form)
+            
+        # Pobieramy formset składników
         context = self.get_context_data()
         ingredient_formset = context['ingredient_formset']
+        print(f"[DEBUG] Otrzymano {len(ingredient_formset.forms)} formularzy składników")
         
-        # Sprawdź, czy formset jest prawidłowy lub czy jest pusty (brak składników)
+        # Najpierw zapisujemy główny model przepisu
+        recipe = form.save(commit=False)
+        recipe.author = self.request.user
+        recipe.save()
+        print(f"[DEBUG] Zapisano główny przepis: {recipe.title} (ID: {recipe.id})")
+        
+        # Zapisujemy relacje many-to-many z głównego formularza
+        form.save_m2m()
+        
+        # Teraz sprawdzamy czy formset jest poprawny
         if ingredient_formset.is_valid():
-            self.object = form.save(commit=False)
-            self.object.author = self.request.user
-            self.object.save()
-            form.save_m2m()  # Zapisz relacje many-to-many
+            print("[DEBUG] Formset składników jest poprawny")
             
-            # Zapisz składniki tylko jeśli istnieją w formularzu
-            ingredient_forms = ingredient_formset.save(commit=False)
+            # Usuwamy istniejące składniki (jeśli to edycja)
+            # W przypadku nowego przepisu to nie będzie miało efektu
+            if recipe.id:
+                print(f"[DEBUG] Usuwanie istniejących składników dla przepisu ID: {recipe.id}")
+                RecipeIngredient.objects.filter(recipe=recipe).delete()
             
-            # Usuń składniki oznaczone do usunięcia
-            for obj in ingredient_formset.deleted_objects:
-                obj.delete()
+            # Teraz ręcznie tworzymy nowe składniki
+            for ingredient_form in ingredient_formset:
+                if ingredient_form.is_valid() and ingredient_form.has_changed() and not ingredient_form.cleaned_data.get('DELETE', False):
+                    ingredient_data = ingredient_form.cleaned_data
+                    ingredient = ingredient_data.get('ingredient')
+                    amount = ingredient_data.get('amount')
+                    unit = ingredient_data.get('unit')
+                    
+                    if ingredient and amount and unit:
+                        # Sprawdź i dodaj kompatybilność jednostki jeśli potrzeba
+                        if unit not in ingredient.compatible_units.all() and unit in ingredient.get_allowed_units():
+                            print(f"[DEBUG] Dodawanie jednostki {unit.name} do kompatybilnych dla {ingredient.name}")
+                            ingredient.compatible_units.add(unit)
+                        
+                        # Ręczne tworzenie obiektu składnika przepisu
+                        print(f"[DEBUG] Tworzenie składnika: {ingredient.name}, {amount} {unit.symbol}")
+                        RecipeIngredient.objects.create(
+                            recipe=recipe,
+                            ingredient=ingredient,
+                            amount=amount,
+                            unit=unit
+                        )
             
-            # Zapisz nowe i zaktualizowane składniki
-            for ingredient_form in ingredient_forms:
-                # Sprawdź, czy składnik nie jest pusty (czy ma wszystkie wymagane pola)
-                if ingredient_form.ingredient and ingredient_form.amount and ingredient_form.unit:
-                    ingredient_form.recipe = self.object
-                    ingredient_form.save()
+            # Wyświetl komunikat sukcesu
+            messages.success(self.request, f'Przepis "{recipe.title}" został pomyślnie zapisany.')
             
-            # Wyświetl komunikat z liczbą dodanych składników
-            messages.success(
-                self.request, 
-                f'Przepis "{self.object.title}" został dodany wraz z {len(ingredient_forms)} składnikami!'
-            )
+            # Ustaw obiekt do użycia w get_success_url
+            self.object = recipe
             
+            # Przekieruj do strony sukcesu
             return redirect(self.get_success_url())
         else:
-            # Jeśli formularz składników jest nieprawidłowy, pokaż błędy
-            # ale tylko jeśli formset zawiera jakieś dane (nie jest pusty)
-            has_non_empty_ingredients = False
+            # Jeśli formset jest niepoprawny, wyświetl błędy i wróć do formularza
+            print("[DEBUG] Formset składników zawiera błędy:")
+            for i, form_errors in enumerate(ingredient_formset.errors):
+                if form_errors:
+                    print(f"[DEBUG] Błędy formularza {i}:", form_errors)
             
-            for form_data in ingredient_formset.cleaned_data:
-                # Jeśli którykolwiek z formularzy ma dane (nie jest pusty), sprawdź błędy
-                if form_data and any(form_data.values()):
-                    has_non_empty_ingredients = True
-                    break
+            # Jako że już zapisaliśmy przepis, ale formset jest niepoprawny,
+            # usuwamy niedokończony przepis aby uniknąć śmieci w bazie danych
+            recipe.delete()
+            print(f"[DEBUG] Usunięto niedokończony przepis: {recipe.title}")
             
-            if has_non_empty_ingredients:
-                for error in ingredient_formset.errors:
-                    messages.error(self.request, f"Błąd składnika: {error}")
-                for error in ingredient_formset.non_form_errors():
-                    messages.error(self.request, f"Ogólny błąd: {error}")
-                    
-                return self.render_to_response(self.get_context_data(form=form))
-            else:
-                # Jeśli wszystkie formularze są puste, zapisz przepis bez składników
-                self.object = form.save(commit=False)
-                self.object.author = self.request.user
-                self.object.save()
-                form.save_m2m()
-                
-                messages.success(
-                    self.request, 
-                    f'Przepis "{self.object.title}" został dodany. Pamiętaj, aby dodać składniki!'
-                )
-                
-                return redirect(self.get_success_url())
+            messages.error(self.request, 'Formularz zawiera błędy. Sprawdź podane informacje o składnikach.')
+            return self.form_invalid(form)
     
     def get_success_url(self):
         # Przekieruj na listę przepisów zamiast na szczegóły przepisu
@@ -868,11 +882,19 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             # Jeśli formularz składników jest nieprawidłowy, pokaż błędy tylko jeśli formset zawiera jakieś dane
             has_non_empty_ingredients = False
             
-            for form_data in ingredient_formset.cleaned_data:
-                # Jeśli którykolwiek z formularzy ma dane (nie jest pusty), sprawdź błędy
-                if form_data and any(form_data.values()):
-                    has_non_empty_ingredients = True
-                    break
+            try:
+                for form_data in ingredient_formset.cleaned_data:
+                    # Jeśli którykolwiek z formularzy ma dane (nie jest pusty), sprawdź błędy
+                    if form_data and any(form_data.values()):
+                        has_non_empty_ingredients = True
+                        break
+            except AttributeError:
+                # Obsługa przypadku, gdy formset nie ma atrybutu cleaned_data
+                # Sprawdź, czy którykolwiek z formularzy ma dane
+                for form in ingredient_formset.forms:
+                    if form.has_changed():
+                        has_non_empty_ingredients = True
+                        break
             
             if has_non_empty_ingredients:
                 for error in ingredient_formset.errors:
@@ -1701,3 +1723,31 @@ def ajax_search_suggestions(request):
     ).distinct().values_list('title', flat=True)[:10]
     
     return JsonResponse({'suggestions': list(suggestions)}) 
+
+def ajax_load_units_by_type(request):
+    unit_type = request.GET.get('unit_type')
+    units = []
+    
+    if unit_type:
+        if unit_type == 'weight_only':
+            units = MeasurementUnit.objects.filter(type='weight')
+        elif unit_type == 'volume_only':
+            units = MeasurementUnit.objects.filter(type='volume')
+        elif unit_type == 'piece_only':
+            units = MeasurementUnit.objects.filter(type='piece')
+        elif unit_type == 'spoon_only':
+            units = MeasurementUnit.objects.filter(type='spoon')
+        elif unit_type == 'weight_volume':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'volume'])
+        elif unit_type == 'weight_piece':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'piece'])
+        elif unit_type == 'weight_spoon':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'spoon'])
+        elif unit_type == 'volume_spoon':
+            units = MeasurementUnit.objects.filter(type__in=['volume', 'spoon'])
+        elif unit_type == 'all':
+            units = MeasurementUnit.objects.all()
+    
+    return JsonResponse({
+        'units': [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
+    })

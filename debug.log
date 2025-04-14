@@ -1962,3 +1962,434 @@ INFO 2025-04-14 23:18:55,669 basehttp 5536 10412 "GET /recipes/list/ HTTP/1.1" 2
 WARNING 2025-04-14 23:18:55,679 basehttp 5536 10412 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
 INFO 2025-04-14 23:18:56,871 basehttp 5536 14620 "GET /recipes/list/?q=a&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty= HTTP/1.1" 200 66817
 WARNING 2025-04-14 23:18:56,881 basehttp 5536 14620 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:23:57,674 basehttp 5536 16836 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-14 23:23:57,730 basehttp 5536 16836 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:23:58,042 basehttp 5536 22252 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:24:02,846 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:35,190 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:47,908 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:49,799 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:51,084 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:52,646 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:24:56,941 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 33626
+INFO 2025-04-14 23:25:32,963 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 32920
+INFO 2025-04-14 23:28:23,718 basehttp 5536 12940 "GET /recipes/detail/12/ HTTP/1.1" 200 33010
+INFO 2025-04-14 23:29:28,520 autoreload 8740 23576 Watching for file changes with StatReloader
+INFO 2025-04-14 23:29:46,303 basehttp 5536 10432 "GET /recipes/create/ HTTP/1.1" 302 0
+INFO 2025-04-14 23:29:46,312 basehttp 5536 10432 "GET /login/?next=/recipes/create/ HTTP/1.1" 200 18040
+INFO 2025-04-14 23:38:14,991 basehttp 5536 9996 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-14 23:38:15,046 basehttp 5536 9996 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:38:15,339 basehttp 5536 18456 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:38:16,085 basehttp 5536 18988 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-14 23:38:16,322 basehttp 5536 11564 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-14 23:38:16,330 basehttp 5536 18988 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-14 23:38:24,757 basehttp 5536 18988 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-14 23:38:25,634 basehttp 5536 18988 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-14 23:38:25,657 basehttp 5536 18988 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-14 23:38:26,728 basehttp 5536 18988 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-14 23:38:27,214 basehttp 5536 18988 "GET /recipes/api/unit-info/?unit_id=1&amount=20 HTTP/1.1" 200 207
+ERROR 2025-04-14 23:38:54,757 log 5536 18988 Internal Server Error: /recipes/create/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 182, in post
+    return super().post(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 151, in post
+    return self.form_valid(form)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 773, in form_valid
+    for form_data in ingredient_formset.cleaned_data:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\forms\formsets.py", line 278, in cleaned_data
+    raise AttributeError(
+AttributeError: 'RecipeIngredientFormSet' object has no attribute 'cleaned_data'
+ERROR 2025-04-14 23:38:54,767 basehttp 5536 18988 "POST /recipes/create/ HTTP/1.1" 500 101736
+INFO 2025-04-14 23:41:35,090 autoreload 5536 15376 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:35,145 autoreload 8740 23576 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:35,152 autoreload 22856 9356 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:35,923 autoreload 13260 12596 Watching for file changes with StatReloader
+INFO 2025-04-14 23:41:35,943 autoreload 21224 16420 Watching for file changes with StatReloader
+INFO 2025-04-14 23:41:35,961 autoreload 16176 10236 Watching for file changes with StatReloader
+INFO 2025-04-14 23:41:46,921 autoreload 21224 16420 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:46,921 autoreload 16176 10236 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:46,972 autoreload 13260 12596 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-14 23:41:47,749 autoreload 6936 14328 Watching for file changes with StatReloader
+INFO 2025-04-14 23:41:47,749 autoreload 16532 15744 Watching for file changes with StatReloader
+INFO 2025-04-14 23:41:47,776 autoreload 17072 19832 Watching for file changes with StatReloader
+INFO 2025-04-14 23:42:07,365 autoreload 6936 14328 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-14 23:42:07,396 autoreload 17072 19832 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-14 23:42:07,405 autoreload 16532 15744 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-14 23:42:08,089 autoreload 23856 21216 Watching for file changes with StatReloader
+INFO 2025-04-14 23:42:08,119 autoreload 1980 6932 Watching for file changes with StatReloader
+INFO 2025-04-14 23:42:08,124 autoreload 12680 10776 Watching for file changes with StatReloader
+INFO 2025-04-14 23:49:44,828 basehttp 23856 8820 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-14 23:49:45,545 basehttp 23856 8820 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-14 23:49:45,558 basehttp 23856 8820 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-14 23:49:46,080 basehttp 23856 8820 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-14 23:49:46,484 basehttp 23856 8820 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+ERROR 2025-04-14 23:49:48,202 log 23856 8820 Internal Server Error: /recipes/create/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+               ^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1075, in render
+    output = self.filter_expression.resolve(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 749, in resolve
+    new_obj = func(obj, *arg_vals)
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\templatetags\form_tags.py", line 8, in add_class
+    return field.as_widget(attrs={'class': css_class})
+          ^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'as_widget'
+ERROR 2025-04-14 23:49:48,213 basehttp 23856 8820 "POST /recipes/create/ HTTP/1.1" 500 179659
+INFO 2025-04-14 23:50:28,671 autoreload 12680 10776 D:\praca_inzynierska\recipes\templatetags\form_tags.py changed, reloading.
+INFO 2025-04-14 23:50:28,687 autoreload 23856 21216 D:\praca_inzynierska\recipes\templatetags\form_tags.py changed, reloading.
+INFO 2025-04-14 23:50:28,694 autoreload 1980 6932 D:\praca_inzynierska\recipes\templatetags\form_tags.py changed, reloading.
+INFO 2025-04-14 23:50:29,424 autoreload 5128 14232 Watching for file changes with StatReloader
+INFO 2025-04-14 23:50:29,440 autoreload 14576 20756 Watching for file changes with StatReloader
+INFO 2025-04-14 23:50:29,440 autoreload 5156 24004 Watching for file changes with StatReloader
+INFO 2025-04-14 23:53:37,081 basehttp 14576 1980 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-14 23:53:45,786 basehttp 14576 1980 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-14 23:53:49,171 basehttp 14576 1980 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-14 23:53:49,211 basehttp 14576 1980 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:53:49,314 basehttp 14576 21760 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:53:49,985 basehttp 14576 1692 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-14 23:53:50,160 basehttp 14576 23156 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-14 23:53:50,170 basehttp 14576 1692 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-14 23:54:04,060 basehttp 14576 1692 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-14 23:54:04,938 basehttp 14576 1692 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-14 23:54:04,950 basehttp 14576 1692 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-14 23:54:05,864 basehttp 14576 1692 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-14 23:54:06,081 basehttp 14576 1692 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-14 23:54:07,931 basehttp 14576 1692 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-14 23:56:22,952 basehttp 14576 9164 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-14 23:56:22,994 basehttp 14576 9164 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:56:23,106 basehttp 14576 16592 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:56:28,198 basehttp 14576 15636 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-14 23:56:28,371 basehttp 14576 15636 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-14 23:56:28,379 basehttp 14576 21076 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-14 23:56:41,955 basehttp 14576 21248 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-14 23:56:42,592 basehttp 14576 21248 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-14 23:56:42,607 basehttp 14576 21248 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-14 23:56:43,388 basehttp 14576 21248 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-14 23:56:43,566 basehttp 14576 21248 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-14 23:56:45,077 basehttp 14576 21248 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-14 23:59:53,869 basehttp 14576 6288 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-14 23:59:53,952 basehttp 14576 6288 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-14 23:59:54,104 basehttp 14576 6884 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-14 23:59:54,748 basehttp 14576 20532 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-14 23:59:54,931 basehttp 14576 10468 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-14 23:59:54,941 basehttp 14576 20532 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:00:09,282 basehttp 14576 20532 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:00:10,002 basehttp 14576 20532 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-15 00:00:10,014 basehttp 14576 20532 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:00:10,693 basehttp 14576 20532 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:00:10,850 basehttp 14576 20532 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 00:00:11,906 basehttp 14576 20532 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-15 00:02:27,426 basehttp 14576 20532 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:02:27,474 basehttp 14576 20532 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:02:27,592 basehttp 14576 10468 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:02:28,207 basehttp 14576 13392 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-15 00:02:28,391 basehttp 14576 20504 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:02:28,394 basehttp 14576 13392 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:02:39,171 basehttp 14576 13392 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:02:40,681 basehttp 14576 13392 "GET /recipes/api/load-units/?ingredient_id=31 HTTP/1.1" 200 1441
+INFO 2025-04-15 00:02:40,691 basehttp 14576 13392 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:02:41,579 basehttp 14576 13392 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:02:41,774 basehttp 14576 13392 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 00:02:43,302 basehttp 14576 13392 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-15 00:02:57,155 basehttp 14576 13392 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:02:57,194 basehttp 14576 13392 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:02:57,296 basehttp 14576 20504 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:02:58,281 basehttp 14576 3832 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-15 00:02:58,454 basehttp 14576 17480 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:02:58,462 basehttp 14576 3832 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:03:08,529 basehttp 14576 3832 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:03:10,362 basehttp 14576 3832 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:03:11,018 basehttp 14576 3832 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-15 00:03:11,029 basehttp 14576 3832 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:03:12,394 basehttp 14576 3832 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:03:12,560 basehttp 14576 3832 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 00:03:13,546 basehttp 14576 3832 "GET /recipes/api/unit-info/?unit_id=3&amount=22 HTTP/1.1" 200 155
+INFO 2025-04-15 00:03:14,570 basehttp 14576 3832 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 00:03:16,570 basehttp 14576 3832 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-15 00:04:54,389 autoreload 5156 24004 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-15 00:04:54,390 autoreload 5128 14232 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-15 00:04:55,233 autoreload 14576 20756 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-15 00:04:55,340 autoreload 20592 19924 Watching for file changes with StatReloader
+INFO 2025-04-15 00:04:55,340 autoreload 18220 14580 Watching for file changes with StatReloader
+INFO 2025-04-15 00:04:56,081 autoreload 21972 24168 Watching for file changes with StatReloader
+INFO 2025-04-15 00:15:10,831 autoreload 12540 3728 Watching for file changes with StatReloader
+INFO 2025-04-15 00:15:50,835 autoreload 12540 3728 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:15:51,688 autoreload 23448 23336 Watching for file changes with StatReloader
+INFO 2025-04-15 00:15:57,890 autoreload 23448 23336 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:15:58,804 autoreload 21880 17488 Watching for file changes with StatReloader
+INFO 2025-04-15 00:16:15,669 basehttp 21880 16040 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-15 00:16:18,238 basehttp 21880 16040 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:16:18,281 basehttp 21880 16040 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:16:18,382 basehttp 21880 24100 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:16:19,015 basehttp 21880 20416 "GET /recipes/create/ HTTP/1.1" 200 59191
+INFO 2025-04-15 00:16:19,228 basehttp 21880 7408 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:16:19,234 basehttp 21880 20416 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:16:29,204 basehttp 21880 20416 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:16:29,907 basehttp 21880 20416 "GET /recipes/api/load-units/?ingredient_id=54 HTTP/1.1" 200 638
+INFO 2025-04-15 00:16:29,927 basehttp 21880 20416 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:16:31,334 basehttp 21880 20416 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:16:33,508 basehttp 21880 20416 "GET /recipes/api/unit-info/?unit_id=3&amount=2 HTTP/1.1" 200 152
+INFO 2025-04-15 00:16:35,065 basehttp 21880 20416 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:16:36,348 basehttp 21880 20416 "GET /recipes/api/unit-info/?unit_id=1&amount=20 HTTP/1.1" 200 207
+INFO 2025-04-15 00:16:39,521 basehttp 21880 20416 "POST /recipes/create/ HTTP/1.1" 200 58903
+INFO 2025-04-15 00:22:50,143 basehttp 21880 7652 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:22:50,212 basehttp 21880 7652 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:22:50,447 basehttp 21880 20660 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:22:51,084 basehttp 21880 9268 "GET /recipes/create/ HTTP/1.1" 200 59437
+INFO 2025-04-15 00:22:51,271 basehttp 21880 20464 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:22:51,276 basehttp 21880 9268 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:23:02,851 basehttp 21880 9268 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:23:05,380 basehttp 21880 9268 "GET /recipes/api/load-units/?ingredient_id=31 HTTP/1.1" 200 1441
+INFO 2025-04-15 00:23:05,393 basehttp 21880 9268 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:23:06,418 basehttp 21880 9268 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:23:06,485 basehttp 21880 9268 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:23:08,803 basehttp 21880 9268 "POST /recipes/create/ HTTP/1.1" 200 59149
+INFO 2025-04-15 00:23:20,067 autoreload 21880 17488 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:23:20,741 autoreload 14836 14168 Watching for file changes with StatReloader
+INFO 2025-04-15 00:32:11,589 basehttp 14836 15296 "GET /fridge/ HTTP/1.1" 200 19376
+INFO 2025-04-15 00:32:13,121 basehttp 14836 15296 "GET /fridge/add/ HTTP/1.1" 200 30815
+INFO 2025-04-15 00:32:13,373 basehttp 14836 15296 "GET /static/fridge/js/fridge_wizard.js HTTP/1.1" 200 13773
+INFO 2025-04-15 00:32:16,944 basehttp 14836 15296 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 598
+INFO 2025-04-15 00:32:18,675 basehttp 14836 15296 "GET /fridge/ajax/load-units/?ingredient_id=53 HTTP/1.1" 200 158
+INFO 2025-04-15 00:32:27,956 models 14836 15296 Dodawanie do lodówki: 400.0 g sk³adnika Bu³ka tarta
+INFO 2025-04-15 00:32:27,957 models 14836 15296 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 00:32:27,975 basehttp 14836 15296 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 110
+INFO 2025-04-15 00:32:28,007 basehttp 14836 15296 "GET /fridge/list/ HTTP/1.1" 200 25823
+INFO 2025-04-15 00:32:29,862 basehttp 14836 15296 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:32:29,913 basehttp 14836 15296 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:32:30,233 basehttp 14836 23692 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:32:31,732 basehttp 14836 8596 "GET /recipes/create/ HTTP/1.1" 200 59437
+INFO 2025-04-15 00:32:31,935 basehttp 14836 1676 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:32:31,941 basehttp 14836 8596 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:32:40,006 basehttp 14836 8596 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:32:42,638 basehttp 14836 8596 "GET /recipes/api/load-units/?ingredient_id=32 HTTP/1.1" 200 877
+INFO 2025-04-15 00:32:42,653 basehttp 14836 8596 "GET /recipes/api/unit-info/?unit_id=15&amount=1 HTTP/1.1" 200 202
+INFO 2025-04-15 00:32:45,764 basehttp 14836 8596 "GET /recipes/api/unit-info/?unit_id=9&amount=1 HTTP/1.1" 200 171
+INFO 2025-04-15 00:32:46,813 basehttp 14836 8596 "GET /recipes/api/unit-info/?unit_id=9&amount=5 HTTP/1.1" 200 171
+INFO 2025-04-15 00:32:48,090 basehttp 14836 8596 "POST /recipes/create/ HTTP/1.1" 200 59149
+INFO 2025-04-15 00:39:08,019 basehttp 14836 22532 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:39:08,095 basehttp 14836 22532 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:39:08,359 basehttp 14836 22208 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:39:08,996 basehttp 14836 12380 "GET /recipes/create/ HTTP/1.1" 200 60630
+INFO 2025-04-15 00:39:09,212 basehttp 14836 12380 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:39:09,222 basehttp 14836 22820 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:39:17,943 basehttp 14836 13736 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:39:18,649 basehttp 14836 13736 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-15 00:39:18,663 basehttp 14836 13736 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:39:19,277 basehttp 14836 13736 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:39:19,399 basehttp 14836 13736 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:39:23,275 basehttp 14836 13736 "POST /recipes/create/ HTTP/1.1" 200 60371
+INFO 2025-04-15 00:39:23,475 basehttp 14836 12524 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:39:23,486 basehttp 14836 13736 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:39:48,369 basehttp 14836 13736 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:39:48,449 basehttp 14836 13736 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:39:48,699 basehttp 14836 12524 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:39:49,438 basehttp 14836 536 "GET /recipes/create/ HTTP/1.1" 200 60630
+INFO 2025-04-15 00:39:49,645 basehttp 14836 19116 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:39:49,655 basehttp 14836 536 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:39:59,403 basehttp 14836 536 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:40:00,355 basehttp 14836 536 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-15 00:40:00,369 basehttp 14836 536 "GET /recipes/api/unit-info/?unit_id=1&amount=1 HTTP/1.1" 200 146
+INFO 2025-04-15 00:40:01,162 basehttp 14836 536 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:40:01,245 basehttp 14836 536 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:40:02,027 basehttp 14836 536 "GET /recipes/api/unit-info/?unit_id=3&amount=25 HTTP/1.1" 200 155
+INFO 2025-04-15 00:40:03,027 basehttp 14836 536 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:40:05,474 basehttp 14836 536 "POST /recipes/create/ HTTP/1.1" 200 60371
+INFO 2025-04-15 00:40:05,693 basehttp 14836 19116 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:40:05,699 basehttp 14836 536 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:42:28,259 autoreload 14836 14168 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-15 00:42:29,271 autoreload 13484 12524 Watching for file changes with StatReloader
+INFO 2025-04-15 00:43:10,694 autoreload 13484 12524 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:43:11,413 autoreload 16272 5348 Watching for file changes with StatReloader
+INFO 2025-04-15 00:43:28,641 autoreload 16272 5348 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-15 00:43:29,329 autoreload 6884 12672 Watching for file changes with StatReloader
+INFO 2025-04-15 00:44:42,074 autoreload 6884 12672 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:44:42,785 autoreload 6764 17512 Watching for file changes with StatReloader
+INFO 2025-04-15 00:45:00,079 autoreload 6764 17512 D:\praca_inzynierska\recipes\forms.py changed, reloading.
+INFO 2025-04-15 00:45:00,803 autoreload 22592 3712 Watching for file changes with StatReloader
+INFO 2025-04-15 00:47:45,476 autoreload 22592 3712 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:47:46,166 autoreload 9616 14008 Watching for file changes with StatReloader
+INFO 2025-04-15 00:47:48,352 basehttp 9616 608 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:47:48,402 basehttp 9616 608 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:47:48,532 basehttp 9616 22136 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:47:50,264 basehttp 9616 10872 "GET /recipes/create/ HTTP/1.1" 200 60112
+INFO 2025-04-15 00:47:50,507 basehttp 9616 24024 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:47:50,517 basehttp 9616 10872 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:47:57,820 basehttp 9616 10872 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:47:58,566 basehttp 9616 10872 "GET /recipes/api/load-units/?ingredient_id=31 HTTP/1.1" 200 1441
+INFO 2025-04-15 00:47:59,086 basehttp 9616 10872 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:47:59,290 basehttp 9616 10872 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 00:48:01,019 basehttp 9616 10872 "GET /recipes/api/unit-info/?unit_id=14&amount=22 HTTP/1.1" 200 184
+INFO 2025-04-15 00:48:02,020 basehttp 9616 10872 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+ERROR 2025-04-15 00:48:04,465 log 9616 10872 Internal Server Error: /recipes/create/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 182, in post
+    return super().post(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 151, in post
+    return self.form_valid(form)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 771, in form_valid
+    self.object.save()
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\base.py", line 857, in save
+    self._prepare_related_fields_for_save(operation_name="save")
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\base.py", line 1242, in _prepare_related_fields_for_save
+    raise ValueError(
+ValueError: save() prohibited to prevent data loss due to unsaved related object 'recipe'.
+ERROR 2025-04-15 00:48:04,475 basehttp 9616 10872 "POST /recipes/create/ HTTP/1.1" 500 108301
+INFO 2025-04-15 00:49:13,656 autoreload 9616 14008 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:49:14,562 autoreload 16592 18496 Watching for file changes with StatReloader
+INFO 2025-04-15 00:49:27,182 autoreload 16592 18496 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:49:28,098 autoreload 13372 18988 Watching for file changes with StatReloader
+INFO 2025-04-15 00:49:38,717 autoreload 13372 18988 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:49:39,522 autoreload 1524 14308 Watching for file changes with StatReloader
+INFO 2025-04-15 00:49:48,429 basehttp 1524 608 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:49:48,472 basehttp 1524 608 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:49:48,705 basehttp 1524 22136 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:49:51,112 basehttp 1524 6272 "GET /recipes/create/ HTTP/1.1" 200 60112
+INFO 2025-04-15 00:49:51,308 basehttp 1524 7028 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:49:51,314 basehttp 1524 6272 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:50:02,221 basehttp 1524 20088 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:50:03,103 basehttp 1524 20088 "GET /recipes/api/load-units/?ingredient_id=31 HTTP/1.1" 200 317
+INFO 2025-04-15 00:50:03,589 basehttp 1524 20088 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:50:03,757 basehttp 1524 20088 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+ERROR 2025-04-15 00:50:06,966 log 1524 20088 Internal Server Error: /recipes/create/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 182, in post
+    return super().post(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\views\generic\edit.py", line 151, in post
+    return self.form_valid(form)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\recipes\views.py", line 773, in form_valid
+    self.object.save()
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\base.py", line 857, in save
+    self._prepare_related_fields_for_save(operation_name="save")
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\base.py", line 1242, in _prepare_related_fields_for_save
+    raise ValueError(
+ValueError: save() prohibited to prevent data loss due to unsaved related object 'recipe'.
+ERROR 2025-04-15 00:50:06,975 basehttp 1524 20088 "POST /recipes/create/ HTTP/1.1" 500 108276
+INFO 2025-04-15 00:50:46,880 autoreload 1524 14308 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:50:47,733 autoreload 17772 10032 Watching for file changes with StatReloader
+INFO 2025-04-15 00:51:17,201 autoreload 17772 10032 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:51:18,099 autoreload 1200 1904 Watching for file changes with StatReloader
+INFO 2025-04-15 00:51:31,557 autoreload 1200 1904 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:51:32,331 autoreload 19340 22532 Watching for file changes with StatReloader
+INFO 2025-04-15 00:51:52,458 autoreload 19340 22532 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 00:51:54,194 autoreload 23452 14304 Watching for file changes with StatReloader
+INFO 2025-04-15 00:51:56,716 basehttp 23452 21000 "GET /recipes/list/ HTTP/1.1" 200 76240
+WARNING 2025-04-15 00:51:56,926 basehttp 23452 21000 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:51:57,048 basehttp 23452 3060 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:51:58,064 basehttp 23452 16636 "GET /recipes/create/ HTTP/1.1" 200 60112
+INFO 2025-04-15 00:51:58,269 basehttp 23452 12936 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 00:51:58,280 basehttp 23452 16636 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 00:52:05,047 basehttp 23452 16296 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 00:52:05,786 basehttp 23452 16296 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 638
+INFO 2025-04-15 00:52:06,721 basehttp 23452 16296 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 00:52:06,821 basehttp 23452 16296 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:52:07,871 basehttp 23452 16296 "GET /recipes/api/unit-info/?unit_id=3&amount=25 HTTP/1.1" 200 155
+INFO 2025-04-15 00:52:08,788 basehttp 23452 16296 "GET /recipes/api/unit-info/?unit_id=1&amount=25 HTTP/1.1" 200 207
+INFO 2025-04-15 00:52:10,951 basehttp 23452 16296 "POST /recipes/create/ HTTP/1.1" 302 0
+INFO 2025-04-15 00:52:11,163 basehttp 23452 16296 "GET /recipes/list/ HTTP/1.1" 200 77673
+WARNING 2025-04-15 00:52:11,229 basehttp 23452 16488 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 00:52:11,375 basehttp 23452 16740 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 00:52:11,509 basehttp 23452 16296 "GET /media/recipes/brak.jpg HTTP/1.1" 200 10498
+INFO 2025-04-15 00:52:29,424 basehttp 23452 16296 "GET /recipes/detail/14/ HTTP/1.1" 200 26147
+INFO 2025-04-15 00:52:29,468 basehttp 23452 16296 "GET /media/recipes/brak.jpg HTTP/1.1" 304 0

@@ -239,4 +239,119 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - ZALECENIE: Dodać podgląd składników na karcie przepisu (bez konieczności wchodzenia w szczegóły).
    - ZALECENIE: Umożliwić zapisywanie ulubionych ustawień filtrowania i sortowania.
 
-[TUTAJ BĘDĄ DOKUMENTOWANE ZNALEZIONE BŁĘDY I POPRAWKI] 
+6. Testy modułu przepisów - Dodawanie przepisu:
+   - BŁĄD: Funkcjonalność dodawania przepisu nie działa poprawnie. Podczas próby dodania przepisu wystąpił błąd AttributeError: 'RecipeIngredientFormSet' object has no attribute 'cleaned_data'.
+   - BŁĄD: Błąd wystąpił w pliku views.py, linia 773, w metodzie form_valid klasy RecipeCreateView, podczas próby iteracji po ingredient_formset.cleaned_data.
+   - PRZYCZYNA: Problem wynika prawdopodobnie z nieprawidłowej konfiguracji formsetów lub błędu w inicjalizacji RecipeIngredientFormSet.
+   - ZALECENIE: Należy naprawić implementację RecipeIngredientFormSet, sprawdzając definicję w forms.py oraz sposób inicjalizacji w widoku.
+   - ZALECENIE: Dodać obsługę wyjątków w metodzie form_valid, aby zapobiec całkowitemu niepowodzeniu formularza.
+   - POPRAWKA: Dodano obsługę wyjątków AttributeError w klasach RecipeCreateView i RecipeUpdateView, aby naprawić problem z brakującym atrybutem cleaned_data.
+   - POPRAWKA: Zaimplementowano klasę bazową BaseRecipeIngredientFormSet z dodatkową walidacją i inicjalizacją atrybutu cleaned_data.
+   - POPRAWKA: Użyto formset=BaseRecipeIngredientFormSet w definicji RecipeIngredientFormSet w forms.py.
+
+7. Testy modułu przepisów - Edycja przepisu:
+   - BŁĄD: Ze względu na problem z dodawaniem przepisów, istnieje wysokie prawdopodobieństwo, że edycja przepisów również nie działa prawidłowo.
+   - PRZYCZYNA: Formularz edycji korzysta z tych samych komponentów (RecipeIngredientFormSet) co formularz dodawania przepisu.
+   - ZALECENIE: Po naprawie funkcjonalności dodawania przepisu, należy przetestować również edycję istniejących przepisów.
+   - ZALECENIE: Zweryfikować czy formset składników w formularzu edycji jest prawidłowo inicjalizowany z istniejącymi danymi przepisu.
+   - POPRAWKA: Naprawiono problem z atrybutem cleaned_data w klasie RecipeUpdateView, dodając obsługę wyjątków AttributeError.
+   - POPRAWKA: Implementacja BaseRecipeIngredientFormSet naprawia również problemy w edycji przepisów.
+
+8. Testy szablonów i filtrów - add_class:
+   - BŁĄD: Napotkano błąd AttributeError: 'str' object has no attribute 'as_widget' podczas używania filtra add_class w szablonie recipe_form.html.
+   - PRZYCZYNA: Filtr add_class zakładał, że wszystkie pola przekazywane do niego są obiektami pola formularza z metodą as_widget, podczas gdy w niektórych przypadkach przekazywane były stringi.
+   - POPRAWKA: Dodano sprawdzenie typu w filtrze add_class, aby obsługiwał również przypadek, gdy przekazywana jest wartość będąca stringiem, a nie polem formularza.
+   - ZALECENIE: Dopracować jednolite podejście do renderowania formularzy w szablonach, aby uniknąć mieszania różnych technik.
+
+===========================================================
+IV. TESTY MODUŁU LODÓWKI
+===========================================================
+
+1. Przeglądanie zawartości lodówki
+   [ ] Lista wszystkich produktów
+   [ ] Filtry i wyszukiwanie
+   [ ] Przełączanie widoków (lista, karty)
+   [ ] Grupowanie według kategorii
+
+2. Dodawanie produktów
+   [ ] Pojedyncze dodawanie produktu
+   [ ] Dodawanie wielu produktów naraz
+   [ ] Wybór jednostki miary
+   [ ] Ustawianie daty ważności
+
+3. Edycja produktów
+   [ ] Zmiana ilości
+   [ ] Zmiana jednostki
+   [ ] Zmiana daty ważności
+
+4. Usuwanie produktów
+   [ ] Usuwanie pojedynczego produktu
+   [ ] Usuwanie przeterminowanych produktów
+
+5. Konwersje jednostek
+   [ ] Przeliczanie między różnymi jednostkami tego samego typu
+   [ ] Automatyczna konwersja przy dodawaniu (jeśli potrzebna)
+
+===========================================================
+V. TESTY MODUŁU LISTY ZAKUPÓW
+===========================================================
+
+1. Przeglądanie listy zakupów
+   [ ] Wyświetlanie aktualnej listy
+   [ ] Filtry i sortowanie
+
+2. Dodawanie produktów
+   [ ] Ręczne dodawanie produktów
+   [ ] Dodawanie z przepisu
+   [ ] Dodawanie brakujących produktów z lodówki
+
+3. Edycja produktów
+   [ ] Zmiana ilości
+   [ ] Zmiana jednostki
+   [ ] Oznaczanie jako kupione/niekupione
+
+4. Usuwanie produktów
+   [ ] Usuwanie pojedynczego produktu
+   [ ] Czyszczenie całej listy
+
+===========================================================
+VI. TESTY PANELU ADMINISTRATORA
+===========================================================
+
+1. Zarządzanie zgłoszonymi składnikami
+   [ ] Przeglądanie listy oczekujących składników
+   [ ] Zatwierdzanie składników
+   [ ] Odrzucanie składników
+   [ ] Edycja przed zatwierdzeniem
+
+2. Zarządzanie jednostkami miary
+   [ ] Przeglądanie listy jednostek
+   [ ] Dodawanie nowych jednostek
+   [ ] Edycja istniejących jednostek
+   [ ] Usuwanie jednostek
+
+3. Zarządzanie kategoriami
+   [ ] Przeglądanie listy kategorii
+   [ ] Dodawanie nowych kategorii
+   [ ] Edycja istniejących kategorii
+   [ ] Usuwanie kategorii
+
+===========================================================
+VII. TESTY INTEGRACYJNE
+===========================================================
+
+1. Przepis → Lista zakupów
+   [ ] Dodawanie składników z przepisu do listy zakupów
+   [ ] Poprawne przeliczanie ilości na podstawie liczby porcji
+
+2. Przepis → Lodówka
+   [ ] Przygotowanie przepisu i aktualizacja stanu lodówki
+   [ ] Poprawne odejmowanie użytych składników
+
+3. Lodówka → Lista zakupów
+   [ ] Dodawanie brakujących produktów do listy zakupów
+
+4. Lista zakupów → Lodówka
+   [ ] Dodawanie kupionych produktów do lodówki
+
+=========================================================== 

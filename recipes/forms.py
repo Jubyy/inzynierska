@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, BaseInlineFormSet
 from .models import Recipe, RecipeIngredient, RecipeCategory, Ingredient, MeasurementUnit, IngredientCategory, Comment, ConversionTable, ConversionTableEntry
 from django.db import models
 
@@ -68,29 +68,76 @@ class RecipeIngredientForm(forms.ModelForm):
         unit = cleaned_data.get('unit')
         amount = cleaned_data.get('amount')
         
+        print(f"[DEBUG] RecipeIngredientForm.clean() - ingredient: {ingredient}, unit: {unit}, amount: {amount}")
+        
         if ingredient and unit and amount:
             # Lista jednostek wymagających liczb całkowitych
             whole_number_units = ['szt', 'sztuka', 'garść', 'opakowanie']
             
             # Sprawdź, czy dla jednostek wymagających liczb całkowitych podano liczbę całkowitą
             if unit.symbol in whole_number_units and not float(amount).is_integer():
+                print(f"[DEBUG] Błąd: Dla jednostki {unit.symbol} podano wartość niecałkowitą: {amount}")
                 self.add_error('amount', 'Dla tej jednostki można podać tylko liczby całkowite.')
             
-            # Sprawdź, czy wybrana jednostka jest kompatybilna ze składnikiem
+            # Sprawdź kompatybilność przez dwa mechanizmy:
+            # 1. Bezpośrednio przypisane kompatybilne jednostki
             compatible_units = ingredient.compatible_units.all()
+            print(f"[DEBUG] Bezpośrednio kompatybilne jednostki dla {ingredient.name}: {[u.name for u in compatible_units]}")
+            
+            # Jeśli nie ma bezpośrednio przypisanych jednostek, ale jest domyślna jednostka
             if not compatible_units.exists() and ingredient.default_unit:
                 compatible_units = [ingredient.default_unit]
+                print(f"[DEBUG] Brak kompatybilnych jednostek, ale istnieje domyślna: {ingredient.default_unit.name}")
             
-            if unit not in compatible_units:
+            # 2. Dozwolone jednostki wg unit_type
+            allowed_units = ingredient.get_allowed_units()
+            print(f"[DEBUG] Dozwolone jednostki wg unit_type dla {ingredient.name}: {[u.name for u in allowed_units]}")
+            
+            # Jednostka jest kompatybilna, jeśli jest na liście kompatybilnych
+            # LUB jeśli pasuje do dozwolonego typu jednostek dla składnika
+            if unit not in compatible_units and unit not in allowed_units:
+                print(f"[DEBUG] Jednostka {unit.name} nie jest kompatybilna ze składnikiem {ingredient.name}")
+                print(f"[DEBUG] Unit type składnika: {ingredient.unit_type}, typ jednostki: {unit.type}")
                 self.add_error('unit', 'Wybrana jednostka nie jest kompatybilna z tym składnikiem.')
+            elif unit not in compatible_units and unit in allowed_units:
+                # Jeśli jednostka jest dozwolona wg typu, ale nie ma jej na liście kompatybilnych,
+                # automatycznie dodaj ją do kompatybilnych jednostek
+                print(f"[DEBUG] Automatycznie dodaję jednostkę {unit.name} do kompatybilnych dla {ingredient.name}")
+                ingredient.compatible_units.add(unit)
         
         return cleaned_data
+
+class BaseRecipeIngredientFormSet(BaseInlineFormSet):
+    """Bazowa klasa dla formsetów składników przepisu"""
+    
+    def clean(self):
+        """
+        Waliduje cały formset, sprawdzając czy wszystkie wymagane pola są wypełnione.
+        """
+        if any(self.errors):
+            # Nie wykonuj walidacji, jeśli poszczególne formularze mają błędy
+            return
+        
+        # Na wszelki wypadek inicjalizujemy cleaned_data jako pustą listę
+        if not hasattr(self, 'cleaned_data'):
+            self.cleaned_data = []
+        
+        # Sprawdzamy, czy wszystkie pola są wypełnione
+        for form in self.forms:
+            if form.has_changed() and not form.cleaned_data.get('DELETE', False):
+                ingredient = form.cleaned_data.get('ingredient')
+                amount = form.cleaned_data.get('amount')
+                unit = form.cleaned_data.get('unit')
+                
+                if not ingredient or not amount or not unit:
+                    form.add_error(None, 'Wszystkie pola składnika muszą być wypełnione.')
 
 # Formset do zarządzania wieloma składnikami dla przepisu
 RecipeIngredientFormSet = inlineformset_factory(
     Recipe, 
     RecipeIngredient,
     form=RecipeIngredientForm,
+    formset=BaseRecipeIngredientFormSet,
     extra=1,  # Liczba pustych formularzy na początku
     can_delete=True,  # Możliwość usuwania składników
     min_num=0,  # Zmieniamy z 1 na 0, aby nie wymagać minimalnej liczby składników

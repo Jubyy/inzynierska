@@ -137,26 +137,50 @@ def ajax_ingredient_search(request):
     return JsonResponse({'results': results})
 
 def ajax_load_units(request):
-    """Pobieranie jednostek miary dla składnika"""
-    ingredient_id = request.GET.get('ingredient_id')
+    ingredient_id = request.GET.get('ingredient')
+    units = []
     
-    try:
-        ingredient = Ingredient.objects.get(pk=ingredient_id)
-        # Pobierz dozwolone jednostki dla składnika
-        allowed_units = ingredient.allowed_units.all()
-        
-        if not allowed_units:
-            # Jeśli nie ma zdefiniowanych jednostek, zwróć wszystkie
+    if ingredient_id:
+        try:
+            ingredient = Ingredient.objects.get(id=ingredient_id)
+            allowed_units = ingredient.get_compatible_units()
+            
+            if not allowed_units:
+                # Jeśli nie ma zdefiniowanych dozwolonych jednostek, zwróć wszystkie
+                units = MeasurementUnit.objects.all()
+            else:
+                units = allowed_units
+        except Ingredient.DoesNotExist:
+            pass
+    
+    return JsonResponse({
+        'units': [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
+    })
+
+def ajax_load_units_by_type(request):
+    unit_type = request.GET.get('unit_type')
+    units = []
+    
+    if unit_type:
+        if unit_type == 'weight_only':
+            units = MeasurementUnit.objects.filter(type='weight')
+        elif unit_type == 'volume_only':
+            units = MeasurementUnit.objects.filter(type='volume')
+        elif unit_type == 'piece_only':
+            units = MeasurementUnit.objects.filter(type='piece')
+        elif unit_type == 'spoon_only':
+            units = MeasurementUnit.objects.filter(type='spoon')
+        elif unit_type == 'weight_volume':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'volume'])
+        elif unit_type == 'weight_piece':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'piece'])
+        elif unit_type == 'weight_spoon':
+            units = MeasurementUnit.objects.filter(type__in=['weight', 'spoon'])
+        elif unit_type == 'volume_spoon':
+            units = MeasurementUnit.objects.filter(type__in=['volume', 'spoon'])
+        elif unit_type == 'all':
             units = MeasurementUnit.objects.all()
-        else:
-            units = [au.unit for au in allowed_units]
-        
-        units_data = [{
-            'id': unit.id,
-            'name': unit.name,
-            'is_default': hasattr(unit, 'is_default') and unit.is_default
-        } for unit in units]
-        
-        return JsonResponse({'units': units_data})
-    except Ingredient.DoesNotExist:
-        return JsonResponse({'units': []}) 
+    
+    return JsonResponse({
+        'units': [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
+    }) 

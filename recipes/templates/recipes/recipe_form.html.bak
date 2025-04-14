@@ -619,10 +619,10 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- Inicjalizacja danych z serwera dla JavaScript -->
-<script type="text/javascript">
+<script>
     // Dane istniejących składników jako JSON
-    const existingIngredientsJson = '{{ ingredient_formset_data|safe }}';
-    let existingIngredients = [];
+    var existingIngredientsJson = '{{ ingredient_formset_data|safe }}';
+    var existingIngredients = [];
     
     try {
         if (existingIngredientsJson && existingIngredientsJson.trim() !== '') {
@@ -634,10 +634,10 @@
     }
     
     // ID przepisu
-    const recipeId = {% if form.instance.pk %}{{ form.instance.pk }}{% else %}null{% endif %};
+    var recipeId = {% if form.instance.pk %}{{ form.instance.pk }}{% else %}null{% endif %};
 </script>
 
-<script type="text/javascript">
+<script>
     $(document).ready(function() {
         // Inicjalizacja Select2 dla pola kategorii
         var categoriesSelector = '{{ form.categories.id_for_label }}';
@@ -700,9 +700,111 @@
                     url: "{% url 'recipes:ajax_load_units' %}",
                     data: { ingredient_id: ingredientId },
                     success: function(data) {
-                        populateUnitSelect(data);
-                        // Wywołaj zdarzenie change dla jQuery
-                        $('#ingredient-unit').trigger('change');
+                        const unitSelect = $('#ingredient-unit');
+                        unitSelect.empty().append('<option value="">-- Wybierz jednostkę --</option>');
+                        
+                        // Sortowanie jednostek: najpierw najczęściej używane
+                        const sortedUnits = [...data.units].sort((a, b) => {
+                            // Najpierw domyślna jednostka
+                            if (a.id === data.default_unit) return -1;
+                            if (b.id === data.default_unit) return 1;
+                            
+                            // Potem popularne jednostki
+                            if (a.is_common && !b.is_common) return -1;
+                            if (!a.is_common && b.is_common) return 1;
+                            
+                            // Na końcu sortuj według typu i nazwy
+                            if (a.type !== b.type) {
+                                const typeOrder = { 'weight': 1, 'volume': 2, 'piece': 3, 'spoon': 4, 'custom': 5 };
+                                return typeOrder[a.type] - typeOrder[b.type];
+                            }
+                            
+                            return a.name.localeCompare(b.name);
+                        });
+                        
+                        // Grupowanie jednostek według typu
+                        const typeLabels = {
+                            'weight': 'Waga',
+                            'volume': 'Objętość',
+                            'piece': 'Sztuki',
+                            'spoon': 'Łyżki',
+                            'custom': 'Inne'
+                        };
+                        
+                        // Jeśli to składnik mięsny, ograniczamy do jednostek wagi
+                        if (data.is_meat) {
+                            // Dla mięsa tylko jednostki wagi
+                            const weightUnits = sortedUnits.filter(unit => unit.type === 'weight');
+                            const optgroup = $('<optgroup label="Waga">');
+                            
+                            weightUnits.forEach(function(unit) {
+                                const option = new Option(
+                                    `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`,
+                                    unit.id,
+                                    false,
+                                    unit.id === data.default_unit
+                                );
+                                $(option).attr('data-symbol', unit.symbol);
+                                $(option).attr('data-type', unit.type);
+                                $(option).attr('data-conversion', unit.conversion || '');
+                                optgroup.append(option);
+                            });
+                            
+                            unitSelect.append(optgroup);
+                        } else {
+                            // Dla innych składników grupuj według typu
+                            const unitsByType = {};
+                            
+                            sortedUnits.forEach(unit => {
+                                if (!unitsByType[unit.type]) {
+                                    unitsByType[unit.type] = [];
+                                }
+                                unitsByType[unit.type].push(unit);
+                            });
+                            
+                            // Dodaj jednostki pogrupowane
+                            Object.keys(unitsByType).forEach(type => {
+                                const optgroup = $('<optgroup label="' + typeLabels[type] + '">');
+                                
+                                unitsByType[type].forEach(unit => {
+                                    const option = new Option(
+                                        `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`,
+                                        unit.id,
+                                        false,
+                                        unit.id === data.default_unit
+                                    );
+                                    $(option).attr('data-symbol', unit.symbol);
+                                    $(option).attr('data-type', unit.type);
+                                    $(option).attr('data-conversion', unit.conversion || '');
+                                    optgroup.append(option);
+                                });
+                                
+                                unitSelect.append(optgroup);
+                            });
+                        }
+                        
+                        unitSelect.trigger('change');
+                        
+                        // Pokaż informację o domyślnych jednostkach dla składnika bazując na unit_type
+                        if (data.unit_type) {
+                            let descriptions = {
+                                'weight_only': 'Ten składnik wymaga jednostek wagi (g, kg).',
+                                'volume_only': 'Ten składnik wymaga jednostek objętości (ml, l).',
+                                'piece_only': 'Ten składnik wymaga jednostek sztukowych.',
+                                'weight_volume': 'Ten składnik można podać w jednostkach wagi lub objętości (g, ml, l).',
+                                'weight_piece': 'Ten składnik można podać w jednostkach wagi lub sztukach.',
+                                'weight_spoon': 'Ten składnik można podać w jednostkach wagi lub łyżkach/łyżeczkach.',
+                                'volume_spoon': 'Ten składnik można podać w jednostkach objętości lub łyżkach/łyżeczkach.',
+                                'all': 'Ten składnik można podać w dowolnych jednostkach.'
+                            };
+                            
+                            $('#unit-description').html(descriptions[data.unit_type] || '');
+                            
+                            // Dla składników sztukowych dodaj informację, że można podać tylko sztuki
+                            if (data.unit_type === 'piece_only') {
+                                $('#unit-description').addClass('text-warning').html('Ten składnik podaje się w sztukach.');
+                            }
+                        }
                     }
                 });
             } else {
@@ -1043,125 +1145,6 @@
             
             return true;
         });
-
-        function populateUnitSelect(data) {
-            const unitSelect = document.getElementById('ingredient-unit');
-            unitSelect.innerHTML = '<option value="">-- Wybierz jednostkę --</option>';
-            
-            if (!data.units || !Array.isArray(data.units) || data.units.length === 0) {
-                console.log("[DEBUG] Brak jednostek dla tego składnika");
-                return;
-            }
-            
-            console.log("[DEBUG] Otrzymano jednostki:", data.units.length);
-            console.log("[DEBUG] Typ jednostek dozwolony dla składnika:", data.unit_type);
-            console.log("[DEBUG] Domyślna jednostka:", data.default_unit);
-            
-            // Sortuj jednostki
-            const sortedUnits = [...data.units].sort((a, b) => {
-                // Najpierw domyślna
-                if (a.id === data.default_unit) return -1;
-                if (b.id === data.default_unit) return 1;
-                
-                // Potem według popularności
-                if (a.is_common && !b.is_common) return -1;
-                if (!a.is_common && b.is_common) return 1;
-                
-                return a.name.localeCompare(b.name);
-            });
-            
-            // Grupowanie jednostek według typów
-            const unitsByType = {
-                'weight': [],
-                'volume': [],
-                'piece': [],
-                'spoon': [],
-                'custom': []
-            };
-            
-            // Tylko dozwolone typy jednostek dla tego składnika
-            const allowedTypes = [];
-            if (data.unit_type === 'weight_only') allowedTypes.push('weight');
-            else if (data.unit_type === 'volume_only') allowedTypes.push('volume');
-            else if (data.unit_type === 'piece_only') allowedTypes.push('piece');
-            else if (data.unit_type === 'weight_volume') allowedTypes.push('weight', 'volume');
-            else if (data.unit_type === 'weight_piece') allowedTypes.push('weight', 'piece');
-            else if (data.unit_type === 'weight_spoon') allowedTypes.push('weight', 'spoon');
-            else if (data.unit_type === 'volume_spoon') allowedTypes.push('volume', 'spoon');
-            else allowedTypes.push('weight', 'volume', 'piece', 'spoon', 'custom'); // 'all'
-            
-            console.log("[DEBUG] Dozwolone typy jednostek:", allowedTypes);
-            
-            // Podziel jednostki według typów
-            for (const unit of sortedUnits) {
-                // Sprawdź, czy typ jednostki jest dozwolony
-                if (allowedTypes.includes(unit.type)) {
-                    unitsByType[unit.type].push(unit);
-                }
-            }
-            
-            // Dodaj grupy jednostek do selecta
-            const typeLabels = {
-                'weight': 'Waga',
-                'volume': 'Objętość',
-                'piece': 'Sztuki',
-                'spoon': 'Łyżki',
-                'custom': 'Inne'
-            };
-            
-            let addedUnits = 0;
-            
-            // Dodaj jednostki według typów
-            for (const type of allowedTypes) {
-                const units = unitsByType[type];
-                if (units && units.length > 0) {
-                    // Stwórz optgroup
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = typeLabels[type];
-                    
-                    // Dodaj jednostki do grupy
-                    for (const unit of units) {
-                        const option = document.createElement('option');
-                        option.value = unit.id;
-                        option.textContent = `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`;
-                        option.dataset.symbol = unit.symbol;
-                        option.dataset.type = unit.type;
-                        option.dataset.conversion = unit.conversion || '';
-                        optgroup.appendChild(option);
-                        addedUnits++;
-                    }
-                    
-                    unitSelect.appendChild(optgroup);
-                }
-            }
-            
-            console.log(`[DEBUG] Dodano ${addedUnits} jednostek do selecta`);
-            
-            // Ustaw domyślną jednostkę jeśli istnieje
-            if (data.default_unit) {
-                unitSelect.value = data.default_unit;
-                console.log("[DEBUG] Ustawiono domyślną jednostkę:", data.default_unit);
-            }
-            
-            // Aktualizuj informacje o jednostce
-            updateUnitInfo();
-            
-            // Ustaw opis typu jednostki
-            if (data.unit_type) {
-                const descriptions = {
-                    'weight_only': 'Ten składnik wymaga jednostek wagi (g, kg).',
-                    'volume_only': 'Ten składnik wymaga jednostek objętości (ml, l).',
-                    'piece_only': 'Ten składnik wymaga jednostek sztukowych.',
-                    'weight_volume': 'Ten składnik można podać w jednostkach wagi lub objętości.',
-                    'weight_piece': 'Ten składnik można podać w jednostkach wagi lub sztukach.',
-                    'weight_spoon': 'Ten składnik można podać w jednostkach wagi lub łyżkach.',
-                    'volume_spoon': 'Ten składnik można podać w jednostkach objętości lub łyżkach.',
-                    'all': 'Ten składnik można podać w dowolnych jednostkach.'
-                };
-                
-                document.getElementById('unit-description').textContent = descriptions[data.unit_type] || '';
-            }
-        }
     });
 </script>
 {% endblock %} 

@@ -1,0 +1,554 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %}{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+<style>
+    .ingredient-form {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        position: relative;
+    }
+
+    .delete-row {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .errorlist {
+        color: #dc3545;
+        padding-left: 0;
+        list-style: none;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+    
+    .unit-info {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    .unit-conversion {
+        font-weight: bold;
+        color: #28a745;
+    }
+
+    .editor-content {
+        min-height: 200px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 0 0 4px 4px;
+        background: white;
+    }
+    
+    .editor-toolbar {
+        display: flex;
+        gap: 5px;
+        padding: 5px;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+    }
+    
+    .editor-toolbar button {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{% if form.instance.pk %}Edytuj przepis{% else %}Dodaj przepis{% endif %}</h1>
+
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="recipe-form">
+        {% csrf_token %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Podstawowe informacje</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                    {{ form.title|add_class:"form-control" }}
+                    {% if form.title.help_text %}
+                        <small class="form-text text-muted">{{ form.title.help_text }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.categories.id_for_label }}" class="form-label">{{ form.categories.label }}</label>
+                    {{ form.categories|add_class:"form-control categories-select" }}
+                    {% if form.categories.help_text %}
+                        <small class="form-text text-muted">{{ form.categories.help_text }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                    {{ form.description|add_class:"form-control" }}
+                    {% if form.description.help_text %}
+                        <small class="form-text text-muted">{{ form.description.help_text }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.instructions.id_for_label }}" class="form-label">{{ form.instructions.label }}</label>
+                    {{ form.instructions|add_class:"form-control" }}
+                    {% if form.instructions.help_text %}
+                        <small class="form-text text-muted">{{ form.instructions.help_text }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.servings.id_for_label }}" class="form-label">{{ form.servings.label }}</label>
+                            {{ form.servings|add_class:"form-control" }}
+                            {% if form.servings.help_text %}
+                                <small class="form-text text-muted">{{ form.servings.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.preparation_time.id_for_label }}" class="form-label">{{ form.preparation_time.label }}</label>
+                            {{ form.preparation_time|add_class:"form-control" }}
+                            {% if form.preparation_time.help_text %}
+                                <small class="form-text text-muted">{{ form.preparation_time.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                    {{ form.image|add_class:"form-control" }}
+                    {% if form.image.help_text %}
+                        <small class="form-text text-muted">{{ form.image.help_text }}</small>
+                    {% endif %}
+                    {% if form.instance.image %}
+                        <div class="mt-2">
+                            <img src="{{ form.instance.image.url }}" alt="Aktualne zdjęcie" class="img-thumbnail" style="max-width: 200px;">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Składniki</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ingredientModal">
+                        Dodaj składnik
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table" id="ingredients-table">
+                        <thead>
+                            <tr>
+                                <th>Składnik</th>
+                                <th>Ilość</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredients-list">
+                            <!-- Składniki będą dodawane dynamicznie przez JavaScript -->
+                            <tr class="no-ingredients">
+                                <td colspan="3" class="text-center">Brak składników. Dodanie składników jest opcjonalne, ale zalecane dla kompletnego przepisu.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Formset dla składników -->
+                {{ ingredient_formset.management_form }}
+                <div id="ingredient-formset" class="d-none">
+                    <!-- Ukryte pola formularza dla składników -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'recipes:list' %}" class="btn btn-outline-secondary">Anuluj</a>
+            <button type="submit" class="btn btn-primary">Zapisz przepis</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal dla dodawania składnika -->
+<div class="modal fade" id="ingredientModal" tabindex="-1" aria-labelledby="ingredientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ingredientModalLabel">Dodaj składnik</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="ingredient-select" class="form-label">Składnik</label>
+                    <select id="ingredient-select" class="form-control">
+                        <option value="">-- Wybierz składnik --</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="ingredient-amount" class="form-label">Ilość</label>
+                    <input type="number" id="ingredient-amount" class="form-control" step="0.01" min="0.01">
+                </div>
+                <div class="mb-3">
+                    <label for="ingredient-unit" class="form-label">Jednostka</label>
+                    <select id="ingredient-unit" class="form-control">
+                        <option value="">-- Wybierz jednostkę --</option>
+                    </select>
+                    <div id="unit-info" class="unit-info mt-2">
+                        <div id="unit-description" class="unit-description"></div>
+                        <div id="unit-conversion" class="unit-conversion"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <button type="button" class="btn btn-primary" id="add-ingredient-btn">Dodaj</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+// Inicjalizacja danych
+const recipeId = {% if form.instance.pk %}{{ form.instance.pk }}{% else %}null{% endif %};
+let formIndex = parseInt('{{ ingredient_formset.total_form_count }}');
+const maxForms = parseInt(document.getElementById('id_ingredients-MAX_NUM_FORMS').value || '100');
+
+// Inicjalizacja po załadowaniu strony
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicjalizacja Select2 dla kategorii
+    try {
+        const categoriesSelect = document.querySelector('.categories-select');
+        if (categoriesSelect) {
+            $(categoriesSelect).select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Wybierz kategorie przepisu',
+                allowClear: true
+            });
+        }
+    } catch (error) {
+        console.error('Błąd inicjalizacji Select2 dla kategorii:', error);
+    }
+
+    // Inicjalizacja Select2 dla wyboru składnika
+    try {
+        $('#ingredient-select').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#ingredientModal'),
+            placeholder: 'Wybierz składnik',
+            ajax: {
+                url: "{% url 'recipes:ajax_ingredient_search' %}",
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Błąd inicjalizacji Select2 dla składników:', error);
+    }
+
+    // Obsługa zmiany składnika
+    document.getElementById('ingredient-select').addEventListener('change', function() {
+        const ingredientId = this.value;
+        if (!ingredientId) {
+            clearUnitSelect();
+            return;
+        }
+
+        // Pobierz jednostki dla wybranego składnika
+        fetch(`{% url 'recipes:ajax_load_units' %}?ingredient_id=${ingredientId}`)
+            .then(response => response.json())
+            .then(data => {
+                populateUnitSelect(data);
+            })
+            .catch(error => {
+                console.error('Błąd podczas pobierania jednostek:', error);
+                clearUnitSelect();
+            });
+    });
+
+    // Obsługa zmiany jednostki
+    document.getElementById('ingredient-unit').addEventListener('change', updateUnitInfo);
+
+    // Obsługa zmiany ilości
+    document.getElementById('ingredient-amount').addEventListener('input', updateUnitInfo);
+
+    // Obsługa dodawania składnika z modalu
+    document.getElementById('add-ingredient-btn').addEventListener('click', addIngredient);
+
+    // Obsługa usuwania składnika (delegacja zdarzeń)
+    document.getElementById('ingredients-list').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-ingredient') || e.target.closest('.remove-ingredient')) {
+            const button = e.target.classList.contains('remove-ingredient') ? e.target : e.target.closest('.remove-ingredient');
+            removeIngredient(button);
+        }
+    });
+
+    // Załaduj istniejące składniki jeśli edycja
+    loadExistingIngredients();
+});
+
+// Funkcja czyszcząca select jednostek
+function clearUnitSelect() {
+    const unitSelect = document.getElementById('ingredient-unit');
+    unitSelect.innerHTML = '<option value="">-- Wybierz jednostkę --</option>';
+    document.getElementById('unit-description').innerHTML = '';
+    document.getElementById('unit-conversion').innerHTML = '';
+}
+
+// Funkcja wypełniająca select jednostek
+function populateUnitSelect(data) {
+    const unitSelect = document.getElementById('ingredient-unit');
+    unitSelect.innerHTML = '<option value="">-- Wybierz jednostkę --</option>';
+    
+    if (!data.units || !Array.isArray(data.units) || data.units.length === 0) {
+        return;
+    }
+    
+    // Sortuj jednostki
+    const sortedUnits = [...data.units].sort((a, b) => {
+        // Najpierw domyślna
+        if (a.id === data.default_unit) return -1;
+        if (b.id === data.default_unit) return 1;
+        
+        // Potem według popularności
+        if (a.is_common && !b.is_common) return -1;
+        if (!a.is_common && b.is_common) return 1;
+        
+        return a.name.localeCompare(b.name);
+    });
+    
+    // Dodaj jednostki do selecta
+    for (const unit of sortedUnits) {
+        const option = document.createElement('option');
+        option.value = unit.id;
+        option.textContent = `${unit.name} (${unit.symbol})${unit.id === data.default_unit ? ' - zalecana' : ''}`;
+        option.dataset.symbol = unit.symbol;
+        option.dataset.type = unit.type;
+        option.dataset.conversion = unit.conversion || '';
+        unitSelect.appendChild(option);
+    }
+    
+    // Ustaw domyślną jednostkę jeśli istnieje
+    if (data.default_unit) {
+        unitSelect.value = data.default_unit;
+    }
+    
+    // Aktualizuj informacje o jednostce
+    updateUnitInfo();
+    
+    // Ustaw opis typu jednostki
+    if (data.unit_type) {
+        const descriptions = {
+            'weight_only': 'Ten składnik wymaga jednostek wagi (g, kg).',
+            'volume_only': 'Ten składnik wymaga jednostek objętości (ml, l).',
+            'piece_only': 'Ten składnik wymaga jednostek sztukowych.',
+            'weight_volume': 'Ten składnik można podać w jednostkach wagi lub objętości.',
+            'weight_piece': 'Ten składnik można podać w jednostkach wagi lub sztukach.',
+            'weight_spoon': 'Ten składnik można podać w jednostkach wagi lub łyżkach.',
+            'volume_spoon': 'Ten składnik można podać w jednostkach objętości lub łyżkach.',
+            'all': 'Ten składnik można podać w dowolnych jednostkach.'
+        };
+        
+        document.getElementById('unit-description').textContent = descriptions[data.unit_type] || '';
+    }
+}
+
+// Aktualizacja informacji o jednostce
+function updateUnitInfo() {
+    const unitSelect = document.getElementById('ingredient-unit');
+    const amountInput = document.getElementById('ingredient-amount');
+    
+    const unitId = unitSelect.value;
+    const amount = amountInput.value;
+    
+    if (!unitId) return;
+    
+    const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+    const unitConversion = selectedOption.dataset.conversion;
+    
+    // Wyświetl podstawowy przelicznik
+    document.getElementById('unit-conversion').textContent = unitConversion || '';
+    
+    // Jeśli mamy ilość, pobierz dokładny przelicznik
+    if (unitId && amount && amount > 0) {
+        fetch(`{% url 'recipes:ajax_unit_info' %}?unit_id=${unitId}&amount=${amount}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.conversion) {
+                    document.getElementById('unit-conversion').textContent = data.conversion;
+                }
+            })
+            .catch(error => {
+                console.error('Błąd podczas pobierania informacji o jednostce:', error);
+            });
+    }
+}
+
+// Dodawanie składnika do przepisu
+function addIngredient() {
+    const ingredientSelect = document.getElementById('ingredient-select');
+    const amountInput = document.getElementById('ingredient-amount');
+    const unitSelect = document.getElementById('ingredient-unit');
+    
+    const ingredientId = ingredientSelect.value;
+    const ingredientName = ingredientSelect.options[ingredientSelect.selectedIndex]?.textContent || '';
+    const amount = amountInput.value;
+    const unitId = unitSelect.value;
+    const unitName = unitSelect.options[unitSelect.selectedIndex]?.textContent || '';
+    const unitSymbol = unitSelect.options[unitSelect.selectedIndex]?.dataset.symbol || '';
+    
+    // Walidacja
+    if (!ingredientId || !amount || !unitId) {
+        alert('Wszystkie pola są wymagane!');
+        return;
+    }
+    
+    if (formIndex >= maxForms) {
+        alert('Osiągnięto maksymalną liczbę składników!');
+        return;
+    }
+    
+    // Usuń komunikat o braku składników
+    const noIngredientsRow = document.querySelector('#ingredients-list tr.no-ingredients');
+    if (noIngredientsRow) {
+        noIngredientsRow.remove();
+    }
+    
+    // Dodaj do tabeli
+    const ingredientsTable = document.getElementById('ingredients-list');
+    const newRow = document.createElement('tr');
+    newRow.dataset.formIndex = formIndex;
+    newRow.innerHTML = `
+        <td>${ingredientName}</td>
+        <td>${amount} ${unitSymbol} (${unitName})</td>
+        <td><button type="button" class="btn btn-sm btn-danger remove-ingredient" data-form-index="${formIndex}">Usuń</button></td>
+    `;
+    ingredientsTable.appendChild(newRow);
+    
+    // Dodaj ukryte pola formularza
+    const formsetContainer = document.getElementById('ingredient-formset');
+    const formHtml = `
+        <div class="ingredient-form-row" data-form-index="${formIndex}">
+            <input type="hidden" name="ingredients-${formIndex}-id" id="id_ingredients-${formIndex}-id">
+            <input type="hidden" name="ingredients-${formIndex}-recipe" id="id_ingredients-${formIndex}-recipe" value="${recipeId || ''}">
+            <input type="hidden" name="ingredients-${formIndex}-ingredient" id="id_ingredients-${formIndex}-ingredient" value="${ingredientId}">
+            <input type="hidden" name="ingredients-${formIndex}-amount" id="id_ingredients-${formIndex}-amount" value="${amount}">
+            <input type="hidden" name="ingredients-${formIndex}-unit" id="id_ingredients-${formIndex}-unit" value="${unitId}">
+        </div>
+    `;
+    formsetContainer.insertAdjacentHTML('beforeend', formHtml);
+    
+    // Zwiększ licznik formularzy
+    formIndex++;
+    document.getElementById('id_ingredients-TOTAL_FORMS').value = formIndex;
+    
+    // Wyczyść formularz
+    ingredientSelect.value = '';
+    try {
+        $(ingredientSelect).trigger('change'); // Dla Select2
+    } catch (e) {
+        ingredientSelect.dispatchEvent(new Event('change'));
+    }
+    amountInput.value = '';
+    unitSelect.value = '';
+    unitSelect.dispatchEvent(new Event('change'));
+    
+    // Zamknij modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('ingredientModal'));
+    if (modal) {
+        modal.hide();
+    } else {
+        $('#ingredientModal').modal('hide');
+    }
+}
+
+// Usuwanie składnika
+function removeIngredient(button) {
+    const formIndex = button.dataset.formIndex;
+    
+    // Usuń z formset
+    const formRow = document.querySelector(`#ingredient-formset .ingredient-form-row[data-form-index="${formIndex}"]`);
+    if (formRow) {
+        formRow.remove();
+    }
+    
+    // Usuń z tabeli
+    const tableRow = button.closest('tr');
+    if (tableRow) {
+        tableRow.remove();
+    }
+    
+    // Sprawdź, czy nie ma więcej składników
+    const ingredients = document.querySelectorAll('#ingredients-list tr');
+    if (ingredients.length === 0) {
+        const ingredientsList = document.getElementById('ingredients-list');
+        ingredientsList.innerHTML = `
+            <tr class="no-ingredients">
+                <td colspan="3" class="text-center">Brak składników. Dodanie składników jest opcjonalne, ale zalecane dla kompletnego przepisu.</td>
+            </tr>
+        `;
+    }
+}
+
+// Załadowanie istniejących składników
+function loadExistingIngredients() {
+    // Ta funkcja może być użyta do inicjalizacji składników jeśli istnieją dane
+    // Tutaj należy zaimplementować ładowanie istniejących składników, jeśli potrzebne
+}
+</script>
+{% endblock %} 
