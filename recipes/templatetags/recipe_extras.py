@@ -5,13 +5,7 @@ register = template.Library()
 
 @register.filter(name='get_item')
 def get_item(dictionary, key):
-    """
-    Filter do pobierania elementu słownika przez klucz w szablonach Django.
-    
-    Przykład użycia:
-    {{ my_dict|get_item:key_variable }}
-    """
+    """Zwraca wartość ze słownika dla podanego klucza"""
     if dictionary is None:
         return None
-    
     return dictionary.get(key) 

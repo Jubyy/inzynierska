@@ -131,6 +131,19 @@
                     </div>
                 </div>
                 
+                <!-- Filtrowanie po ocenie -->
+                <div class="mb-3">
+                    <label for="min_rating" class="form-label">Minimalna ocena:</label>
+                    <select class="form-select" id="min_rating" name="min_rating">
+                        <option value="">Wszystkie oceny</option>
+                        {% for option in rating_options %}
+                            <option value="{{ option.value }}" {% if min_rating == option.value %}selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
                 {% if user.is_authenticated %}
                 <div class="col-12 mt-3">
                     <div class="form-check form-switch">
@@ -250,6 +263,17 @@
                             <span><i class="bi bi-clock"></i> {{ recipe.preparation_time }} min</span>
                             <span><i class="bi bi-people"></i> {{ recipe.servings }}</span>
                         </div>
+
+                        <!-- Ocena przepisu -->
+                        {% if recipe.ratings_count > 0 %}
+                        <div class="recipe-rating mb-2">
+                            <span class="badge bg-warning text-dark">
+                                {{ recipe.average_rating|floatformat:1 }}
+                                <i class="bi bi-star-fill"></i>
+                            </span>
+                            <small class="text-muted">({{ recipe.ratings_count }})</small>
+                        </div>
+                        {% endif %}
                     </div>
                 </a>
                 

@@ -283,7 +283,20 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - IMPLEMENTACJA: Rozszerzono model Recipe o właściwości związane z ocenami (average_rating, ratings_count, get_user_rating)
    - IMPLEMENTACJA: Dodano wyświetlanie średniej oceny w szczegółach przepisu
    - IMPLEMENTACJA: Zarejestrowano model RecipeRating w panelu administracyjnym
+   - IMPLEMENTACJA: Dodano możliwość filtrowania przepisów według minimalnej oceny (3+, 4+, 4.5+ gwiazdki)
+   - IMPLEMENTACJA: Dodano możliwość sortowania przepisów według średniej oceny
+   - IMPLEMENTACJA: Dodano sekcję wyświetlania komentarzy do ocen na stronie szczegółów przepisu
+   - IMPLEMENTACJA: Dodano wyświetlanie ocen na kartach przepisów w widoku listy
+   - IMPLEMENTACJA: Dodano statystyki ocen w formie paska postępu dla każdej wartości gwiazdek (1-5)
+   - IMPLEMENTACJA: Dodano model RatingHelpful do oznaczania opinii jako przydatne
+   - IMPLEMENTACJA: Dodano funkcję toggle_rating_helpful do przełączania przydatności opinii
+   - IMPLEMENTACJA: Dodano wyświetlanie liczby oznaczeń "przydatne" dla każdej opinii
+   - IMPLEMENTACJA: Dodano obsługę AJAX dla oznaczania opinii jako przydatne bez przeładowania strony
    - WNIOSKI: Funkcjonalność oceniania przepisów działa poprawnie, użytkownicy mogą dodawać oceny od 1 do 5 oraz opcjonalny komentarz do oceny
    - WNIOSKI: Oceny są odpowiednio walidowane i wyświetlane na stronie przepisu
-   - ZALECENIE: Rozważyć dodanie możliwości filtrowania przepisów według średniej oceny
-   - ZALECENIE: Dodać możliwość wyświetlania komentarzy do ocen na stronie przepisu 
+   - WNIOSKI: Użytkownicy mogą przeglądać opinie innych użytkowników wraz z ich oceną
+   - WNIOSKI: System filtrowania i sortowania wg ocen działa poprawnie
+   - WNIOSKI: Użytkownicy mogą oznaczać opinie innych jako przydatne, co pomaga w identyfikacji wartościowych recenzji
+   - ZALECENIE: Dodać możliwość odpowiadania na opinie innych użytkowników
+   - ZALECENIE: Dodać bardziej zaawansowane statystyki ocen (np. zmiana oceny w czasie)
+   - ZALECENIE: Wprowadzić bardziej szczegółowe oceny (np. łatwość przygotowania, smak, wygląd) 

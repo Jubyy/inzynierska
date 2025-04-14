@@ -4,7 +4,7 @@ from .models import (
     Ingredient, IngredientCategory, MeasurementUnit, UnitConversion,
     RecipeStep, RecipeImage, FavoriteRecipe, RecipeLike,
     Comment, IngredientUnit, IngredientConversion,
-    ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating
+    ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating, RatingHelpful
 )
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -203,3 +203,10 @@ class RecipeRatingAdmin(admin.ModelAdmin):
     list_filter = ('rating', 'created_at')
     search_fields = ('user__username', 'recipe__title', 'comment')
     autocomplete_fields = ('user', 'recipe')
+
+@admin.register(RatingHelpful)
+class RatingHelpfulAdmin(admin.ModelAdmin):
+    list_display = ('user', 'rating', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'rating__comment')
+    autocomplete_fields = ('user', 'rating')

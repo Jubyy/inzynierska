@@ -442,6 +442,27 @@ class Recipe(models.Model):
         except RecipeRating.DoesNotExist:
             return None
 
+    def get_rating_stats(self):
+        """Zwraca statystyki ocen przepisu (ile ocen poszczególnych wartości)"""
+        stats = {i: 0 for i in range(1, 6)}  # Słownik z kluczami 1-5 i wartościami początkowymi 0
+        
+        for rating in self.ratings.all():
+            stats[rating.rating] += 1
+            
+        # Dodajemy dodatkowe informacje: łączna liczba ocen i procenty dla każdej oceny
+        total = sum(stats.values())
+        
+        if total > 0:
+            percentages = {score: (count / total) * 100 for score, count in stats.items()}
+        else:
+            percentages = {score: 0 for score in stats.keys()}
+            
+        return {
+            'counts': stats,
+            'total': total,
+            'percentages': percentages
+        }
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='ingredients', on_delete=models.CASCADE, verbose_name="Przepis")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Składnik")
@@ -818,4 +839,43 @@ class RecipeRating(models.Model):
         unique_together = ('user', 'recipe')  # Użytkownik może dać tylko jedną ocenę dla przepisu
         
     def __str__(self):
-        return f"Ocena {self.rating}/5 od {self.user.username} dla {self.recipe.title}" 
+        return f"Ocena {self.rating}/5 od {self.user.username} dla {self.recipe.title}"
+
+    @property
+    def helpful_count(self):
+        """Zwraca liczbę oznaczeń oceny jako przydatna"""
+        return self.helpful_marks.count()
+    
+    def is_helpful_for(self, user):
+        """Sprawdza, czy ocena jest oznaczona jako przydatna przez danego użytkownika"""
+        if not user.is_authenticated:
+            return False
+        return self.helpful_marks.filter(user=user).exists()
+    
+    def toggle_helpful(self, user):
+        """Przełącza oznaczenie oceny jako przydatna/nieprzydatna przez użytkownika"""
+        if not user.is_authenticated:
+            return False
+            
+        helpful, created = RatingHelpful.objects.get_or_create(user=user, rating=self)
+        
+        if not created:
+            # Jeśli oznaczenie już istniało, usuń je
+            helpful.delete()
+            return False
+            
+        return True
+
+class RatingHelpful(models.Model):
+    """Model do przechowywania informacji o tym, czy ocena była przydatna dla użytkownika"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='helpful_ratings', verbose_name="Użytkownik")
+    rating = models.ForeignKey(RecipeRating, on_delete=models.CASCADE, related_name='helpful_marks', verbose_name="Ocena")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
+    
+    class Meta:
+        verbose_name = "Przydatna ocena"
+        verbose_name_plural = "Przydatne oceny"
+        unique_together = ('user', 'rating')  # Użytkownik może oznaczyć ocenę jako przydatną tylko raz
+        
+    def __str__(self):
+        return f"Ocena {self.rating.id} oznaczona jako przydatna przez {self.user.username}" 

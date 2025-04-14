@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count, F
 from django.http import JsonResponse, HttpResponseRedirect, FileResponse
-from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating
+from .models import Recipe, RecipeIngredient, Ingredient, MeasurementUnit, RecipeCategory, IngredientCategory, UnitConversion, FavoriteRecipe, RecipeLike, Comment, ConversionTable, ConversionTableEntry, UserIngredient, RecipeRating, RatingHelpful
 from .utils import convert_units, get_common_units, get_common_conversions
 from .forms import RecipeForm, RecipeIngredientFormSet, IngredientForm, CommentForm, ConversionTableForm, ConversionEntryForm, RecipeRatingForm
 from shopping.models import ShoppingItem, ShoppingList
@@ -101,6 +101,22 @@ class RecipeListView(ListView):
         difficulty = self.request.GET.get('difficulty')
         if difficulty and difficulty in ['easy', 'medium', 'hard'] and difficulty != 'None':
             queryset = queryset.filter(difficulty=difficulty)
+            
+        # Filtrowanie po średniej ocenie
+        min_rating = self.request.GET.get('min_rating')
+        if min_rating and min_rating != 'None':
+            try:
+                min_rating = float(min_rating)
+                # Krok 1: Pobierz średnie oceny dla przepisów
+                recipes_with_ratings = []
+                for recipe in queryset:
+                    if recipe.average_rating >= min_rating:
+                        recipes_with_ratings.append(recipe.id)
+                
+                # Krok 2: Filtruj przepisy na podstawie średnich ocen
+                queryset = queryset.filter(id__in=recipes_with_ratings)
+            except (ValueError, TypeError):
+                pass
         
         # Sortowanie
         sort_by = self.request.GET.get('sort_by', 'created_at')  # Domyślnie sortowanie po dacie utworzenia
@@ -115,12 +131,31 @@ class RecipeListView(ListView):
             'difficulty': 'difficulty',
         }
         
-        sort_field = sort_fields.get(sort_by, 'created_at')
-        
-        if sort_order == 'asc':
-            queryset = queryset.order_by(sort_field)
+        # Dodaj sortowanie po ocenie
+        if sort_by == 'rating':
+            # Sortowanie po średniej ocenie wymaga specjalnej obsługi
+            recipe_list = list(queryset)
+            recipe_list.sort(key=lambda r: r.average_rating, reverse=(sort_order == 'desc'))
+            # Utwórz listę ID w posortowanej kolejności
+            sorted_ids = [recipe.id for recipe in recipe_list]
+            
+            # Zachowaj kolejność sortowania przy przekazywaniu do szablonu
+            clauses = ' '.join(['WHEN id=%s THEN %s' % (pk, i) for i, pk in enumerate(sorted_ids)])
+            ordering = 'CASE %s END' % clauses
+            
+            if sorted_ids:
+                queryset = Recipe.objects.filter(id__in=sorted_ids).extra(
+                    select={'ordering': ordering}, order_by=('ordering',)
+                )
+            else:
+                queryset = Recipe.objects.none()
         else:
-            queryset = queryset.order_by(f'-{sort_field}')
+            sort_field = sort_fields.get(sort_by, 'created_at')
+            
+            if sort_order == 'asc':
+                queryset = queryset.order_by(sort_field)
+            else:
+                queryset = queryset.order_by(f'-{sort_field}')
         
         return queryset
     
@@ -163,6 +198,17 @@ class RecipeListView(ListView):
         difficulty = self.request.GET.get('difficulty')
         context['selected_difficulty'] = difficulty if difficulty and difficulty != 'None' else None
         
+        # Obsługa parametru filtrowania po minimalnej ocenie
+        min_rating = self.request.GET.get('min_rating')
+        context['min_rating'] = min_rating if min_rating and min_rating != 'None' else None
+        
+        # Dodaj dostępne oceny do filtrowania
+        context['rating_options'] = [
+            {'value': '3', 'label': '3+ gwiazdki'},
+            {'value': '4', 'label': '4+ gwiazdki'},
+            {'value': '4.5', 'label': '4.5+ gwiazdki'}
+        ]
+        
         # Dodaj opcje sortowania do kontekstu
         sort_by = self.request.GET.get('sort_by', 'created_at')
         sort_order = self.request.GET.get('sort_order', 'desc')
@@ -176,6 +222,7 @@ class RecipeListView(ListView):
             {'value': 'preparation_time', 'label': 'Czas przygotowania'},
             {'value': 'servings', 'label': 'Liczba porcji'},
             {'value': 'difficulty', 'label': 'Poziom trudności'},
+            {'value': 'rating', 'label': 'Ocena'},
         ]
         
         # Dodaj liczbę śledzonych użytkowników do kontekstu
@@ -665,6 +712,9 @@ class RecipeDetailView(DetailView):
         
         # Pobierz komentarze do przepisu (tylko główne, bez odpowiedzi)
         context['comments'] = self.object.comments.filter(parent=None)
+        
+        # Dodaj statystyki ocen
+        context['rating_stats'] = self.object.get_rating_stats()
         
         return context
         
@@ -1797,3 +1847,22 @@ def ajax_load_units_by_type(request):
     return JsonResponse({
         'units': [{'id': unit.id, 'name': f"{unit.name} ({unit.symbol})"} for unit in units]
     })
+
+@login_required
+@require_POST
+def toggle_rating_helpful(request, pk):
+    """Przełącza oznaczenie oceny jako przydatna"""
+    rating = get_object_or_404(RecipeRating, pk=pk)
+    
+    # Przełącz oznaczenie oceny jako przydatna
+    is_helpful = rating.toggle_helpful(request.user)
+    
+    # Jeśli to żądanie AJAX, zwróć odpowiedź JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'is_helpful': is_helpful,
+            'helpful_count': rating.helpful_count
+        })
+    
+    # W przeciwnym razie, przekieruj z powrotem do strony przepisu
+    return HttpResponseRedirect(rating.recipe.get_absolute_url())
