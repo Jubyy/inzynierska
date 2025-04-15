@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Potwierdź usunięcie jednostki miary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Potwierdź usunięcie jednostki miary</h1>
+    
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Uwaga!</strong> Operacja jest nieodwracalna. Usunięcie jednostki może wpłynąć na przepisy, które jej używają.
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h2 class="h5 mb-0">Czy na pewno chcesz usunąć tę jednostkę miary?</h2>
+        </div>
+        <div class="card-body">
+            <p>
+                Jednostka: <strong>{{ unit.name }}</strong> (symbol: <code>{{ unit.symbol }}</code>)
+            </p>
+            <p>
+                Typ: <strong>{{ unit.get_type_display }}</strong> | 
+                Przelicznik bazowy: <strong>{{ unit.base_ratio }}</strong>
+            </p>
+            
+            {% if unit.description %}
+            <p>
+                Opis: {{ unit.description }}
+            </p>
+            {% endif %}
+            
+            <hr>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'recipes:admin_units_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Anuluj i wróć do listy
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Tak, usuń jednostkę
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

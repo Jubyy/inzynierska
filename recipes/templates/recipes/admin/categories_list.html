@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel administratora - Kategorie składników{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel administratora - Kategorie składników</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Tu możesz zarządzać kategoriami składników używanymi w przepisach. Kategorie pomagają w organizacji składników i określają ich właściwości (np. czy są wegetariańskie/wegańskie).
+    </div>
+    
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{% url 'recipes:admin_units_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Zarządzaj jednostkami
+        </a>
+        <a href="{% url 'recipes:admin_category_create' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-2"></i> Dodaj nową kategorię
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Kategorie składników ({{ categories|length }})</h2>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nazwa</th>
+                                    <th class="text-center">Wegetariańska</th>
+                                    <th class="text-center">Wegańska</th>
+                                    <th>Liczba składników</th>
+                                    <th class="text-end">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td><strong>{{ category.name }}</strong></td>
+                                    <td class="text-center">
+                                        {% if category.is_vegetarian %}
+                                        <span class="badge bg-success">Tak</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Nie</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if category.is_vegan %}
+                                        <span class="badge bg-success">Tak</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Nie</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ category.ingredients.count }} składników
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'recipes:admin_category_edit' category.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Edytuj
+                                        </a>
+                                        <a href="{% url 'recipes:admin_category_delete' category.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Usuń
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Brak zdefiniowanych kategorii składników. <a href="{% url 'recipes:admin_category_create' %}" class="alert-link">Dodaj pierwszą kategorię</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-12 mt-3">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Informacje o kategoriach</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Kategorie składników</h5>
+                            <p>
+                                Kategorie pomagają uporządkować składniki i określić ich właściwości. 
+                                Dzięki nim można:
+                            </p>
+                            <ul>
+                                <li>Łatwiej wyszukiwać składniki podczas tworzenia przepisów</li>
+                                <li>Automatycznie określać, czy przepis jest wegetariański/wegański</li>
+                                <li>Filtrować przepisy na podstawie kategorii składników</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Przykładowe kategorie</h5>
+                            <ul>
+                                <li><strong>Mięso</strong> - nie jest wegetariańskie ani wegańskie</li>
+                                <li><strong>Nabiał</strong> - jest wegetariańskie, ale nie wegańskie</li>
+                                <li><strong>Warzywa</strong> - jest wegetariańskie i wegańskie</li>
+                                <li><strong>Owoce</strong> - jest wegetariańskie i wegańskie</li>
+                                <li><strong>Przyprawy</strong> - zazwyczaj wegetariańskie i wegańskie</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'recipes:admin_pending_ingredients' %}" class="btn btn-primary">
+            <i class="fas fa-check-circle me-2"></i> Oczekujące składniki
+        </a>
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="fas fa-home me-2"></i> Strona główna
+        </a>
+    </div>
+</div>
+{% endblock %} 

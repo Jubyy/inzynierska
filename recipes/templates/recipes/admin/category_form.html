@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if is_new %}
+Panel administratora - Dodaj kategorię składników
+{% else %}
+Panel administratora - Edytuj kategorię składników
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        {% if is_new %}
+        Panel administratora - Dodaj kategorię składników
+        {% else %}
+        Panel administratora - Edytuj kategorię składników
+        {% endif %}
+    </h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">
+                        {% if is_new %}
+                        Nowa kategoria składników
+                        {% else %}
+                        Edycja kategorii: {{ category.name }}
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-4">
+                            <label for="name" class="form-label fw-bold">Nazwa kategorii <span class="text-danger">*</span></label>
+                            <input type="text" id="name" name="name" class="form-control" 
+                                   value="{{ category.name|default:'' }}" required
+                                   placeholder="np. Warzywa, Owoce, Mięso, Nabiał">
+                            <div class="form-text">Nazwę kategorii widać podczas wyszukiwania i filtrowania składników</div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" id="is_vegetarian" name="is_vegetarian" class="form-check-input" 
+                                       {% if category.is_vegetarian %}checked{% endif %}>
+                                <label for="is_vegetarian" class="form-check-label">Składniki wegetariańskie</label>
+                            </div>
+                            <div class="form-text">Oznacza, że składniki z tej kategorii są odpowiednie dla wegetarian</div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" id="is_vegan" name="is_vegan" class="form-check-input" 
+                                       {% if category.is_vegan %}checked{% endif %}>
+                                <label for="is_vegan" class="form-check-label">Składniki wegańskie</label>
+                            </div>
+                            <div class="form-text">Oznacza, że składniki z tej kategorii są odpowiednie dla wegan</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'recipes:admin_categories_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Powrót do listy
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                {% if is_new %}
+                                <i class="fas fa-plus-circle me-2"></i> Dodaj kategorię
+                                {% else %}
+                                <i class="fas fa-save me-2"></i> Zapisz zmiany
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Pomoc</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Typowe kategorie składników</h5>
+                    <ul class="mb-3">
+                        <li><strong>Mięso i wędliny</strong> - nie wegetariańskie, nie wegańskie</li>
+                        <li><strong>Ryby i owoce morza</strong> - nie wegetariańskie, nie wegańskie</li>
+                        <li><strong>Nabiał</strong> - wegetariańskie, nie wegańskie</li>
+                        <li><strong>Jaja</strong> - wegetariańskie, nie wegańskie</li>
+                        <li><strong>Warzywa</strong> - wegetariańskie, wegańskie</li>
+                        <li><strong>Owoce</strong> - wegetariańskie, wegańskie</li>
+                        <li><strong>Zboża i kasze</strong> - wegetariańskie, wegańskie</li>
+                        <li><strong>Strączkowe</strong> - wegetariańskie, wegańskie</li>
+                        <li><strong>Przyprawy</strong> - wegetariańskie, wegańskie</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Flagi "wegetariańskie" i "wegańskie" pomagają automatycznie określić, czy dany przepis jest odpowiedni dla wegetarian i wegan na podstawie użytych składników.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

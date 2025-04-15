@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Administratora{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel Administratora</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Witaj w panelu administratora. Tutaj możesz zarządzać składnikami, jednostkami miary, kategoriami i innymi elementami aplikacji.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Zarządzanie składnikami</h2>
+                </div>
+                <div class="card-body">
+                    <p>Zarządzaj składnikami zgłoszonymi przez użytkowników. Zatwierdzaj nowe składniki i edytuj ich parametry.</p>
+                    <div class="d-grid">
+                        <a href="{% url 'recipes:admin_pending_ingredients' %}" class="btn btn-primary">
+                            <i class="fas fa-check-circle me-2"></i> Oczekujące składniki
+                            {% if pending_ingredients_count > 0 %}
+                            <span class="badge bg-danger ms-2">{{ pending_ingredients_count }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Jednostki miary</h2>
+                </div>
+                <div class="card-body">
+                    <p>Zarządzaj jednostkami miary używanymi w przepisach. Dodawaj, edytuj i usuwaj jednostki oraz ich przeliczniki.</p>
+                    <div class="d-grid">
+                        <a href="{% url 'recipes:admin_units_list' %}" class="btn btn-primary">
+                            <i class="fas fa-balance-scale me-2"></i> Jednostki miary
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Kategorie składników</h2>
+                </div>
+                <div class="card-body">
+                    <p>Zarządzaj kategoriami składników. Dodawaj nowe kategorie, edytuj istniejące i określaj ich właściwości.</p>
+                    <div class="d-grid">
+                        <a href="{% url 'recipes:admin_categories_list' %}" class="btn btn-primary">
+                            <i class="fas fa-tags me-2"></i> Kategorie składników
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Statystyki aplikacji</h2>
+                </div>
+                <div class="card-body">
+                    <p>Przeglądaj statystyki aplikacji, informacje o użytkownikach, przepisach i aktywności.</p>
+                    <div class="d-grid">
+                        <a href="{% url 'recipes:admin_statistics' %}" class="btn btn-primary">
+                            <i class="fas fa-chart-bar me-2"></i> Statystyki
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Import/Eksport danych</h2>
+                </div>
+                <div class="card-body">
+                    <p>Importuj i eksportuj dane jednostek, kategorii i składników w formacie CSV/JSON.</p>
+                    <div class="d-grid">
+                        <a href="{% url 'recipes:admin_import_export' %}" class="btn btn-primary">
+                            <i class="fas fa-exchange-alt me-2"></i> Import/Eksport
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Panel Django Admin</h2>
+                </div>
+                <div class="card-body">
+                    <p>Przejdź do standardowego panelu administracyjnego Django z zaawansowanymi opcjami zarządzania.</p>
+                    <div class="d-grid">
+                        <a href="/admin/" class="btn btn-primary">
+                            <i class="fas fa-tools me-2"></i> Django Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="h5 mb-0">Statystyki systemu</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <h3 class="h2 mb-0">{{ users_count }}</h3>
+                                <p class="text-muted mb-0">Użytkowników</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <h3 class="h2 mb-0">{{ recipes_count }}</h3>
+                                <p class="text-muted mb-0">Przepisów</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <h3 class="h2 mb-0">{{ ingredients_count }}</h3>
+                                <p class="text-muted mb-0">Składników</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <h3 class="h2 mb-0">{{ pending_ingredients_count }}</h3>
+                                <p class="text-muted mb-0">Oczekujących składników</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

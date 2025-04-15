@@ -48,6 +48,19 @@ urlpatterns = [
     path('admin/pending-ingredients/', views.admin_pending_ingredients, name='admin_pending_ingredients'),
     path('admin/approve-ingredient/<int:ingredient_id>/', views.admin_approve_ingredient, name='admin_approve_ingredient'),
     path('admin/reject-ingredient/<int:ingredient_id>/', views.admin_reject_ingredient, name='admin_reject_ingredient'),
+    path('admin/import-export/', views.admin_import_export, name='admin_import_export'),
+    
+    # Admin - jednostki miary
+    path('admin/units/', views.admin_units_list, name='admin_units_list'),
+    path('admin/units/create/', views.admin_unit_create, name='admin_unit_create'),
+    path('admin/units/edit/<int:pk>/', views.admin_unit_edit, name='admin_unit_edit'),
+    path('admin/units/delete/<int:pk>/', views.admin_unit_delete, name='admin_unit_delete'),
+    
+    # Admin - kategorie
+    path('admin/categories/', views.admin_categories_list, name='admin_categories_list'),
+    path('admin/categories/create/', views.admin_category_create, name='admin_category_create'),
+    path('admin/categories/edit/<int:pk>/', views.admin_category_edit, name='admin_category_edit'),
+    path('admin/categories/delete/<int:pk>/', views.admin_category_delete, name='admin_category_delete'),
     
     # AJAX
     path('ajax/like/<int:pk>/', views.toggle_like, name='ajax_toggle_like'),

@@ -2549,3 +2549,23 @@ INFO 2025-04-15 17:49:57,564 autoreload 23392 13544 D:\praca_inzynierska\shoppin
 INFO 2025-04-15 17:49:58,350 autoreload 12516 2092 Watching for file changes with StatReloader
 INFO 2025-04-15 17:50:15,115 autoreload 12516 2092 D:\praca_inzynierska\shopping\views.py changed, reloading.
 INFO 2025-04-15 17:50:15,897 autoreload 14616 3960 Watching for file changes with StatReloader
+INFO 2025-04-15 17:58:54,307 autoreload 14616 3960 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-15 17:58:55,318 autoreload 20124 10572 Watching for file changes with StatReloader
+INFO 2025-04-15 17:59:44,607 autoreload 20124 10572 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 17:59:45,839 autoreload 18340 15448 Watching for file changes with StatReloader
+INFO 2025-04-15 18:05:27,237 autoreload 18340 15448 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:05:30,004 autoreload 15024 20584 Watching for file changes with StatReloader
+INFO 2025-04-15 18:05:54,526 autoreload 15024 20584 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:05:55,417 autoreload 12340 11592 Watching for file changes with StatReloader
+INFO 2025-04-15 18:06:07,616 autoreload 12340 11592 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:06:08,295 autoreload 11260 7548 Watching for file changes with StatReloader
+INFO 2025-04-15 18:06:33,814 autoreload 11260 7548 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:06:34,676 autoreload 6780 13664 Watching for file changes with StatReloader
+INFO 2025-04-15 18:07:29,596 autoreload 6780 13664 D:\praca_inzynierska\recipes\urls.py changed, reloading.
+INFO 2025-04-15 18:07:30,424 autoreload 17664 23840 Watching for file changes with StatReloader
+INFO 2025-04-15 18:10:23,540 autoreload 17664 23840 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:10:24,354 autoreload 10468 20436 Watching for file changes with StatReloader
+INFO 2025-04-15 18:10:42,222 autoreload 10468 20436 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:10:43,209 autoreload 13120 9696 Watching for file changes with StatReloader
+INFO 2025-04-15 18:12:09,232 autoreload 13120 9696 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:12:10,040 autoreload 14188 12740 Watching for file changes with StatReloader

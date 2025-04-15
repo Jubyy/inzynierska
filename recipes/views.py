@@ -16,6 +16,8 @@ from decimal import Decimal
 from django.utils import timezone
 import json
 from django.core.paginator import Paginator
+import csv
+from django.http import HttpResponse
 
 class RecipeListView(ListView):
     model = Recipe
@@ -1866,3 +1868,581 @@ def toggle_rating_helpful(request, pk):
     
     # W przeciwnym razie, przekieruj z powrotem do strony przepisu
     return HttpResponseRedirect(rating.recipe.get_absolute_url())
+
+# Widoki administratora do zarządzania jednostkami miary
+
+@user_passes_test(is_admin)
+def admin_units_list(request):
+    """Panel administratora - lista jednostek miary"""
+    units = MeasurementUnit.objects.all().order_by('type', 'name')
+    
+    # Grupowanie jednostek według typu
+    grouped_units = []
+    from itertools import groupby
+    for unit_type, units_group in groupby(units, key=lambda x: x.get_type_display()):
+        grouped_units.append({
+            'type': unit_type,
+            'units': list(units_group)
+        })
+    
+    return render(request, 'recipes/admin/units_list.html', {
+        'grouped_units': grouped_units
+    })
+
+@user_passes_test(is_admin)
+def admin_unit_create(request):
+    """Panel administratora - tworzenie nowej jednostki miary"""
+    if request.method == 'POST':
+        # Pobierz dane z formularza
+        name = request.POST.get('name')
+        symbol = request.POST.get('symbol')
+        unit_type = request.POST.get('type')
+        base_ratio = request.POST.get('base_ratio')
+        is_common = request.POST.get('is_common') == 'on'
+        description = request.POST.get('description', '')
+        
+        # Walidacja danych
+        errors = []
+        if not name:
+            errors.append('Nazwa jest wymagana')
+        if not symbol:
+            errors.append('Symbol jest wymagany')
+        if not unit_type:
+            errors.append('Typ jednostki jest wymagany')
+        if not base_ratio:
+            errors.append('Przelicznik bazowy jest wymagany')
+        
+        # Sprawdź, czy jednostka o podanym symbolu już istnieje
+        if MeasurementUnit.objects.filter(symbol=symbol).exists():
+            errors.append(f'Jednostka o symbolu "{symbol}" już istnieje')
+        
+        if not errors:
+            try:
+                # Utwórz nową jednostkę
+                unit = MeasurementUnit.objects.create(
+                    name=name,
+                    symbol=symbol,
+                    type=unit_type,
+                    base_ratio=base_ratio,
+                    is_common=is_common,
+                    description=description
+                )
+                messages.success(request, f'Jednostka "{unit.name}" została utworzona')
+                return redirect('recipes:admin_units_list')
+            except Exception as e:
+                errors.append(f'Błąd podczas tworzenia jednostki: {str(e)}')
+        
+        # Wyświetl błędy walidacji
+        for error in errors:
+            messages.error(request, error)
+    
+    # Przygotuj dane do formularza
+    unit_types = MeasurementUnit._meta.get_field('type').choices
+    
+    return render(request, 'recipes/admin/unit_form.html', {
+        'unit_types': unit_types,
+        'is_new': True
+    })
+
+@user_passes_test(is_admin)
+def admin_unit_edit(request, pk):
+    """Panel administratora - edycja jednostki miary"""
+    unit = get_object_or_404(MeasurementUnit, pk=pk)
+    
+    if request.method == 'POST':
+        # Pobierz dane z formularza
+        name = request.POST.get('name')
+        symbol = request.POST.get('symbol')
+        unit_type = request.POST.get('type')
+        base_ratio = request.POST.get('base_ratio')
+        is_common = request.POST.get('is_common') == 'on'
+        description = request.POST.get('description', '')
+        
+        # Walidacja danych
+        errors = []
+        if not name:
+            errors.append('Nazwa jest wymagana')
+        if not symbol:
+            errors.append('Symbol jest wymagany')
+        if not unit_type:
+            errors.append('Typ jednostki jest wymagany')
+        if not base_ratio:
+            errors.append('Przelicznik bazowy jest wymagany')
+        
+        # Sprawdź, czy jednostka o podanym symbolu już istnieje (z pominięciem obecnej jednostki)
+        if MeasurementUnit.objects.filter(symbol=symbol).exclude(pk=pk).exists():
+            errors.append(f'Jednostka o symbolu "{symbol}" już istnieje')
+        
+        if not errors:
+            try:
+                # Zaktualizuj jednostkę
+                unit.name = name
+                unit.symbol = symbol
+                unit.type = unit_type
+                unit.base_ratio = base_ratio
+                unit.is_common = is_common
+                unit.description = description
+                unit.save()
+                
+                messages.success(request, f'Jednostka "{unit.name}" została zaktualizowana')
+                return redirect('recipes:admin_units_list')
+            except Exception as e:
+                errors.append(f'Błąd podczas aktualizacji jednostki: {str(e)}')
+        
+        # Wyświetl błędy walidacji
+        for error in errors:
+            messages.error(request, error)
+    
+    # Przygotuj dane do formularza
+    unit_types = MeasurementUnit._meta.get_field('type').choices
+    
+    return render(request, 'recipes/admin/unit_form.html', {
+        'unit': unit,
+        'unit_types': unit_types,
+        'is_new': False
+    })
+
+@user_passes_test(is_admin)
+def admin_unit_delete(request, pk):
+    """Panel administratora - usuwanie jednostki miary"""
+    unit = get_object_or_404(MeasurementUnit, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            unit_name = unit.name
+            unit.delete()
+            messages.success(request, f'Jednostka "{unit_name}" została usunięta')
+        except Exception as e:
+            messages.error(request, f'Błąd podczas usuwania jednostki: {str(e)}')
+        
+        return redirect('recipes:admin_units_list')
+    
+    return render(request, 'recipes/admin/unit_confirm_delete.html', {
+        'unit': unit
+    })
+
+# Widoki administratora do zarządzania kategoriami składników
+
+@user_passes_test(is_admin)
+def admin_categories_list(request):
+    """Panel administratora - lista kategorii składników"""
+    categories = IngredientCategory.objects.all().order_by('name')
+    
+    return render(request, 'recipes/admin/categories_list.html', {
+        'categories': categories
+    })
+
+@user_passes_test(is_admin)
+def admin_category_create(request):
+    """Panel administratora - tworzenie nowej kategorii składników"""
+    if request.method == 'POST':
+        # Pobierz dane z formularza
+        name = request.POST.get('name')
+        is_vegetarian = request.POST.get('is_vegetarian') == 'on'
+        is_vegan = request.POST.get('is_vegan') == 'on'
+        
+        # Walidacja danych
+        errors = []
+        if not name:
+            errors.append('Nazwa jest wymagana')
+        
+        # Sprawdź, czy kategoria o podanej nazwie już istnieje
+        if IngredientCategory.objects.filter(name=name).exists():
+            errors.append(f'Kategoria o nazwie "{name}" już istnieje')
+        
+        if not errors:
+            try:
+                # Utwórz nową kategorię
+                category = IngredientCategory.objects.create(
+                    name=name,
+                    is_vegetarian=is_vegetarian,
+                    is_vegan=is_vegan
+                )
+                messages.success(request, f'Kategoria "{category.name}" została utworzona')
+                return redirect('recipes:admin_categories_list')
+            except Exception as e:
+                errors.append(f'Błąd podczas tworzenia kategorii: {str(e)}')
+        
+        # Wyświetl błędy walidacji
+        for error in errors:
+            messages.error(request, error)
+    
+    return render(request, 'recipes/admin/category_form.html', {
+        'is_new': True
+    })
+
+@user_passes_test(is_admin)
+def admin_category_edit(request, pk):
+    """Panel administratora - edycja kategorii składników"""
+    category = get_object_or_404(IngredientCategory, pk=pk)
+    
+    if request.method == 'POST':
+        # Pobierz dane z formularza
+        name = request.POST.get('name')
+        is_vegetarian = request.POST.get('is_vegetarian') == 'on'
+        is_vegan = request.POST.get('is_vegan') == 'on'
+        
+        # Walidacja danych
+        errors = []
+        if not name:
+            errors.append('Nazwa jest wymagana')
+        
+        # Sprawdź, czy kategoria o podanej nazwie już istnieje (z pominięciem obecnej kategorii)
+        if IngredientCategory.objects.filter(name=name).exclude(pk=pk).exists():
+            errors.append(f'Kategoria o nazwie "{name}" już istnieje')
+        
+        if not errors:
+            try:
+                # Zaktualizuj kategorię
+                category.name = name
+                category.is_vegetarian = is_vegetarian
+                category.is_vegan = is_vegan
+                category.save()
+                
+                messages.success(request, f'Kategoria "{category.name}" została zaktualizowana')
+                return redirect('recipes:admin_categories_list')
+            except Exception as e:
+                errors.append(f'Błąd podczas aktualizacji kategorii: {str(e)}')
+        
+        # Wyświetl błędy walidacji
+        for error in errors:
+            messages.error(request, error)
+    
+    return render(request, 'recipes/admin/category_form.html', {
+        'category': category,
+        'is_new': False
+    })
+
+@user_passes_test(is_admin)
+def admin_category_delete(request, pk):
+    """Panel administratora - usuwanie kategorii składników"""
+    category = get_object_or_404(IngredientCategory, pk=pk)
+    
+    # Sprawdź czy istnieją składniki przypisane do tej kategorii
+    ingredients_count = Ingredient.objects.filter(category=category).count()
+    
+    if request.method == 'POST':
+        try:
+            category_name = category.name
+            category.delete()
+            messages.success(request, f'Kategoria "{category_name}" została usunięta')
+        except Exception as e:
+            messages.error(request, f'Błąd podczas usuwania kategorii: {str(e)}')
+        
+        return redirect('recipes:admin_categories_list')
+    
+    return render(request, 'recipes/admin/category_confirm_delete.html', {
+        'category': category,
+        'ingredients_count': ingredients_count
+    })
+
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    """Panel główny administratora"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
+    # Pobierz dane statystyczne
+    users_count = User.objects.count()
+    recipes_count = Recipe.objects.count()
+    ingredients_count = Ingredient.objects.count()
+    pending_ingredients_count = UserIngredient.objects.filter(status='pending').count()
+    
+    return render(request, 'admin/admin_dashboard.html', {
+        'users_count': users_count,
+        'recipes_count': recipes_count,
+        'ingredients_count': ingredients_count,
+        'pending_ingredients_count': pending_ingredients_count
+    })
+
+@user_passes_test(is_admin)
+def admin_statistics(request):
+    """Panel statystyk aplikacji"""
+    from django.contrib.auth import get_user_model
+    from django.db.models import Count, Avg
+    from django.utils import timezone
+    import datetime
+    
+    User = get_user_model()
+    
+    # Statystyki ogólne
+    users_count = User.objects.count()
+    recipes_count = Recipe.objects.count()
+    ingredients_count = Ingredient.objects.count()
+    
+    # Statystyki przepisów
+    avg_rating = Recipe.objects.aggregate(avg=Avg('reciperating__rating'))['avg'] or 0
+    avg_rating = round(avg_rating, 1)
+    
+    # Najlepiej oceniane przepisy
+    top_recipes = Recipe.objects.annotate(
+        avg_rating=Avg('reciperating__rating'),
+        ratings_count=Count('reciperating')
+    ).filter(ratings_count__gt=0).order_by('-avg_rating')[:5]
+    
+    # Najpopularniejsze przepisy (po liczbie polubień)
+    popular_recipes = Recipe.objects.annotate(
+        likes_count=Count('likes')
+    ).order_by('-likes_count')[:5]
+    
+    # Aktywność w czasie
+    # Liczba nowych przepisów w ostatnich 6 miesiącach
+    today = timezone.now().date()
+    six_months_ago = today - datetime.timedelta(days=180)
+    
+    # Przygotuj dane dla wykresu
+    months_labels = []
+    recipes_data = []
+    
+    for i in range(6):
+        month_date = today - datetime.timedelta(days=30 * i)
+        month_start = datetime.date(month_date.year, month_date.month, 1)
+        if month_date.month == 12:
+            next_month = 1
+            next_year = month_date.year + 1
+        else:
+            next_month = month_date.month + 1
+            next_year = month_date.year
+            
+        month_end = datetime.date(next_year, next_month, 1) - datetime.timedelta(days=1)
+        
+        # Pobierz liczbę przepisów dla tego miesiąca
+        month_recipes = Recipe.objects.filter(
+            created_at__gte=month_start,
+            created_at__lte=month_end
+        ).count()
+        
+        # Dodaj dane do list
+        months_labels.insert(0, month_date.strftime('%b %Y'))
+        recipes_data.insert(0, month_recipes)
+    
+    return render(request, 'admin/admin_statistics.html', {
+        'users_count': users_count,
+        'recipes_count': recipes_count,
+        'ingredients_count': ingredients_count,
+        'avg_rating': avg_rating,
+        'top_recipes': top_recipes,
+        'popular_recipes': popular_recipes,
+        'months_labels': months_labels,
+        'recipes_data': recipes_data
+    })
+
+@user_passes_test(is_admin)
+def admin_import_export(request):
+    """Panel importu/eksportu danych"""
+    
+    if request.method == 'POST':
+        # Obsługa eksportu
+        if 'export_units' in request.POST:
+            # Eksport jednostek miary do CSV
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="measurement_units.csv"'},
+            )
+            
+            writer = csv.writer(response)
+            writer.writerow(['name', 'symbol', 'type', 'base_ratio', 'is_common', 'description'])
+            
+            units = MeasurementUnit.objects.all()
+            for unit in units:
+                writer.writerow([
+                    unit.name,
+                    unit.symbol,
+                    unit.type,
+                    unit.base_ratio,
+                    unit.is_common,
+                    unit.description or ''
+                ])
+            
+            messages.success(request, 'Jednostki miary zostały wyeksportowane.')
+            return response
+            
+        elif 'export_categories' in request.POST:
+            # Eksport kategorii składników do CSV
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="ingredient_categories.csv"'},
+            )
+            
+            writer = csv.writer(response)
+            writer.writerow(['name', 'description'])
+            
+            categories = IngredientCategory.objects.all()
+            for category in categories:
+                writer.writerow([
+                    category.name,
+                    category.description or ''
+                ])
+            
+            messages.success(request, 'Kategorie składników zostały wyeksportowane.')
+            return response
+            
+        elif 'export_ingredients' in request.POST:
+            # Eksport składników do CSV
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="ingredients.csv"'},
+            )
+            
+            writer = csv.writer(response)
+            writer.writerow(['name', 'category', 'unit_type', 'default_unit', 'piece_weight', 'density', 'description'])
+            
+            ingredients = Ingredient.objects.all()
+            for ingredient in ingredients:
+                writer.writerow([
+                    ingredient.name,
+                    ingredient.category.name if ingredient.category else '',
+                    ingredient.unit_type,
+                    ingredient.default_unit.symbol if ingredient.default_unit else '',
+                    ingredient.piece_weight or '',
+                    ingredient.density or '',
+                    ingredient.description or ''
+                ])
+            
+            messages.success(request, 'Składniki zostały wyeksportowane.')
+            return response
+            
+        # Obsługa importu
+        elif 'import_units' in request.POST:
+            if 'units_file' in request.FILES:
+                csv_file = request.FILES['units_file']
+                
+                if not csv_file.name.endswith('.csv'):
+                    messages.error(request, 'Proszę wgrać plik CSV.')
+                    return redirect('recipes:admin_import_export')
+                
+                try:
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.DictReader(decoded_file)
+                    
+                    for row in reader:
+                        MeasurementUnit.objects.update_or_create(
+                            name=row['name'],
+                            defaults={
+                                'symbol': row['symbol'],
+                                'type': row['type'],
+                                'base_ratio': float(row['base_ratio']),
+                                'is_common': row['is_common'].lower() in ('true', 't', 'yes', 'y', '1'),
+                                'description': row['description']
+                            }
+                        )
+                    
+                    messages.success(request, 'Jednostki miary zostały zaimportowane.')
+                except Exception as e:
+                    messages.error(request, f'Wystąpił błąd podczas importu: {str(e)}')
+            else:
+                messages.error(request, 'Nie wybrano pliku.')
+                
+            return redirect('recipes:admin_import_export')
+            
+        elif 'import_categories' in request.POST:
+            if 'categories_file' in request.FILES:
+                csv_file = request.FILES['categories_file']
+                
+                if not csv_file.name.endswith('.csv'):
+                    messages.error(request, 'Proszę wgrać plik CSV.')
+                    return redirect('recipes:admin_import_export')
+                
+                try:
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.DictReader(decoded_file)
+                    
+                    for row in reader:
+                        IngredientCategory.objects.update_or_create(
+                            name=row['name'],
+                            defaults={
+                                'description': row['description']
+                            }
+                        )
+                    
+                    messages.success(request, 'Kategorie składników zostały zaimportowane.')
+                except Exception as e:
+                    messages.error(request, f'Wystąpił błąd podczas importu: {str(e)}')
+            else:
+                messages.error(request, 'Nie wybrano pliku.')
+                
+            return redirect('recipes:admin_import_export')
+            
+        elif 'import_ingredients' in request.POST:
+            if 'ingredients_file' in request.FILES:
+                csv_file = request.FILES['ingredients_file']
+                
+                if not csv_file.name.endswith('.csv'):
+                    messages.error(request, 'Proszę wgrać plik CSV.')
+                    return redirect('recipes:admin_import_export')
+                
+                try:
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.DictReader(decoded_file)
+                    
+                    imported_count = 0
+                    error_count = 0
+                    
+                    for row in reader:
+                        try:
+                            # Znajdź kategorię
+                            category = None
+                            if row['category']:
+                                category, _ = IngredientCategory.objects.get_or_create(name=row['category'])
+                            
+                            # Znajdź domyślną jednostkę
+                            default_unit = None
+                            if row['default_unit']:
+                                try:
+                                    default_unit = MeasurementUnit.objects.get(symbol=row['default_unit'])
+                                except MeasurementUnit.DoesNotExist:
+                                    pass
+                            
+                            # Przygotuj wartości liczbowe
+                            piece_weight = None
+                            if row.get('piece_weight') and row['piece_weight'].strip():
+                                try:
+                                    piece_weight = float(row['piece_weight'])
+                                except (ValueError, TypeError):
+                                    pass
+                            
+                            density = None
+                            if row.get('density') and row['density'].strip():
+                                try:
+                                    density = float(row['density'])
+                                except (ValueError, TypeError):
+                                    pass
+                            
+                            # Utwórz lub zaktualizuj składnik
+                            ingredient, created = Ingredient.objects.update_or_create(
+                                name=row['name'],
+                                defaults={
+                                    'category': category,
+                                    'unit_type': row['unit_type'] if row.get('unit_type') else 'weight_volume',
+                                    'default_unit': default_unit,
+                                    'piece_weight': piece_weight,
+                                    'density': density,
+                                    'description': row.get('description', '')
+                                }
+                            )
+                            
+                            imported_count += 1
+                        except Exception as e:
+                            error_count += 1
+                    
+                    if error_count > 0:
+                        messages.warning(request, f'Zaimportowano {imported_count} składników. Wystąpiło {error_count} błędów.')
+                    else:
+                        messages.success(request, f'Zaimportowano {imported_count} składników.')
+                        
+                except Exception as e:
+                    messages.error(request, f'Wystąpił błąd podczas importu: {str(e)}')
+            else:
+                messages.error(request, 'Nie wybrano pliku.')
+                
+            return redirect('recipes:admin_import_export')
+    
+    # Przekierowanie do widoku
+    context = {
+        'title': 'Import/Export danych',
+        'measurements_count': MeasurementUnit.objects.count(),
+        'categories_count': IngredientCategory.objects.count(),
+        'ingredients_count': Ingredient.objects.count(),
+        'unread_notifications_count': unread_notifications_count(request),
+    }
+    return render(request, 'recipes/admin/import_export.html', context)

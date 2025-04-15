@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Import/Export danych{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel administratora - Import/Export danych</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Ta strona pozwala na import i eksport danych. Możesz wyeksportować dane do plików CSV, zmodyfikować je według potrzeb, a następnie zaimportować z powrotem.
+    </div>
+    
+    <div class="row">
+        <!-- Sekcja jednostek miary -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Jednostki miary ({{ measurements_count }})</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Eksport jednostek miary</h5>
+                    <p>Pobierz plik CSV ze wszystkimi jednostkami miary.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="export_units" class="btn btn-success mb-4">
+                            <i class="fas fa-file-download me-2"></i> Eksportuj jednostki do CSV
+                        </button>
+                    </form>
+                    
+                    <h5>Import jednostek miary</h5>
+                    <p>Zaimportuj jednostki miary z pliku CSV. Plik powinien zawierać następujące kolumny: name, symbol, type, base_ratio, is_common, description.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" name="units_file" accept=".csv">
+                            <button type="submit" name="import_units" class="btn btn-primary">
+                                <i class="fas fa-file-upload me-2"></i> Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sekcja kategorii składników -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Kategorie składników ({{ categories_count }})</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Eksport kategorii składników</h5>
+                    <p>Pobierz plik CSV ze wszystkimi kategoriami składników.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="export_categories" class="btn btn-success mb-4">
+                            <i class="fas fa-file-download me-2"></i> Eksportuj kategorie do CSV
+                        </button>
+                    </form>
+                    
+                    <h5>Import kategorii składników</h5>
+                    <p>Zaimportuj kategorie składników z pliku CSV. Plik powinien zawierać następujące kolumny: name, description.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" name="categories_file" accept=".csv">
+                            <button type="submit" name="import_categories" class="btn btn-primary">
+                                <i class="fas fa-file-upload me-2"></i> Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nowa sekcja składników -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Składniki ({{ ingredients_count }})</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Eksport składników</h5>
+                    <p>Pobierz plik CSV ze wszystkimi składnikami.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="export_ingredients" class="btn btn-success mb-4">
+                            <i class="fas fa-file-download me-2"></i> Eksportuj składniki do CSV
+                        </button>
+                    </form>
+                    
+                    <h5>Import składników</h5>
+                    <p>Zaimportuj składniki z pliku CSV. Plik powinien zawierać następujące kolumny: name, category, unit_type, default_unit, piece_weight, density, description.</p>
+                    
+                    <form action="{% url 'recipes:admin_import_export' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" name="ingredients_file" accept=".csv">
+                            <button type="submit" name="import_ingredients" class="btn btn-primary">
+                                <i class="fas fa-file-upload me-2"></i> Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Instrukcje importu/eksportu</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Format pliku CSV</h5>
+                    <p>Pliki CSV (Comma-Separated Values) to proste pliki tekstowe, gdzie każda linia reprezentuje rekord, a pola są oddzielone przecinkami.</p>
+                    
+                    <h6>Jednostki miary - wymagane pola:</h6>
+                    <ul>
+                        <li><strong>name</strong> - pełna nazwa jednostki (np. "kilogram")</li>
+                        <li><strong>symbol</strong> - skrócona forma (np. "kg")</li>
+                        <li><strong>type</strong> - typ jednostki: "waga", "objętość", "sztuki", "łyżki" lub "inne"</li>
+                        <li><strong>base_ratio</strong> - przelicznik bazowy (liczba)</li>
+                        <li><strong>is_common</strong> - czy jest to popularna jednostka (true/false)</li>
+                        <li><strong>description</strong> - opcjonalny opis</li>
+                    </ul>
+                    
+                    <h6>Kategorie składników - wymagane pola:</h6>
+                    <ul>
+                        <li><strong>name</strong> - nazwa kategorii</li>
+                        <li><strong>description</strong> - opcjonalny opis kategorii</li>
+                    </ul>
+
+                    <h6>Składniki - wymagane pola:</h6>
+                    <ul>
+                        <li><strong>name</strong> - nazwa składnika</li>
+                        <li><strong>category</strong> - nazwa kategorii składnika (musi istnieć w systemie)</li>
+                        <li><strong>unit_type</strong> - typ jednostek: "weight_only", "volume_only", "piece_only", "weight_volume", "weight_piece" itd.</li>
+                        <li><strong>default_unit</strong> - symbol domyślnej jednostki (musi istnieć w systemie)</li>
+                        <li><strong>piece_weight</strong> - waga jednej sztuki w gramach (opcjonalne)</li>
+                        <li><strong>density</strong> - gęstość składnika (opcjonalne)</li>
+                        <li><strong>description</strong> - opcjonalny opis składnika</li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Uwaga:</strong> Import danych nadpisze istniejące rekordy o tych samych nazwach. Upewnij się, że twój plik CSV zawiera wszystkie wymagane pola i jest zgodny z określonym formatem.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'recipes:admin_units_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Zarządzaj jednostkami
+        </a>
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="fas fa-home me-2"></i> Strona główna
+        </a>
+    </div>
+</div>
+{% endblock %} 

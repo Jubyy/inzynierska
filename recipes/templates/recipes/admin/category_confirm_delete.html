@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Potwierdź usunięcie kategorii{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Potwierdź usunięcie kategorii</h1>
+    
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Uwaga!</strong> Operacja jest nieodwracalna. Usunięcie kategorii wpłynie na składniki, które są do niej przypisane.
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h2 class="h5 mb-0">Czy na pewno chcesz usunąć tę kategorię?</h2>
+        </div>
+        <div class="card-body">
+            <p>
+                Kategoria: <strong>{{ category.name }}</strong>
+            </p>
+            
+            <p>
+                Właściwości: 
+                {% if category.is_vegetarian %}
+                <span class="badge bg-success">Wegetariańska</span>
+                {% else %}
+                <span class="badge bg-danger">Nie wegetariańska</span>
+                {% endif %}
+                
+                {% if category.is_vegan %}
+                <span class="badge bg-success">Wegańska</span>
+                {% else %}
+                <span class="badge bg-danger">Nie wegańska</span>
+                {% endif %}
+            </p>
+            
+            {% if ingredients_count > 0 %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>Ta kategoria zawiera {{ ingredients_count }} składników!</strong> 
+                Usunięcie kategorii spowoduje, że składniki zostaną bez kategorii, co może prowadzić do błędów w przepisach.
+                Lepszym rozwiązaniem może być przypisanie tym składnikom innej kategorii zamiast usuwania tej.
+            </div>
+            {% endif %}
+            
+            <hr>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'recipes:admin_categories_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Anuluj i wróć do listy
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Tak, usuń kategorię
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

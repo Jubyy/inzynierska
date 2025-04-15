@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel administratora - Jednostki miary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel administratora - Jednostki miary</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Tu możesz zarządzać jednostkami miary używanymi w przepisach. Jednostki są pogrupowane według typu (waga, objętość, sztuki, łyżki, inne).
+    </div>
+    
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{% url 'recipes:admin_pending_ingredients' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Oczekujące składniki
+        </a>
+        <a href="{% url 'recipes:admin_unit_create' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-2"></i> Dodaj nową jednostkę
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            {% for group in grouped_units %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">{{ group.type }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nazwa</th>
+                                    <th>Symbol</th>
+                                    <th>Przelicznik bazowy</th>
+                                    <th>Popularność</th>
+                                    <th>Opis</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for unit in group.units %}
+                                <tr>
+                                    <td>{{ unit.name }}</td>
+                                    <td><code>{{ unit.symbol }}</code></td>
+                                    <td>{{ unit.base_ratio }}</td>
+                                    <td>
+                                        {% if unit.is_common %}
+                                        <span class="badge bg-success">Popularna</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Standardowa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ unit.description|default:"-" }}</td>
+                                    <td>
+                                        <a href="{% url 'recipes:admin_unit_edit' unit.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Edytuj
+                                        </a>
+                                        <a href="{% url 'recipes:admin_unit_delete' unit.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Usuń
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Brak zdefiniowanych jednostek miary. <a href="{% url 'recipes:admin_unit_create' %}" class="alert-link">Dodaj pierwszą jednostkę</a>.
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="col-md-12 mt-3">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Przydatne informacje</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Typy jednostek</h5>
+                            <ul>
+                                <li><strong>Waga</strong> - jednostki mierzące masę, np. gram (g), kilogram (kg)</li>
+                                <li><strong>Objętość</strong> - jednostki mierzące objętość, np. mililitr (ml), litr (l)</li>
+                                <li><strong>Sztuki</strong> - jednostki liczące, np. sztuka (szt), opakowanie (opak)</li>
+                                <li><strong>Łyżki</strong> - miary kuchenne, np. łyżka (łyżka), łyżeczka (łyżeczka)</li>
+                                <li><strong>Inne</strong> - pozostałe jednostki</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Przelicznik bazowy</h5>
+                            <p>
+                                Określa ile gramów (dla jednostek wagi) lub mililitrów (dla jednostek objętości) 
+                                odpowiada jednej jednostce miary. Na przykład:
+                            </p>
+                            <ul>
+                                <li>1 kg = 1000 g, więc przelicznik dla kg to 1000</li>
+                                <li>1 l = 1000 ml, więc przelicznik dla l to 1000</li>
+                                <li>1 łyżka ≈ 15 ml, więc przelicznik dla łyżki to 15</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'recipes:admin_categories_list' %}" class="btn btn-primary">
+            <i class="fas fa-tags me-2"></i> Zarządzaj kategoriami
+        </a>
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="fas fa-home me-2"></i> Strona główna
+        </a>
+    </div>
+</div>
+{% endblock %} 

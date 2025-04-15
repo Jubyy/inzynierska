@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if is_new %}
+Panel administratora - Dodaj jednostkę miary
+{% else %}
+Panel administratora - Edytuj jednostkę miary
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        {% if is_new %}
+        Panel administratora - Dodaj jednostkę miary
+        {% else %}
+        Panel administratora - Edytuj jednostkę miary
+        {% endif %}
+    </h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">
+                        {% if is_new %}
+                        Nowa jednostka miary
+                        {% else %}
+                        Edycja jednostki: {{ unit.name }}
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="form-label fw-bold">Nazwa jednostki <span class="text-danger">*</span></label>
+                                    <input type="text" id="name" name="name" class="form-control" 
+                                           value="{{ unit.name|default:'' }}" required
+                                           placeholder="np. Kilogram, Litr, Sztuka">
+                                    <div class="form-text">Pełna nazwa jednostki miary (widoczna w interfejsie)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="symbol" class="form-label fw-bold">Symbol <span class="text-danger">*</span></label>
+                                    <input type="text" id="symbol" name="symbol" class="form-control" 
+                                           value="{{ unit.symbol|default:'' }}" required
+                                           placeholder="np. kg, l, szt">
+                                    <div class="form-text">Krótki symbol jednostki (używany w przepisach)</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="type" class="form-label fw-bold">Typ jednostki <span class="text-danger">*</span></label>
+                                    <select id="type" name="type" class="form-select" required>
+                                        <option value="">-- Wybierz typ --</option>
+                                        {% for type_value, type_name in unit_types %}
+                                        <option value="{{ type_value }}" {% if unit.type == type_value %}selected{% endif %}>
+                                            {{ type_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Kategoria jednostki wpływa na możliwości konwersji</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="base_ratio" class="form-label fw-bold">Przelicznik bazowy <span class="text-danger">*</span></label>
+                                    <input type="number" id="base_ratio" name="base_ratio" class="form-control" 
+                                           value="{{ unit.base_ratio|default:'1.0' }}" step="0.0001" min="0.0001" required
+                                           placeholder="np. 1000 dla kg (1 kg = 1000 g)">
+                                    <div class="form-text">Ile gramów/mililitrów odpowiada 1 jednostce</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" id="is_common" name="is_common" class="form-check-input" 
+                                       {% if unit.is_common %}checked{% endif %}>
+                                <label for="is_common" class="form-check-label">Popularna miara kuchenna</label>
+                            </div>
+                            <div class="form-text">Zaznacz, jeśli jest to często używana jednostka</div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="description" class="form-label">Opis/przykład (opcjonalnie)</label>
+                            <textarea id="description" name="description" class="form-control" rows="2"
+                                     placeholder="Dodatkowe informacje o jednostce">{{ unit.description|default:'' }}</textarea>
+                            <div class="form-text">Pomocniczy opis wyjaśniający zastosowanie jednostki</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'recipes:admin_units_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Powrót do listy
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                {% if is_new %}
+                                <i class="fas fa-plus-circle me-2"></i> Dodaj jednostkę
+                                {% else %}
+                                <i class="fas fa-save me-2"></i> Zapisz zmiany
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0">Pomoc</h2>
+                </div>
+                <div class="card-body">
+                    <h5>Typy jednostek</h5>
+                    <ul class="mb-3">
+                        <li><strong>Waga</strong> - gram (g), kilogram (kg), dag</li>
+                        <li><strong>Objętość</strong> - mililitr (ml), litr (l)</li>
+                        <li><strong>Sztuki</strong> - sztuka (szt), opakowanie</li>
+                        <li><strong>Łyżki</strong> - łyżka, łyżeczka, szklanka</li>
+                        <li><strong>Inne</strong> - pęczek, garść, kostka</li>
+                    </ul>
+                    
+                    <h5>Przelicznik bazowy</h5>
+                    <p class="mb-0">
+                        Przykłady:
+                    </p>
+                    <ul>
+                        <li>1 kg = 1000 g → 1000</li>
+                        <li>1a dag = 10 g → 10</li>
+                        <li>1 l = 1000 ml → 1000</li>
+                        <li>1 łyżka ≈ 15 ml → 15</li>
+                        <li>1 łyżeczka ≈ 5 ml → 5</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
