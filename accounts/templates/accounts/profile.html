@@ -60,9 +60,9 @@
                     <h2 class="h5 mb-0">Moje przepisy</h2>
                 </div>
                 <div class="card-body">
-                    {% if recipes %}
+                    {% if recent_recipes %}
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                            {% for recipe in recipes %}
+                            {% for recipe in recent_recipes %}
                                 <div class="col">
                                     <div class="card h-100">
                                         {% if recipe.image %}
@@ -83,6 +83,9 @@
                                 </div>
                             {% endfor %}
                         </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'accounts:user_recipes' %}" class="btn btn-outline-primary">Zobacz wszystkie moje przepisy</a>
+                        </div>
                     {% else %}
                         <div class="alert alert-info">
                             <p class="mb-0">Nie dodałeś jeszcze żadnych przepisów.</p>
@@ -91,6 +94,105 @@
                             <i class="bi bi-plus-circle"></i> Dodaj pierwszy przepis
                         </a>
                     {% endif %}
+                </div>
+            </div>
+            
+            <!-- Ulubione przepisy -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Ulubione przepisy</h2>
+                </div>
+                <div class="card-body">
+                    {% if favorite_recipes %}
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for recipe in favorite_recipes %}
+                                <div class="col">
+                                    <div class="card h-100">
+                                        {% if recipe.image %}
+                                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}" style="height: 150px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light text-center py-5">
+                                                <i class="bi bi-camera text-muted" style="font-size: 2rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ recipe.title }}</h5>
+                                            <p class="card-text small">{{ recipe.description|truncatechars:100 }}</p>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'recipes:detail' recipe.id %}" class="btn btn-sm btn-outline-primary">Zobacz przepis</a>
+                                            <form method="post" action="{% url 'recipes:toggle_favorite' recipe.id %}" class="favorite-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-heart-fill"></i> Usuń z ulubionych
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Nie masz jeszcze ulubionych przepisów.</p>
+                        </div>
+                        <a href="{% url 'recipes:list' %}" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Przeglądaj przepisy
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Historia przygotowanych przepisów -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Historia przygotowanych przepisów</h2>
+                </div>
+                <div class="card-body">
+                    {% if recipe_history %}
+                        <div class="list-group">
+                            {% for item in recipe_history %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ item.recipe.title }}</h6>
+                                        <small class="text-muted">Przygotowano: {{ item.prepared_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ item.servings }} porcji</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'recipes:history' %}" class="btn btn-outline-primary">Zobacz pełną historię</a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Nie przygotowałeś jeszcze żadnych przepisów.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Aktywność społecznościowa</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <div class="p-3">
+                                <h3 class="h1">{{ following_count }}</h3>
+                                <p>Obserwujesz</p>
+                                <a href="{% url 'accounts:following' %}" class="btn btn-sm btn-outline-primary">Zobacz listę</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3">
+                                <h3 class="h1">{{ followers_count }}</h3>
+                                <p>Obserwujących</p>
+                                <a href="{% url 'accounts:followers' %}" class="btn btn-sm btn-outline-primary">Zobacz listę</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -124,4 +226,95 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pobierz wszystkie formularze ulubionych
+    const favoriteForms = document.querySelectorAll('.favorite-form');
+    
+    // Dodaj obsługę zdarzeń do każdego formularza
+    favoriteForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = this.action;
+            const formData = new FormData(this);
+            const cardElement = this.closest('.col');
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && !data.is_favorite) {
+                    // Usuń kartę z przepisem z interfejsu
+                    cardElement.classList.add('fade-out');
+                    setTimeout(() => {
+                        cardElement.remove();
+                        
+                        // Sprawdź czy to był ostatni element
+                        const remainingCards = document.querySelectorAll('.favorite-form');
+                        if (remainingCards.length === 0) {
+                            // Jeśli nie ma więcej elementów, pokaż komunikat o braku ulubionych
+                            const favoriteSection = this.closest('.card');
+                            const cardBody = favoriteSection.querySelector('.card-body');
+                            if (cardBody) {
+                                cardBody.innerHTML = `
+                                    <div class="alert alert-info">
+                                        <p class="mb-0">Nie masz jeszcze ulubionych przepisów.</p>
+                                    </div>
+                                    <a href="{% url 'recipes:list' %}" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Przeglądaj przepisy
+                                    </a>
+                                `;
+                            }
+                        }
+                    }, 500);
+                    
+                    // Pokaż komunikat powodzenia
+                    showAlert(data.message, 'success');
+                } else if (data.status === 'error') {
+                    // Pokaż komunikat błędu
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Wystąpił błąd podczas przetwarzania żądania.', 'danger');
+            });
+        });
+    });
+    
+    // Funkcja pomocnicza do wyświetlania komunikatów
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Automatycznie ukryj alert po 3 sekundach
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+</style>
 {% endblock %} 

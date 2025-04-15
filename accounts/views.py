@@ -174,6 +174,23 @@ def profile_view(request):
     following_count = UserFollowing.objects.filter(user=request.user).count()
     followers_count = UserFollowing.objects.filter(followed_user=request.user).count()
     
+    # Pobierz liczby do statystyk
+    recipes_count = Recipe.objects.filter(author=request.user).count()
+    
+    # Sprawdź czy istnieje model FridgeItem
+    try:
+        from fridge.models import FridgeItem
+        fridge_count = FridgeItem.objects.filter(user=request.user).count()
+    except ImportError:
+        fridge_count = 0
+    
+    # Sprawdź czy istnieje model ShoppingList
+    try:
+        from shopping.models import ShoppingList
+        shopping_lists_count = ShoppingList.objects.filter(user=request.user).count()
+    except ImportError:
+        shopping_lists_count = 0
+    
     context = {
         'user': request.user,
         'favorite_recipes': favorite_recipes,
@@ -181,6 +198,9 @@ def profile_view(request):
         'recipe_history': recipe_history,
         'following_count': following_count,
         'followers_count': followers_count,
+        'recipes_count': recipes_count,
+        'fridge_count': fridge_count,
+        'shopping_lists_count': shopping_lists_count,
     }
     
     return render(request, 'accounts/profile.html', context)

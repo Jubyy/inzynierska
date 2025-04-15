@@ -396,13 +396,24 @@
         transition: all 0.3s ease;
     }
     
-    .btn-favorite:hover, .btn-favorite.active {
+    .btn-favorite:hover {
         color: var(--primary-color);
         transform: scale(1.1);
     }
     
-    .btn-favorite.active i::before {
-        content: "\F415"; /* Filled heart icon */
+    .btn-favorite.active {
+        color: #ff4d6d;
+        background-color: #ffe0e6;
+        border-color: #ff4d6d;
+        transform: scale(1.05);
+    }
+    
+    .btn-favorite.active i {
+        color: #ff4d6d;
+    }
+    
+    .btn-favorite i {
+        transition: all 0.3s ease;
     }
     
     .form-check-input:checked {
@@ -429,11 +440,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const recipeId = this.getAttribute('data-recipe-id');
             
             // Wyślij żądanie AJAX
-            fetch(`/recipes/${recipeId}/toggle-favorite/`, {
+            fetch(`/recipes/toggle-favorite/${recipeId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCSRFToken(),
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 credentials: 'same-origin'
             })
@@ -443,6 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Aktualizuj wygląd przycisku
                     this.classList.toggle('active');
                     const icon = this.querySelector('i');
+                    
                     if (data.is_favorite) {
                         icon.classList.remove('bi-heart');
                         icon.classList.add('bi-heart-fill');
@@ -453,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.setAttribute('title', 'Dodaj do ulubionych');
                     }
                     
-                    // Opcjonalnie: pokaż powiadomienie
+                    // Pokaż powiadomienie
                     showNotification(data.message);
                 } else {
                     console.error('Błąd:', data.message);

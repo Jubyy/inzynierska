@@ -152,24 +152,23 @@ VII. TESTY PROFILU UŻYTKOWNIKA
 ===========================================================
 
 1. Zarządzanie profilem
-   [ ] Przeglądanie własnego profilu
-   [ ] Edycja danych profilu
-   [ ] Zmiana zdjęcia profilowego
-   [ ] Usuwanie zdjęcia profilowego
-   [ ] Zmiana preferencji powiadomień
+   [X] Przeglądanie własnego profilu
+   [X] Edycja danych profilu
+   [X] Zmiana zdjęcia profilowego
+   [X] Usuwanie zdjęcia profilowego
 
 2. Przepisy użytkownika
-   [ ] Wyświetlanie listy własnych przepisów
-   [ ] Wyświetlanie listy ulubionych przepisów
-   [ ] Wyświetlanie historii przygotowanych przepisów
-   [ ] Usuwanie przepisów z ulubionych
+   [X] Wyświetlanie listy własnych przepisów
+   [X] Wyświetlanie listy ulubionych przepisów
+   [X] Wyświetlanie historii przygotowanych przepisów
+   [X] Usuwanie przepisów z ulubionych
 
 3. Funkcje społecznościowe
-   [ ] Przeglądanie profili innych użytkowników
-   [ ] Obserwowanie innych użytkowników
-   [ ] Przestawanie obserwowania użytkowników
-   [ ] Wyświetlanie listy obserwowanych użytkowników
-   [ ] Wyświetlanie przepisów obserwowanych użytkowników
+   [X] Przeglądanie profili innych użytkowników
+   [X] Obserwowanie innych użytkowników
+   [X] Przestawanie obserwowania użytkowników
+   [X] Wyświetlanie listy obserwowanych użytkowników
+   [X] Wyświetlanie przepisów obserwowanych użytkowników
 
 ===========================================================
 VIII. TESTY BEZPIECZEŃSTWA

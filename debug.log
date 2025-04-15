@@ -7692,3 +7692,247 @@ INFO 2025-04-15 23:40:37,158 basehttp 23140 6164 "GET /media/avatars/brak.jpg HT
 INFO 2025-04-15 23:40:42,522 basehttp 23140 6164 "POST /accounts/profile/edit/ HTTP/1.1" 302 0
 INFO 2025-04-15 23:40:42,535 basehttp 23140 6164 "GET /accounts/profile/ HTTP/1.1" 200 17187
 INFO 2025-04-15 23:40:42,571 basehttp 23140 6164 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 200 188413
+INFO 2025-04-15 23:41:13,252 autoreload 24352 10664 Watching for file changes with StatReloader
+INFO 2025-04-15 23:42:16,316 basehttp 24352 3584 "GET /recipes/create/ HTTP/1.1" 200 60707
+INFO 2025-04-15 23:42:16,379 basehttp 24352 3584 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:42:16,683 basehttp 24352 3584 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 23:42:16,695 basehttp 24352 1000 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2538
+INFO 2025-04-15 23:42:25,122 basehttp 24352 14228 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2538
+INFO 2025-04-15 23:42:25,890 basehttp 24352 14228 "GET /recipes/api/load-units/?ingredient_id=34 HTTP/1.1" 200 316
+INFO 2025-04-15 23:42:26,593 basehttp 24352 14228 "GET /recipes/api/unit-info/?unit_id=1&amount=2 HTTP/1.1" 200 146
+INFO 2025-04-15 23:42:26,911 basehttp 24352 14228 "GET /recipes/api/unit-info/?unit_id=1&amount=22 HTTP/1.1" 200 207
+INFO 2025-04-15 23:42:27,945 basehttp 24352 14228 "POST /recipes/create/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:42:28,212 basehttp 24352 14228 "GET /recipes/list/ HTTP/1.1" 200 80660
+INFO 2025-04-15 23:42:28,252 basehttp 24352 14228 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:42:28,381 basehttp 24352 14228 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:42:28,386 basehttp 24352 2412 "GET /media/recipes/obraz_2025-04-15_202626657.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:42:28,388 basehttp 24352 16196 "GET /media/recipes/obraz_2025-04-15_202328813.png HTTP/1.1" 304 0
+WARNING 2025-04-15 23:42:28,392 basehttp 24352 1516 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:42:28,473 basehttp 24352 11596 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 200 10498
+INFO 2025-04-15 23:42:31,894 basehttp 24352 11596 "GET /accounts/profile/ HTTP/1.1" 200 16756
+INFO 2025-04-15 23:42:41,417 basehttp 24352 11596 "GET /accounts/profile/ HTTP/1.1" 200 16756
+INFO 2025-04-15 23:42:41,449 basehttp 24352 11596 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:42:44,388 basehttp 24352 11596 "GET /recipes/list/ HTTP/1.1" 200 80213
+INFO 2025-04-15 23:42:44,431 basehttp 24352 11596 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+WARNING 2025-04-15 23:42:44,431 basehttp 24352 16196 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:42:44,537 basehttp 24352 11596 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:42:49,392 basehttp 24352 2412 "GET /accounts/profile/ HTTP/1.1" 200 16756
+INFO 2025-04-15 23:45:21,444 autoreload 24352 10664 D:\praca_inzynierska\accounts\views.py changed, reloading.
+INFO 2025-04-15 23:45:22,167 autoreload 23812 18436 Watching for file changes with StatReloader
+INFO 2025-04-15 23:45:43,773 basehttp 23812 20364 "GET /accounts/profile/ HTTP/1.1" 200 20154
+INFO 2025-04-15 23:45:43,814 basehttp 23812 9128 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:45:43,814 basehttp 23812 20364 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:45:53,944 basehttp 23812 20364 "GET /recipes/list/ HTTP/1.1" 200 80213
+WARNING 2025-04-15 23:45:54,142 basehttp 23812 20364 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:45:55,919 basehttp 23812 9128 "GET /recipes/detail/19/ HTTP/1.1" 200 34909
+INFO 2025-04-15 23:45:59,363 basehttp 23812 9128 "GET /recipes/detail/18/ HTTP/1.1" 200 34744
+WARNING 2025-04-15 23:46:02,090 log 23812 23752 Not Found: /recipes/18/toggle-favorite/
+WARNING 2025-04-15 23:46:02,091 basehttp 23812 23752 "POST /recipes/18/toggle-favorite/ HTTP/1.1" 404 17035
+INFO 2025-04-15 23:46:06,162 basehttp 23812 23752 "GET /accounts/profile/ HTTP/1.1" 200 20154
+INFO 2025-04-15 23:46:06,198 basehttp 23812 23752 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:46:10,678 basehttp 23812 23752 "GET /recipes/list/ HTTP/1.1" 200 80213
+WARNING 2025-04-15 23:46:10,714 basehttp 23812 23752 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:46:10,821 basehttp 23812 15120 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:46:11,839 basehttp 23812 11132 "GET /recipes/detail/18/ HTTP/1.1" 200 34744
+INFO 2025-04-15 23:46:14,390 basehttp 23812 11132 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 85
+INFO 2025-04-15 23:46:18,871 basehttp 23812 11132 "GET /accounts/profile/ HTTP/1.1" 200 21566
+INFO 2025-04-15 23:46:18,911 basehttp 23812 11132 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:46:26,704 basehttp 23812 11132 "GET /accounts/following/ HTTP/1.1" 200 16707
+INFO 2025-04-15 23:46:27,848 basehttp 23812 11132 "GET /accounts/community/ HTTP/1.1" 200 61526
+INFO 2025-04-15 23:46:29,197 basehttp 23812 11132 "POST /accounts/user/admin/follow/ HTTP/1.1" 200 82
+INFO 2025-04-15 23:46:31,666 basehttp 23812 11132 "GET /accounts/profile/ HTTP/1.1" 200 22004
+INFO 2025-04-15 23:46:31,705 basehttp 23812 11132 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:46:34,344 basehttp 23812 11132 "GET /accounts/following/ HTTP/1.1" 200 18096
+INFO 2025-04-15 23:46:42,413 basehttp 23812 11132 "GET /accounts/user/admin/ HTTP/1.1" 200 28198
+WARNING 2025-04-15 23:46:42,454 basehttp 23812 11132 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:46:42,558 basehttp 23812 23944 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:46:48,994 basehttp 23812 21736 "GET / HTTP/1.1" 200 39087
+INFO 2025-04-15 23:46:54,717 basehttp 23812 21736 "GET /accounts/profile/ HTTP/1.1" 200 21566
+INFO 2025-04-15 23:46:54,752 basehttp 23812 21736 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:47:07,658 basehttp 23812 21736 "GET /recipes/list/ HTTP/1.1" 200 80746
+INFO 2025-04-15 23:47:07,699 basehttp 23812 21736 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+WARNING 2025-04-15 23:47:07,703 basehttp 23812 20476 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:47:07,810 basehttp 23812 21736 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:47:09,388 basehttp 23812 17196 "GET /recipes/detail/19/ HTTP/1.1" 200 34909
+INFO 2025-04-15 23:47:11,058 basehttp 23812 17196 "GET /recipes/missing-ingredients/19/ HTTP/1.1" 200 17187
+INFO 2025-04-15 23:47:12,338 basehttp 23812 17196 "POST /recipes/missing-ingredients/19/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:47:12,372 basehttp 23812 17196 "GET /shopping/18/ HTTP/1.1" 200 32186
+INFO 2025-04-15 23:47:13,416 models 23812 17196 Dodawanie do lodówki: 22.0 g sk³adnika Dro¿d¿e
+INFO 2025-04-15 23:47:13,417 models 23812 17196 Typ jednostki sk³adnika: weight_only, Typ u¿ywany: weight
+INFO 2025-04-15 23:47:13,418 models 23812 17196 Jednostka g ju¿ jest podstawowa
+INFO 2025-04-15 23:47:13,427 models 23812 17196 Utworzono nowy wpis: 22.0 g Dro¿d¿e
+INFO 2025-04-15 23:47:13,440 basehttp 23812 17196 "POST /shopping/18/complete/ HTTP/1.1" 200 173
+INFO 2025-04-15 23:47:15,797 basehttp 23812 17196 "GET /shopping/18/ HTTP/1.1" 200 29645
+INFO 2025-04-15 23:47:17,776 models 23812 17196 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:17,794 models 23812 17196 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 25.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:18,029 basehttp 23812 17196 "GET /recipes/list/ HTTP/1.1" 200 81017
+INFO 2025-04-15 23:47:18,070 basehttp 23812 17196 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+WARNING 2025-04-15 23:47:18,177 basehttp 23812 17196 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:47:19,423 models 23812 18072 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:19,448 basehttp 23812 18072 "GET /recipes/detail/19/ HTTP/1.1" 200 33628
+INFO 2025-04-15 23:47:20,614 models 23812 18072 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:20,624 basehttp 23812 18072 "GET /recipes/prepare/19/ HTTP/1.1" 200 17097
+INFO 2025-04-15 23:47:21,543 models 23812 18072 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:21,547 models 23812 18072 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:21,548 models 23812 18072 U¿ywanie sk³adników do przepisu: fds
+INFO 2025-04-15 23:47:21,548 models 23812 18072 Wspó³czynnik skalowania: 1.0 (z 4 na 4 porcji)
+INFO 2025-04-15 23:47:21,551 models 23812 18072 Sprawdzam dostêpnoœæ: 22.0 g sk³adnika Dro¿d¿e
+INFO 2025-04-15 23:47:21,555 models 23812 18072 Sprawdzanie dostêpnoœci Dro¿d¿e: potrzeba 22.0 g, dostêpne 22.0 g
+INFO 2025-04-15 23:47:21,557 models 23812 18072 Usuwam z lodówki: 22.0 g sk³adnika Dro¿d¿e
+INFO 2025-04-15 23:47:21,560 models 23812 18072 U¿yto ca³ego produktu: 22.0 g Dro¿d¿e
+INFO 2025-04-15 23:47:21,582 basehttp 23812 18072 "POST /recipes/prepare/19/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:47:21,771 basehttp 23812 18072 "GET /recipes/detail/19/ HTTP/1.1" 200 36103
+INFO 2025-04-15 23:47:21,934 basehttp 23812 18072 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 23:47:23,438 models 23812 18072 Sprawdzanie dostêpnoœci Jogurt naturalny: potrzeba 100.0 g, dostêpne 1060.5 g
+INFO 2025-04-15 23:47:23,523 basehttp 23812 18072 "GET /accounts/dashboard/ HTTP/1.1" 200 24761
+INFO 2025-04-15 23:47:31,145 models 23812 18072 Sprawdzanie dostêpnoœci Jogurt naturalny: potrzeba 100.0 g, dostêpne 1060.5 g
+INFO 2025-04-15 23:47:31,246 basehttp 23812 18072 "GET /dashboard/ HTTP/1.1" 200 24761
+INFO 2025-04-15 23:47:31,283 basehttp 23812 18072 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:47:32,377 basehttp 23812 18072 "GET /recipes/list/ HTTP/1.1" 200 80746
+WARNING 2025-04-15 23:47:32,517 basehttp 23812 18072 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:47:34,729 models 23812 22400 Sprawdzanie dostêpnoœci Jogurt naturalny: potrzeba 100.0 g, dostêpne 1060.5 g
+INFO 2025-04-15 23:47:34,808 basehttp 23812 22400 "GET /dashboard/ HTTP/1.1" 200 24761
+ERROR 2025-04-15 23:47:41,907 log 23812 22400 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 206, in profile_view
+    return render(request, 'accounts/profile.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'recipe_history' not found. 'recipe_history' is not a valid view function or pattern name.
+ERROR 2025-04-15 23:47:41,924 basehttp 23812 22400 "GET /accounts/profile/ HTTP/1.1" 500 190508
+INFO 2025-04-15 23:48:33,562 basehttp 23812 22400 "GET /recipes/list/ HTTP/1.1" 200 80746
+INFO 2025-04-15 23:48:33,601 basehttp 23812 22400 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:48:33,603 basehttp 23812 12620 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+WARNING 2025-04-15 23:48:33,727 basehttp 23812 12620 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:48:36,924 basehttp 23812 22400 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty=&min_rating=&followed=true HTTP/1.1" 200 62038
+WARNING 2025-04-15 23:48:36,972 basehttp 23812 22400 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:48:37,076 basehttp 23812 5652 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:48:39,395 basehttp 23812 17804 "GET /recipes/list/?q=&category=&diet=&sort_by=created_at&sort_order=desc&prep_time=&difficulty=&min_rating= HTTP/1.1" 200 80746
+WARNING 2025-04-15 23:48:39,540 basehttp 23812 17804 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:48:49,145 basehttp 23812 12184 "GET /accounts/profile/ HTTP/1.1" 200 22235
+INFO 2025-04-15 23:48:51,544 basehttp 23812 12184 "GET /recipes/recipes/history/ HTTP/1.1" 200 15170
+INFO 2025-04-15 23:49:03,643 basehttp 23812 16476 "GET /accounts/profile/ HTTP/1.1" 200 22235
+INFO 2025-04-15 23:49:05,475 basehttp 23812 16476 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 92
+INFO 2025-04-15 23:49:11,589 basehttp 23812 16476 "GET /recipes/recipes/history/ HTTP/1.1" 200 15170
+INFO 2025-04-15 23:51:02,873 basehttp 23812 15912 "GET /recipes/recipes/history/ HTTP/1.1" 200 17952
+INFO 2025-04-15 23:51:02,910 basehttp 23812 15912 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:51:13,418 basehttp 23812 15912 "GET /accounts/profile/ HTTP/1.1" 200 20823
+INFO 2025-04-15 23:51:13,453 basehttp 23812 15912 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:51:17,275 basehttp 23812 15912 "GET /recipes/list/ HTTP/1.1" 200 80719
+WARNING 2025-04-15 23:51:17,415 basehttp 23812 15912 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:51:19,205 log 23812 8588 Not Found: /recipes/18/toggle-favorite/
+WARNING 2025-04-15 23:51:19,206 basehttp 23812 8588 "POST /recipes/18/toggle-favorite/ HTTP/1.1" 404 17035
+INFO 2025-04-15 23:51:20,982 basehttp 23812 8588 "GET /recipes/detail/18/ HTTP/1.1" 200 34744
+INFO 2025-04-15 23:51:22,621 basehttp 23812 8588 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 85
+INFO 2025-04-15 23:51:27,254 basehttp 23812 8588 "GET /accounts/profile/ HTTP/1.1" 200 22235
+INFO 2025-04-15 23:51:28,659 basehttp 23812 8588 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 92
+INFO 2025-04-15 23:52:30,814 basehttp 23812 5484 "GET /accounts/profile/ HTTP/1.1" 200 20823
+INFO 2025-04-15 23:52:30,862 basehttp 23812 5484 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:52:30,864 basehttp 23812 20516 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:52:36,286 basehttp 23812 20516 "GET /recipes/list/ HTTP/1.1" 200 80719
+INFO 2025-04-15 23:52:36,431 basehttp 23812 20516 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+WARNING 2025-04-15 23:52:36,511 basehttp 23812 20516 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:52:41,680 log 23812 13444 Not Found: /recipes/15/toggle-favorite/
+WARNING 2025-04-15 23:52:41,681 basehttp 23812 13444 "POST /recipes/15/toggle-favorite/ HTTP/1.1" 404 17035
+INFO 2025-04-15 23:52:45,433 basehttp 23812 13444 "GET /accounts/profile/ HTTP/1.1" 200 24400
+INFO 2025-04-15 23:52:47,780 basehttp 23812 13444 "GET /recipes/list/ HTTP/1.1" 200 80719
+WARNING 2025-04-15 23:52:47,817 basehttp 23812 13444 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:52:47,930 basehttp 23812 3276 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 23:52:51,178 basehttp 23812 15036 "GET /recipes/detail/18/ HTTP/1.1" 200 34744
+INFO 2025-04-15 23:52:53,123 basehttp 23812 15036 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 85
+INFO 2025-04-15 23:52:56,447 basehttp 23812 15036 "GET /accounts/profile/ HTTP/1.1" 200 25834
+INFO 2025-04-15 23:52:58,148 basehttp 23812 15036 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 92
+INFO 2025-04-15 23:54:28,592 basehttp 23812 6640 "GET /accounts/profile/ HTTP/1.1" 200 24482
+INFO 2025-04-15 23:54:28,642 basehttp 23812 6640 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:54:28,642 basehttp 23812 22288 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 23:54:31,742 basehttp 23812 18612 "GET /recipes/list/ HTTP/1.1" 200 80719
+WARNING 2025-04-15 23:54:31,883 basehttp 23812 18612 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 23:58:44,134 log 23812 5668 Not Found: /recipes/18/toggle-favorite/
+WARNING 2025-04-15 23:58:44,135 basehttp 23812 5668 "POST /recipes/18/toggle-favorite/ HTTP/1.1" 404 17035
+INFO 2025-04-16 00:00:49,993 basehttp 23812 15276 "GET /recipes/list/ HTTP/1.1" 200 80957
+INFO 2025-04-16 00:00:50,056 basehttp 23812 15276 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-16 00:00:50,056 basehttp 23812 11196 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-16 00:00:50,372 basehttp 23812 11196 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+WARNING 2025-04-16 00:00:50,378 basehttp 23812 15276 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-16 00:00:51,997 basehttp 23812 11196 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 85
+INFO 2025-04-16 00:00:56,172 basehttp 23812 4060 "GET /accounts/profile/ HTTP/1.1" 200 25916
+INFO 2025-04-16 00:00:58,091 basehttp 23812 4060 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 92
+INFO 2025-04-16 00:01:01,543 basehttp 23812 4060 "GET /recipes/list/ HTTP/1.1" 200 80957
+WARNING 2025-04-16 00:01:01,591 basehttp 23812 4060 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-16 00:01:01,696 basehttp 23812 10920 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-16 00:01:02,831 basehttp 23812 4388 "GET /recipes/detail/18/ HTTP/1.1" 200 34744
+INFO 2025-04-16 00:01:04,131 basehttp 23812 4388 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 85
+INFO 2025-04-16 00:01:06,335 basehttp 23812 4388 "GET /recipes/list/ HTTP/1.1" 200 80984
+WARNING 2025-04-16 00:01:06,478 basehttp 23812 4388 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-16 00:01:08,031 basehttp 23812 24096 "POST /recipes/toggle-favorite/18/ HTTP/1.1" 200 92
+INFO 2025-04-16 00:01:09,805 basehttp 23812 24096 "POST /recipes/toggle-favorite/15/ HTTP/1.1" 200 85
+INFO 2025-04-16 00:01:10,667 basehttp 23812 24096 "POST /recipes/toggle-favorite/17/ HTTP/1.1" 200 85
+INFO 2025-04-16 00:01:14,593 basehttp 23812 24096 "GET /accounts/profile/ HTTP/1.1" 200 27580
+INFO 2025-04-16 00:01:17,467 basehttp 23812 22280 "POST /recipes/toggle-favorite/17/ HTTP/1.1" 200 92
