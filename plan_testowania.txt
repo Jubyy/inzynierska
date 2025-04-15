@@ -141,36 +141,11 @@ VI. TESTY PANELU ADMINISTRATORA
 ===========================================================
 
 1. Zarządzanie składnikami
-   [ ] Przeglądanie zgłoszonych składników
-   [ ] Zatwierdzanie nowych składników
-   [ ] Odrzucanie składników z podaniem powodu
-   [ ] Edycja składników przed zatwierdzeniem
-   [ ] Zarządzanie właściwościami składników (gęstość, waga sztuki)
-
-2. Zarządzanie jednostkami i kategoriami
-   [ ] Dodawanie nowych jednostek miary
-   [ ] Edycja istniejących jednostek miary
-   [ ] Usuwanie jednostek miary
-   [ ] Dodawanie nowych kategorii składników
-   [ ] Edycja kategorii składników
-   [ ] Usuwanie kategorii składników
-   [ ] Ustawianie właściwości kategorii (wegetariańska, wegańska)
-
-3. Import/Eksport danych
-   [ ] Eksport jednostek do CSV
-   [ ] Import jednostek z CSV
-   [ ] Eksport kategorii do CSV
-   [ ] Import kategorii z CSV
-   [ ] Eksport składników do CSV
-   [ ] Import składników z CSV
-   [ ] Obsługa błędów podczas importu
-
-4. Statystyki
-   [ ] Wyświetlanie ogólnych statystyk użytkowników
-   [ ] Wyświetlanie statystyk przepisów
-   [ ] Wyświetlanie statystyk najczęściej używanych jednostek
-   [ ] Wyświetlanie statystyk najczęściej używanych kategorii
-   [ ] Działanie wykresów i wizualizacji danych
+   [X] Przeglądanie zgłoszonych składników
+   [X] Zatwierdzanie nowych składników
+   [X] Odrzucanie składników z podaniem powodu
+   [X] Edycja składników przed zatwierdzeniem
+   [X] Zarządzanie właściwościami składników (gęstość, waga sztuki)
 
 ===========================================================
 VII. TESTY PROFILU UŻYTKOWNIKA

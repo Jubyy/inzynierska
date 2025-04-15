@@ -23,6 +23,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('profile/recipes/', views.user_recipes, name='user_recipes'),
+    path('profile/delete/', views.delete_account, name='delete_account'),
     
     # Zmiana hasła
     path('profile/change-password/', 

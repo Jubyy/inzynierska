@@ -162,7 +162,7 @@ def custom_logout(request):
 def profile_view(request):
     """Wyświetla profil użytkownika"""
     # Pobierz ulubione przepisy użytkownika
-    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+    favorite_recipes = Recipe.objects.filter(favorited_by__user=request.user)[:5]
     
     # Pobierz ostatnio dodane przepisy użytkownika
     recent_recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')[:5]

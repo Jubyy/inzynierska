@@ -18,6 +18,22 @@ import json
 from django.core.paginator import Paginator
 import csv
 from django.http import HttpResponse
+from collections import defaultdict
+from django.utils.safestring import mark_safe
+from markdown import markdown
+from django.template.defaulttags import register
+
+@register.filter
+def get_item(dictionary, key):
+    """Filtr do pobierania wartości ze słownika w szablonie"""
+    if dictionary is None:
+        return None
+    return dictionary.get(key)
+
+@register.filter
+def contains(value, arg):
+    """Sprawdza czy string zawiera podany argument"""
+    return arg in value
 
 class RecipeListView(ListView):
     model = Recipe
@@ -1568,6 +1584,98 @@ def admin_pending_ingredients(request):
     # Pobierz wszystkie zatwierdzone tablice konwersji
     conversion_tables = ConversionTable.objects.filter(is_approved=True).order_by('category__name', 'name')
     
+    # Grupowanie tablic konwersji według kategorii
+    grouped_tables = defaultdict(list)
+    
+    for table in conversion_tables:
+        category_id = table.category_id if table.category else 0
+        category_name = table.category.name if table.category else "Ogólne"
+        grouped_tables[category_id].append(table)
+    
+    # Przygotuj rekomendacje tablic konwersji dla każdego składnika
+    ingredient_recommendations = {}
+    
+    for ingredient in pending:
+        category_id = ingredient.category_id
+        
+        # Tablice dla tej samej kategorii
+        matching_tables = []
+        if category_id in grouped_tables:
+            matching_tables = grouped_tables[category_id]
+        
+        # Jeśli nie znaleziono tablic dla kategorii, pokaż wszystkie
+        if not matching_tables:
+            matching_tables = conversion_tables
+        
+        # Posortuj tablice według relewantności
+        # - Na górze tablice dla tej samej kategorii
+        # - Następnie ogólne tablice
+        # - Tablice dla płynów/stałych substancji
+        recommended_tables = sorted(
+            matching_tables,
+            key=lambda t: (
+                0 if t.category_id == category_id else 1,  # Najpierw tablice z tej samej kategorii
+                not t.is_for_liquids if category_id and ingredient.category and "Płyn" in ingredient.category.name else 1,  # Tablice dla płynów, jeśli kategoria to płyny
+            )
+        )
+        
+        # Ustal najbardziej pasującą tablicę konwersji
+        best_table = None
+        if recommended_tables:
+            best_table = recommended_tables[0]  # Najbardziej pasująca tablica
+        
+        # Ustal rekomendowaną jednostkę domyślną
+        default_unit = None
+        unit_type = 'weight_volume'  # domyślnie
+        
+        # Sprawdź czy to produkt płynny
+        is_liquid = category_id and ingredient.category and any(
+            liquid_term in ingredient.category.name.lower() 
+            for liquid_term in ['płyn', 'napój', 'mleko', 'sok', 'olej']
+        )
+        
+        if is_liquid:
+            # Dla płynów, domyślna jednostka to ml
+            try:
+                default_unit = MeasurementUnit.objects.get(symbol='ml')
+                unit_type = 'volume_only' if ingredient.category.name == 'Napoje' else 'volume_spoon'
+            except MeasurementUnit.DoesNotExist:
+                pass
+        elif ingredient.piece_weight:
+            # Jeśli podano wagę sztuki, domyślna jednostka to sztuki
+            try:
+                default_unit = MeasurementUnit.objects.get(symbol='szt')
+                unit_type = 'weight_piece'
+            except MeasurementUnit.DoesNotExist:
+                pass
+        else:
+            # Dla pozostałych, domyślna jednostka to g
+            try:
+                default_unit = MeasurementUnit.objects.get(symbol='g')
+                
+                # Określ typ jednostek na podstawie nazwy kategorii
+                unit_type = 'weight_only'  # domyślnie tylko waga
+                
+                if category_id and ingredient.category:
+                    category_name = ingredient.category.name.lower()
+                    if any(term in category_name for term in ['warzywa', 'owoce']):
+                        unit_type = 'weight_piece'  # waga i sztuki
+                    elif any(term in category_name for term in ['mąka', 'kasza', 'ryż', 'sypkie']):
+                        unit_type = 'weight_volume'  # waga i objętość
+                    elif any(term in category_name for term in ['przyprawy', 'zioła']):
+                        unit_type = 'weight_spoon'  # waga i łyżki
+            except MeasurementUnit.DoesNotExist:
+                pass
+        
+        # Zapisz rekomendacje dla tego składnika
+        ingredient_recommendations[ingredient.id] = {
+            'recommended_tables': recommended_tables,
+            'best_table': best_table,
+            'default_unit': default_unit,
+            'unit_type': unit_type,
+            'is_liquid': is_liquid,
+        }
+    
     # Pogrupowane jednostki miary
     measurement_units = MeasurementUnit.objects.all().order_by('type', 'name')
     grouped_units = []
@@ -1582,12 +1690,36 @@ def admin_pending_ingredients(request):
     # Lista typów jednostek
     unit_types = UserIngredient._meta.get_field('unit_type').choices
     
+    # Typowe wagi dla popularnych produktów (do podpowiedzi)
+    typical_weights = {
+        'pomidor': 150,
+        'pomidory': 150,
+        'cebula': 110,
+        'ziemniak': 170,
+        'ziemniaki': 170,
+        'marchew': 80,
+        'marchewka': 80,
+        'jabłko': 180,
+        'jabłka': 180,
+        'ogórek': 200,
+        'ogórki': 200,
+        'papryka': 160,
+        'jajko': 60,
+        'jajka': 60,
+        'banan': 120,
+        'banany': 120,
+        'gruszka': 170,
+        'gruszki': 170,
+    }
+    
     return render(request, 'recipes/admin/pending_ingredients.html', {
         'pending_ingredients': pending,
         'recent_ingredients': recent,
         'conversion_tables': conversion_tables,
         'measurement_units': grouped_units,
-        'unit_types': unit_types
+        'unit_types': unit_types,
+        'recommendations': ingredient_recommendations,
+        'typical_weights': typical_weights,
     })
 
 @user_passes_test(is_admin)
@@ -2045,90 +2177,6 @@ def admin_dashboard(request):
         'recipes_count': recipes_count,
         'ingredients_count': ingredients_count,
         'pending_ingredients_count': pending_ingredients_count
-    })
-
-@user_passes_test(is_admin)
-def admin_statistics(request):
-    """Panel statystyk aplikacji"""
-    from django.contrib.auth import get_user_model
-    from django.db.models import Count, Avg, F, Q
-    from django.utils import timezone
-    import datetime
-    
-    User = get_user_model()
-    
-    # Statystyki ogólne
-    users_count = User.objects.count()
-    recipes_count = Recipe.objects.count()
-    ingredients_count = Ingredient.objects.count()
-    
-    # Statystyki przepisów
-    avg_rating = Recipe.objects.aggregate(avg=Avg('reciperating__rating'))['avg'] or 0
-    avg_rating = round(avg_rating, 1)
-    
-    # Najlepiej oceniane przepisy
-    top_recipes = Recipe.objects.annotate(
-        avg_rating=Avg('reciperating__rating'),
-        ratings_count=Count('reciperating')
-    ).filter(ratings_count__gt=0).order_by('-avg_rating')[:5]
-    
-    # Najpopularniejsze przepisy (po liczbie polubień)
-    popular_recipes = Recipe.objects.annotate(
-        likes_count=Count('likes')
-    ).order_by('-likes_count')[:5]
-
-    # Statystyki jednostek miary - ile razy dana jednostka jest używana w przepisach
-    measurement_unit_stats = MeasurementUnit.objects.annotate(
-        usage_count=Count('recipeingredient')
-    ).filter(usage_count__gt=0).order_by('-usage_count')[:10]
-    
-    # Statystyki kategorii składników - ile razy składniki z danej kategorii są używane w przepisach
-    ingredient_category_stats = IngredientCategory.objects.annotate(
-        usage_count=Count('ingredients__recipeingredient')
-    ).filter(usage_count__gt=0).order_by('-usage_count')[:10]
-    
-    # Aktywność w czasie
-    # Liczba nowych przepisów w ostatnich 6 miesiącach
-    today = timezone.now().date()
-    six_months_ago = today - datetime.timedelta(days=180)
-    
-    # Przygotuj dane dla wykresu
-    months_labels = []
-    recipes_data = []
-    
-    for i in range(6):
-        month_date = today - datetime.timedelta(days=30 * i)
-        month_start = datetime.date(month_date.year, month_date.month, 1)
-        if month_date.month == 12:
-            next_month = 1
-            next_year = month_date.year + 1
-        else:
-            next_month = month_date.month + 1
-            next_year = month_date.year
-            
-        month_end = datetime.date(next_year, next_month, 1) - datetime.timedelta(days=1)
-        
-        # Pobierz liczbę przepisów dla tego miesiąca
-        month_recipes = Recipe.objects.filter(
-            created_at__gte=month_start,
-            created_at__lte=month_end
-        ).count()
-        
-        # Dodaj dane do list
-        months_labels.insert(0, month_date.strftime('%b %Y'))
-        recipes_data.insert(0, month_recipes)
-    
-    return render(request, 'admin/admin_statistics.html', {
-        'users_count': users_count,
-        'recipes_count': recipes_count,
-        'ingredients_count': ingredients_count,
-        'avg_rating': avg_rating,
-        'top_recipes': top_recipes,
-        'popular_recipes': popular_recipes,
-        'months_labels': months_labels,
-        'recipes_data': recipes_data,
-        'measurement_unit_stats': measurement_unit_stats,
-        'ingredient_category_stats': ingredient_category_stats
     })
 
 @user_passes_test(is_admin)

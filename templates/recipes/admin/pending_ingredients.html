@@ -102,19 +102,51 @@
                                                                 <label for="conversion_table_{{ ingredient.id }}" class="form-label fw-bold">
                                                                     Tablica konwersji <span class="text-danger">*</span>
                                                                 </label>
+                                                                {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'recommended_tables' %}
+                                                                    <!-- Zalecane tablice konwersji dla tej kategorii -->
+                                                                    <div class="mb-2">
+                                                                        <small class="text-success">
+                                                                            <i class="fas fa-info-circle"></i> 
+                                                                            Rekomendowane tablice dla kategorii <strong>{{ ingredient.category.name }}</strong>:
+                                                                        </small>
+                                                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                                                            {% for table in recommendations|get_item:ingredient.id|get_item:'recommended_tables'|slice:":3" %}
+                                                                                <span class="badge {% if table == recommendations|get_item:ingredient.id|get_item:'best_table' %}bg-success{% else %}bg-secondary{% endif %} me-1">
+                                                                                    {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %}
+                                                                                </span>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                {% endif %}
+                                                                
                                                                 <select name="conversion_table" id="conversion_table_{{ ingredient.id }}" 
                                                                         class="form-select" required>
                                                                     <option value="">-- Wybierz tablicę konwersji --</option>
-                                                                    {% for table in conversion_tables %}
-                                                                        <option value="{{ table.id }}" {% if ingredient.conversion_table and ingredient.conversion_table.id == table.id %}selected{% endif %}>
-                                                                            {{ table.category.name }} - {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %} ({{ table.entries.count }} przeliczników)
-                                                                        </option>
-                                                                    {% endfor %}
+                                                                    
+                                                                    <!-- Najpierw rekomendowane tablice -->
+                                                                    {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'recommended_tables' %}
+                                                                        <optgroup label="Rekomendowane tablice">
+                                                                            {% for table in recommendations|get_item:ingredient.id|get_item:'recommended_tables' %}
+                                                                                <option value="{{ table.id }}" {% if ingredient.conversion_table and ingredient.conversion_table.id == table.id %}selected{% elif table == recommendations|get_item:ingredient.id|get_item:'best_table' and not ingredient.conversion_table %}selected{% endif %}>
+                                                                                    {{ table.category.name }} - {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </optgroup>
+                                                                    {% endif %}
+                                                                    
+                                                                    <!-- Wszystkie pozostałe tablice -->
+                                                                    <optgroup label="Wszystkie tablice konwersji">
+                                                                        {% for table in conversion_tables %}
+                                                                            <option value="{{ table.id }}" {% if ingredient.conversion_table and ingredient.conversion_table.id == table.id and not recommendations|get_item:ingredient.id|get_item:'recommended_tables' %}selected{% endif %}>
+                                                                                {{ table.category.name }} - {{ table.name }}{% if table.is_for_liquids %} (płyn){% endif %} ({{ table.entries.count }} przeliczników)
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </optgroup>
                                                                 </select>
                                                                 <div class="form-text">
-                                                                    Wybierz tablicę konwersji powiązaną z kategorią produktu. Każda kategoria ma swoje dedykowane tablice konwersji.
+                                                                    Wybierz tablicę konwersji odpowiednią dla kategorii produktu.
                                                                     {% if ingredient.conversion_table %}
-                                                                    <div class="mt-1 text-success">
+                                                                    <div class="mt-1 text-info">
                                                                         <i class="fas fa-info-circle"></i> 
                                                                         Użytkownik wybrał tablicę konwersji: {{ ingredient.conversion_table.name }}
                                                                     </div>
@@ -127,13 +159,28 @@
                                                                 <label for="default_unit_{{ ingredient.id }}" class="form-label fw-bold">
                                                                     Domyślna jednostka <span class="text-danger">*</span>
                                                                 </label>
+                                                                {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'default_unit' %}
+                                                                    <div class="mb-2">
+                                                                        <small class="text-success">
+                                                                            <i class="fas fa-info-circle"></i> 
+                                                                            Zalecana jednostka domyślna: 
+                                                                            <strong>{{ recommendations|get_item:ingredient.id|get_item:'default_unit' }}</strong>
+                                                                        </small>
+                                                                    </div>
+                                                                {% endif %}
                                                                 <select name="default_unit" id="default_unit_{{ ingredient.id }}" 
                                                                         class="form-select" required>
                                                                     <option value="">-- Wybierz domyślną jednostkę --</option>
                                                                     {% for unit_group in measurement_units %}
                                                                         <optgroup label="{{ unit_group.grouper }}">
                                                                             {% for unit in unit_group.list %}
-                                                                                <option value="{{ unit.id }}">
+                                                                                <option value="{{ unit.id }}" 
+                                                                                {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'default_unit' %}
+                                                                                    {% with default_unit=recommendations|get_item:ingredient.id|get_item:'default_unit' %}
+                                                                                        {% if default_unit.id == unit.id %}selected{% endif %}
+                                                                                    {% endwith %}
+                                                                                {% endif %}
+                                                                                >
                                                                                     {{ unit.name }} ({{ unit.symbol }})
                                                                                 </option>
                                                                             {% endfor %}
@@ -150,12 +197,33 @@
                                                                 <label for="unit_type_{{ ingredient.id }}" class="form-label fw-bold">
                                                                     Dozwolone jednostki <span class="text-danger">*</span>
                                                                 </label>
+                                                                {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'unit_type' %}
+                                                                    <div class="mb-2">
+                                                                        <small class="text-success">
+                                                                            <i class="fas fa-info-circle"></i> 
+                                                                            Zalecany typ jednostek:
+                                                                            {% for type_choice in unit_types %}
+                                                                                {% if type_choice.0 == recommendations|get_item:ingredient.id|get_item:'unit_type' %}
+                                                                                    <strong>{{ type_choice.1 }}</strong>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        </small>
+                                                                    </div>
+                                                                {% endif %}
                                                                 <select name="unit_type" id="unit_type_{{ ingredient.id }}" 
                                                                         class="form-select" required
                                                                         onchange="togglePieceWeightRequired(this, '{{ ingredient.id }}')">
                                                                     <option value="">-- Wybierz typ jednostek --</option>
                                                                     {% for unit_type in unit_types %}
-                                                                        <option value="{{ unit_type.0 }}">{{ unit_type.1 }}</option>
+                                                                        <option value="{{ unit_type.0 }}" 
+                                                                        {% if recommendations and recommendations|get_item:ingredient.id and recommendations|get_item:ingredient.id|get_item:'unit_type' %}
+                                                                            {% with recommended_type=recommendations|get_item:ingredient.id|get_item:'unit_type' %}
+                                                                                {% if recommended_type == unit_type.0 %}selected{% endif %}
+                                                                            {% endwith %}
+                                                                        {% endif %}
+                                                                        >
+                                                                            {{ unit_type.1 }}
+                                                                        </option>
                                                                     {% endfor %}
                                                                 </select>
                                                                 <div class="form-text">
@@ -168,10 +236,29 @@
                                                                 <label for="piece_weight_{{ ingredient.id }}" class="form-label fw-bold">
                                                                     Waga sztuki (g) <span class="text-danger piece-weight-required d-none">*</span>
                                                                 </label>
+                                                                
+                                                                <!-- Podpowiedzi typowych wag -->
+                                                                {% if typical_weights %}
+                                                                    {% with found_match=False %}
+                                                                    {% for product, weight in typical_weights.items %}
+                                                                        {% if ingredient.name|lower|contains:product|lower and not found_match %}
+                                                                            {% with found_match=True %}
+                                                                            <div class="mb-2">
+                                                                                <small class="text-success">
+                                                                                    <i class="fas fa-info-circle"></i> 
+                                                                                    Typowa waga {{ ingredient.name }}: <strong>{{ weight }}g</strong> na sztukę
+                                                                                </small>
+                                                                            </div>
+                                                                            {% endwith %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                    {% endwith %}
+                                                                {% endif %}
+                                                                
                                                                 <div class="input-group">
                                                                     <input type="number" name="piece_weight" id="piece_weight_{{ ingredient.id }}" 
                                                                            class="form-control" step="0.01" min="0.01" 
-                                                                           value="{{ ingredient.piece_weight|default:'' }}"
+                                                                           value="{% if ingredient.piece_weight %}{{ ingredient.piece_weight }}{% else %}{% with found_match=False %}{% for product, weight in typical_weights.items %}{% if ingredient.name|lower|contains:product|lower and not found_match %}{% with found_match=True %}{{ weight }}{% endwith %}{% endif %}{% endfor %}{% endwith %}{% endif %}"
                                                                            placeholder="np. 250 dla jednej sztuki">
                                                                     <span class="input-group-text">g</span>
                                                                 </div>
