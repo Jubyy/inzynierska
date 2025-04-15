@@ -2159,7 +2159,7 @@ def admin_dashboard(request):
 def admin_statistics(request):
     """Panel statystyk aplikacji"""
     from django.contrib.auth import get_user_model
-    from django.db.models import Count, Avg
+    from django.db.models import Count, Avg, F, Q
     from django.utils import timezone
     import datetime
     
@@ -2184,6 +2184,16 @@ def admin_statistics(request):
     popular_recipes = Recipe.objects.annotate(
         likes_count=Count('likes')
     ).order_by('-likes_count')[:5]
+
+    # Statystyki jednostek miary - ile razy dana jednostka jest używana w przepisach
+    measurement_unit_stats = MeasurementUnit.objects.annotate(
+        usage_count=Count('recipeingredient')
+    ).filter(usage_count__gt=0).order_by('-usage_count')[:10]
+    
+    # Statystyki kategorii składników - ile razy składniki z danej kategorii są używane w przepisach
+    ingredient_category_stats = IngredientCategory.objects.annotate(
+        usage_count=Count('ingredients__recipeingredient')
+    ).filter(usage_count__gt=0).order_by('-usage_count')[:10]
     
     # Aktywność w czasie
     # Liczba nowych przepisów w ostatnich 6 miesiącach
@@ -2224,7 +2234,9 @@ def admin_statistics(request):
         'top_recipes': top_recipes,
         'popular_recipes': popular_recipes,
         'months_labels': months_labels,
-        'recipes_data': recipes_data
+        'recipes_data': recipes_data,
+        'measurement_unit_stats': measurement_unit_stats,
+        'ingredient_category_stats': ingredient_category_stats
     })
 
 @user_passes_test(is_admin)

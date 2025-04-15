@@ -2569,3 +2569,123 @@ INFO 2025-04-15 18:10:42,222 autoreload 10468 20436 D:\praca_inzynierska\recipes
 INFO 2025-04-15 18:10:43,209 autoreload 13120 9696 Watching for file changes with StatReloader
 INFO 2025-04-15 18:12:09,232 autoreload 13120 9696 D:\praca_inzynierska\recipes\views.py changed, reloading.
 INFO 2025-04-15 18:12:10,040 autoreload 14188 12740 Watching for file changes with StatReloader
+INFO 2025-04-15 18:19:14,696 autoreload 14188 12740 D:\praca_inzynierska\recipes\views.py changed, reloading.
+INFO 2025-04-15 18:19:15,494 autoreload 17248 1480 Watching for file changes with StatReloader
+WARNING 2025-04-15 18:27:09,224 log 17248 9768 Not Found: /favicon.ico
+WARNING 2025-04-15 18:27:09,393 basehttp 17248 9768 "GET /favicon.ico HTTP/1.1" 404 4613
+INFO 2025-04-15 18:27:10,772 basehttp 17248 9768 "GET / HTTP/1.1" 200 38575
+INFO 2025-04-15 18:27:10,842 basehttp 17248 9768 "GET /static/css/style.css HTTP/1.1" 304 0
+INFO 2025-04-15 18:27:10,848 basehttp 17248 9768 "GET /static/img/user-placeholder.svg HTTP/1.1" 304 0
+INFO 2025-04-15 18:27:10,867 basehttp 17248 9768 "GET /static/img/recipe-placeholder.svg HTTP/1.1" 304 0
+INFO 2025-04-15 18:27:10,955 basehttp 17248 9768 "GET /media/recipes/brak.jpg HTTP/1.1" 304 0
+INFO 2025-04-15 18:42:48,799 basehttp 17248 13664 "GET /recipes/list/ HTTP/1.1" 200 79853
+WARNING 2025-04-15 18:42:48,873 basehttp 17248 13664 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:42:49,124 basehttp 17248 22776 "GET /media/recipes/12259_NATUR_JOG_330G_PIAT_wizualizacja_Q7hOk4j.png HTTP/1.1" 304 0
+WARNING 2025-04-15 18:42:49,138 basehttp 17248 22776 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:42:53,223 basehttp 17248 15008 "GET /recipes/list/?page=2 HTTP/1.1" 200 46005
+WARNING 2025-04-15 18:42:53,268 basehttp 17248 15008 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:42:53,464 basehttp 17248 6128 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:42:54,832 basehttp 17248 3868 "GET /accounts/community/ HTTP/1.1" 200 51072
+INFO 2025-04-15 18:42:56,609 basehttp 17248 3868 "GET /fridge/ HTTP/1.1" 200 24303
+INFO 2025-04-15 18:42:58,128 basehttp 17248 3868 "GET /shopping/ HTTP/1.1" 200 14107
+INFO 2025-04-15 18:42:59,763 basehttp 17248 8476 "GET /shopping/create/ HTTP/1.1" 200 14115
+INFO 2025-04-15 18:43:02,442 basehttp 17248 8476 "POST /shopping/create/ HTTP/1.1" 302 0
+INFO 2025-04-15 18:43:02,474 basehttp 17248 8476 "GET /shopping/6/ HTTP/1.1" 200 28056
+INFO 2025-04-15 18:43:05,688 basehttp 17248 8476 "GET /shopping/6/add-item/ HTTP/1.1" 200 216876
+INFO 2025-04-15 18:43:08,687 basehttp 17248 8476 "GET /shopping/ajax/load-units/?ingredient_id=31 HTTP/1.1" 200 78
+INFO 2025-04-15 18:43:10,341 basehttp 17248 8476 "GET /shopping/ajax/load-units/?ingredient_id=14 HTTP/1.1" 200 76
+INFO 2025-04-15 18:43:14,236 basehttp 17248 8476 "POST /shopping/6/add-item/ HTTP/1.1" 302 0
+INFO 2025-04-15 18:43:14,265 basehttp 17248 8476 "GET /shopping/6/ HTTP/1.1" 200 32163
+INFO 2025-04-15 18:43:17,919 models 17248 8476 Dodawanie do lodówki: 1.0 szt sk³adnika Jajko
+INFO 2025-04-15 18:43:17,945 models 17248 8476 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-15 18:43:17,958 models 17248 8476 Waga sztuki dla Jajko: 60.00g
+INFO 2025-04-15 18:43:17,959 models 17248 8476 Próba konwersji z szt na g dla Jajko
+INFO 2025-04-15 18:43:17,959 utils 17248 8476 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:43:17,960 utils 17248 8476 Konwersja: 1.0 szt -> 60.0 g -> 60.0 g
+INFO 2025-04-15 18:43:17,961 models 17248 8476 Po konwersji: 60.0 g
+INFO 2025-04-15 18:43:17,991 basehttp 17248 8476 "POST /shopping/item/20/toggle/ HTTP/1.1" 200 170
+INFO 2025-04-15 18:43:20,353 basehttp 17248 8476 "GET /shopping/6/ HTTP/1.1" 200 29287
+INFO 2025-04-15 18:43:23,904 utils 17248 8476 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:43:23,907 utils 17248 8476 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:43:23,960 basehttp 17248 8476 "GET /recipes/list/ HTTP/1.1" 200 79853
+WARNING 2025-04-15 18:43:24,008 basehttp 17248 8476 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:43:24,124 basehttp 17248 15104 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:43:25,990 utils 17248 23512 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:43:25,996 utils 17248 23512 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:43:26,070 basehttp 17248 23512 "GET /dashboard/ HTTP/1.1" 200 24459
+INFO 2025-04-15 18:45:13,600 basehttp 17248 23512 "GET /accounts/community/ HTTP/1.1" 200 51072
+INFO 2025-04-15 18:45:16,417 basehttp 17248 23512 "POST /accounts/user/zywic/follow/ HTTP/1.1" 200 82
+INFO 2025-04-15 18:45:18,518 basehttp 17248 23512 "POST /accounts/user/zywic/follow/ HTTP/1.1" 200 83
+INFO 2025-04-15 18:45:19,829 basehttp 17248 23512 "POST /accounts/user/katarzynakowalczyk/follow/ HTTP/1.1" 200 82
+INFO 2025-04-15 18:45:21,970 basehttp 17248 23512 "GET /accounts/following/ HTTP/1.1" 200 20901
+INFO 2025-04-15 18:45:26,066 basehttp 17248 23512 "GET /accounts/user/katarzynakowalczyk/ HTTP/1.1" 200 20375
+WARNING 2025-04-15 18:45:26,110 basehttp 17248 23512 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+ERROR 2025-04-15 18:45:29,735 log 17248 19672 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 165, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, ratings, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-15 18:45:29,764 basehttp 17248 19672 "GET /accounts/profile/ HTTP/1.1" 500 122533
+INFO 2025-04-15 18:45:35,218 basehttp 17248 16892 "GET / HTTP/1.1" 200 38575
+INFO 2025-04-15 18:45:40,826 utils 17248 16892 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:45:40,829 utils 17248 16892 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:45:40,878 basehttp 17248 16892 "GET /recipes/list/ HTTP/1.1" 200 79853
+WARNING 2025-04-15 18:45:40,922 basehttp 17248 16892 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:41,175 basehttp 17248 18016 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:45:44,488 basehttp 17248 14900 "GET /recipes/list/?ingredient=5 HTTP/1.1" 200 55381
+WARNING 2025-04-15 18:45:44,529 basehttp 17248 14900 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:44,769 basehttp 17248 12604 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:45:45,707 utils 17248 24164 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:45:45,709 utils 17248 24164 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:45:45,774 basehttp 17248 24164 "GET /recipes/list/?ingredient=7 HTTP/1.1" 200 65337
+WARNING 2025-04-15 18:45:45,845 basehttp 17248 24164 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:46,108 basehttp 17248 20836 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:45:47,235 utils 17248 14164 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:45:47,237 utils 17248 14164 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:45:47,302 basehttp 17248 14164 "GET /recipes/list/?ingredient=19 HTTP/1.1" 200 68620
+WARNING 2025-04-15 18:45:47,346 basehttp 17248 14164 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:47,611 basehttp 17248 9652 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:45:51,405 basehttp 17248 17688 "GET /recipes/list/?ingredient=34 HTTP/1.1" 200 43260
+INFO 2025-04-15 18:45:53,369 basehttp 17248 17688 "GET /recipes/list/?ingredient=13 HTTP/1.1" 200 45551
+WARNING 2025-04-15 18:45:53,412 basehttp 17248 17688 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:53,674 basehttp 17248 1288 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 18:45:55,271 utils 17248 19228 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 18:45:55,271 utils 17248 19228 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 18:45:55,327 basehttp 17248 19228 "GET /recipes/list/?ingredient=20 HTTP/1.1" 200 52218
+WARNING 2025-04-15 18:45:55,370 basehttp 17248 19228 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 18:45:55,507 basehttp 17248 11376 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 19:30:03,658 basehttp 17248 12472 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880

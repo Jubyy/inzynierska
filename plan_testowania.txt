@@ -1,0 +1,285 @@
+===========================================================
+PLAN TESTOWANIA APLIKACJI KSIĄŻKA KUCHARSKA
+===========================================================
+Data rozpoczęcia testów: [WPISZ DATĘ]
+
+Cel testów: Kompleksowe przetestowanie wszystkich funkcjonalności aplikacji, włączając każdy przycisk, link i przepływ użytkownika. Dokumentacja błędów i potencjalnych ulepszeń.
+
+===========================================================
+I. TESTY PODSTAWOWE
+===========================================================
+
+1. Logowanie i rejestracja
+   [ ] Rejestracja nowego konta z poprawnymi danymi
+   [ ] Logowanie do istniejącego konta
+   [ ] Próba logowania z błędnymi danymi (walidacja)
+   [ ] Zmiana hasła i ponowne logowanie z nowym hasłem
+   [ ] Obsługa formularza "Zapomniałem hasła"
+   [ ] Wylogowanie z aplikacji
+
+2. Nawigacja i responsywność
+   [ ] Sprawdzenie działania menu głównego na urządzeniach mobilnych (320px, 375px, 425px)
+   [ ] Sprawdzenie działania menu głównego na tabletach (768px)
+   [ ] Sprawdzenie działania menu głównego na desktopie (1024px+)
+   [ ] Poprawne wyświetlanie powiadomień systemowych
+   [ ] Przejścia między kluczowymi widokami aplikacji
+   [ ] Działanie stopki strony
+
+===========================================================
+II. TESTY MODUŁU PRZEPISÓW
+===========================================================
+
+1. Przeglądanie przepisów
+   [ ] Wyświetlanie listy wszystkich przepisów
+   [ ] Filtrowanie przepisów według kategorii
+   [ ] Filtrowanie przepisów według składników
+   [ ] Filtrowanie przepisów według diety (wegetariańskie, wegańskie)
+   [ ] Filtrowanie przepisów według czasu przygotowania
+   [ ] Filtrowanie przepisów według poziomu trudności
+   [ ] Wyszukiwanie przepisów po nazwie/opisie
+   [ ] Sortowanie przepisów (data, popularność, oceny)
+   [ ] Działanie paginacji na liście przepisów
+
+2. Szczegóły przepisu
+   [ ] Poprawne wyświetlanie wszystkich informacji o przepisie
+   [ ] Wyświetlanie listy składników z jednostkami
+   [ ] Wyświetlanie kroków przygotowania
+   [ ] Wyświetlanie ocen i komentarzy
+   [ ] Zmiana liczby porcji i przeliczanie składników
+   [ ] Działanie przycisku "Dodaj do ulubionych"
+   [ ] Działanie przycisku "Polub przepis"
+
+3. Zarządzanie przepisami
+   [ ] Tworzenie nowego przepisu z wszystkimi danymi
+   [ ] Dodawanie składników z jednostkami miary
+   [ ] Dodawanie kroków przygotowania
+   [ ] Dodawanie zdjęć do przepisu
+   [ ] Edycja istniejącego przepisu
+   [ ] Usuwanie przepisu (z potwierdzeniem)
+   [ ] Działanie formularza przy błędnych danych
+
+4. Interakcje z przepisami
+   [ ] Ocenianie przepisu (gwiazdki 1-5)
+   [ ] Dodawanie komentarza do przepisu
+   [ ] Odpowiadanie na komentarze innych użytkowników
+   [ ] Usuwanie własnych komentarzy
+   [ ] Oznaczanie ocen jako przydatne
+
+===========================================================
+III. TESTY MODUŁU LODÓWKI
+===========================================================
+
+1. Zarządzanie zawartością lodówki
+   [ ] Dodawanie nowego produktu do lodówki
+   [ ] Dodawanie produktu z datą ważności
+   [ ] Dodawanie wielu produktów jednocześnie
+   [ ] Edycja ilości produktu
+   [ ] Edycja daty ważności produktu
+   [ ] Usuwanie produktu z lodówki
+   [ ] Filtrowanie produktów w lodówce według kategorii
+   [ ] Wyszukiwanie produktów w lodówce
+   [ ] Sortowanie produktów (data ważności, nazwa)
+
+2. Funkcje dodatkowe lodówki
+   [ ] Konsolidacja tych samych produktów
+   [ ] Eksport zawartości lodówki do pliku
+   [ ] Import zawartości lodówki z pliku
+   [ ] Wyświetlanie statystyk zawartości lodówki
+
+3. Powiadomienia
+   [ ] Generowanie powiadomień o przeterminowanych produktach
+   [ ] Generowanie powiadomień o produktach bliskich przeterminowania
+   [ ] Wyświetlanie liczby nieprzeczytanych powiadomień
+   [ ] Oznaczanie powiadomień jako przeczytane
+   [ ] Usuwanie powiadomień
+
+===========================================================
+IV. TESTY MODUŁU LISTY ZAKUPÓW
+===========================================================
+
+1. Zarządzanie listami zakupów
+   [ ] Tworzenie nowej listy zakupów
+   [ ] Nadawanie nazwy liście zakupów
+   [ ] Dodawanie produktów do listy ręcznie
+   [ ] Wybór jednostki miary dla produktu
+   [ ] Edycja ilości produktu na liście
+   [ ] Oznaczanie produktów jako kupione
+   [ ] Usuwanie produktów z listy
+   [ ] Usuwanie całej listy zakupów
+   [ ] Sortowanie produktów na liście
+
+2. Funkcje dodatkowe list zakupów
+   [ ] Współdzielenie list zakupów z innymi użytkownikami
+   [ ] Eksport listy zakupów do pliku
+   [ ] Drukowanie listy zakupów
+   [ ] Oznaczanie list zakupów jako zakończone
+
+===========================================================
+V. TESTY INTEGRACYJNE
+===========================================================
+
+1. Przepis → Lista zakupów
+   [ ] Dodawanie wszystkich składników z przepisu do listy zakupów
+   [ ] Dodawanie tylko brakujących składników do listy zakupów
+   [ ] Sprawdzenie przeliczania ilości przy różnej liczbie porcji
+   [ ] Wybór istniejącej lub utworzenie nowej listy zakupów
+   [ ] Sprawdzenie obsługi różnych jednostek miary
+
+2. Przepis → Lodówka
+   [ ] Przygotowanie przepisu i sprawdzenie czy składniki zostały odjęte z lodówki
+   [ ] Sprawdzenie czy historia przepisów aktualizuje się poprawnie
+   [ ] Próba przygotowania przepisu z niewystarczającą ilością składników
+   [ ] Przygotowanie przepisu na różną liczbę porcji
+
+3. Lodówka → Lista zakupów
+   [ ] Generowanie listy brakujących/kończących się produktów
+   [ ] Dodawanie ich do listy zakupów
+   [ ] Ustawienie minimalnej ilości produktu do automatycznego dodania
+
+4. Lista zakupów → Lodówka
+   [ ] Dodawanie kupionych produktów do lodówki
+   [ ] Sprawdzenie czy produkty są dodawane z poprawną ilością i jednostką
+   [ ] Dodawanie daty ważności podczas przenoszenia do lodówki
+   [ ] Obsługa konwersji jednostek podczas przenoszenia
+
+===========================================================
+VI. TESTY PANELU ADMINISTRATORA
+===========================================================
+
+1. Zarządzanie składnikami
+   [ ] Przeglądanie zgłoszonych składników
+   [ ] Zatwierdzanie nowych składników
+   [ ] Odrzucanie składników z podaniem powodu
+   [ ] Edycja składników przed zatwierdzeniem
+   [ ] Zarządzanie właściwościami składników (gęstość, waga sztuki)
+
+2. Zarządzanie jednostkami i kategoriami
+   [ ] Dodawanie nowych jednostek miary
+   [ ] Edycja istniejących jednostek miary
+   [ ] Usuwanie jednostek miary
+   [ ] Dodawanie nowych kategorii składników
+   [ ] Edycja kategorii składników
+   [ ] Usuwanie kategorii składników
+   [ ] Ustawianie właściwości kategorii (wegetariańska, wegańska)
+
+3. Import/Eksport danych
+   [ ] Eksport jednostek do CSV
+   [ ] Import jednostek z CSV
+   [ ] Eksport kategorii do CSV
+   [ ] Import kategorii z CSV
+   [ ] Eksport składników do CSV
+   [ ] Import składników z CSV
+   [ ] Obsługa błędów podczas importu
+
+4. Statystyki
+   [ ] Wyświetlanie ogólnych statystyk użytkowników
+   [ ] Wyświetlanie statystyk przepisów
+   [ ] Wyświetlanie statystyk najczęściej używanych jednostek
+   [ ] Wyświetlanie statystyk najczęściej używanych kategorii
+   [ ] Działanie wykresów i wizualizacji danych
+
+===========================================================
+VII. TESTY PROFILU UŻYTKOWNIKA
+===========================================================
+
+1. Zarządzanie profilem
+   [ ] Przeglądanie własnego profilu
+   [ ] Edycja danych profilu
+   [ ] Zmiana zdjęcia profilowego
+   [ ] Usuwanie zdjęcia profilowego
+   [ ] Zmiana preferencji powiadomień
+
+2. Przepisy użytkownika
+   [ ] Wyświetlanie listy własnych przepisów
+   [ ] Wyświetlanie listy ulubionych przepisów
+   [ ] Wyświetlanie historii przygotowanych przepisów
+   [ ] Usuwanie przepisów z ulubionych
+
+3. Funkcje społecznościowe
+   [ ] Przeglądanie profili innych użytkowników
+   [ ] Obserwowanie innych użytkowników
+   [ ] Przestawanie obserwowania użytkowników
+   [ ] Wyświetlanie listy obserwowanych użytkowników
+   [ ] Wyświetlanie przepisów obserwowanych użytkowników
+
+===========================================================
+VIII. TESTY BEZPIECZEŃSTWA
+===========================================================
+
+1. Kontrola dostępu
+   [ ] Próba dostępu do panelu administratora jako zwykły użytkownik
+   [ ] Próba edycji/usuwania przepisów innego użytkownika
+   [ ] Próba dostępu do zasobów bez logowania
+   [ ] Próba modyfikacji lodówki innego użytkownika
+   [ ] Próba modyfikacji listy zakupów innego użytkownika
+
+2. Walidacja formularzy
+   [ ] Próba dodania przepisu z nieprawidłowymi danymi
+   [ ] Próba dodania produktu do lodówki z nieprawidłowymi danymi
+   [ ] Próba rejestracji z nieprawidłowymi danymi
+   [ ] Próba dodania nieprawidłowej daty ważności
+   [ ] Próba wprowadzenia niedozwolonych znaków do pól formularzy
+
+3. Ochrona przed atakami
+   [ ] Próba wykonania Cross-Site Scripting (XSS)
+   [ ] Próba wykonania Cross-Site Request Forgery (CSRF)
+   [ ] Próba wstrzyknięcia SQL (SQL Injection)
+   [ ] Testowanie limitów przesyłanych plików
+
+===========================================================
+IX. TESTY WYDAJNOŚCIOWE
+===========================================================
+
+1. Ładowanie danych
+   [ ] Mierzenie czasu ładowania strony głównej
+   [ ] Mierzenie czasu ładowania listy przepisów przy dużej ilości danych
+   [ ] Mierzenie czasu ładowania lodówki przy dużej ilości produktów
+   [ ] Mierzenie czasu ładowania listy zakupów
+
+2. Wydajność operacji
+   [ ] Wydajność wyszukiwania przepisów
+   [ ] Wydajność filtrowania listy przepisów
+   [ ] Wydajność dodawania wielu produktów do lodówki
+   [ ] Wydajność konwersji jednostek
+
+===========================================================
+X. TESTY KOMPATYBILNOŚCI
+===========================================================
+
+1. Przeglądarki
+   [ ] Google Chrome (najnowsza wersja)
+   [ ] Mozilla Firefox (najnowsza wersja)
+   [ ] Microsoft Edge (najnowsza wersja)
+   [ ] Safari (najnowsza wersja)
+
+2. Urządzenia mobilne
+   [ ] Smartfon z systemem Android
+   [ ] iPhone z systemem iOS
+   [ ] Tablet z systemem Android
+   [ ] iPad z systemem iPadOS
+
+===========================================================
+NOTATKI DO TESTÓW
+===========================================================
+
+W trakcie przeprowadzania testów należy zwracać szczególną uwagę na:
+1. Czytelność komunikatów błędów
+2. Intuicyjność interfejsu użytkownika
+3. Spójność wizualną aplikacji
+4. Poprawność działania konwersji jednostek
+5. Działanie funkcji przeskalowania ilości składników
+6. Poprawność obliczeń przy dodawaniu/usuwaniu produktów
+7. Prawidłowe działanie powiadomień
+
+Dla każdego znalezionego błędu należy udokumentować:
+1. Kroki prowadzące do wystąpienia błędu
+2. Oczekiwane zachowanie
+3. Rzeczywiste zachowanie
+4. Środowisko testowe (przeglądarka, urządzenie)
+5. Zrzut ekranu (jeśli możliwe)
+
+Po zakończeniu testów, wyniki powinny zostać opracowane w formie raportu zawierającego:
+1. Listę przetestowanych funkcjonalności
+2. Listę znalezionych błędów
+3. Propozycje usprawnień
+4. Ogólną ocenę jakości aplikacji 
