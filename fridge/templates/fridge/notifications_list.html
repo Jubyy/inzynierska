@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Powiadomienia o przeterminowanych produktach{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-card {
+        border-radius: 10px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        border-left: 5px solid #28a745;
+    }
+    
+    .notification-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: #f8f9fa;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .notification-title i {
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+    
+    .notification-time {
+        color: #6c757d;
+        font-size: 0.9em;
+    }
+    
+    .notification-body {
+        padding: 20px;
+    }
+    
+    .notification-message {
+        margin-bottom: 15px;
+    }
+    
+    .notification-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .notification-card.unread {
+        border-left-color: #dc3545;
+        background-color: #fff9f9;
+    }
+    
+    .notification-card.unread .notification-title {
+        color: #dc3545;
+    }
+    
+    .notification-card.unread::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+    }
+    
+    .empty-notifications {
+        text-align: center;
+        padding: 40px 20px;
+        margin-top: 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .empty-notifications i {
+        font-size: 4em;
+        color: #adb5bd;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    .notification-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="notification-heading">
+        <h1 class="display-5">
+            <i class="fas fa-bell"></i> Powiadomienia
+        </h1>
+        
+        <div class="d-flex gap-2">
+            <a href="{% url 'fridge:check_notifications' %}" class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> Sprawdź nowe powiadomienia
+            </a>
+            
+            {% if notifications %}
+            <a href="{% url 'fridge:delete_all_notifications' %}" class="btn btn-outline-danger" 
+               onclick="return confirm('Czy na pewno chcesz usunąć wszystkie powiadomienia?')">
+                <i class="fas fa-trash"></i> Usuń wszystkie
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if notifications %}
+        {% for notification in notifications %}
+        <div class="card notification-card {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-header">
+                <h5 class="notification-title">
+                    <i class="fas fa-exclamation-circle"></i> {{ notification.title }}
+                </h5>
+                <span class="notification-time">{{ notification.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <div class="notification-body">
+                <p class="notification-message">{{ notification.message }}</p>
+                <div class="notification-actions">
+                    <a href="{% url 'fridge:delete_notification' notification.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i> Usuń
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-notifications">
+            <i class="fas fa-bell-slash"></i>
+            <h3>Brak powiadomień</h3>
+            <p class="text-muted">Nie masz żadnych nowych powiadomień o przeterminowanych produktach.</p>
+            <a href="{% url 'fridge:check_notifications' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-sync-alt"></i> Sprawdź przeterminowane produkty
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

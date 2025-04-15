@@ -4,15 +4,16 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 import json
 import requests
 from datetime import datetime, timedelta, date
 from difflib import SequenceMatcher
+import csv
 
 from recipes.models import Ingredient, MeasurementUnit, Recipe, IngredientCategory, IngredientConversion
-from .models import FridgeItem
+from .models import FridgeItem, ExpiryNotification
 from .forms import FridgeItemForm, BulkAddForm, FridgeSearchForm, BulkItemFormSet
 
 @login_required
@@ -35,6 +36,12 @@ def fridge_dashboard(request):
         expiry_date__lte=date.today() + timedelta(days=3)
     ).count()
     
+    # Pobierz produkty, które niedługo się przeterminują (w ciągu 7 dni)
+    expiring_soon_items = fridge_items.filter(
+        expiry_date__gte=date.today(),
+        expiry_date__lte=date.today() + timedelta(days=7)
+    ).select_related('ingredient', 'unit')[:10]  # Ogranicz do 10 produktów
+    
     # Pobierz przepisy, które można przygotować z produktów w lodówce
     available_recipes = []
     recipes = Recipe.objects.filter(Q(author=request.user) | Q(is_public=True)).distinct()[:20]  # Ogranicz do 20 najnowszych przepisów
@@ -48,12 +55,47 @@ def fridge_dashboard(request):
             if len(available_recipes) >= 5:  # Ogranicz do 5 przepisów
                 break
     
+    # Pobierz przepisy, które wykorzystują kończące się produkty
+    expiring_ingredients = [item.ingredient for item in expiring_soon_items]
+    recipes_with_expiring = []
+    
+    if expiring_ingredients:
+        # Znajdź przepisy zawierające kończące się składniki
+        recipes_with_expiring_ingredients = Recipe.objects.filter(
+            Q(author=request.user) | Q(is_public=True),
+            ingredients__ingredient__in=expiring_ingredients
+        ).distinct()[:10]  # Ogranicz do 10 przepisów
+        
+        for recipe in recipes_with_expiring_ingredients:
+            # Sprawdź, które z kończących się składników są używane w przepisie
+            used_expiring = []
+            for ingredient in expiring_ingredients:
+                if recipe.ingredients.filter(ingredient=ingredient).exists():
+                    # Znajdź odpowiedni FridgeItem, żeby pokazać ile dni zostało
+                    expiring_item = next((item for item in expiring_soon_items if item.ingredient == ingredient), None)
+                    if expiring_item:
+                        used_expiring.append({
+                            'name': ingredient.name,
+                            'days_left': expiring_item.days_until_expiry,
+                            'amount': expiring_item.amount,
+                            'unit': expiring_item.unit.symbol
+                        })
+            
+            if used_expiring:
+                recipes_with_expiring.append({
+                    'recipe': recipe,
+                    'expiring_ingredients': used_expiring,
+                    'can_be_prepared': recipe.can_be_prepared_with_available_ingredients(request.user)
+                })
+    
     context = {
         'item_count': item_count,
         'expired_count': expired_count,
         'soon_expiring': soon_expiring,
         'fridge_items': fridge_items, # Dodaję bezpośrednio wszystkie produkty
-        'available_recipes': available_recipes
+        'available_recipes': available_recipes,
+        'expiring_soon_items': expiring_soon_items,
+        'recipes_with_expiring': recipes_with_expiring
     }
     
     return render(request, 'fridge/dashboard.html', context)
@@ -1074,3 +1116,177 @@ def ajax_add_to_fridge(request):
         'success': False,
         'error': 'Nieprawidłowe żądanie. Wymagane jest żądanie POST.'
     })
+
+@login_required
+def export_fridge(request):
+    """Eksportuje zawartość lodówki do pliku CSV"""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="moja_lodowka_{date.today().strftime("%Y-%m-%d")}.csv"'
+    
+    # Dodaj BOM (Byte Order Mark) dla poprawnego odczytu polskich znaków w Excel
+    response.write('\ufeff')
+    
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['Składnik', 'Ilość', 'Jednostka', 'Data ważności', 'Kategoria'])
+    
+    # Pobierz produkty z lodówki użytkownika
+    fridge_items = FridgeItem.objects.filter(user=request.user).select_related(
+        'ingredient', 'unit', 'ingredient__category'
+    ).order_by('ingredient__name')
+    
+    for item in fridge_items:
+        writer.writerow([
+            item.ingredient.name,
+            item.amount,
+            item.unit.symbol,
+            item.expiry_date.strftime('%Y-%m-%d') if item.expiry_date else 'Brak terminu',
+            item.ingredient.category.name if item.ingredient.category else 'Bez kategorii'
+        ])
+    
+    return response
+
+@login_required
+def import_fridge(request):
+    """Importuje produkty do lodówki z pliku CSV"""
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        
+        # Sprawdź czy plik ma właściwe rozszerzenie
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, 'Nieprawidłowy format pliku. Proszę wgrać plik CSV.')
+            return redirect('fridge:list')
+        
+        # Liczniki statystyk
+        added_count = 0
+        error_count = 0
+        
+        try:
+            # Dekodowanie pliku z uwzględnieniem kodowania UTF-8
+            decoded_file = csv_file.read().decode('utf-8-sig').splitlines()
+            reader = csv.reader(decoded_file, delimiter=';')
+            
+            # Pomiń wiersz nagłówkowy
+            next(reader)
+            
+            for row in reader:
+                try:
+                    if len(row) < 3:
+                        error_count += 1
+                        continue
+                    
+                    ingredient_name = row[0].strip()
+                    amount = float(row[1].replace(',', '.'))
+                    unit_symbol = row[2].strip()
+                    
+                    # Próba sparsowania daty ważności (opcjonalna)
+                    expiry_date = None
+                    if len(row) > 3 and row[3] and row[3].strip() != 'Brak terminu':
+                        try:
+                            expiry_date = datetime.strptime(row[3].strip(), "%Y-%m-%d").date()
+                        except ValueError:
+                            # Spróbuj innego formatu daty
+                            try:
+                                expiry_date = datetime.strptime(row[3].strip(), "%d.%m.%Y").date()
+                            except ValueError:
+                                # Jeśli nie da się sparsować, zostaw None
+                                pass
+                    
+                    # Znajdź lub utwórz składnik
+                    ingredient, created = Ingredient.objects.get_or_create(
+                        name=ingredient_name,
+                        defaults={
+                            'unit_type': 'weight_volume',
+                            'is_basic': False
+                        }
+                    )
+                    
+                    # Znajdź jednostkę
+                    try:
+                        unit = MeasurementUnit.objects.get(symbol=unit_symbol)
+                    except MeasurementUnit.DoesNotExist:
+                        # Jeśli jednostka nie istnieje, użyj domyślnej (gramy)
+                        unit = MeasurementUnit.objects.get(symbol='g')
+                    
+                    # Dodaj produkt do lodówki
+                    FridgeItem.add_to_fridge(
+                        user=request.user,
+                        ingredient=ingredient,
+                        amount=amount,
+                        unit=unit,
+                        expiry_date=expiry_date
+                    )
+                    
+                    added_count += 1
+                except Exception as e:
+                    print(f"Błąd podczas importu wiersza: {str(e)}")
+                    error_count += 1
+            
+            if added_count > 0:
+                messages.success(request, f'Zaimportowano {added_count} produktów do lodówki.')
+            if error_count > 0:
+                messages.warning(request, f'Wystąpiło {error_count} błędów podczas importu.')
+                
+        except Exception as e:
+            messages.error(request, f'Wystąpił błąd podczas przetwarzania pliku: {str(e)}')
+        
+        return redirect('fridge:list')
+    
+    return render(request, 'fridge/import_fridge.html')
+
+@login_required
+def check_notifications(request):
+    """
+    Sprawdza czy są nowe powiadomienia o przeterminowaniu i generuje je.
+    Powiadomienia są wyświetlane automatycznie na stronie, więc ten widok
+    tylko je generuje i przekierowuje z powrotem.
+    """
+    # Generuj powiadomienia o przeterminowanych produktach
+    notification_count = ExpiryNotification.check_expiring_products(request.user)
+    
+    if notification_count > 0:
+        messages.info(request, f'Wygenerowano {notification_count} nowych powiadomień o produktach z kończącym się terminem ważności.')
+    
+    # Przekieruj z powrotem na stronę, z której przyszło żądanie
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    else:
+        return redirect('fridge:list')
+
+@login_required
+def notifications_list(request):
+    """Wyświetla listę powiadomień o przeterminowanych produktach"""
+    # Pobierz powiadomienia dla zalogowanego użytkownika, posortowane od najnowszych
+    notifications = ExpiryNotification.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Zaktualizuj wszystkie nieprzeczytane powiadomienia jako przeczytane
+    unread_notifications = notifications.filter(is_read=False)
+    if unread_notifications.exists():
+        unread_notifications.update(is_read=True)
+    
+    return render(request, 'fridge/notifications_list.html', {
+        'notifications': notifications
+    })
+
+@login_required
+def delete_notification(request, pk):
+    """Usuwa pojedyncze powiadomienie"""
+    notification = get_object_or_404(ExpiryNotification, pk=pk, user=request.user)
+    notification.delete()
+    messages.success(request, 'Powiadomienie zostało usunięte.')
+    return redirect('fridge:notifications_list')
+
+@login_required
+def delete_all_notifications(request):
+    """Usuwa wszystkie powiadomienia użytkownika"""
+    ExpiryNotification.objects.filter(user=request.user).delete()
+    messages.success(request, 'Wszystkie powiadomienia zostały usunięte.')
+    return redirect('fridge:notifications_list')
+
+@login_required
+def mark_notification_read(request, pk):
+    """Oznacza pojedyncze powiadomienie jako przeczytane"""
+    notification = get_object_or_404(ExpiryNotification, pk=pk, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True})

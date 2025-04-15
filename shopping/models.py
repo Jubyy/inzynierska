@@ -175,6 +175,90 @@ class ShoppingList(models.Model):
         
         return added_count
 
+    def get_items_by_category(self):
+        """
+        Grupuje pozycje na liście zakupów według kategorii.
+        
+        Returns:
+            dict: Słownik z kategoriami jako kluczami i listami pozycji jako wartościami
+        """
+        result = {}
+        
+        # Pobierz wszystkie pozycje na liście
+        items = self.items.select_related('ingredient', 'ingredient__category', 'unit')
+        
+        # Grupuj według kategorii
+        for item in items:
+            category_name = item.ingredient.category.name if item.ingredient.category else "Bez kategorii"
+            
+            if category_name not in result:
+                result[category_name] = []
+            
+            result[category_name].append(item)
+        
+        # Sortuj kategorie
+        sorted_result = {}
+        for category in sorted(result.keys()):
+            sorted_result[category] = sorted(result[category], key=lambda x: x.ingredient.name)
+        
+        return sorted_result
+
+    def get_unpurchased_items_by_category(self):
+        """
+        Grupuje niezakupione pozycje na liście zakupów według kategorii.
+        
+        Returns:
+            dict: Słownik z kategoriami jako kluczami i listami niezakupionych pozycji jako wartościami
+        """
+        result = {}
+        
+        # Pobierz niezakupione pozycje
+        items = self.items.filter(is_purchased=False).select_related('ingredient', 'ingredient__category', 'unit')
+        
+        # Grupuj według kategorii
+        for item in items:
+            category_name = item.ingredient.category.name if item.ingredient.category else "Bez kategorii"
+            
+            if category_name not in result:
+                result[category_name] = []
+            
+            result[category_name].append(item)
+        
+        # Sortuj kategorie
+        sorted_result = {}
+        for category in sorted(result.keys()):
+            sorted_result[category] = sorted(result[category], key=lambda x: x.ingredient.name)
+        
+        return sorted_result
+
+    def get_purchased_items_by_category(self):
+        """
+        Grupuje zakupione pozycje na liście zakupów według kategorii.
+        
+        Returns:
+            dict: Słownik z kategoriami jako kluczami i listami zakupionych pozycji jako wartościami
+        """
+        result = {}
+        
+        # Pobierz zakupione pozycje
+        items = self.items.filter(is_purchased=True).select_related('ingredient', 'ingredient__category', 'unit')
+        
+        # Grupuj według kategorii
+        for item in items:
+            category_name = item.ingredient.category.name if item.ingredient.category else "Bez kategorii"
+            
+            if category_name not in result:
+                result[category_name] = []
+            
+            result[category_name].append(item)
+        
+        # Sortuj kategorie
+        sorted_result = {}
+        for category in sorted(result.keys()):
+            sorted_result[category] = sorted(result[category], key=lambda x: x.ingredient.name)
+        
+        return sorted_result
+
 class ShoppingItem(models.Model):
     shopping_list = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, related_name='items', verbose_name="Lista zakupów")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Składnik")
@@ -194,38 +278,29 @@ class ShoppingItem(models.Model):
         return f"{self.amount} {self.unit.symbol} {self.ingredient.name}"
     
     def mark_as_purchased(self):
-        """Oznacza pozycję jako zakupioną i dodaje do lodówki"""
-        from fridge.models import FridgeItem
-        from django.utils import timezone
+        """
+        Oznacza produkt jako zakupiony i dodaje go do lodówki.
         
-        if not self.is_purchased:
-            # Dodaj do lodówki tylko jeśli produkt nie był wcześniej oznaczony jako zakupiony
-            try:
-                # Dodaj do lodówki
-                FridgeItem.add_to_fridge(
-                    user=self.shopping_list.user,
-                    ingredient=self.ingredient,
-                    amount=self.amount,
-                    unit=self.unit
-                )
-                
-                # Oznacz jako zakupione
-                self.is_purchased = True
-                self.purchase_date = timezone.now()
-                self.save()
-                
-                # Sprawdź, czy wszystkie pozycje na liście są zakupione
-                all_purchased = not self.shopping_list.items.filter(is_purchased=False).exists()
-                
-                if all_purchased:
-                    # Oznacz listę jako zakończoną
-                    self.shopping_list.is_completed = True
-                    self.shopping_list.save()
-                    
-                    return True
-            except Exception as e:
-                # W przypadku błędu podczas dodawania do lodówki, nie oznaczaj jako zakupione
-                print(f"Błąd podczas dodawania do lodówki: {str(e)}")
-                return False
-                
-        return False
+        Returns:
+            bool: True jeśli udało się dodać do lodówki, False w przeciwnym razie
+        """
+        from django.utils import timezone
+        from fridge.models import FridgeItem
+        
+        # Oznacz jako zakupiony
+        self.is_purchased = True
+        self.purchase_date = timezone.now()
+        self.save()
+        
+        # Dodaj do lodówki, jeśli nie jest już zakupiony
+        try:
+            FridgeItem.add_to_fridge(
+                user=self.shopping_list.user,
+                ingredient=self.ingredient,
+                amount=self.amount,
+                unit=self.unit
+            )
+            return True
+        except Exception as e:
+            print(f"Błąd podczas dodawania do lodówki: {str(e)}")
+            return False

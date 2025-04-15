@@ -392,6 +392,12 @@
                                 <i class="fas fa-trash me-1"></i> Usuń przeterminowane
                             </a>
                             {% endif %}
+                            <a href="{% url 'fridge:export' %}" class="btn btn-outline-success">
+                                <i class="fas fa-file-export me-1"></i> Eksportuj do CSV
+                            </a>
+                            <a href="{% url 'fridge:import' %}" class="btn btn-outline-info">
+                                <i class="fas fa-file-import me-1"></i> Importuj z CSV
+                            </a>
                         </div>
                     </div>
                 </div>

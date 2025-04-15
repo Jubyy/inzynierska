@@ -110,51 +110,57 @@ IV. TESTY MODUŁU LODÓWKI
 ===========================================================
 
 1. Przeglądanie zawartości lodówki
-   [ ] Lista wszystkich produktów
-   [ ] Filtry i wyszukiwanie
-   [ ] Przełączanie widoków (lista, karty)
-   [ ] Grupowanie według kategorii
+   [X] Lista wszystkich produktów
+   [X] Filtry i wyszukiwanie
+   [X] Przełączanie widoków (lista, karty)
+   [X] Grupowanie według kategorii
 
 2. Dodawanie produktów
-   [ ] Pojedyncze dodawanie produktu
-   [ ] Dodawanie wielu produktów naraz
-   [ ] Wybór jednostki miary
-   [ ] Ustawianie daty ważności
+   [X] Pojedyncze dodawanie produktu
+   [X] Dodawanie wielu produktów naraz
+   [X] Wybór jednostki miary
+   [X] Ustawianie daty ważności
 
 3. Edycja produktów
-   [ ] Zmiana ilości
-   [ ] Zmiana jednostki
-   [ ] Zmiana daty ważności
+   [X] Zmiana ilości
+   [X] Zmiana jednostki
+   [X] Zmiana daty ważności
 
 4. Usuwanie produktów
-   [ ] Usuwanie pojedynczego produktu
-   [ ] Usuwanie przeterminowanych produktów
+   [X] Usuwanie pojedynczego produktu
+   [X] Usuwanie przeterminowanych produktów
 
 5. Konwersje jednostek
-   [ ] Przeliczanie między różnymi jednostkami tego samego typu
-   [ ] Automatyczna konwersja przy dodawaniu (jeśli potrzebna)
+   [X] Przeliczanie między różnymi jednostkami tego samego typu
+   [X] Automatyczna konwersja przy dodawaniu (jeśli potrzebna)
+
+6. Dodatkowe funkcjonalności (propozycje)
+   [X] Eksport zawartości lodówki (CSV/JSON)
+   [X] Import zawartości lodówki z pliku
+   [X] Sugestie przepisów na podstawie kończących się produktów
+   [X] Powiadomienia o przeterminowanych produktach
 
 ===========================================================
 V. TESTY MODUŁU LISTY ZAKUPÓW
 ===========================================================
 
 1. Przeglądanie listy zakupów
-   [ ] Wyświetlanie aktualnej listy
-   [ ] Filtry i sortowanie
+   [X] Wyświetlanie aktualnej listy
+   [X] Filtry i sortowanie
 
 2. Dodawanie produktów
-   [ ] Ręczne dodawanie produktów
-   [ ] Dodawanie z przepisu
-   [ ] Dodawanie brakujących produktów z lodówki
+   [X] Ręczne dodawanie produktów
+   [X] Dodawanie z przepisu
+   [X] Dodawanie brakujących produktów z lodówki
 
 3. Edycja produktów
-   [ ] Zmiana ilości
-   [ ] Zmiana jednostki
-   [ ] Oznaczanie jako kupione/niekupione
+   [X] Zmiana ilości
+   [X] Zmiana jednostki
+   [X] Oznaczanie jako kupione/niekupione
 
 4. Usuwanie produktów
-   [ ] Usuwanie pojedynczego produktu
-   [ ] Czyszczenie całej listy
+   [X] Usuwanie pojedynczego produktu
+   [X] Czyszczenie całej listy
 
 ===========================================================
 VI. TESTY PANELU ADMINISTRATORA

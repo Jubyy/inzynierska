@@ -21,7 +21,7 @@ urlpatterns = [
     
     # Podstawowe widoki kont (dla wygody)
     path('register/', accounts_views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('login/', accounts_views.CustomLoginView.as_view(), name='login'),
     path('dashboard/', accounts_views.dashboard, name='dashboard'),
     path('logout/', accounts_views.custom_logout, name='logout'),
     path('password-reset/', 

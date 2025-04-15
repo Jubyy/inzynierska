@@ -17,9 +17,10 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Count, Avg
 from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_POST
+from django.contrib.auth.views import LoginView
 
 from recipes.models import Recipe, RecipeLike
-from fridge.models import FridgeItem
+from fridge.models import FridgeItem, ExpiryNotification
 from shopping.models import ShoppingList
 
 from .models import UserProfile, RecipeHistory, UserFollowing
@@ -378,3 +379,25 @@ def delete_account(request):
             messages.error(request, 'Nieprawidłowe hasło. Spróbuj ponownie.')
     
     return render(request, 'accounts/delete_account.html')
+
+class CustomLoginView(LoginView):
+    """Niestandardowy widok logowania z dodatkowymi funkcjonalnościami"""
+    template_name = 'registration/login.html'
+    
+    def form_valid(self, form):
+        """Po pomyślnym zalogowaniu sprawdź powiadomienia o przeterminowanych produktach"""
+        # Najpierw standardowa obsługa logowania
+        response = super().form_valid(form)
+        
+        # Teraz sprawdź powiadomienia o przeterminowanych produktach
+        notification_count = ExpiryNotification.check_expiring_products(self.request.user)
+        
+        if notification_count > 0:
+            messages.info(
+                self.request, 
+                f'Masz {notification_count} nowych powiadomień o produktach z kończącym się terminem ważności. '
+                f'<a href="{reverse("fridge:notifications_list")}" class="alert-link">Sprawdź powiadomienia</a>.',
+                extra_tags='safe'
+            )
+        
+        return response

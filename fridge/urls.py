@@ -19,6 +19,15 @@ urlpatterns = [
     path('bulk-add/', views.bulk_add_to_fridge, name='bulk_add'),
     path('clean-expired/', views.clean_expired, name='clean_expired'),
     path('available-recipes/', views.available_recipes, name='available_recipes'),
+    path('export/', views.export_fridge, name='export'),
+    path('import/', views.import_fridge, name='import'),
+    
+    # Powiadomienia o przeterminowanych produktach
+    path('check-notifications/', views.check_notifications, name='check_notifications'),
+    path('notifications/', views.notifications_list, name='notifications_list'),
+    path('notifications/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
+    path('notifications/delete-all/', views.delete_all_notifications, name='delete_all_notifications'),
+    path('notifications/mark-read/<int:pk>/', views.mark_notification_read, name='mark_notification_read'),
     
     # Widoki AJAX
     path('ajax/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),

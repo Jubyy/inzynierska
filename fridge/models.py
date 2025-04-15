@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from recipes.models import Ingredient, MeasurementUnit
 from recipes.utils import convert_units
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 import logging
 
 class FridgeItem(models.Model):
@@ -463,5 +463,108 @@ class FridgeItem(models.Model):
             
         # Porównanie dostępnej ilości z potrzebną ilością
         return total_available >= float(amount)
+
+class ExpiryNotification(models.Model):
+    """Model przechowujący informacje o powiadomieniach dotyczących przeterminowanych produktów"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expiry_notifications')
+    title = models.CharField(max_length=100)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Powiadomienie o przeterminowaniu"
+        verbose_name_plural = "Powiadomienia o przeterminowaniu"
+    
+    def __str__(self):
+        return f"{self.title} ({self.created_at.strftime('%d.%m.%Y')})"
+    
+    @classmethod
+    def check_expiring_products(cls, user):
+        """
+        Sprawdza produkty, które niedługo się przeterminują lub już są przeterminowane
+        i generuje odpowiednie powiadomienia.
+        
+        Args:
+            user (User): Użytkownik, dla którego sprawdzane są produkty
+            
+        Returns:
+            int: Liczba wygenerowanych powiadomień
+        """
+        today = date.today()
+        tomorrow = today + timedelta(days=1)
+        next_week = today + timedelta(days=7)
+        
+        # Produkty przeterminowane, o których użytkownik jeszcze nie został powiadomiony
+        expired_items = FridgeItem.objects.filter(
+            user=user,
+            expiry_date__lt=today
+        )
+        
+        # Produkty, które przeterminują się jutro
+        expiring_tomorrow = FridgeItem.objects.filter(
+            user=user, 
+            expiry_date=tomorrow
+        )
+        
+        # Produkty, które przeterminują się w ciągu tygodnia
+        expiring_soon = FridgeItem.objects.filter(
+            user=user,
+            expiry_date__gt=tomorrow,
+            expiry_date__lte=next_week
+        )
+        
+        notifications_count = 0
+        
+        # Powiadomienie o przeterminowanych produktach
+        if expired_items.exists():
+            expired_count = expired_items.count()
+            items_list = ", ".join([item.ingredient.name for item in expired_items[:5]])
+            
+            if expired_count > 5:
+                items_list += f" i {expired_count - 5} innych"
+            
+            cls.objects.create(
+                user=user,
+                title="Przeterminowane produkty",
+                message=f"Masz {expired_count} przeterminowanych produktów w lodówce: {items_list}. "
+                        f"Zalecamy ich usunięcie."
+            )
+            notifications_count += 1
+        
+        # Powiadomienie o produktach, które przeterminują się jutro
+        if expiring_tomorrow.exists():
+            expiring_count = expiring_tomorrow.count()
+            items_list = ", ".join([item.ingredient.name for item in expiring_tomorrow[:5]])
+            
+            if expiring_count > 5:
+                items_list += f" i {expiring_count - 5} innych"
+            
+            cls.objects.create(
+                user=user,
+                title="Produkty wygasają jutro",
+                message=f"{expiring_count} produktów wygasa jutro: {items_list}. "
+                        f"Wykorzystaj je jak najszybciej."
+            )
+            notifications_count += 1
+        
+        # Powiadomienie o produktach, które przeterminują się w ciągu tygodnia
+        if expiring_soon.exists():
+            expiring_count = expiring_soon.count()
+            items_list = ", ".join([f"{item.ingredient.name} ({item.days_until_expiry} dni)" for item in expiring_soon[:5]])
+            
+            if expiring_count > 5:
+                items_list += f" i {expiring_count - 5} innych"
+            
+            cls.objects.create(
+                user=user,
+                title="Produkty wygasają wkrótce",
+                message=f"{expiring_count} produktów wygasa w ciągu tygodnia: {items_list}. "
+                        f"Zaplanuj wykorzystanie tych produktów."
+            )
+            notifications_count += 1
+        
+        return notifications_count
 
 

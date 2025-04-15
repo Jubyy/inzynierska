@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Import produktów do lodówki{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Import produktów do lodówki</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Zaimportuj produkty do swojej lodówki z pliku CSV.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i>Format pliku CSV</h5>
+                        <p class="mb-0">Plik CSV powinien zawierać następujące kolumny:</p>
+                        <ol>
+                            <li>Składnik (nazwa)</li>
+                            <li>Ilość (wartość liczbowa)</li>
+                            <li>Jednostka (symbol, np. g, kg, ml, l, szt)</li>
+                            <li>Data ważności (format YYYY-MM-DD, opcjonalnie)</li>
+                            <li>Kategoria (opcjonalnie)</li>
+                        </ol>
+                        <p>Separator kolumn: średnik (;)<br>
+                           Pierwszy wiersz powinien zawierać nagłówki kolumn.<br>
+                           Kodowanie pliku: UTF-8</p>
+                        <p class="mb-0">Przykład zawartości pliku:</p>
+                        <pre class="bg-light p-2 mt-2">Składnik;Ilość;Jednostka;Data ważności;Kategoria
+Jabłka;5;szt;2023-12-01;Owoce
+Mleko;1;l;2023-11-15;Nabiał</pre>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="csv_file" class="form-label">Wybierz plik CSV</label>
+                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'fridge:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Wróć do lodówki
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-import me-1"></i> Importuj
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4">
+                        <h5>Pobierz przykładowy plik</h5>
+                        <p>Możesz pobrać przykładowy szablon pliku, aby ułatwić sobie przygotowanie danych do importu.</p>
+                        <a href="{% url 'fridge:export' %}" class="btn btn-outline-success">
+                            <i class="fas fa-download me-1"></i> Pobierz aktualną zawartość lodówki jako szablon
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

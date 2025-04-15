@@ -725,7 +725,7 @@ class RecipeDetailView(DetailView):
         # Sprawdź, czy to formularz zmiany porcji (ma parametr servings)
         if 'servings' in request.POST:
             return self.post_servings(request)
-            
+        
         # Sprawdź, czy to formularz oceny (ma parametr rating)
         if 'rating' in request.POST and request.user.is_authenticated:
             return self.post_rating(request)

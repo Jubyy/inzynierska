@@ -24,16 +24,63 @@ class ShoppingListListView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         try:
-            return ShoppingList.objects.filter(user=self.request.user).order_by('-created_at')
-        except Exception:
+            queryset = ShoppingList.objects.filter(user=self.request.user)
+            
+            # Filtrowanie po statusie
+            status = self.request.GET.get('status')
+            if status == 'active':
+                queryset = queryset.filter(is_completed=False)
+            elif status == 'completed':
+                queryset = queryset.filter(is_completed=True)
+                
+            # Wyszukiwanie po nazwie
+            search = self.request.GET.get('search')
+            if search:
+                queryset = queryset.filter(name__icontains=search)
+                
+            # Sortowanie
+            sort_by = self.request.GET.get('sort_by', 'created_at')
+            sort_order = self.request.GET.get('sort_order', 'desc')
+            
+            order_prefix = '-' if sort_order == 'desc' else ''
+            order_field = {
+                'name': 'name',
+                'created_at': 'created_at',
+                'modified_at': 'modified_at',
+                'item_count': 'items__count'
+            }.get(sort_by, 'created_at')
+            
+            # Specjalne sortowanie dla ilości produktów
+            if sort_by == 'item_count':
+                from django.db.models import Count
+                queryset = queryset.annotate(items__count=Count('items'))
+                
+            queryset = queryset.order_by(f"{order_prefix}{order_field}")
+            
+            return queryset
+        except Exception as e:
             # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
+            print(f"Błąd podczas pobierania list zakupów: {str(e)}")
             return ShoppingList.objects.none()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['active_lists'] = self.get_queryset().filter(is_completed=False)
-            context['completed_lists'] = self.get_queryset().filter(is_completed=True)
+            queryset = self.get_queryset()
+            context['active_lists'] = queryset.filter(is_completed=False)
+            context['completed_lists'] = queryset.filter(is_completed=True)
+            
+            # Dodaj parametry filtrowania i sortowania do kontekstu
+            context['status'] = self.request.GET.get('status', '')
+            context['search'] = self.request.GET.get('search', '')
+            context['sort_by'] = self.request.GET.get('sort_by', 'created_at')
+            context['sort_order'] = self.request.GET.get('sort_order', 'desc')
+            
+            # Liczniki dla statystyk
+            context['total_count'] = queryset.count()
+            context['active_count'] = context['active_lists'].count()
+            context['completed_count'] = context['completed_lists'].count()
+            
         except Exception:
             # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
             context['active_lists'] = []
@@ -53,9 +100,75 @@ class ShoppingListDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
+        # Filtry i sortowanie dla pozycji na liście
+        search = self.request.GET.get('search', '')
+        category = self.request.GET.get('category', '')
+        sort_by = self.request.GET.get('sort_by', 'ingredient__name')
+        sort_order = self.request.GET.get('sort_order', 'asc')
+        view_mode = self.request.GET.get('view_mode', 'list')  # 'list' lub 'category'
+        
+        # Bazowy queryset dla niezakupionych i zakupionych pozycji
+        unpurchased_items = self.object.items.filter(is_purchased=False)
+        purchased_items = self.object.items.filter(is_purchased=True)
+        
+        # Zastosuj filtrowanie
+        if search:
+            unpurchased_items = unpurchased_items.filter(
+                Q(ingredient__name__icontains=search) |
+                Q(note__icontains=search)
+            )
+            purchased_items = purchased_items.filter(
+                Q(ingredient__name__icontains=search) |
+                Q(note__icontains=search)
+            )
+        
+        if category:
+            unpurchased_items = unpurchased_items.filter(ingredient__category__name=category)
+            purchased_items = purchased_items.filter(ingredient__category__name=category)
+        
+        # Zastosuj sortowanie
+        order_prefix = '-' if sort_order == 'desc' else ''
+        order_field = {
+            'ingredient__name': 'ingredient__name',
+            'amount': 'amount',
+            'unit__name': 'unit__name',
+            'purchase_date': 'purchase_date',
+            'note': 'note'
+        }.get(sort_by, 'ingredient__name')
+        
+        unpurchased_items = unpurchased_items.order_by(f"{order_prefix}{order_field}")
+        purchased_items = purchased_items.order_by(f"{order_prefix}{order_field}")
+        
+        # Pobierz kategorie składników do filtrowania
+        categories = IngredientCategory.objects.all().order_by('name')
+        
+        # W zależności od trybu widoku, zapewniamy różne dane
+        if view_mode == 'category':
+            # Grupuj według kategorii
+            context['unpurchased_by_category'] = self.object.get_unpurchased_items_by_category()
+            context['purchased_by_category'] = self.object.get_purchased_items_by_category()
+        
         # Podziel pozycje na zakupione i niezakupione
-        context['unpurchased_items'] = self.object.items.filter(is_purchased=False)
-        context['purchased_items'] = self.object.items.filter(is_purchased=True)
+        context['unpurchased_items'] = unpurchased_items
+        context['purchased_items'] = purchased_items
+        
+        # Dodaj opcje filtrowania i sortowania
+        context['search'] = search
+        context['selected_category'] = category
+        context['categories'] = categories
+        context['sort_by'] = sort_by
+        context['sort_order'] = sort_order
+        context['view_mode'] = view_mode
+        
+        # Dodaj statystyki
+        context['total_items'] = self.object.items.count()
+        context['purchased_count'] = purchased_items.count()
+        context['unpurchased_count'] = unpurchased_items.count()
+        
+        if context['total_items'] > 0:
+            context['purchase_percentage'] = int((context['purchased_count'] / context['total_items']) * 100)
+        else:
+            context['purchase_percentage'] = 0
         
         # Przygotuj formularz do dodawania nowej pozycji
         context['form'] = ShoppingItemForm(initial={'shopping_list': self.object})
@@ -282,16 +395,21 @@ def toggle_purchased(request, pk):
             return redirect('shopping:detail', pk=item.shopping_list.pk)
         
         # Oznacz jako zakupiony i dodaj do lodówki
-        item.mark_as_purchased()
+        success = item.mark_as_purchased()
         
         # Sprawdź, czy wszystkie pozycje są już zakupione
         all_purchased = not item.shopping_list.items.filter(is_purchased=False).exists()
+        if all_purchased:
+            # Oznacz listę jako zakończoną
+            item.shopping_list.is_completed = True
+            item.shopping_list.save()
+            
         has_recipe = item.shopping_list.recipe is not None
         recipe_id = item.shopping_list.recipe.id if has_recipe else None
         
         if is_ajax:
             return JsonResponse({
-                'success': True, 
+                'success': success, 
                 'purchased': True,
                 'all_purchased': all_purchased,
                 'has_recipe': has_recipe,
@@ -299,7 +417,11 @@ def toggle_purchased(request, pk):
                 'message': f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.'
             })
         
-        messages.success(request, f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.')
+        if success:
+            messages.success(request, f'Oznaczono {item.ingredient.name} jako zakupione i dodano do lodówki.')
+        else:
+            messages.warning(request, f'Oznaczono {item.ingredient.name} jako zakupione, ale nie udało się dodać do lodówki.')
+            
         return redirect('shopping:detail', pk=item.shopping_list.pk)
     
     if is_ajax:

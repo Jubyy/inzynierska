@@ -832,6 +832,7 @@ class RecipeRating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data dodania")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Data aktualizacji")
     comment = models.TextField(blank=True, null=True, verbose_name="Komentarz do oceny")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies', verbose_name="Odpowiedź na ocenę")
     
     class Meta:
         verbose_name = "Ocena przepisu"
@@ -840,6 +841,11 @@ class RecipeRating(models.Model):
         
     def __str__(self):
         return f"Ocena {self.rating}/5 od {self.user.username} dla {self.recipe.title}"
+    
+    @property
+    def is_reply(self):
+        """Sprawdza, czy ocena jest odpowiedzią na inną ocenę"""
+        return self.parent is not None
 
     @property
     def helpful_count(self):

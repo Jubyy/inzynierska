@@ -270,5 +270,80 @@
             </div>
         </div>
     </div>
+    
+    <!-- Sekcja z kończącymi się produktami i sugestiami przepisów -->
+    {% if expiring_soon_items %}
+    <div class="row mb-5">
+        <!-- Kończące się produkty -->
+        <div class="col-md-6 mb-4">
+            <h3 class="section-title" style="border-left-color: #fd7e14;">Produkty kończące się wkrótce</h3>
+            <div class="card h-100 dashboard-card">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for item in expiring_soon_items %}
+                            <div class="list-group-item d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-0 fw-bold">{{ item.ingredient.name }}</h6>
+                                        <span class="badge {% if item.days_until_expiry <= 3 %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} rounded-pill">
+                                            Zostało {{ item.days_until_expiry }} dni
+                                        </span>
+                                    </div>
+                                    <div class="mt-1 d-flex justify-content-between">
+                                        <span class="text-muted">{{ item.amount }} {{ item.unit.name }}</span>
+                                        <small class="text-muted">Ważne do: {{ item.expiry_date|date:"d.m.Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sugestie przepisów wykorzystujących kończące się produkty -->
+        <div class="col-md-6 mb-4">
+            <h3 class="section-title" style="border-left-color: #fd7e14;">Wykorzystaj kończące się produkty</h3>
+            <div class="card h-100 dashboard-card">
+                <div class="card-body p-0">
+                    {% if recipes_with_expiring %}
+                        <div class="list-group list-group-flush">
+                            {% for recipe_info in recipes_with_expiring %}
+                                <a href="{% url 'recipes:detail' recipe_info.recipe.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-0 fw-bold">{{ recipe_info.recipe.title }}</h6>
+                                        {% if recipe_info.can_be_prepared %}
+                                            <span class="badge bg-success rounded-pill">Gotowe do przygotowania</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary rounded-pill">Brakuje składników</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Wykorzystuje kończące się produkty:</small>
+                                        <div class="mt-1">
+                                            {% for ingredient in recipe_info.expiring_ingredients %}
+                                                <span class="badge bg-warning text-dark me-1">
+                                                    {{ ingredient.name }} ({{ ingredient.days_left }} dni)
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info m-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Brak przepisów wykorzystujących kończące się produkty.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <a href="{% url 'fridge:available_recipes' %}" class="btn btn-outline-warning btn-sm">Zobacz wszystkie przepisy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %} 
