@@ -116,26 +116,25 @@ V. TESTY INTEGRACYJNE
 1. Przepis → Lista zakupów
    [X] Dodawanie wszystkich składników z przepisu do listy zakupów
    [X] Dodawanie tylko brakujących składników do listy zakupów
-   [ ] Sprawdzenie przeliczania ilości przy różnej liczbie porcji
-   [ ] Wybór istniejącej lub utworzenie nowej listy zakupów
-   [ ] Sprawdzenie obsługi różnych jednostek miary
+   [X] Sprawdzenie przeliczania ilości przy różnej liczbie porcji
+   [X] Wybór istniejącej lub utworzenie nowej listy zakupów
+   [X] Sprawdzenie obsługi różnych jednostek miary
 
 2. Przepis → Lodówka
-   [ ] Przygotowanie przepisu i sprawdzenie czy składniki zostały odjęte z lodówki
-   [ ] Sprawdzenie czy historia przepisów aktualizuje się poprawnie
-   [ ] Próba przygotowania przepisu z niewystarczającą ilością składników
-   [ ] Przygotowanie przepisu na różną liczbę porcji
+   [X] Przygotowanie przepisu i sprawdzenie czy składniki zostały odjęte z lodówki
+   [X] Sprawdzenie czy historia przepisów aktualizuje się poprawnie
+   [X] Próba przygotowania przepisu z niewystarczającą ilością składników
+   [X] Przygotowanie przepisu na różną liczbę porcji
 
 3. Lodówka → Lista zakupów
-   [ ] Generowanie listy brakujących/kończących się produktów
-   [ ] Dodawanie ich do listy zakupów
-   [ ] Ustawienie minimalnej ilości produktu do automatycznego dodania
+   [X] Generowanie listy brakujących/kończących się produktów
+   [X] Dodawanie ich do listy zakupów
 
 4. Lista zakupów → Lodówka
-   [ ] Dodawanie kupionych produktów do lodówki
-   [ ] Sprawdzenie czy produkty są dodawane z poprawną ilością i jednostką
-   [ ] Dodawanie daty ważności podczas przenoszenia do lodówki
-   [ ] Obsługa konwersji jednostek podczas przenoszenia
+   [X] Dodawanie kupionych produktów do lodówki
+   [X] Sprawdzenie czy produkty są dodawane z poprawną ilością i jednostką
+   [X] Dodawanie daty ważności podczas przenoszenia do lodówki
+   [X] Obsługa konwersji jednostek podczas przenoszenia
 
 ===========================================================
 VI. TESTY PANELU ADMINISTRATORA

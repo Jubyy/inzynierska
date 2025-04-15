@@ -86,7 +86,7 @@
                                 {% for item in unpurchased_items %}
                                     <tr id="item-row-{{ item.id }}">
                                         <td>{{ item.ingredient.name }}</td>
-                                        <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                        <td>{{ item.get_amount_display }} {{ item.unit.symbol }}</td>
                                         <td class="text-center">
                                             <form method="post" action="{% url 'shopping:toggle_purchased' item.id %}" class="d-inline purchase-form">
                                                 {% csrf_token %}
@@ -136,7 +136,7 @@
                             {% for item in purchased_items %}
                                 <tr id="purchased-item-{{ item.id }}">
                                     <td>{{ item.ingredient.name }}</td>
-                                    <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                    <td>{{ item.get_amount_display }} {{ item.unit.symbol }}</td>
                                     <td>{{ item.purchase_date|date:"d.m.Y H:i" }}</td>
                                     <td class="text-center">
                                         <span class="badge bg-success">Dodano do lodówki</span>

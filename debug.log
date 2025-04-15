@@ -5831,3 +5831,1213 @@ INFO 2025-04-15 22:38:35,596 utils 6244 1592 Konwersja: 25.0 g -> 25.0 g -> 0.33
 INFO 2025-04-15 22:38:35,641 basehttp 6244 1592 "POST /recipes/detail/13/ HTTP/1.1" 200 45021
 INFO 2025-04-15 22:38:55,913 autoreload 6244 17348 D:\praca_inzynierska\recipes\models.py changed, reloading.
 INFO 2025-04-15 22:38:56,729 autoreload 17088 20552 Watching for file changes with StatReloader
+INFO 2025-04-15 22:42:40,267 autoreload 10328 15588 Watching for file changes with StatReloader
+INFO 2025-04-15 22:42:47,715 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:47,715 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:47,717 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:47,718 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:47,757 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:47,757 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:47,760 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:47,761 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:47,860 basehttp 10328 1452 "POST /recipes/detail/13/ HTTP/1.1" 200 45023
+INFO 2025-04-15 22:42:51,260 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:51,261 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:51,264 utils 10328 1452 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:51,265 utils 10328 1452 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:51,300 basehttp 10328 1452 "GET /recipes/missing-ingredients/13/?servings=12 HTTP/1.1" 200 25686
+INFO 2025-04-15 22:42:54,202 utils 10328 16456 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:54,202 utils 10328 16456 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:54,205 utils 10328 16456 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:42:54,205 utils 10328 16456 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:42:54,297 basehttp 10328 16456 "POST /recipes/missing-ingredients/13/?servings=12 HTTP/1.1" 302 0
+INFO 2025-04-15 22:42:54,340 basehttp 10328 16456 "GET /shopping/14/ HTTP/1.1" 200 43519
+INFO 2025-04-15 22:46:09,979 autoreload 10328 15588 D:\praca_inzynierska\shopping\models.py changed, reloading.
+INFO 2025-04-15 22:46:10,876 autoreload 2180 13928 Watching for file changes with StatReloader
+INFO 2025-04-15 22:46:15,082 basehttp 2180 16076 "GET /shopping/14/ HTTP/1.1" 200 43071
+INFO 2025-04-15 22:46:34,676 autoreload 2180 13928 D:\praca_inzynierska\shopping\models.py changed, reloading.
+INFO 2025-04-15 22:46:35,423 autoreload 9040 24008 Watching for file changes with StatReloader
+INFO 2025-04-15 22:46:52,079 basehttp 9040 23704 "GET /shopping/14/ HTTP/1.1" 200 43025
+INFO 2025-04-15 22:47:47,341 basehttp 9040 12632 "GET /shopping/ HTTP/1.1" 200 18471
+INFO 2025-04-15 22:47:52,985 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:52,986 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:52,988 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:52,989 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:47:53,023 utils 9040 12252 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:47:53,051 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,052 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,054 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,054 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,072 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,072 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,074 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,075 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,135 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,136 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,138 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,138 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,176 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,176 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,179 utils 9040 12252 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:47:53,180 utils 9040 12252 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:47:53,239 basehttp 9040 12252 "GET /recipes/list/ HTTP/1.1" 200 79200
+WARNING 2025-04-15 22:47:53,490 basehttp 9040 12252 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:47:55,106 basehttp 9040 9792 "GET /recipes/detail/17/ HTTP/1.1" 200 44172
+INFO 2025-04-15 22:47:56,979 basehttp 9040 9792 "GET /recipes/missing-ingredients/17/ HTTP/1.1" 200 18419
+INFO 2025-04-15 22:48:00,293 basehttp 9040 20728 "POST /recipes/missing-ingredients/17/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:48:00,330 basehttp 9040 20728 "GET /shopping/13/ HTTP/1.1" 200 40162
+INFO 2025-04-15 22:48:06,561 basehttp 9040 20728 "GET /shopping/ HTTP/1.1" 200 18471
+INFO 2025-04-15 22:48:07,596 basehttp 9040 20728 "GET /shopping/create/ HTTP/1.1" 200 13826
+INFO 2025-04-15 22:48:10,962 basehttp 9040 20728 "POST /shopping/create/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:48:10,987 basehttp 9040 20728 "GET /shopping/15/ HTTP/1.1" 200 28071
+INFO 2025-04-15 22:48:13,853 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,853 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:13,856 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,857 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:48:13,892 utils 9040 20728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:48:13,921 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,921 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:13,923 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,924 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:13,947 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,948 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:13,950 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:13,951 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:14,020 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:14,020 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:14,023 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:14,023 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:14,061 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:14,062 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:14,064 utils 9040 20728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:14,065 utils 9040 20728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:14,114 basehttp 9040 20728 "GET /recipes/list/ HTTP/1.1" 200 79200
+WARNING 2025-04-15 22:48:14,152 basehttp 9040 20728 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:48:14,400 basehttp 9040 22492 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:48:15,482 basehttp 9040 2768 "GET /recipes/detail/17/ HTTP/1.1" 200 44172
+INFO 2025-04-15 22:48:17,095 basehttp 9040 2768 "GET /recipes/missing-ingredients/17/ HTTP/1.1" 200 18558
+INFO 2025-04-15 22:48:19,495 basehttp 9040 2768 "POST /recipes/missing-ingredients/17/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:48:19,523 basehttp 9040 2768 "GET /shopping/15/ HTTP/1.1" 200 31856
+INFO 2025-04-15 22:48:31,160 basehttp 9040 2768 "GET / HTTP/1.1" 200 38690
+INFO 2025-04-15 22:48:34,489 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,489 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,492 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,493 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:48:34,528 utils 9040 20004 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:48:34,555 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,556 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,560 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,561 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,581 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,582 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,584 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,585 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,649 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,650 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,652 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,652 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,699 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,699 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,702 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,702 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,738 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,743 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,745 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,746 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,763 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,763 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,765 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,766 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,787 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,787 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,789 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,790 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,827 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,827 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,830 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,831 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,869 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,869 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,871 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,871 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,890 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,890 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,893 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,897 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,913 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,914 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,916 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,916 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,947 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,947 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,949 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,949 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,968 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,969 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,971 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,971 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,989 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,989 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:34,992 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:34,993 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:35,016 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:35,016 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:35,018 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:35,019 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:35,056 basehttp 9040 20004 "GET /fridge/ HTTP/1.1" 200 36528
+INFO 2025-04-15 22:48:36,886 basehttp 9040 20004 "GET /fridge/list/ HTTP/1.1" 200 33485
+INFO 2025-04-15 22:48:40,258 basehttp 9040 20004 "GET / HTTP/1.1" 200 38690
+INFO 2025-04-15 22:48:42,425 basehttp 9040 20004 "GET /recipes/create/ HTTP/1.1" 200 60417
+INFO 2025-04-15 22:48:42,800 basehttp 9040 24528 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 22:48:42,806 basehttp 9040 20004 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 22:48:44,683 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,684 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,687 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,688 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:48:44,729 utils 9040 20004 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:48:44,757 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,758 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,762 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,763 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,786 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,786 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,788 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,789 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,883 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,883 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,885 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,885 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,931 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,931 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,933 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,934 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,973 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,974 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:44,979 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:44,979 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:45,000 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:45,001 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:45,003 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:45,003 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:45,037 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:45,038 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:45,040 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:45,040 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:45,094 basehttp 9040 20004 "GET /dashboard/ HTTP/1.1" 200 25061
+INFO 2025-04-15 22:48:46,939 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:46,939 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:46,942 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:46,943 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:48:46,980 utils 9040 20004 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:48:47,012 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,012 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,014 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,015 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,036 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,037 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,039 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,040 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,115 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,115 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,118 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,118 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,155 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,155 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,160 utils 9040 20004 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:48:47,160 utils 9040 20004 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:48:47,212 basehttp 9040 20004 "GET /recipes/list/ HTTP/1.1" 200 79200
+WARNING 2025-04-15 22:48:47,273 basehttp 9040 20004 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:48:47,546 basehttp 9040 24528 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:48:49,119 basehttp 9040 16972 "GET /recipes/detail/17/ HTTP/1.1" 200 44172
+INFO 2025-04-15 22:48:51,381 basehttp 9040 16972 "GET /recipes/missing-ingredients/17/ HTTP/1.1" 200 18558
+INFO 2025-04-15 22:48:53,494 basehttp 9040 16972 "POST /recipes/missing-ingredients/17/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:48:53,523 basehttp 9040 16972 "GET /shopping/16/ HTTP/1.1" 200 31900
+INFO 2025-04-15 22:48:55,410 models 9040 16972 Dodawanie do lodówki: 20.0 g sk³adnika Oliwki czarne
+INFO 2025-04-15 22:48:55,411 models 9040 16972 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 22:48:55,423 basehttp 9040 16972 "POST /shopping/item/57/toggle/ HTTP/1.1" 200 178
+INFO 2025-04-15 22:48:57,779 basehttp 9040 16972 "GET /shopping/16/ HTTP/1.1" 200 29359
+INFO 2025-04-15 22:49:01,444 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,444 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,447 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,447 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:49:01,484 utils 9040 22344 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:49:01,514 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,514 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,516 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,517 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,536 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,537 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,539 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,539 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,604 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,605 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,607 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,607 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,645 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,645 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,648 utils 9040 22344 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:01,648 utils 9040 22344 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:01,699 basehttp 9040 22344 "GET /recipes/list/ HTTP/1.1" 200 79471
+WARNING 2025-04-15 22:49:01,737 basehttp 9040 22344 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:49:01,907 basehttp 9040 9012 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:49:03,557 basehttp 9040 2468 "GET /recipes/detail/17/ HTTP/1.1" 200 42891
+INFO 2025-04-15 22:49:05,338 basehttp 9040 2468 "GET /recipes/prepare/17/ HTTP/1.1" 200 16811
+INFO 2025-04-15 22:49:06,471 basehttp 9040 2468 "POST /recipes/prepare/17/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:49:06,509 basehttp 9040 2468 "GET /recipes/detail/17/ HTTP/1.1" 200 45366
+INFO 2025-04-15 22:49:06,773 basehttp 9040 2468 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 22:49:10,713 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,713 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,716 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,716 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:49:10,752 utils 9040 21752 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:49:10,782 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,783 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,785 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,786 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,806 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,806 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,810 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,810 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,878 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,878 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,881 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,881 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,917 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,918 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,920 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,920 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,953 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,954 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,955 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,956 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,972 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,973 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,975 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,975 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:10,998 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:10,998 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,000 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,001 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,034 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,035 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,037 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,037 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,078 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,079 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,081 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,081 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,101 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,102 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,104 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,104 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,121 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,122 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,124 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,124 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,154 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,155 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,157 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,158 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,180 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,180 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,182 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,183 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,200 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,200 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,202 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,203 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,226 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,226 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,229 utils 9040 21752 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:11,229 utils 9040 21752 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:11,265 basehttp 9040 21752 "GET /fridge/ HTTP/1.1" 200 36528
+INFO 2025-04-15 22:49:12,641 basehttp 9040 21752 "GET /fridge/list/ HTTP/1.1" 200 33485
+ERROR 2025-04-15 22:49:25,272 log 9040 23704 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 165, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, ratings, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-15 22:49:25,282 basehttp 9040 23704 "GET /accounts/profile/ HTTP/1.1" 500 122698
+INFO 2025-04-15 22:49:31,127 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,128 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,130 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,131 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:49:31,165 utils 9040 23704 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:49:31,194 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,194 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,197 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,197 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,216 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,217 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,219 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,219 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,285 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,285 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,287 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,288 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,330 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,331 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,333 utils 9040 23704 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:31,334 utils 9040 23704 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:31,388 basehttp 9040 23704 "GET /recipes/list/ HTTP/1.1" 200 79200
+WARNING 2025-04-15 22:49:31,528 basehttp 9040 23704 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:49:32,801 basehttp 9040 14444 "GET /recipes/detail/15/ HTTP/1.1" 200 32981
+INFO 2025-04-15 22:49:34,106 basehttp 9040 14444 "GET /recipes/prepare/15/ HTTP/1.1" 200 16808
+INFO 2025-04-15 22:49:35,186 basehttp 9040 14444 "POST /recipes/prepare/15/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:49:35,220 basehttp 9040 14444 "GET /recipes/detail/15/ HTTP/1.1" 200 34179
+INFO 2025-04-15 22:49:35,562 basehttp 9040 14444 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 22:49:36,612 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,613 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,615 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,615 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:49:36,648 utils 9040 14444 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:49:36,673 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,674 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,677 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,677 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,697 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,697 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,699 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,700 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,765 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,766 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,767 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,768 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,803 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,804 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,806 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,806 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,841 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,842 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,845 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,845 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,864 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,864 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,866 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,867 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,892 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,893 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,895 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:36,896 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:36,929 basehttp 9040 14444 "GET /accounts/dashboard/ HTTP/1.1" 200 25061
+INFO 2025-04-15 22:49:41,927 basehttp 9040 14444 "GET /recipes/recipes/history/ HTTP/1.1" 200 20213
+INFO 2025-04-15 22:49:53,458 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,459 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,461 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,462 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:49:53,493 utils 9040 14444 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:49:53,517 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,518 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,520 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,520 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,538 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,538 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,540 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,541 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,603 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,604 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,606 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,606 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,644 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,645 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,647 utils 9040 14444 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:49:53,647 utils 9040 14444 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:49:53,809 basehttp 9040 14444 "GET /recipes/list/ HTTP/1.1" 200 79200
+INFO 2025-04-15 22:49:53,903 basehttp 9040 14444 "GET /media/recipes/obraz_2025-04-15_202626657.png HTTP/1.1" 304 0
+INFO 2025-04-15 22:49:53,904 basehttp 9040 13536 "GET /media/recipes/obraz_2025-04-15_202328813.png HTTP/1.1" 304 0
+WARNING 2025-04-15 22:49:54,029 basehttp 9040 14444 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:49:55,280 basehttp 9040 13536 "GET /recipes/detail/17/ HTTP/1.1" 200 44172
+INFO 2025-04-15 22:50:07,295 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,295 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,297 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,298 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:50:07,330 utils 9040 13536 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:50:07,355 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,356 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,359 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,360 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,379 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,379 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,381 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,382 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,468 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,469 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,471 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,471 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,505 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,506 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,512 utils 9040 13536 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:07,513 utils 9040 13536 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:07,571 basehttp 9040 13536 "GET /recipes/list/ HTTP/1.1" 200 79200
+WARNING 2025-04-15 22:50:07,616 basehttp 9040 13536 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:50:07,742 basehttp 9040 13388 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:50:08,527 basehttp 9040 23516 "GET /recipes/detail/15/ HTTP/1.1" 200 32981
+INFO 2025-04-15 22:50:12,457 basehttp 9040 23516 "POST /recipes/detail/15/ HTTP/1.1" 200 33003
+INFO 2025-04-15 22:50:13,500 basehttp 9040 23516 "GET /recipes/prepare/15/ HTTP/1.1" 200 16808
+INFO 2025-04-15 22:50:18,313 basehttp 9040 23516 "GET /recipes/prepare/15/?servings=20 HTTP/1.1" 200 16855
+INFO 2025-04-15 22:50:22,021 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,022 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,026 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,027 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:50:22,065 utils 9040 23516 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:50:22,093 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,094 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,096 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,096 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,116 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,116 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,118 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,118 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,183 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,183 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,185 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,186 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,219 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,219 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,221 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,221 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,253 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,253 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,255 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,255 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,272 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,272 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,275 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,275 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,298 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,298 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,300 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,301 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,334 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,334 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,336 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,336 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,371 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,371 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,373 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,374 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,396 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,396 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,398 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,398 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,416 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,416 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,418 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,419 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,452 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,452 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,454 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,454 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,474 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,475 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,477 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,477 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,495 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,495 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,497 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,498 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,521 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,522 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,525 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:22,526 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:22,561 basehttp 9040 23516 "GET /fridge/ HTTP/1.1" 200 36528
+INFO 2025-04-15 22:50:24,564 basehttp 9040 23516 "GET /fridge/list/ HTTP/1.1" 200 33485
+INFO 2025-04-15 22:50:27,066 basehttp 9040 23516 "POST /recipes/prepare/15/?servings=20 HTTP/1.1" 302 0
+INFO 2025-04-15 22:50:27,246 basehttp 9040 23516 "GET /recipes/detail/15/ HTTP/1.1" 200 34181
+INFO 2025-04-15 22:50:27,564 basehttp 9040 23516 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 22:50:29,716 basehttp 9040 23516 "GET /fridge/list/ HTTP/1.1" 200 33485
+INFO 2025-04-15 22:50:38,021 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,022 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,024 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,025 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:50:38,060 utils 9040 23516 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:50:38,087 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,087 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,089 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,089 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,111 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,111 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,113 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,114 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,175 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,176 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,179 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,179 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,212 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,213 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,215 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,215 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,247 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,247 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,249 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,250 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,267 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,268 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,270 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,270 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,293 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,294 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,296 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,297 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,331 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,332 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,333 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,334 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,370 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,371 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,373 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,373 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,394 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,395 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,397 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,397 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,414 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,415 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,416 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,417 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,448 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,448 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,451 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,451 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,472 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,472 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,475 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,476 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,494 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,494 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,496 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,497 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,520 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,520 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,522 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:38,523 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:38,563 basehttp 9040 23516 "GET /fridge/ HTTP/1.1" 200 36528
+INFO 2025-04-15 22:50:44,089 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:44,089 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:44,093 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:44,093 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:44,141 basehttp 9040 23516 "GET /recipes/detail/13/ HTTP/1.1" 200 44974
+INFO 2025-04-15 22:50:48,926 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:48,927 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:48,930 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:48,930 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:48,957 basehttp 9040 23516 "GET /recipes/missing-ingredients/13/ HTTP/1.1" 200 25483
+INFO 2025-04-15 22:50:50,596 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:50,597 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:50,599 utils 9040 23516 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:50:50,599 utils 9040 23516 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:50:50,688 basehttp 9040 23516 "POST /recipes/missing-ingredients/13/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:50:50,764 basehttp 9040 23516 "GET /shopping/17/ HTTP/1.1" 200 43471
+INFO 2025-04-15 22:51:18,603 models 9040 16728 Dodawanie do lodówki: 4.0 szt sk³adnika Pomidory
+INFO 2025-04-15 22:51:18,604 models 9040 16728 Typ jednostki: piece, Typ podstawowy: weight
+ERROR 2025-04-15 22:51:18,604 models 9040 16728 B£¥D: Brak wagi sztuki dla Pomidory
+INFO 2025-04-15 22:51:18,605 models 9040 16728 Próba konwersji z szt na g dla Pomidory
+ERROR 2025-04-15 22:51:18,605 utils 9040 16728 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:51:18,605 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:51:18,607 models 9040 16728 Nie mo¿na przekonwertowaæ 4.0 Sztuka na Gram: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki
+INFO 2025-04-15 22:51:18,616 basehttp 9040 16728 "POST /shopping/item/63/toggle/ HTTP/1.1" 200 174
+INFO 2025-04-15 22:51:20,256 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,256 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,261 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,262 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:51:20,306 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:51:20,340 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,341 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,344 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,345 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,366 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,366 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,368 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,368 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+ERROR 2025-04-15 22:51:20,432 utils 9040 16728 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:51:20,432 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:51:20,436 utils 9040 16728 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:51:20,436 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:51:20,446 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,447 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,448 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,449 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,487 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,487 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,489 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,490 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,527 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,528 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,530 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,530 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,548 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,548 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,550 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,550 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,575 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,576 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,579 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,580 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,708 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,709 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,712 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,712 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,760 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,760 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,762 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,762 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,782 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,782 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,784 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,784 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+ERROR 2025-04-15 22:51:20,796 utils 9040 16728 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:51:20,796 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:51:20,799 utils 9040 16728 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:51:20,800 utils 9040 16728 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:51:20,808 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,808 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,810 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,811 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,840 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,841 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,843 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,844 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,864 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,864 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,867 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,867 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,886 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,886 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,889 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,890 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,915 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,915 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,917 utils 9040 16728 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:20,917 utils 9040 16728 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:51:20,954 basehttp 9040 16728 "GET /fridge/ HTTP/1.1" 200 37642
+INFO 2025-04-15 22:51:47,821 basehttp 9040 16728 "GET /shopping/ HTTP/1.1" 200 20560
+INFO 2025-04-15 22:51:49,774 basehttp 9040 16728 "GET /shopping/17/ HTTP/1.1" 200 41869
+INFO 2025-04-15 22:51:51,154 basehttp 9040 16728 "GET /shopping/item/60/edit/ HTTP/1.1" 200 218656
+INFO 2025-04-15 22:51:53,145 basehttp 9040 16728 "POST /shopping/item/60/edit/ HTTP/1.1" 302 0
+INFO 2025-04-15 22:51:53,184 basehttp 9040 16728 "GET /shopping/17/ HTTP/1.1" 200 42307
+INFO 2025-04-15 22:51:55,378 models 9040 23392 Dodawanie do lodówki: 1.6666666666666667 szt sk³adnika Cebula
+INFO 2025-04-15 22:51:55,378 models 9040 23392 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,379 models 9040 23392 Waga sztuki dla Cebula: 75.00g
+INFO 2025-04-15 22:51:55,379 models 9040 23392 Próba konwersji z szt na g dla Cebula
+INFO 2025-04-15 22:51:55,380 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:51:55,380 utils 9040 23392 Konwersja: 1.6666666666666667 szt -> 125.0 g -> 125.0 g
+INFO 2025-04-15 22:51:55,380 models 9040 23392 Po konwersji: 125.0 g
+INFO 2025-04-15 22:51:55,429 models 9040 23392 Dodawanie do lodówki: 3.0 szt sk³adnika Czosnek
+INFO 2025-04-15 22:51:55,430 models 9040 23392 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,430 models 9040 23392 Waga sztuki dla Czosnek: 5.00g
+INFO 2025-04-15 22:51:55,431 models 9040 23392 Próba konwersji z szt na g dla Czosnek
+INFO 2025-04-15 22:51:55,431 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:51:55,432 utils 9040 23392 Konwersja: 3.0 szt -> 15.0 g -> 15.0 g
+INFO 2025-04-15 22:51:55,432 models 9040 23392 Po konwersji: 15.0 g
+INFO 2025-04-15 22:51:55,453 models 9040 23392 Dodawanie do lodówki: 2.0 szt sk³adnika Marchew
+INFO 2025-04-15 22:51:55,453 models 9040 23392 Typ jednostki: piece, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,453 models 9040 23392 Waga sztuki dla Marchew: 80.00g
+INFO 2025-04-15 22:51:55,454 models 9040 23392 Próba konwersji z szt na g dla Marchew
+INFO 2025-04-15 22:51:55,454 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:51:55,455 utils 9040 23392 Konwersja: 2.0 szt -> 160.0 g -> 160.0 g
+INFO 2025-04-15 22:51:55,455 models 9040 23392 Po konwersji: 160.0 g
+INFO 2025-04-15 22:51:55,478 models 9040 23392 Dodawanie do lodówki: 2.0 szt sk³adnika Papryka
+INFO 2025-04-15 22:51:55,479 models 9040 23392 Typ jednostki: piece, Typ podstawowy: weight
+ERROR 2025-04-15 22:51:55,479 models 9040 23392 B£¥D: Brak wagi sztuki dla Papryka
+INFO 2025-04-15 22:51:55,479 models 9040 23392 Próba konwersji z szt na g dla Papryka
+ERROR 2025-04-15 22:51:55,480 utils 9040 23392 Brak wagi sztuki dla sk³adnika Papryka (id: 47)
+WARNING 2025-04-15 22:51:55,480 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Papryka
+ERROR 2025-04-15 22:51:55,481 models 9040 23392 Nie mo¿na przekonwertowaæ 2.0 Sztuka na Gram: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki
+INFO 2025-04-15 22:51:55,495 models 9040 23392 Dodawanie do lodówki: 2.0 ³y¿eczka sk³adnika Sól
+INFO 2025-04-15 22:51:55,496 models 9040 23392 Typ jednostki: spoon, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,496 models 9040 23392 Próba konwersji z ³y¿eczka na g dla Sól
+WARNING 2025-04-15 22:51:55,497 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z ³y¿eczka na g dla Sól
+INFO 2025-04-15 22:51:55,499 models 9040 23392 Po konwersji: 10.0 g
+INFO 2025-04-15 22:51:55,513 models 9040 23392 Dodawanie do lodówki: 600.0 g sk³adnika Ziemniaki
+INFO 2025-04-15 22:51:55,513 models 9040 23392 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,528 models 9040 23392 Dodawanie do lodówki: 800.0 g sk³adnika £opatka wieprzowa
+INFO 2025-04-15 22:51:55,528 models 9040 23392 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 22:51:55,546 basehttp 9040 23392 "POST /shopping/17/complete/ HTTP/1.1" 200 173
+INFO 2025-04-15 22:51:58,018 basehttp 9040 23392 "GET /shopping/17/ HTTP/1.1" 200 32852
+INFO 2025-04-15 22:52:00,049 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,050 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:00,051 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,051 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:00,055 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:00,055 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+INFO 2025-04-15 22:52:00,064 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:00,065 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+WARNING 2025-04-15 22:52:00,077 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:52:00,094 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:52:00,110 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:00,110 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:00,112 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:00,113 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:00,125 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,126 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:00,126 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,127 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:00,136 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:52:00,148 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,148 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:00,149 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:00,150 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:00,154 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:52:01,716 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+WARNING 2025-04-15 22:52:03,298 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+INFO 2025-04-15 22:52:03,307 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,308 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+WARNING 2025-04-15 22:52:03,313 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+ERROR 2025-04-15 22:52:03,321 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:52:03,322 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:52:03,327 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:52:03,327 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:52:03,332 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,332 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,335 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,336 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,337 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,337 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:03,341 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:03,342 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:52:03,363 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:52:03,376 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,377 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,381 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,381 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,382 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,383 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,390 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,396 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,425 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,425 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,426 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,427 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,434 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,439 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,452 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,452 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,453 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,453 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,463 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,468 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,487 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,487 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,488 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,489 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:03,494 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:03,494 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:52:03,504 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,510 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,536 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,536 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,537 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,537 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:03,544 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:03,544 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+INFO 2025-04-15 22:52:03,551 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,552 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+WARNING 2025-04-15 22:52:03,565 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:52:03,574 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,575 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,578 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,579 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,590 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,591 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,593 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,594 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,603 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:52:03,616 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,616 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,617 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,617 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,622 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+ERROR 2025-04-15 22:52:03,632 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:52:03,632 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:52:03,636 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:52:03,636 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:52:03,643 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,644 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,648 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,648 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,649 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,649 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:03,653 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:03,653 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:52:03,675 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:52:03,684 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:52:03,685 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:52:03,688 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,688 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,689 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,689 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,699 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,704 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,720 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,721 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,722 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,722 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,734 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,739 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,754 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,755 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,755 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,756 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:52:03,765 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,770 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,791 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,792 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:52:03,793 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:52:03,794 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:52:03,798 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:52:03,798 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:52:03,811 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:52:03,816 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:52:03,846 basehttp 9040 23392 "GET /fridge/ HTTP/1.1" 200 38139
+INFO 2025-04-15 22:52:05,465 basehttp 9040 23392 "GET /fridge/list/ HTTP/1.1" 200 54368
+INFO 2025-04-15 22:52:23,776 basehttp 9040 23392 "GET /fridge/add/ HTTP/1.1" 200 31120
+INFO 2025-04-15 22:52:25,591 basehttp 9040 23392 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 598
+INFO 2025-04-15 22:52:29,642 basehttp 9040 23392 "GET /fridge/ajax/ingredient-search/?term=pomi&list_all=false HTTP/1.1" 200 121
+INFO 2025-04-15 22:52:32,754 basehttp 9040 23392 "GET /fridge/ajax/load-units/?ingredient_id=9 HTTP/1.1" 200 450
+INFO 2025-04-15 22:52:41,739 models 9040 23392 Dodawanie do lodówki: 200.0 g sk³adnika Pomidor
+INFO 2025-04-15 22:52:41,739 models 9040 23392 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 22:52:41,748 basehttp 9040 23392 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 101
+INFO 2025-04-15 22:52:41,803 basehttp 9040 23392 "GET /fridge/list/ HTTP/1.1" 200 57586
+INFO 2025-04-15 22:52:52,715 basehttp 9040 23392 "GET /fridge/add/ HTTP/1.1" 200 31120
+INFO 2025-04-15 22:52:53,987 basehttp 9040 23392 "GET /fridge/ajax/ingredient-search/?term=&list_all=true HTTP/1.1" 200 598
+INFO 2025-04-15 22:52:57,980 basehttp 9040 23392 "GET /fridge/ajax/ingredient-search/?term=pomido&list_all=false HTTP/1.1" 200 121
+INFO 2025-04-15 22:52:59,799 basehttp 9040 23392 "GET /fridge/ajax/load-units/?ingredient_id=44 HTTP/1.1" 200 453
+INFO 2025-04-15 22:53:08,389 models 9040 23392 Dodawanie do lodówki: 400.0 g sk³adnika Pomidory
+INFO 2025-04-15 22:53:08,390 models 9040 23392 Typ jednostki: weight, Typ podstawowy: weight
+INFO 2025-04-15 22:53:08,401 basehttp 9040 23392 "POST /fridge/ajax/add-to-fridge/ HTTP/1.1" 200 102
+INFO 2025-04-15 22:53:08,461 basehttp 9040 23392 "GET /fridge/list/ HTTP/1.1" 200 60380
+INFO 2025-04-15 22:53:45,474 basehttp 9040 23392 "GET / HTTP/1.1" 200 38690
+INFO 2025-04-15 22:53:47,930 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:47,930 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:53:47,931 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:47,932 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:53:47,935 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:53:47,936 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+INFO 2025-04-15 22:53:47,945 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:47,945 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+ERROR 2025-04-15 22:53:47,950 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:53:47,951 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+WARNING 2025-04-15 22:53:47,963 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:53:47,981 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:53:47,996 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:47,997 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:53:47,999 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:48,000 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:53:48,013 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:48,014 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:53:48,015 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:48,016 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:53:48,027 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:53:48,038 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:48,039 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:53:48,040 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:48,041 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:53:48,046 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:53:49,639 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+WARNING 2025-04-15 22:53:51,119 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+INFO 2025-04-15 22:53:51,128 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:51,129 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+WARNING 2025-04-15 22:53:51,135 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+ERROR 2025-04-15 22:53:51,145 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:53:51,145 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:53:51,150 utils 9040 23392 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:53:51,151 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:53:51,157 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:51,157 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:53:51,162 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:51,162 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:53:51,163 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:51,164 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:53:51,169 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:53:51,169 utils 9040 23392 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:53:51,191 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:53:51,202 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:53:51,203 utils 9040 23392 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:53:51,208 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:51,208 utils 9040 23392 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:53:51,209 utils 9040 23392 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:53:51,210 utils 9040 23392 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:53:51,219 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+WARNING 2025-04-15 22:53:51,226 utils 9040 23392 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na szczypta dla Sól
+INFO 2025-04-15 22:53:51,277 basehttp 9040 23392 "GET /recipes/list/ HTTP/1.1" 200 79471
+WARNING 2025-04-15 22:53:51,326 basehttp 9040 23392 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:53:51,588 basehttp 9040 18264 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:53:53,413 basehttp 9040 14328 "GET /recipes/create/ HTTP/1.1" 200 60417
+INFO 2025-04-15 22:53:53,854 basehttp 9040 7160 "GET /recipes/api/load-units/ HTTP/1.1" 200 35
+INFO 2025-04-15 22:53:53,863 basehttp 9040 14328 "GET /recipes/api/ingredient-search/ HTTP/1.1" 200 2412
+INFO 2025-04-15 22:54:01,146 basehttp 9040 20308 "GET /recipes/api/ingredient-search/?_type=query HTTP/1.1" 200 2412
+INFO 2025-04-15 22:54:03,258 basehttp 9040 20308 "GET /recipes/api/ingredient-search/?term=pomi&_type=query&q=pomi HTTP/1.1" 200 2412
+INFO 2025-04-15 22:54:05,232 basehttp 9040 20308 "GET /recipes/api/ingredient-search/?term=&_type=query&q= HTTP/1.1" 200 2412
+INFO 2025-04-15 22:54:10,454 basehttp 9040 20308 "GET /recipes/api/load-units/?ingredient_id=44 HTTP/1.1" 200 1345
+INFO 2025-04-15 22:54:14,698 basehttp 9040 20308 "GET /recipes/api/unit-info/?unit_id=1&amount=3 HTTP/1.1" 200 146
+INFO 2025-04-15 22:54:16,492 basehttp 9040 20308 "GET /recipes/api/unit-info/?unit_id=1&amount=3 HTTP/1.1" 200 146
+INFO 2025-04-15 22:54:16,749 basehttp 9040 20308 "GET /recipes/api/unit-info/?unit_id=1&amount=30 HTTP/1.1" 200 207
+INFO 2025-04-15 22:54:16,909 basehttp 9040 20308 "GET /recipes/api/unit-info/?unit_id=1&amount=300 HTTP/1.1" 200 203
+INFO 2025-04-15 22:54:18,818 basehttp 9040 20308 "POST /recipes/create/ HTTP/1.1" 302 0
+ERROR 2025-04-15 22:54:18,837 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:18,837 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:18,865 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,865 utils 9040 20308 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:54:18,866 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,867 utils 9040 20308 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:54:18,871 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:54:18,871 utils 9040 20308 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+INFO 2025-04-15 22:54:18,881 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:54:18,881 utils 9040 20308 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+ERROR 2025-04-15 22:54:18,886 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:18,886 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+WARNING 2025-04-15 22:54:18,899 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:54:18,917 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿ka dla Cukier
+INFO 2025-04-15 22:54:18,933 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:54:18,933 utils 9040 20308 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:54:18,936 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:54:18,937 utils 9040 20308 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:54:18,951 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,952 utils 9040 20308 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:54:18,953 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,953 utils 9040 20308 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:54:18,965 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:54:18,979 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,979 utils 9040 20308 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:54:18,980 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:18,981 utils 9040 20308 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+WARNING 2025-04-15 22:54:18,986 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+WARNING 2025-04-15 22:54:20,602 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+WARNING 2025-04-15 22:54:22,129 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na kg dla Ziemniaki
+INFO 2025-04-15 22:54:22,137 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:54:22,138 utils 9040 20308 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+WARNING 2025-04-15 22:54:22,144 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+ERROR 2025-04-15 22:54:22,155 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:22,156 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:54:22,162 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:22,162 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:22,168 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Marchew, piece_weight: 80.00
+INFO 2025-04-15 22:54:22,168 utils 9040 20308 Konwersja: 160.0 g -> 160.0 g -> 2.0 szt
+INFO 2025-04-15 22:54:22,172 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:22,173 utils 9040 20308 Konwersja: 125.0 g -> 125.0 g -> 1.6666666666666667 szt
+INFO 2025-04-15 22:54:22,174 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Cebula, piece_weight: 75.00
+INFO 2025-04-15 22:54:22,175 utils 9040 20308 Konwersja: 25.0 g -> 25.0 g -> 0.3333333333333333 szt
+INFO 2025-04-15 22:54:22,179 utils 9040 20308 Konwersja miêdzy sztukami a wag¹ dla Czosnek, piece_weight: 5.00
+INFO 2025-04-15 22:54:22,180 utils 9040 20308 Konwersja: 15.0 g -> 15.0 g -> 3.0 szt
+WARNING 2025-04-15 22:54:22,202 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak mo¿liwoœci konwersji z g na ³y¿eczka dla Sól
+INFO 2025-04-15 22:54:22,247 basehttp 9040 20308 "GET /recipes/list/ HTTP/1.1" 200 81191
+WARNING 2025-04-15 22:54:22,295 basehttp 9040 13268 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+WARNING 2025-04-15 22:54:22,447 basehttp 9040 2196 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
+INFO 2025-04-15 22:54:22,543 basehttp 9040 20308 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 200 101246
+ERROR 2025-04-15 22:54:24,194 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:24,195 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:24,217 basehttp 9040 20308 "GET /recipes/detail/18/ HTTP/1.1" 200 33552
+INFO 2025-04-15 22:54:24,257 basehttp 9040 20308 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-15 22:54:29,860 basehttp 9040 20308 "GET /fridge/list/ HTTP/1.1" 200 59952
+ERROR 2025-04-15 22:54:34,847 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:34,847 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:34,857 basehttp 9040 20308 "GET /recipes/prepare/18/ HTTP/1.1" 200 16807
+ERROR 2025-04-15 22:54:36,518 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,518 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:54:36,527 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,528 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:54:36,534 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,534 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:54:36,541 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,542 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:36,563 basehttp 9040 20308 "POST /recipes/prepare/18/ HTTP/1.1" 302 0
+ERROR 2025-04-15 22:54:36,579 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,580 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:54:36,584 utils 9040 20308 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:54:36,585 utils 9040 20308 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:54:36,609 basehttp 9040 20308 "GET /recipes/detail/18/ HTTP/1.1" 200 36028
+INFO 2025-04-15 22:54:36,641 basehttp 9040 20308 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-15 22:54:36,774 basehttp 9040 20308 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 22:54:39,173 basehttp 9040 20308 "GET /fridge/list/ HTTP/1.1" 200 59952
+INFO 2025-04-15 22:57:10,097 autoreload 9040 24008 D:\praca_inzynierska\fridge\models.py changed, reloading.
+INFO 2025-04-15 22:57:11,088 autoreload 22636 9880 Watching for file changes with StatReloader
+INFO 2025-04-15 22:57:33,448 autoreload 22636 9880 D:\praca_inzynierska\fridge\models.py changed, reloading.
+INFO 2025-04-15 22:57:34,216 autoreload 17508 13448 Watching for file changes with StatReloader
+INFO 2025-04-15 22:57:52,928 autoreload 17508 13448 D:\praca_inzynierska\fridge\models.py changed, reloading.
+INFO 2025-04-15 22:57:53,653 autoreload 19020 7372 Watching for file changes with StatReloader
+INFO 2025-04-15 22:58:09,013 autoreload 19020 7372 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-15 22:58:09,779 autoreload 20568 10460 Watching for file changes with StatReloader
+INFO 2025-04-15 22:58:18,435 autoreload 20568 10460 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-15 22:58:19,130 autoreload 17772 17516 Watching for file changes with StatReloader
+ERROR 2025-04-15 22:58:27,313 utils 17772 23532 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:58:27,313 utils 17772 23532 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:58:27,316 models 17772 23532 B³¹d konwersji: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki dla Pomidory z szt na g
+INFO 2025-04-15 22:58:27,317 models 17772 23532 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 100.0 g
+ERROR 2025-04-15 22:58:27,319 utils 17772 23532 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:58:27,319 utils 17772 23532 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:58:27,397 basehttp 17772 23532 "GET /recipes/detail/18/ HTTP/1.1" 200 34834
+INFO 2025-04-15 22:58:27,461 basehttp 17772 23532 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-15 22:58:29,971 basehttp 17772 18324 "GET /fridge/list/ HTTP/1.1" 200 59952
+INFO 2025-04-15 22:58:33,756 autoreload 17772 17516 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-15 22:58:34,486 autoreload 16560 8000 Watching for file changes with StatReloader
+INFO 2025-04-15 22:58:38,742 basehttp 16560 14444 "GET /fridge/list/ HTTP/1.1" 200 59952
+ERROR 2025-04-15 22:58:41,509 utils 16560 14932 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:58:41,509 utils 16560 14932 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 22:58:41,511 models 16560 14932 B³¹d konwersji: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki dla Pomidory z szt na g
+INFO 2025-04-15 22:58:41,513 models 16560 14932 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 100.0 g
+ERROR 2025-04-15 22:58:41,515 utils 16560 14932 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 22:58:41,515 utils 16560 14932 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 22:58:41,558 basehttp 16560 14932 "GET /recipes/detail/18/ HTTP/1.1" 200 34834
+INFO 2025-04-15 23:00:07,550 autoreload 16560 8000 D:\praca_inzynierska\fridge\models.py changed, reloading.
+INFO 2025-04-15 23:00:08,414 autoreload 2508 20788 Watching for file changes with StatReloader
+ERROR 2025-04-15 23:00:13,669 utils 2508 3440 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 23:00:13,671 utils 2508 3440 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 23:00:13,675 models 2508 3440 B³¹d konwersji: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki dla Pomidory z szt na g
+INFO 2025-04-15 23:00:13,676 models 2508 3440 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 100.0 g
+ERROR 2025-04-15 23:00:13,678 utils 2508 3440 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 23:00:13,679 utils 2508 3440 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 23:00:13,759 basehttp 2508 3440 "GET /recipes/detail/18/ HTTP/1.1" 200 34834
+INFO 2025-04-15 23:00:13,795 basehttp 2508 3440 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+ERROR 2025-04-15 23:00:15,768 utils 2508 3440 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 23:00:15,768 utils 2508 3440 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+ERROR 2025-04-15 23:00:15,772 models 2508 3440 B³¹d konwersji: Konwersja miêdzy piece a weight wymaga informacji o wadze sztuki dla Pomidory z szt na g
+INFO 2025-04-15 23:00:15,773 models 2508 3440 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 100.0 g
+ERROR 2025-04-15 23:00:15,775 utils 2508 3440 Brak wagi sztuki dla sk³adnika Pomidory (id: 44)
+WARNING 2025-04-15 23:00:15,776 utils 2508 3440 B³¹d podczas konwersji specyficznej dla sk³adnika: Brak zdefiniowanej wagi sztuki dla Pomidory
+INFO 2025-04-15 23:00:15,799 basehttp 2508 3440 "GET /recipes/detail/18/ HTTP/1.1" 200 34834
+INFO 2025-04-15 23:02:33,411 autoreload 2508 20788 D:\praca_inzynierska\recipes\models.py changed, reloading.
+INFO 2025-04-15 23:02:34,151 autoreload 6108 18700 Watching for file changes with StatReloader
+INFO 2025-04-15 23:15:59,525 utils 6108 10764 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:15:59,526 utils 6108 10764 Konwersja: 4.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-15 23:15:59,527 models 6108 10764 Konwersja dla Pomidory: 4.0 szt = 600.0 g
+INFO 2025-04-15 23:15:59,527 models 6108 10764 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 700.0 g
+INFO 2025-04-15 23:15:59,603 basehttp 6108 10764 "GET /recipes/detail/18/ HTTP/1.1" 200 33552
+INFO 2025-04-15 23:16:00,070 basehttp 6108 10764 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:16:04,021 basehttp 6108 10764 "GET /fridge/list/ HTTP/1.1" 200 59952
+INFO 2025-04-15 23:16:06,737 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:06,738 utils 6108 23588 Konwersja: 4.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-15 23:16:06,739 models 6108 23588 Konwersja dla Pomidory: 4.0 szt = 600.0 g
+INFO 2025-04-15 23:16:06,740 models 6108 23588 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 700.0 g
+INFO 2025-04-15 23:16:06,755 basehttp 6108 23588 "GET /recipes/prepare/18/ HTTP/1.1" 200 16807
+INFO 2025-04-15 23:16:08,558 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,558 utils 6108 23588 Konwersja: 4.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-15 23:16:08,558 models 6108 23588 Konwersja dla Pomidory: 4.0 szt = 600.0 g
+INFO 2025-04-15 23:16:08,559 models 6108 23588 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 700.0 g
+INFO 2025-04-15 23:16:08,565 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,566 utils 6108 23588 Konwersja: 4.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-15 23:16:08,566 models 6108 23588 Konwersja dla Pomidory: 4.0 szt = 600.0 g
+INFO 2025-04-15 23:16:08,567 models 6108 23588 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 700.0 g
+INFO 2025-04-15 23:16:08,568 models 6108 23588 U¿ywanie sk³adników do przepisu: dsa
+INFO 2025-04-15 23:16:08,569 models 6108 23588 Wspó³czynnik skalowania: 1.0 (z 4 na 4 porcji)
+INFO 2025-04-15 23:16:08,571 models 6108 23588 Sprawdzam dostêpnoœæ: 300.0 g sk³adnika Pomidory
+INFO 2025-04-15 23:16:08,573 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,574 utils 6108 23588 Konwersja: 4.0 szt -> 600.0 g -> 600.0 g
+INFO 2025-04-15 23:16:08,574 models 6108 23588 Konwersja dla Pomidory: 4.0 szt = 600.0 g
+INFO 2025-04-15 23:16:08,575 models 6108 23588 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 700.0 g
+INFO 2025-04-15 23:16:08,577 models 6108 23588 Usuwam z lodówki: 300.0 g sk³adnika Pomidory
+INFO 2025-04-15 23:16:08,579 models 6108 23588 U¿yto ca³ego produktu: 100.0 g Pomidory (wa¿ne do 2025-04-17)
+INFO 2025-04-15 23:16:08,587 models 6108 23588 Potrzeba jeszcze 200.0 g sk³adnika Pomidory
+INFO 2025-04-15 23:16:08,589 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,589 utils 6108 23588 Konwersja: 200.0 g -> 200.0 g -> 1.3333333333333333 szt
+INFO 2025-04-15 23:16:08,590 models 6108 23588 Konwersja: 200.0 g = 1.3333333333333333 szt
+INFO 2025-04-15 23:16:08,596 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,598 utils 6108 23588 Konwersja: 1.3333333333333333 szt -> 200.0 g -> 200.0 g
+INFO 2025-04-15 23:16:08,599 models 6108 23588 U¿yto 1.3333333333333333 szt z 2.666666666666667 szt Pomidory (odpowiada 200.0 g)
+INFO 2025-04-15 23:16:08,612 basehttp 6108 23588 "POST /recipes/prepare/18/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:16:08,630 utils 6108 23588 Konwersja miêdzy sztukami a wag¹ dla Pomidory, piece_weight: 150.00
+INFO 2025-04-15 23:16:08,632 utils 6108 23588 Konwersja: 2.666666666666667 szt -> 400.00000000000006 g -> 400.00000000000006 g
+INFO 2025-04-15 23:16:08,632 models 6108 23588 Konwersja dla Pomidory: 2.666666666666667 szt = 400.00000000000006 g
+INFO 2025-04-15 23:16:08,633 models 6108 23588 Sprawdzanie dostêpnoœci Pomidory: potrzeba 300.0 g, dostêpne 400.00000000000006 g
+INFO 2025-04-15 23:16:08,655 basehttp 6108 23588 "GET /recipes/detail/18/ HTTP/1.1" 200 34746
+INFO 2025-04-15 23:16:09,092 basehttp 6108 23588 "POST /recipes/clear-prepared/ HTTP/1.1" 200 17
+INFO 2025-04-15 23:16:11,655 basehttp 6108 23588 "GET /fridge/list/ HTTP/1.1" 200 57187
+INFO 2025-04-15 23:17:36,445 autoreload 6108 18700 D:\praca_inzynierska\fridge\models.py changed, reloading.
+INFO 2025-04-15 23:17:37,307 autoreload 5936 17360 Watching for file changes with StatReloader
+INFO 2025-04-15 23:18:12,195 basehttp 5936 22592 "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:18:12,223 basehttp 5936 22592 "GET /login/ HTTP/1.1" 200 18763
+INFO 2025-04-15 23:18:20,660 basehttp 5936 23824 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:18:20,809 models 5936 23824 Sprawdzanie dostêpnoœci Bu³ka tarta: potrzeba 200.0 g, dostêpne 400.0 g
+INFO 2025-04-15 23:18:20,894 utils 5936 23824 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 23:18:20,894 utils 5936 23824 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 23:18:20,895 models 5936 23824 Konwersja dla Jajko: 60.0 g = 1.0 szt
+INFO 2025-04-15 23:18:20,896 models 5936 23824 Sprawdzanie dostêpnoœci Jajko: potrzeba 3.0 szt, dostêpne 1.0 szt
+INFO 2025-04-15 23:18:20,898 utils 5936 23824 Konwersja miêdzy sztukami a wag¹ dla Jajko, piece_weight: 60.00
+INFO 2025-04-15 23:18:20,899 utils 5936 23824 Konwersja: 60.0 g -> 60.0 g -> 1.0 szt
+INFO 2025-04-15 23:18:20,981 basehttp 5936 23824 "GET /dashboard/ HTTP/1.1" 200 27818
+INFO 2025-04-15 23:18:21,022 basehttp 5936 23824 "GET /media/recipes/obraz_2025-04-15_202626657.png HTTP/1.1" 304 0
+INFO 2025-04-15 23:18:21,022 basehttp 5936 13880 "GET /media/recipes/obraz_2025-04-15_202328813.png HTTP/1.1" 304 0
+ERROR 2025-04-15 23:18:28,049 log 5936 13880 Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\accounts\views.py", line 165, in profile_view
+    favorite_recipes = Recipe.objects.filter(favoriterecipe__user=request.user)[:5]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1523, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1330, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\praca_inzynierska\venv\Lib\site-packages\django\db\models\sql\query.py", line 1802, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'favoriterecipe' into field. Choices are: author, author_id, categories, comments, created_at, description, difficulty, favorited_by, id, image, images, ingredients, instructions, is_public, likes, preparation_history, preparation_time, ratings, servings, shoppingitem, shoppinglist, steps, title, updated_at
+ERROR 2025-04-15 23:18:28,060 basehttp 5936 13880 "GET /accounts/profile/ HTTP/1.1" 500 122770
+INFO 2025-04-15 23:18:42,250 basehttp 5936 23676 "GET /admin HTTP/1.1" 301 0
+INFO 2025-04-15 23:18:42,280 basehttp 5936 1508 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-04-15 23:18:42,318 basehttp 5936 1508 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 3754
+INFO 2025-04-15 23:18:42,769 basehttp 5936 13144 "GET /static/admin/css/responsive.css HTTP/1.1" 200 16632
+INFO 2025-04-15 23:18:42,774 basehttp 5936 24032 "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2025-04-15 23:18:42,806 basehttp 5936 14484 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-04-15 23:18:42,975 basehttp 5936 1508 "GET /static/admin/css/base.css HTTP/1.1" 200 22154
+INFO 2025-04-15 23:18:43,017 basehttp 5936 23536 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-04-15 23:18:43,021 basehttp 5936 12544 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2808
+INFO 2025-04-15 23:18:43,026 basehttp 5936 12544 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-04-15 23:18:47,954 basehttp 5936 12544 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 3966

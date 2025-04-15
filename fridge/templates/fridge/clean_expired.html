@@ -30,7 +30,7 @@
                                     {% for item in expired_items %}
                                         <tr>
                                             <td>{{ item.ingredient.name }}</td>
-                                            <td>{{ item.amount }} {{ item.unit.name }}</td>
+                                            <td>{{ item.get_amount_display }} {{ item.unit.name }}</td>
                                             <td class="text-danger">{{ item.expiry_date }}</td>
                                         </tr>
                                     {% endfor %}

@@ -545,6 +545,7 @@ class RecipeDetailView(DetailView):
         
         # Dodaj informacje o skali przepisu
         servings_param = self.request.GET.get('servings')
+        servings = None
         if servings_param:
             try:
                 servings = int(servings_param)
@@ -580,8 +581,15 @@ class RecipeDetailView(DetailView):
         # Dodaj drobne informacje o przepisie
         context['can_be_prepared'] = False
         if self.request.user.is_authenticated:
-            context['can_be_prepared'] = self.object.can_be_prepared_with_available_ingredients(self.request.user)
-            context['missing_ingredients'] = self.object.get_missing_ingredients(self.request.user)
+            # Pobierz brakujące składniki z uwzględnieniem liczby porcji
+            missing_ingredients = self.object.get_missing_ingredients(self.request.user, servings)
+            context['missing_ingredients'] = missing_ingredients
+            context['can_be_prepared'] = len(missing_ingredients) == 0
+            
+            # Dodaj debugowanie przy otwieraniu strony
+            print(f"DEBUG: get_context_data - Liczba porcji: {servings or self.object.servings}")
+            for item in missing_ingredients:
+                print(f"DEBUG: Brakujący składnik (get_context): {item.ingredient.name}, ilość: {item.amount}, dostępne: {item.available}, brakuje: {item.missing}")
             
         # Dodaj formularz do komentowania
         context['comment_form'] = CommentForm()
@@ -677,6 +685,16 @@ class RecipeDetailView(DetailView):
             context['servings'] = servings
             context['original_servings'] = self.object.servings
             context['scaled_ingredients'] = self.object.scale_to_servings(servings)
+            
+            # Oblicz brakujące składniki dla przeskalowanej liczby porcji
+            if self.request.user.is_authenticated:
+                context['missing_ingredients'] = self.object.get_missing_ingredients(self.request.user, servings)
+                context['can_be_prepared'] = not context['missing_ingredients']
+                
+                # Dodaj debugowanie
+                print(f"DEBUG: Przeliczanie składników dla {servings} porcji (oryginalnie {self.object.servings})")
+                for item in context['missing_ingredients']:
+                    print(f"DEBUG: Brakujący składnik po przeliczeniu: {item.ingredient.name}, ilość: {item.amount}, dostępne: {item.available}, brakuje: {item.missing}")
             
             # Renderuj stronę z nowym kontekstem
             return self.render_to_response(context)

@@ -220,7 +220,7 @@
                                             </span>
                                         </div>
                                         <div class="mt-1 d-flex justify-content-between">
-                                            <span class="text-muted">{{ item.amount }} {{ item.unit.name }}</span>
+                                            <span class="text-muted">{{ item.get_amount_display }} {{ item.unit.name }}</span>
                                             <small class="text-muted">Dodano: {{ item.purchase_date }}</small>
                                         </div>
                                     </div>
@@ -290,7 +290,7 @@
                                         </span>
                                     </div>
                                     <div class="mt-1 d-flex justify-content-between">
-                                        <span class="text-muted">{{ item.amount }} {{ item.unit.name }}</span>
+                                        <span class="text-muted">{{ item.get_amount_display }} {{ item.unit.name }}</span>
                                         <small class="text-muted">Ważne do: {{ item.expiry_date|date:"d.m.Y" }}</small>
                                     </div>
                                 </div>

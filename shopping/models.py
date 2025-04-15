@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from recipes.models import Ingredient, MeasurementUnit, Recipe
 from django.utils import timezone
+import math
 
 class ShoppingList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shopping_lists', verbose_name="Użytkownik")
@@ -364,7 +365,21 @@ class ShoppingItem(models.Model):
         ordering = ['ingredient__name']
     
     def __str__(self):
-        return f"{self.amount} {self.unit.symbol} {self.ingredient.name}"
+        # Zaokrąglaj do góry ilość, jeśli jednostka jest typem 'piece'
+        displayed_amount = self.amount
+        if self.unit.type == 'piece':
+            displayed_amount = math.ceil(self.amount)
+        return f"{displayed_amount} {self.unit.symbol} {self.ingredient.name}"
+    
+    def get_amount_display(self):
+        """
+        Zwraca ilość produktu odpowiednio sformatowaną:
+        - dla jednostek 'piece' zaokrągloną do góry do liczby całkowitej
+        - dla pozostałych jednostek oryginalną wartość
+        """
+        if self.unit.type == 'piece':
+            return math.ceil(self.amount)
+        return self.amount
     
     def mark_as_purchased(self):
         """

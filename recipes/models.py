@@ -214,6 +214,61 @@ class Ingredient(models.Model):
 
     def save(self, *args, **kwargs):
         """Zapisz model i dodaj domyślną jednostkę do kompatybilnych"""
+        # Automatycznie ustaw wagę sztuki dla typowych produktów, jeśli nie została określona
+        if 'piece' in self.unit_type and not self.piece_weight:
+            # Słownik typowych wag dla popularnych produktów (w gramach)
+            typical_weights = {
+                'pomidor': 150,
+                'pomidory': 150,
+                'cebula': 110,
+                'ziemniak': 170,
+                'ziemniaki': 170,
+                'marchew': 80,
+                'marchewka': 80,
+                'jabłko': 180,
+                'jabłka': 180,
+                'pomarańcza': 200,
+                'pomarańcze': 200,
+                'cytryna': 70,
+                'cytryny': 70,
+                'ogórek': 200,
+                'ogórki': 200,
+                'papryka': 160,
+                'czosnek': 5,  # ząbek czosnku
+                'jajko': 60,
+                'jajka': 60,
+                'jaja': 60,
+                'banan': 120,
+                'banany': 120,
+                'gruszka': 170,
+                'gruszki': 170,
+                'pietruszka': 60,
+                'bakłażan': 300,
+                'cukinia': 250,
+                'por': 100,
+                'pory': 100,
+                'brokuł': 400,
+                'brokuły': 400,
+                'kalafior': 800,
+                'kalafiory': 800,
+                'malina': 6,
+                'maliny': 6,
+                'truskawka': 15,
+                'truskawki': 15,
+                'winogrono': 8,
+                'winogrona': 8,
+                'kapusta': 900,
+                'seler': 350,
+                'grzyb': 25,
+                'grzyby': 25,
+            }
+            
+            # Sprawdź, czy nazwa składnika zawiera jakiś klucz z typowych wag
+            for product, weight in typical_weights.items():
+                if product.lower() in self.name.lower():
+                    self.piece_weight = weight
+                    break
+        
         super().save(*args, **kwargs)
         
         # Dodaj domyślną jednostkę do kompatybilnych, jeśli istnieje

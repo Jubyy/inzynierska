@@ -161,7 +161,7 @@
                                     {% endif %}
                             </td>
                             <td>
-                                {{ item.amount|floatformat:"-2" }} {{ item.unit.symbol }}
+                                {{ item.get_amount_display }} {{ item.unit.symbol }}
                                     
                                     <!-- Jeśli ten produkt ma wyświetlenie w jednostkach podstawowych -->
                                     {% for display_item in display_items %}
