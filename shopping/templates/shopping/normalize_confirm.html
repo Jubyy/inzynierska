@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Konsolidacja jednostek - {{ shopping_list.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Konsolidacja jednostek na liście zakupów</h2>
+                </div>
+                <div class="card-body">
+                    <p class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Ta operacja skonsoliduje wszystkie duplikaty składników na liście zakupów,
+                        konwertując je do jednostek podstawowych (gramy, mililitry).
+                    </p>
+
+                    <p>Na tej liście są składniki, które występują wielokrotnie, potencjalnie z różnymi jednostkami miary.</p>
+                    <p>Konsolidacja spowoduje, że:</p>
+                    <ul>
+                        <li>Składniki zostaną przeliczone na jednostki podstawowe (np. g, ml)</li>
+                        <li>Duplikaty zostaną połączone w jeden wpis ze zsumowaną ilością</li>
+                        <li>Składniki, których jednostek nie można skonwertować, pozostaną bez zmian</li>
+                    </ul>
+
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Ta operacja jest nieodwracalna. Wszystkie zduplikowane pozycje zostaną połączone.
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'shopping:detail' shopping_list.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Anuluj
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i> Konsoliduj jednostki
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

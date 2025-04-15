@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from datetime import datetime
+import copy
 
 class IngredientCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nazwa kategorii")
@@ -366,28 +367,92 @@ class Recipe(models.Model):
             
         return True
     
-    def get_missing_ingredients(self, user):
-        """Zwraca listę brakujących składników, które użytkownik musi dokupić,
-        aby przygotować przepis"""
-        if not user.is_authenticated:
-            return []
+    def get_missing_ingredients(self, user, servings=None):
+        """
+        Zwraca listę składników, których brakuje użytkownikowi do przygotowania przepisu.
         
-        # Import lokalny, aby uniknąć cyklicznego importu
+        Args:
+            user: User object - użytkownik, dla którego sprawdzamy dostępność składników
+            servings: int - liczba porcji (opcjonalnie, domyślnie używa liczby porcji z przepisu)
+            
+        Returns:
+            list: Lista obiektów RecipeIngredient, których brakuje
+        """
         from fridge.models import FridgeItem
         
-        missing = []
-        for ingredient_entry in self.ingredients.all():
-            # Sprawdź każdy składnik przepisu
-            if not FridgeItem.check_ingredient_availability(
-                user, 
-                ingredient_entry.ingredient,
-                ingredient_entry.amount,
-                ingredient_entry.unit
-            ):
-                # Dodaj do listy brakujących
-                missing.append(ingredient_entry)
+        # Jeśli użytkownik nie jest zalogowany, zwróć wszystkie składniki
+        if not user or not user.is_authenticated:
+            if servings and servings != self.servings:
+                # Zwróć przeskalowane składniki, jeśli podano liczbę porcji
+                scaled_ingredients = self.scale_to_servings(servings)
+                result = []
+                for ing_dict in scaled_ingredients:
+                    missing_entry = copy.copy(self.ingredients.get(ingredient=ing_dict['ingredient']))
+                    missing_entry.amount = ing_dict['amount']
+                    missing_entry.missing = ing_dict['amount']  # Brakuje całości
+                    missing_entry.available = 0  # Nie ma nic w lodówce
+                    result.append(missing_entry)
+                return result
+            return self.ingredients.all()
+            
+        missing_ingredients = []
         
-        return missing
+        # Oblicz współczynnik skalowania
+        scale_factor = 1.0
+        if servings and servings != self.servings:
+            scale_factor = float(servings) / float(self.servings)
+        
+        # Debug - pokaż współczynnik skalowania
+        print(f"DEBUG: Współczynnik skalowania: {scale_factor} (z {self.servings} na {servings} porcji)")
+        
+        # Sprawdź każdy składnik przepisu
+        for ingredient_entry in self.ingredients.all():
+            ingredient = ingredient_entry.ingredient
+            unit = ingredient_entry.unit
+            required_amount = ingredient_entry.amount * scale_factor  # Skaluj ilość składników
+            
+            print(f"DEBUG: Sprawdzanie {ingredient.name}: potrzeba {required_amount} {unit.symbol} (oryginalnie {ingredient_entry.amount} {unit.symbol})")
+            
+            # Sprawdź, czy ten składnik jest dostępny w lodówce
+            is_available = FridgeItem.check_ingredient_availability(user, ingredient, required_amount, unit)
+            print(f"DEBUG: Czy dostępny: {is_available}")
+            
+            if not is_available:
+                # Jeśli składnika brakuje, utwórz kopię obiektu RecipeIngredient
+                missing_entry = copy.copy(ingredient_entry)
+                
+                # Oblicz brakującą ilość
+                total_available = 0.0
+                fridge_items = FridgeItem.objects.filter(user=user, ingredient=ingredient)
+                
+                for item in fridge_items:
+                    try:
+                        # Jeśli jednostki są różne, przelicz
+                        if item.unit != unit:
+                            try:
+                                from recipes.utils import convert_units
+                                converted = convert_units(float(item.amount), item.unit, unit, ingredient=ingredient)
+                                total_available += converted
+                            except Exception as e:
+                                print(f"DEBUG: Błąd konwersji: {e}")
+                                continue
+                        else:
+                            total_available += float(item.amount)
+                    except Exception as e:
+                        print(f"DEBUG: Ogólny błąd: {e}")
+                        continue
+                
+                # Przypisz przeskalowaną ilość i brakującą wartość
+                missing_entry.amount = required_amount
+                missing_entry.missing = max(0, required_amount - total_available)
+                missing_entry.available = total_available
+                
+                print(f"DEBUG: Brakuje {missing_entry.missing} {unit.symbol} z {required_amount} {unit.symbol} (dostępne: {total_available} {unit.symbol})")
+                
+                # Dodaj do listy brakujących składników
+                missing_ingredients.append(missing_entry)
+                
+        return missing_ingredients
     
     def can_be_prepared_with_available_ingredients(self, user):
         """Sprawdza, czy przepis może być przygotowany z dostępnych składników"""

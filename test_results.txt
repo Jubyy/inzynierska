@@ -326,6 +326,22 @@ ZNALEZIONE BŁĘDY I WPROWADZONE POPRAWKI
    - WNIOSKI: Panel administratora zawiera teraz kompleksowe statystyki dotyczące wszystkich aspektów aplikacji 
 
 ===========================================================
+NOWE BŁĘDY I PROPOZYCJE USPRAWNIEŃ
+===========================================================
+
+1. Błąd sortowania przepisów po ocenie:
+   - PROBLEM: Przy sortowaniu przepisów po ocenie (rating) występuje błąd: "sqlite3.OperationalError: no such column: recipes_reciperating.parent_id"
+   - PRZYCZYNA: Model RecipeRating zawiera pole parent do obsługi odpowiedzi na oceny, ale w bazie danych brakowało tej kolumny
+   - ROZWIĄZANIE: Dodano migrację, która dodaje brakującą kolumnę parent_id do tabeli recipes_reciperating
+   - STATUS: Naprawione
+
+2. Brakujący plik obrazu domyślnego:
+   - PROBLEM: W logach aplikacji pojawiają się błędy 404 dla pliku "/static/img/default-recipe.jpg"
+   - PRZYCZYNA: W systemie brakuje domyślnego obrazu, który wyświetlany jest dla przepisów bez zdjęcia
+   - ROZWIĄZANIE: Należy utworzyć katalog static/img/ (jeśli nie istnieje) i dodać tam plik default-recipe.jpg
+   - ZALECENIE: Użyj skryptu create_default_image.py, aby wygenerować domyślny obraz przepisu
+
+===========================================================
 WERYFIKACJA KOŃCOWA
 ===========================================================
 

@@ -120,6 +120,9 @@
                onclick="return confirm('Czy na pewno chcesz usunąć wszystkie powiadomienia?')">
                 <i class="fas fa-trash"></i> Usuń wszystkie
             </a>
+            <a href="{% url 'fridge:mark_all_notifications_read' %}" class="btn btn-outline-success">
+                <i class="fas fa-check-double"></i> Oznacz wszystkie jako przeczytane
+            </a>
             {% endif %}
         </div>
     </div>

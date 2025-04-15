@@ -54,44 +54,66 @@ class FridgeItemForm(forms.ModelForm):
             if not self.fields['unit'].queryset.exists() and self.instance.ingredient.default_unit:
                 self.fields['unit'].queryset = MeasurementUnit.objects.filter(pk=self.instance.ingredient.default_unit.pk)
             
-            # Podczas edycji, zamiast blokować jednostkę jako disabled/readonly,
-            # dodajmy tylko ukryte pole, które zawsze będzie przesyłane
+            # Podczas edycji produktu, pola składnika i jednostki powinny być tylko do odczytu
+            self.fields['ingredient'].widget.attrs['readonly'] = True
+            self.fields['unit'].widget.attrs['readonly'] = True
+            
+            # Dodajemy ukryte pola, które będą przesyłać oryginalne wartości
+            self.fields['hidden_ingredient'] = forms.IntegerField(
+                initial=self.instance.ingredient.pk,
+                widget=forms.HiddenInput(),
+                required=False
+            )
+            
             self.fields['hidden_unit'] = forms.IntegerField(
                 initial=self.instance.unit.pk,
                 widget=forms.HiddenInput(),
                 required=False
             )
             
-            # Ustawmy początkową wartość pola jednostki
+            # Ustawmy początkowe wartości pól
+            self.initial['ingredient'] = self.instance.ingredient.pk
             self.initial['unit'] = self.instance.unit.pk
             
-            # Dodajmy klasę CSS, która pozwoli stylizować to pole jako "tylko do odczytu"
+            # Dodajmy klasę CSS, która pozwoli stylizować te pola jako "tylko do odczytu"
+            self.fields['ingredient'].widget.attrs['class'] += ' readonly-select'
             self.fields['unit'].widget.attrs['class'] += ' readonly-select'
-            self.fields['unit'].widget.attrs['data-original-value'] = self.instance.unit.pk
     
     def clean(self):
         cleaned_data = super().clean()
+        
+        # Jeśli edytujemy istniejący obiekt, użyj wartości z ukrytych pól
+        if self.instance and self.instance.pk:
+            # Przywróć oryginalne wartości składnika i jednostki z ukrytych pól
+            if 'hidden_ingredient' in self.fields:
+                hidden_ingredient = self.data.get('hidden_ingredient')
+                if hidden_ingredient:
+                    try:
+                        ingredient = Ingredient.objects.get(pk=hidden_ingredient)
+                        cleaned_data['ingredient'] = ingredient
+                    except Ingredient.DoesNotExist:
+                        pass
+                
+                # Awaryjnie, jeśli brak ukrytej wartości, użyj oryginalnego składnika
+                if 'ingredient' not in cleaned_data and self.instance.ingredient:
+                    cleaned_data['ingredient'] = self.instance.ingredient
+            
+            if 'hidden_unit' in self.fields:
+                hidden_unit = self.data.get('hidden_unit')
+                if hidden_unit:
+                    try:
+                        unit = MeasurementUnit.objects.get(pk=hidden_unit)
+                        cleaned_data['unit'] = unit
+                    except MeasurementUnit.DoesNotExist:
+                        pass
+                
+                # Awaryjnie, jeśli brak ukrytej wartości, użyj oryginalnej jednostki
+                if 'unit' not in cleaned_data and self.instance.unit:
+                    cleaned_data['unit'] = self.instance.unit
+        
         ingredient = cleaned_data.get('ingredient')
         unit = cleaned_data.get('unit')
         amount = cleaned_data.get('amount')
-        
-        # Jeśli edytujemy istniejący obiekt i pole jednostki jest wyłączone,
-        # użyj wartości z ukrytego pola lub bezpośrednio z instancji
-        if self.instance and self.instance.pk:
-            hidden_unit = self.data.get('hidden_unit')
-            if hidden_unit:
-                try:
-                    unit = MeasurementUnit.objects.get(pk=hidden_unit)
-                    cleaned_data['unit'] = unit
-                except (MeasurementUnit.DoesNotExist, ValueError):
-                    # Jeśli nie znaleziono jednostki z ukrytego pola, użyj jednostki z instancji
-                    if self.instance.unit:
-                        unit = self.instance.unit
-                        cleaned_data['unit'] = unit
-            elif not unit and self.instance.unit:
-                # Jeśli brak jednostki w danych, ale mamy ją w instancji
-                unit = self.instance.unit
-                cleaned_data['unit'] = unit
         
         if ingredient and amount:
             # Jeśli brakuje jednostki przy edycji, dodaj błąd

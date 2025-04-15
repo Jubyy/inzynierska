@@ -312,8 +312,6 @@ def add_to_shopping_list(request, pk):
 @login_required
 def add_missing_to_shopping_list(request, pk):
     """Dodaje brakujące składniki przepisu do listy zakupów"""
-    from fridge.models import FridgeItem
-    
     recipe = get_object_or_404(Recipe, pk=pk)
     
     # Obsługa przypadku, gdy tabela shopping_shoppinglist nie istnieje
@@ -327,73 +325,30 @@ def add_missing_to_shopping_list(request, pk):
         }
         return render(request, 'recipes/add_missing_to_shopping_list.html', context)
     
-    # Pobierz liczbę porcji z parametru URL (może pochodzić z ekranu prepare_recipe)
-    servings_param = request.GET.get('servings')
-    servings = None
-    
-    if servings_param:
-        try:
-            servings = int(servings_param)
-            if servings <= 0:
-                servings = recipe.servings
-        except (ValueError, TypeError):
-            servings = recipe.servings
-    
+    # Pobierz liczbę porcji z parametru lub formularza
+    servings = request.GET.get('servings') or request.POST.get('servings')
+    try:
+        servings = int(servings)
+    except (TypeError, ValueError):
+        servings = recipe.servings
+
     if request.method == 'POST':
-        # Pobierz lub utwórz listę zakupów
+        create_new = request.POST.get('create_new') == 'true'
         shopping_list_id = request.POST.get('shopping_list')
-        create_new = request.POST.get('create_new', 'true')
-        post_servings = request.POST.get('servings', servings_param)
         
-        print(f"DEBUG: add_missing_to_shopping_list POST - shopping_list_id: {shopping_list_id}, create_new: {create_new}, post_servings: {post_servings}")
-        
-        try:
-            if post_servings:
-                post_servings = int(post_servings)
-        except (ValueError, TypeError):
-            post_servings = None
-        
-        if shopping_list_id and create_new != 'true':
-            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
-            print(f"DEBUG: Używam istniejącej listy zakupów: ID {shopping_list.id}, nazwa: {shopping_list.name}")
-        else:
+        if create_new or not shopping_list_id:
             # Utwórz nową listę zakupów
             list_name = f"Brakujące składniki: {recipe.title}"
-            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name, recipe=recipe)
-            print(f"DEBUG: Utworzono nową listę zakupów: ID {shopping_list.id}, nazwa: {shopping_list.name}")
+            shopping_list = ShoppingList.objects.create(user=request.user, name=list_name)
+        else:
+            # Użyj istniejącej listy
+            shopping_list = get_object_or_404(ShoppingList, pk=shopping_list_id, user=request.user)
         
-        # Sprawdź bezpośrednio, czy są brakujące składniki
-        missing_ingredients = recipe.get_missing_ingredients(request.user)
-        print(f"DEBUG: Liczba brakujących składników przed wywołaniem add_missing_ingredients: {len(missing_ingredients)}")
-        for i, item in enumerate(missing_ingredients):
-            ingredient_name = item.ingredient.name if hasattr(item, 'ingredient') else item.get('ingredient', {}).name if hasattr(item.get('ingredient', {}), 'name') else 'Unknown'
-            amount = item.amount if hasattr(item, 'amount') else item.get('amount', 'Unknown')
-            unit = item.unit.name if hasattr(item, 'unit') and item.unit else (item.get('unit').name if item.get('unit') else 'Unknown')
-            print(f"DEBUG: Brakujący składnik #{i+1}: {ingredient_name}, {amount} {unit}")
+        # Dodaj brakujące składniki do listy
+        created_items = shopping_list.add_missing_ingredients(recipe, servings)
         
-        # Próbujemy najpierw standardową metodą
-        created_items = shopping_list.add_missing_ingredients(recipe, servings=post_servings or servings)
-        print(f"DEBUG: Liczba utworzonych pozycji: {len(created_items)}")
-        
-        # Sprawdź, czy lista faktycznie ma pozycje
-        list_items = shopping_list.items.all()
-        print(f"DEBUG: Lista po dodaniu ma {list_items.count()} pozycji")
-        
-        # Jeśli lista jest pusta, dodaj elementy bezpośrednio
-        if list_items.count() == 0 and missing_ingredients:
-            print("DEBUG: Lista jest pusta, dodaję składniki bezpośrednio")
-            add_items_directly(shopping_list, recipe, missing_ingredients, post_servings or servings)
-            # Sprawdź ponownie po bezpośrednim dodaniu
-            list_items = shopping_list.items.all()
-            print(f"DEBUG: Lista po bezpośrednim dodaniu ma {list_items.count()} pozycji")
-            
-        # Wyświetl dodane elementy
-        for i, item in enumerate(list_items):
-            print(f"DEBUG: Pozycja #{i+1} na liście: {item.ingredient.name}, {item.amount} {item.unit.name}")
-        
-        # Jeśli dodano elementy, pokaż komunikat sukcesu
-        if list_items.count() > 0:
-            messages.success(request, f'Dodano {list_items.count()} brakujących składników do listy zakupów.')
+        if created_items:
+            messages.success(request, f'Dodano {len(created_items)} brakujących składników do listy zakupów.')
         else:
             messages.info(request, 'Wszystkie składniki do tego przepisu są już dostępne w Twojej lodówce.')
             
@@ -405,99 +360,18 @@ def add_missing_to_shopping_list(request, pk):
     except Exception:
         shopping_lists = []
     
-    # Przygotuj brakujące składniki w zależności od liczby porcji
-    missing_ingredients = []
+    # Pobierz brakujące składniki z uwzględnieniem liczby porcji
+    missing_ingredients = recipe.get_missing_ingredients(request.user, servings)
     
-    if servings and servings != recipe.servings:
-        # Dla przeskalowanej liczby porcji
-        scaled_ingredients = recipe.scale_to_servings(servings)
-        
-        for scaled_ing in scaled_ingredients:
-            ingredient = scaled_ing['ingredient']
-            amount = scaled_ing['amount']
-            unit = scaled_ing['unit']
-            
-            if not FridgeItem.check_ingredient_availability(request.user, ingredient, amount, unit):
-                # Oblicz brakującą ilość
-                total_available = 0.0
-                fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
-                
-                for item in fridge_items:
-                    try:
-                        # Jeśli jednostki są różne, przelicz
-                        if item.unit != unit:
-                            converted = convert_units(float(item.amount), item.unit, unit)
-                            total_available += converted
-                        else:
-                            total_available += float(item.amount)
-                    except Exception:
-                        continue
-                
-                # Oblicz brakującą ilość
-                missing_amount = max(0, float(amount) - total_available)
-                
-                scaled_missing_ingredients.append({
-                    'ingredient': ingredient,
-                    'unit': unit,
-                    'required': float(amount),
-                    'available': total_available,
-                    'missing': missing_amount
-                })
-    else:
-        # Dla domyślnej liczby porcji
-        # Pobierz brakujące składniki (zwraca listę obiektów RecipeIngredient)
-        recipe_missing_ingredients = recipe.get_missing_ingredients(request.user)
-        
-        # Jeśli nie ma brakujących składników, przekaż pustą listę do szablonu
-        if not recipe_missing_ingredients:
-            context = {
-                'recipe': recipe,
-                'shopping_lists': shopping_lists,
-                'missing_ingredients': []
-            }
-            return render(request, 'recipes/add_missing_to_shopping_list.html', context)
-        
-        # Przekształć obiekty RecipeIngredient na format oczekiwany przez szablon
-        for ingredient_entry in recipe_missing_ingredients:
-            ingredient = ingredient_entry.ingredient
-            unit = ingredient_entry.unit
-            required_amount = float(ingredient_entry.amount)
-            
-            # Pobierz dostępną ilość składnika w lodówce
-            available_amount = 0
-            fridge_items = FridgeItem.objects.filter(user=request.user, ingredient=ingredient)
-            
-            for item in fridge_items:
-                try:
-                    # Jeśli jednostki są różne, przelicz
-                    if item.unit != unit:
-                        try:
-                            converted = convert_units(float(item.amount), item.unit, unit)
-                            available_amount += converted
-                        except Exception:
-                            continue
-                    else:
-                        available_amount += float(item.amount)
-                except Exception:
-                    continue
-            
-            # Oblicz brakującą ilość
-            missing_amount = max(0, required_amount - available_amount)
-            
-            # Dodaj informacje o składniku do listy
-            missing_ingredients.append({
-                'ingredient': ingredient,
-                'unit': unit,
-                'required': required_amount,
-                'available': available_amount,
-                'missing': missing_amount
-            })
+    # Dodaj logowanie, aby sprawdzić wartości brakujących składników
+    for item in missing_ingredients:
+        print(f"DEBUG: Brakujący składnik: {item.ingredient.name}, ilość: {item.amount}, dostępne: {item.available}, brakuje: {item.missing}")
     
     context = {
         'recipe': recipe,
         'shopping_lists': shopping_lists,
         'missing_ingredients': missing_ingredients,
-        'servings': servings or recipe.servings
+        'servings': servings
     }
     
     return render(request, 'recipes/add_missing_to_shopping_list.html', context)

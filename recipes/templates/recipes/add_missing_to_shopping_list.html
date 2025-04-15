@@ -46,9 +46,42 @@ python manage.py migrate</pre>
                                     {% for item in missing_ingredients %}
                                     <tr>
                                         <td>{{ item.ingredient.name }}</td>
-                                        <td>{{ item.required|floatformat:"-2" }} {{ item.unit.symbol }}</td>
-                                        <td>{{ item.available|floatformat:"-2" }} {{ item.unit.symbol }}</td>
-                                        <td><strong>{{ item.missing|floatformat:"-2" }} {{ item.unit.symbol }}</strong></td>
+                                        <td>
+                                        {% if item.amount < 0.1 %}
+                                            {{ item.amount|floatformat:"-3" }}
+                                        {% elif item.amount < 1 %}
+                                            {{ item.amount|floatformat:"-2" }}
+                                        {% elif item.amount == item.amount|floatformat:"0"|add:"0" %}
+                                            {{ item.amount|floatformat:"0" }}
+                                        {% else %}
+                                            {{ item.amount|floatformat:"-2" }}
+                                        {% endif %}
+                                        {{ item.unit.symbol }}
+                                        </td>
+                                        <td>
+                                        {% if item.available < 0.1 and item.available > 0 %}
+                                            {{ item.available|floatformat:"-3" }}
+                                        {% elif item.available < 1 %}
+                                            {{ item.available|floatformat:"-2" }}
+                                        {% elif item.available == item.available|floatformat:"0"|add:"0" %}
+                                            {{ item.available|floatformat:"0" }}
+                                        {% else %}
+                                            {{ item.available|floatformat:"-2" }}
+                                        {% endif %}
+                                        {{ item.unit.symbol }}
+                                        </td>
+                                        <td><strong>
+                                        {% if item.missing < 0.1 and item.missing > 0 %}
+                                            {{ item.missing|floatformat:"-3" }}
+                                        {% elif item.missing < 1 %}
+                                            {{ item.missing|floatformat:"-2" }}
+                                        {% elif item.missing == item.missing|floatformat:"0"|add:"0" %}
+                                            {{ item.missing|floatformat:"0" }}
+                                        {% else %}
+                                            {{ item.missing|floatformat:"-2" }}
+                                        {% endif %}
+                                        {{ item.unit.symbol }}</strong>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

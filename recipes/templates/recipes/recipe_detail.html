@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load recipe_extras %}
 
 {% block title %}{{ recipe.title }}{% endblock %}
 
@@ -296,7 +297,7 @@
                         <p class="mb-0">
                             <i class="bi bi-exclamation-triangle"></i> 
                             Brakuje {{ missing_ingredients|length }} składników do przygotowania tego dania.
-                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="alert-link">
+                            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}{% if servings %}?servings={{ servings }}{% endif %}" class="alert-link">
                                 Dodaj do listy zakupów
                             </a>
                         </p>
@@ -339,7 +340,7 @@
                     
                     <!-- Przycisk dodania do ulubionych -->
                     {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'recipes:toggle_favorite' recipe.id %}" class="d-inline ms-2">
+                        <form method="post" action="{% url 'recipes:toggle_favorite' recipe.id %}" class="d-inline ms-2" id="favorite-form">
                             {% csrf_token %}
                             <button type="submit" class="btn {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if is_favorite %}Usuń z ulubionych{% else %}Dodaj do ulubionych{% endif %}">
                                 <i class="bi bi-star{% if is_favorite %}-fill{% endif %}"></i>
@@ -594,8 +595,8 @@
                         <div class="mt-2 text-end">
                             <form method="post" action="{% url 'recipes:toggle_rating_helpful' rating.id %}" class="d-inline helpful-form">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm {% if rating.is_helpful_for user %}btn-success{% else %}btn-outline-success{% endif %}">
-                                    <i class="bi bi-hand-thumbs-up{% if rating.is_helpful_for user %}-fill{% endif %}"></i>
+                                <button type="submit" class="btn btn-sm {% if rating|is_helpful_to:user %}btn-success{% else %}btn-outline-success{% endif %}">
+                                    <i class="bi bi-hand-thumbs-up{% if rating|is_helpful_to:user %}-fill{% endif %}"></i>
                                     Przydatne
                                     <span class="helpful-count">{{ rating.helpful_count }}</span>
                                 </button>
@@ -624,7 +625,7 @@
 
         <!-- Dodatkowe przyciski akcji tylko dla zalogowanych -->
         {% if user.is_authenticated and missing_ingredients %}
-            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}" class="btn btn-primary">
+            <a href="{% url 'recipes:add_missing_to_shopping_list' recipe.pk %}{% if servings %}?servings={{ servings }}{% endif %}" class="btn btn-primary">
                 <i class="bi bi-cart-plus"></i> Dodaj brakujące do listy zakupów
             </a>
         {% endif %}
@@ -670,6 +671,63 @@
                         likeBtn.classList.add('btn-outline-primary');
                         likeIcon.classList.remove('bi-hand-thumbs-up-fill');
                         likeIcon.classList.add('bi-hand-thumbs-up');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Obsługa formularza dodawania do ulubionych przez AJAX
+        const favoriteForm = document.getElementById('favorite-form');
+        if (favoriteForm) {
+            favoriteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const url = this.action;
+                const formData = new FormData(this);
+                
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Zaktualizuj wygląd przycisku
+                    const favoriteBtn = favoriteForm.querySelector('button');
+                    const favoriteIcon = favoriteForm.querySelector('i');
+                    
+                    if (data.is_favorite) {
+                        favoriteBtn.classList.remove('btn-outline-warning');
+                        favoriteBtn.classList.add('btn-warning');
+                        favoriteIcon.classList.remove('bi-star');
+                        favoriteIcon.classList.add('bi-star-fill');
+                        favoriteBtn.title = 'Usuń z ulubionych';
+                    } else {
+                        favoriteBtn.classList.remove('btn-warning');
+                        favoriteBtn.classList.add('btn-outline-warning');
+                        favoriteIcon.classList.remove('bi-star-fill');
+                        favoriteIcon.classList.add('bi-star');
+                        favoriteBtn.title = 'Dodaj do ulubionych';
+                    }
+                    
+                    // Opcjonalnie możemy wyświetlić komunikat o sukcesie
+                    if (data.message) {
+                        const container = document.querySelector('.container');
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+                        alert.innerHTML = `
+                            ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        container.insertBefore(alert, container.firstChild);
+                        
+                        // Automatycznie ukryj alert po 3 sekundach
+                        setTimeout(() => {
+                            alert.classList.remove('show');
+                            setTimeout(() => alert.remove(), 300);
+                        }, 3000);
                     }
                 })
                 .catch(error => console.error('Error:', error));

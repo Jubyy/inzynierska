@@ -10,117 +10,112 @@ I. TESTY PODSTAWOWE
 ===========================================================
 
 1. Logowanie i rejestracja
-   [ ] Rejestracja nowego konta z poprawnymi danymi
-   [ ] Logowanie do istniejącego konta
-   [ ] Próba logowania z błędnymi danymi (walidacja)
-   [ ] Zmiana hasła i ponowne logowanie z nowym hasłem
-   [ ] Obsługa formularza "Zapomniałem hasła"
-   [ ] Wylogowanie z aplikacji
+   [X] Rejestracja nowego konta z poprawnymi danymi
+   [X] Logowanie do istniejącego konta
+   [X] Próba logowania z błędnymi danymi (walidacja)
+   [X] Zmiana hasła i ponowne logowanie z nowym hasłem
+   [X] Obsługa formularza "Zapomniałem hasła"
+   [X] Wylogowanie z aplikacji
 
 2. Nawigacja i responsywność
-   [ ] Sprawdzenie działania menu głównego na urządzeniach mobilnych (320px, 375px, 425px)
-   [ ] Sprawdzenie działania menu głównego na tabletach (768px)
-   [ ] Sprawdzenie działania menu głównego na desktopie (1024px+)
-   [ ] Poprawne wyświetlanie powiadomień systemowych
-   [ ] Przejścia między kluczowymi widokami aplikacji
-   [ ] Działanie stopki strony
+   [X] Sprawdzenie działania menu głównego na urządzeniach mobilnych (320px, 375px, 425px)
+   [X] Sprawdzenie działania menu głównego na tabletach (768px)
+   [X] Sprawdzenie działania menu głównego na desktopie (1024px+)
+   [X] Poprawne wyświetlanie powiadomień systemowych
+   [X] Przejścia między kluczowymi widokami aplikacji
+   [X] Działanie stopki strony
 
 ===========================================================
 II. TESTY MODUŁU PRZEPISÓW
 ===========================================================
 
 1. Przeglądanie przepisów
-   [ ] Wyświetlanie listy wszystkich przepisów
-   [ ] Filtrowanie przepisów według kategorii
-   [ ] Filtrowanie przepisów według składników
-   [ ] Filtrowanie przepisów według diety (wegetariańskie, wegańskie)
-   [ ] Filtrowanie przepisów według czasu przygotowania
-   [ ] Filtrowanie przepisów według poziomu trudności
-   [ ] Wyszukiwanie przepisów po nazwie/opisie
-   [ ] Sortowanie przepisów (data, popularność, oceny)
-   [ ] Działanie paginacji na liście przepisów
+   [X] Wyświetlanie listy wszystkich przepisów
+   [X] Filtrowanie przepisów według kategorii
+   [X] Filtrowanie przepisów według składników
+   [X] Filtrowanie przepisów według diety (wegetariańskie, wegańskie)
+   [X] Filtrowanie przepisów według czasu przygotowania
+   [X] Filtrowanie przepisów według poziomu trudności
+   [X] Wyszukiwanie przepisów po nazwie/opisie
+   [X] Sortowanie przepisów (data, popularność, oceny)
+   [X] Działanie paginacji na liście przepisów
 
 2. Szczegóły przepisu
-   [ ] Poprawne wyświetlanie wszystkich informacji o przepisie
-   [ ] Wyświetlanie listy składników z jednostkami
-   [ ] Wyświetlanie kroków przygotowania
-   [ ] Wyświetlanie ocen i komentarzy
-   [ ] Zmiana liczby porcji i przeliczanie składników
-   [ ] Działanie przycisku "Dodaj do ulubionych"
-   [ ] Działanie przycisku "Polub przepis"
+   [X] Poprawne wyświetlanie wszystkich informacji o przepisie
+   [X] Wyświetlanie listy składników z jednostkami
+   [X] Wyświetlanie kroków przygotowania
+   [X] Wyświetlanie ocen i komentarzy
+   [X] Zmiana liczby porcji i przeliczanie składników
+   [X] Działanie przycisku "Dodaj do ulubionych"
+   [X] Działanie przycisku "Polub przepis"
 
 3. Zarządzanie przepisami
-   [ ] Tworzenie nowego przepisu z wszystkimi danymi
-   [ ] Dodawanie składników z jednostkami miary
-   [ ] Dodawanie kroków przygotowania
-   [ ] Dodawanie zdjęć do przepisu
-   [ ] Edycja istniejącego przepisu
-   [ ] Usuwanie przepisu (z potwierdzeniem)
-   [ ] Działanie formularza przy błędnych danych
+   [X] Tworzenie nowego przepisu z wszystkimi danymi
+   [X] Dodawanie składników z jednostkami miary
+   [X] Dodawanie kroków przygotowania
+   [X] Dodawanie zdjęć do przepisu
+   [X] Edycja istniejącego przepisu
+   [X] Usuwanie przepisu (z potwierdzeniem)
+   [X] Działanie formularza przy błędnych danych
 
 4. Interakcje z przepisami
-   [ ] Ocenianie przepisu (gwiazdki 1-5)
-   [ ] Dodawanie komentarza do przepisu
-   [ ] Odpowiadanie na komentarze innych użytkowników
-   [ ] Usuwanie własnych komentarzy
-   [ ] Oznaczanie ocen jako przydatne
+   [X] Ocenianie przepisu (gwiazdki 1-5)
+   [X] Dodawanie komentarza do przepisu
+   [X] Odpowiadanie na komentarze innych użytkowników
+   [X] Usuwanie własnych komentarzy
+   [X] Oznaczanie ocen jako przydatne
 
 ===========================================================
 III. TESTY MODUŁU LODÓWKI
 ===========================================================
 
 1. Zarządzanie zawartością lodówki
-   [ ] Dodawanie nowego produktu do lodówki
-   [ ] Dodawanie produktu z datą ważności
-   [ ] Dodawanie wielu produktów jednocześnie
-   [ ] Edycja ilości produktu
-   [ ] Edycja daty ważności produktu
-   [ ] Usuwanie produktu z lodówki
-   [ ] Filtrowanie produktów w lodówce według kategorii
-   [ ] Wyszukiwanie produktów w lodówce
-   [ ] Sortowanie produktów (data ważności, nazwa)
+   [X] Dodawanie nowego produktu do lodówki
+   [X] Dodawanie produktu z datą ważności
+   [X] Dodawanie wielu produktów jednocześnie
+   [X] Edycja ilości produktu
+   [X] Edycja daty ważności produktu
+   [X] Usuwanie produktu z lodówki
+   [X] Filtrowanie produktów w lodówce według kategorii
+   [X] Wyszukiwanie produktów w lodówce
+   [X] Sortowanie produktów (data ważności, nazwa)
 
 2. Funkcje dodatkowe lodówki
-   [ ] Konsolidacja tych samych produktów
-   [ ] Eksport zawartości lodówki do pliku
-   [ ] Import zawartości lodówki z pliku
-   [ ] Wyświetlanie statystyk zawartości lodówki
+   [X] Wyświetlanie statystyk zawartości lodówki
 
 3. Powiadomienia
-   [ ] Generowanie powiadomień o przeterminowanych produktach
-   [ ] Generowanie powiadomień o produktach bliskich przeterminowania
-   [ ] Wyświetlanie liczby nieprzeczytanych powiadomień
-   [ ] Oznaczanie powiadomień jako przeczytane
-   [ ] Usuwanie powiadomień
+   [X] Generowanie powiadomień o przeterminowanych produktach
+   [X] Generowanie powiadomień o produktach bliskich przeterminowania
+   [X] Wyświetlanie liczby nieprzeczytanych powiadomień
+   [X] Oznaczanie powiadomień jako przeczytane
+   [X] Usuwanie powiadomień
 
 ===========================================================
 IV. TESTY MODUŁU LISTY ZAKUPÓW
 ===========================================================
 
 1. Zarządzanie listami zakupów
-   [ ] Tworzenie nowej listy zakupów
-   [ ] Nadawanie nazwy liście zakupów
-   [ ] Dodawanie produktów do listy ręcznie
-   [ ] Wybór jednostki miary dla produktu
-   [ ] Edycja ilości produktu na liście
-   [ ] Oznaczanie produktów jako kupione
-   [ ] Usuwanie produktów z listy
-   [ ] Usuwanie całej listy zakupów
-   [ ] Sortowanie produktów na liście
+   [X] Tworzenie nowej listy zakupów
+   [X] Nadawanie nazwy liście zakupów
+   [X] Dodawanie produktów do listy ręcznie
+   [X] Wybór jednostki miary dla produktu
+   [X] Edycja ilości produktu na liście
+   [X] Oznaczanie produktów jako kupione
+   [X] Usuwanie produktów z listy
+   [X] Usuwanie całej listy zakupów
 
 2. Funkcje dodatkowe list zakupów
-   [ ] Współdzielenie list zakupów z innymi użytkownikami
-   [ ] Eksport listy zakupów do pliku
-   [ ] Drukowanie listy zakupów
-   [ ] Oznaczanie list zakupów jako zakończone
+   [X] Eksport listy zakupów do pliku
+   [X] Drukowanie listy zakupów
+   [X] Oznaczanie list zakupów jako zakończone
 
 ===========================================================
 V. TESTY INTEGRACYJNE
 ===========================================================
 
 1. Przepis → Lista zakupów
-   [ ] Dodawanie wszystkich składników z przepisu do listy zakupów
-   [ ] Dodawanie tylko brakujących składników do listy zakupów
+   [X] Dodawanie wszystkich składników z przepisu do listy zakupów
+   [X] Dodawanie tylko brakujących składników do listy zakupów
    [ ] Sprawdzenie przeliczania ilości przy różnej liczbie porcji
    [ ] Wybór istniejącej lub utworzenie nowej listy zakupów
    [ ] Sprawdzenie obsługi różnych jednostek miary

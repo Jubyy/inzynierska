@@ -9,7 +9,7 @@ class ShoppingListForm(forms.ModelForm):
         model = ShoppingList
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa listy zakupów'})
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'name': 'Nazwa listy'
@@ -17,13 +17,19 @@ class ShoppingListForm(forms.ModelForm):
 
 class ShoppingItemForm(forms.ModelForm):
     """Formularz do dodawania i edycji pozycji na liście zakupów"""
+    # Ukryte pola do przechowywania oryginalnych wartości podczas edycji
+    hidden_ingredient = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    hidden_unit = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    
     class Meta:
         model = ShoppingItem
-        fields = ['ingredient', 'amount', 'unit', 'note']
+        fields = ['ingredient', 'amount', 'unit', 'note', 'shopping_list']
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': 0.01, 'step': 0.01}),
+            'ingredient': forms.Select(attrs={'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
             'unit': forms.Select(attrs={'class': 'form-control'}),
-            'note': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opcjonalna notatka'})
+            'note': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'shopping_list': forms.HiddenInput(),
         }
         labels = {
             'ingredient': 'Składnik',
@@ -53,15 +59,55 @@ class ShoppingItemForm(forms.ModelForm):
         # Ustaw pogrupowane opcje dla pola ingredient
         self.fields['ingredient'].choices = ingredient_choices
         
+        # Opcjonalny atrybut readonly dla składnika i jednostki podczas edycji
+        if self.instance and self.instance.pk:
+            # Jeśli edytujemy istniejący obiekt, ustawiamy tylko zmianę ilości i notatki
+            self.fields['ingredient'].widget.attrs['readonly'] = True
+            self.fields['ingredient'].widget.attrs['class'] += ' bg-light'
+            self.fields['unit'].widget.attrs['readonly'] = True
+            self.fields['unit'].widget.attrs['class'] += ' bg-light'
+            
+            # Inicjalizacja ukrytych pól z istniejących wartości
+            self.initial['hidden_ingredient'] = self.instance.ingredient_id
+            self.initial['hidden_unit'] = self.instance.unit_id
+        
     def clean(self):
         cleaned_data = super().clean()
-        amount = cleaned_data.get('amount')
-        unit = cleaned_data.get('unit')
         
-        # Sprawdź czy jednostka to sztuki (piece) i czy ilość jest liczbą całkowitą
-        if unit and unit.type == 'piece' and amount and amount != int(amount):
-            self.add_error('amount', 'Dla jednostki typu "sztuki" ilość musi być liczbą całkowitą.')
-            
+        # Jeśli to edycja istniejącego obiektu, używamy ukrytych pól
+        if self.instance and self.instance.pk:
+            try:
+                # Pobierz wartości z ukrytych pól lub z formularza
+                hidden_ingredient_id = self.data.get('hidden_ingredient') or self.initial.get('hidden_ingredient')
+                hidden_unit_id = self.data.get('hidden_unit') or self.initial.get('hidden_unit')
+                
+                if hidden_ingredient_id:
+                    # Pobieramy oryginalne wartości z bazy danych
+                    ingredient = Ingredient.objects.get(pk=hidden_ingredient_id)
+                    cleaned_data['ingredient'] = ingredient
+                else:
+                    # Fallback do oryginalnej wartości z instancji
+                    cleaned_data['ingredient'] = self.instance.ingredient
+                
+                if hidden_unit_id:
+                    unit = MeasurementUnit.objects.get(pk=hidden_unit_id)
+                    cleaned_data['unit'] = unit
+                else:
+                    # Fallback do oryginalnej wartości z instancji
+                    cleaned_data['unit'] = self.instance.unit
+                    
+            except (Ingredient.DoesNotExist, MeasurementUnit.DoesNotExist):
+                # Jeśli nie można pobrać obiektu, używamy oryginalnych wartości z instancji
+                cleaned_data['ingredient'] = self.instance.ingredient
+                cleaned_data['unit'] = self.instance.unit
+        
+        # Jeśli jednostka to sztuka, upewnij się, że ilość jest liczbą całkowitą
+        unit = cleaned_data.get('unit')
+        amount = cleaned_data.get('amount')
+        
+        if unit and unit.type == 'piece' and amount is not None:
+            cleaned_data['amount'] = round(amount)
+        
         return cleaned_data
 
 # Formset do dodawania wielu pozycji jednocześnie

@@ -46,6 +46,11 @@
                             <i class="bi bi-check-circle me-2"></i> Zakończ zakupy
                         </a></li>
                     {% endif %}
+                    {% if has_duplicates %}
+                        <li><a class="dropdown-item" href="{% url 'shopping:normalize' shopping_list.id %}">
+                            <i class="bi bi-arrows-collapse me-2"></i> Konsoliduj jednostki
+                        </a></li>
+                    {% endif %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="{% url 'shopping:delete' shopping_list.id %}">
                         <i class="bi bi-trash me-2"></i> Usuń listę

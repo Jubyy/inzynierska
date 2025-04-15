@@ -39,19 +39,6 @@
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.description.errors }}
-                                </div>
-                            {% endif %}
-                            {% if form.description.help_text %}
-                                <small class="form-text text-muted">{{ form.description.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{% url 'shopping:list' %}" class="btn btn-outline-secondary">Anuluj</a>
                             <button type="submit" class="btn btn-primary">Zapisz</button>

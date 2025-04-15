@@ -128,7 +128,11 @@
                         <div class="mb-3">
                             <label for="{{ form.ingredient.id_for_label }}" class="form-label">{{ form.ingredient.label }}</label>
                             {{ form.ingredient }}
+                            {% if form.instance.pk %}
+                            <div class="readonly-select-info">Składnik nie może być zmieniony podczas edycji</div>
+                            {% else %}
                             <div class="form-text text-muted mt-2">Wpisz nazwę składnika lub wybierz z listy</div>
+                            {% endif %}
                             {% if form.ingredient.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.ingredient.errors }}

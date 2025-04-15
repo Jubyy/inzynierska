@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Lista zakupów: {{ shopping_list.name }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{ title }}</title>
     <style>
         @page {
             size: a4 portrait;
             margin: 2cm;
         }
         body {
-            font-family: DejaVu Sans, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             color: #333;
             line-height: 1.5;
         }
         h1 {
             color: #2b5797;
             font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        h2 {
+            color: #2b5797;
+            font-size: 18px;
+            margin-top: 20px;
             margin-bottom: 10px;
         }
         .info {
@@ -26,7 +33,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
             margin-bottom: 20px;
         }
         th {
@@ -52,6 +59,9 @@
         .item-row:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .category-section {
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
@@ -60,31 +70,34 @@
     <div class="info">
         <p>Data utworzenia: {{ shopping_list.created_at|date:"d.m.Y" }}</p>
         <p>Użytkownik: {{ shopping_list.user.username }}</p>
-        <p>Data wygenerowania: {{ today|date:"d.m.Y" }}</p>
+        <p>Data wygenerowania: {% now "d.m.Y" %}</p>
     </div>
     
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 45%">Składnik</th>
-                <th style="width: 15%">Ilość</th>
-                <th style="width: 15%">Jednostka</th>
-                <th style="width: 15%">Kategoria</th>
-                <th style="width: 10%">Kupiono</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in items %}
-            <tr class="item-row {% if item.is_purchased %}purchased{% endif %}">
-                <td>{{ item.ingredient.name }}</td>
-                <td>{{ item.amount|floatformat:2 }}</td>
-                <td>{{ item.unit.name }}</td>
-                <td>{{ item.ingredient.category.name }}</td>
-                <td>{% if item.is_purchased %}✓{% endif %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% for category, products in products_by_category.items %}
+    <div class="category-section">
+        <h2>{{ category }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 45%">Składnik</th>
+                    <th style="width: 15%">Ilość</th>
+                    <th style="width: 15%">Jednostka</th>
+                    <th style="width: 10%">Kupiono</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in products %}
+                <tr class="item-row {% if item.is_purchased %}purchased{% endif %}">
+                    <td>{{ item.ingredient.name }}</td>
+                    <td>{{ item.amount|floatformat:2 }}</td>
+                    <td>{{ item.unit.name }}</td>
+                    <td>{% if item.is_purchased %}✓{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
     
     <div class="footer">
         Wygenerowano z aplikacji Książka Kucharska

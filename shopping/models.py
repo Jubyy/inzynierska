@@ -36,6 +36,95 @@ class ShoppingList(models.Model):
             return 0
         return int((self.completed_item_count / self.item_count) * 100)
     
+    def normalize_units(self):
+        """
+        Konsoliduje produkty na liście zakupów, łącząc te same składniki
+        i konwertując je do jednostek podstawowych.
+        
+        Returns:
+            int: Liczba skonsolidowanych produktów
+        """
+        from django.db.models import Count
+        from recipes.utils import convert_units
+        from recipes.models import MeasurementUnit
+        
+        # Pobierz podstawowe jednostki
+        try:
+            gram_unit = MeasurementUnit.objects.get(symbol='g')
+            ml_unit = MeasurementUnit.objects.get(symbol='ml')
+        except MeasurementUnit.DoesNotExist:
+            raise ValueError("Podstawowe jednostki (g/ml) nie istnieją w bazie danych")
+        
+        # Pobierz wszystkie składniki z listy zakupów
+        ingredients_groups = self.items.values('ingredient_id').distinct()
+        consolidated_count = 0
+        
+        # Dla każdego unikalnego składnika
+        for ing_data in ingredients_groups:
+            ingredient_id = ing_data['ingredient_id']
+            
+            # Pobierz wszystkie wpisy dla tego składnika
+            items = self.items.filter(
+                ingredient_id=ingredient_id
+            ).select_related('ingredient', 'unit')
+            
+            if not items or items.count() <= 1:
+                continue
+                
+            # Określ podstawową jednostkę dla tego składnika
+            first_item = items[0]
+            ingredient = first_item.ingredient
+            unit_type = 'weight'  # domyślnie zakładamy wagę
+            
+            if ingredient.unit_type.startswith('volume'):
+                unit_type = 'volume'
+                base_unit = ml_unit
+            else:
+                base_unit = gram_unit
+            
+            # Przygotuj się do konsolidacji zakupionych i niezakupionych osobno
+            for is_purchased in [False, True]:
+                purchase_items = items.filter(is_purchased=is_purchased)
+                
+                if purchase_items.count() <= 1:
+                    continue
+                
+                # Skonsoliduj do jednego wpisu
+                total_amount = 0
+                for item in purchase_items:
+                    try:
+                        # Konwertuj do jednostki podstawowej i dodaj
+                        if item.unit != base_unit:
+                            # Próbuj dokonać konwersji
+                            try:
+                                converted = convert_units(item.amount, item.unit, base_unit, ingredient=ingredient)
+                                total_amount += converted
+                            except Exception as e:
+                                print(f"Błąd konwersji dla {item.ingredient.name}: {str(e)}")
+                                # Jeśli konwersja się nie powiedzie, zachowaj ten element
+                                continue
+                        else:
+                            total_amount += item.amount
+                    except Exception as e:
+                        print(f"Błąd podczas konsolidacji {item.ingredient.name}: {str(e)}")
+                        continue
+                
+                # Usuń skonsolidowane elementy
+                items_to_delete = list(purchase_items)
+                first_item = items_to_delete.pop(0)  # zachowaj pierwszy element, aby zaktualizować go
+                
+                # Usuń pozostałe elementy
+                ShoppingItem.objects.filter(id__in=[item.id for item in items_to_delete]).delete()
+                
+                # Zaktualizuj pierwszy element o nową ilość i jednostkę
+                first_item.amount = total_amount
+                first_item.unit = base_unit
+                first_item.save()
+                
+                consolidated_count += len(items_to_delete)  # liczba usuniętych elementów
+        
+        return consolidated_count
+    
     def add_recipe_ingredients(self, recipe, servings=None):
         """
         Dodaje składniki z przepisu do listy zakupów.
@@ -93,7 +182,7 @@ class ShoppingList(models.Model):
             list: Lista utworzonych obiektów ShoppingItem
         """
         # Pobierz brakujące składniki z przepisu
-        missing_ingredients = recipe.get_missing_ingredients(self.user)
+        missing_ingredients = recipe.get_missing_ingredients(self.user, servings)
         print(f"DEBUG: Znaleziono {len(missing_ingredients)} brakujących składników")
         
         if not missing_ingredients:
@@ -112,7 +201,7 @@ class ShoppingList(models.Model):
         for ingredient_entry in missing_ingredients:
             # Pobierz informacje o składniku
             ingredient = ingredient_entry.ingredient
-            amount = float(ingredient_entry.amount) * scale_factor
+            amount = float(ingredient_entry.missing)  # Używamy już przeskalowanej wartości brakującej ilości
             unit = ingredient_entry.unit
             
             print(f"DEBUG: Dodaję składnik: {ingredient.name}, {amount} {unit.symbol}")

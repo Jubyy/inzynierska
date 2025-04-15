@@ -444,16 +444,32 @@
                             var defaultUnitId = data.default_unit;
                             var units = data.units;
                             
-                            // Dodaj do listy wybranych
-                            selectedIngredients[ingredientId] = {
-                                name: ingredientName,
-                                amount: 1,
-                                unitId: defaultUnitId,
-                                units: units
-                            };
+                            // Jeśli nie ma domyślnej jednostki, a są dostępne jednostki, użyj pierwszej
+                            if (!defaultUnitId && units && units.length > 0) {
+                                defaultUnitId = units[0].id;
+                            }
                             
-                            // Dodaj do widoku
-                            updateIngredientList();
+                            // Dodaj do listy wybranych tylko jeśli mamy jednostkę
+                            if (defaultUnitId) {
+                                selectedIngredients[ingredientId] = {
+                                    name: ingredientName,
+                                    amount: 1,
+                                    unitId: defaultUnitId,
+                                    units: units
+                                };
+                                
+                                // Dodaj do widoku
+                                updateIngredientList();
+                            } else {
+                                // Odznacz checkbox jeśli nie ma jednostek
+                                $('#ingredient-' + ingredientId).prop('checked', false);
+                                alert('Nie można dodać składnika "' + ingredientName + '" - brak dostępnych jednostek!');
+                            }
+                        },
+                        error: function() {
+                            // Odznacz checkbox w przypadku błędu
+                            $('#ingredient-' + ingredientId).prop('checked', false);
+                            alert('Błąd podczas pobierania jednostek dla składnika!');
                         }
                     });
                 }
@@ -605,16 +621,29 @@
                 }
                 
                 amounts.push(amount);
-                unitIds.push(ingredient.unitId);
+                
+                // Upewnij się, że unitId nie jest nullem
+                var unitId = ingredient.unitId;
+                if (!unitId && unitSelect.val()) {
+                    unitId = unitSelect.val();
+                }
+                
+                unitIds.push(unitId || '');
             }
             
             // Jeśli nie ma składników, przerwij
             if (ingredientIds.length === 0) {
+                alert('Wybierz przynajmniej jeden składnik!');
                 return false;
             }
             
             // Dodaj dane do formularza
             var $form = $(this);
+            
+            // Wyczyść istniejące pola hidden przed dodaniem nowych
+            $form.find('input[type="hidden"][name="ingredient_ids[]"]').remove();
+            $form.find('input[type="hidden"][name="amounts[]"]').remove();
+            $form.find('input[type="hidden"][name="unit_ids[]"]').remove();
             
             // Dodaj pola hidden do formularza
             for (var i = 0; i < ingredientIds.length; i++) {
@@ -623,8 +652,11 @@
                 $form.append('<input type="hidden" name="unit_ids[]" value="' + unitIds[i] + '">');
             }
             
+            // Debugging
+            console.log("Wysyłanie formularza z " + ingredientIds.length + " składnikami");
+            
             // Wyślij formularz
-            this.submit();
+            $form.unbind('submit').submit();
         });
     });
 </script>
