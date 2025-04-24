@@ -65,3 +65,13 @@ INFO 2025-04-22 23:36:23,293 basehttp 14032 24480 "GET /recipes/list/ HTTP/1.1" 
 WARNING 2025-04-22 23:36:23,332 basehttp 14032 24480 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
 WARNING 2025-04-22 23:36:23,509 basehttp 14032 10016 "GET /static/img/default-recipe.jpg HTTP/1.1" 404 1880
 INFO 2025-04-22 23:36:26,748 basehttp 14032 13820 "GET / HTTP/1.1" 200 39087
+INFO 2025-04-23 21:52:47,045 autoreload 18652 5008 Watching for file changes with StatReloader
+INFO 2025-04-23 21:52:55,142 basehttp 18652 1460 "GET / HTTP/1.1" 200 39087
+INFO 2025-04-23 21:52:55,553 basehttp 18652 9940 "GET /media/recipes/brak.jpg HTTP/1.1" 304 0
+INFO 2025-04-23 21:52:55,553 basehttp 18652 1460 "GET /media/avatars/12259_NATUR_JOG_330G_PIAT_wizualizacja_biyyy3X.png HTTP/1.1" 304 0
+INFO 2025-04-23 21:52:55,570 basehttp 18652 9940 "GET /media/recipes/brak_fEyiWFm.jpg HTTP/1.1" 304 0
+INFO 2025-04-23 21:52:55,573 basehttp 18652 1460 "GET /media/recipes/obraz_2025-04-15_225359382.png HTTP/1.1" 304 0
+INFO 2025-04-23 21:52:55,595 basehttp 18652 1460 "GET /media/recipes/obraz_2025-04-15_202626657.png HTTP/1.1" 304 0
+INFO 2025-04-23 21:52:55,605 basehttp 18652 1460 "GET /media/recipes/obraz_2025-04-15_202328813.png HTTP/1.1" 304 0
+WARNING 2025-04-23 21:52:55,993 log 18652 1460 Not Found: /favicon.ico
+WARNING 2025-04-23 21:52:55,994 basehttp 18652 1460 "GET /favicon.ico HTTP/1.1" 404 4613

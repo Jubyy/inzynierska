@@ -259,6 +259,13 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Dodaj informację czy jesteśmy w trybie debugowania
+        from django.conf import settings
+        context['is_debug'] = settings.DEBUG
+        return context
+    
     def form_valid(self, form):
         # Pobierz dane z formularza
         ingredient = form.cleaned_data['ingredient']
@@ -289,8 +296,10 @@ class FridgeItemCreateView(LoginRequiredMixin, CreateView):
                     f'Dodano {ingredient.name} w ilości {amount} {unit.symbol}'
                 )
             
-            # Zaproponuj podobne produkty lub tablicę konwersji
-            self.suggest_conversion_table(ingredient)
+            # Tylko w trybie debug sugeruj tablicę konwersji
+            from django.conf import settings
+            if settings.DEBUG:
+                self.suggest_conversion_table(ingredient)
             
             return redirect(self.success_url)
         except ValueError as e:

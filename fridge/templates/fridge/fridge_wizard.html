@@ -85,15 +85,20 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            {% if is_debug %}
             <div class="debug-info">
                 <h5>Informacja o debugowaniu</h5>
                 <p>Jeśli nie widzisz składników w formularzu, kliknij przycisk "Napraw formularz" w prawym górnym rogu.</p>
                 <p>Jeśli problemy nadal występują, otwórz konsolę przeglądarki (F12) i sprawdź błędy.</p>
             </div>
+            {% endif %}
             
             <div class="card">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Dodaj produkt do lodówki</h2>
+                    {% if is_debug %}
+                    <a href="javascript:void(0);" id="napraw-formularz" class="btn btn-warning btn-sm">Napraw formularz</a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="wizard-steps">
@@ -173,23 +178,34 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'fridge/js/fridge_wizard.js' %}"></script>
+<script src="{% static 'fridge/js/fridge_wizard.js' %}?v={% now 'U' %}"></script>
+
 <script>
-    // Przechwytywanie wszystkich błędów JavaScript
-    window.onerror = function(message, source, lineno, colno, error) {
-        console.error("Błąd JavaScript:", message);
-        console.error("Miejsce:", source, "linia:", lineno, "kolumna:", colno);
-        console.error("Obiekt błędu:", error);
-        
-        // Wyświetl informację w elemencie debug-info
-        const debugInfo = $('.debug-info');
-        debugInfo.append(`<div class="alert alert-danger mt-2">
-            <p><strong>Błąd JavaScript:</strong> ${message}</p>
-            <p><strong>Linia:</strong> ${lineno}, <strong>Kolumna:</strong> ${colno}</p>
-        </div>`);
-        
-        return false; // pozwala na domyślną obsługę błędu
-    };
+    // Inicjalizacja zmiennej trybu debugowania
+    var isDebugModeEnabled = false;
+    {% if is_debug %}
+    isDebugModeEnabled = true;
+    {% endif %}
+    
+    // Przechwytywanie wszystkich błędów JavaScript - tylko w trybie debug
+    if (isDebugModeEnabled) {
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Błąd JavaScript:", message);
+            console.error("Miejsce:", source, "linia:", lineno, "kolumna:", colno);
+            console.error("Obiekt błędu:", error);
+            
+            // Wyświetl informację w elemencie debug-info
+            const debugInfo = $('.debug-info');
+            if (debugInfo.length) {
+                debugInfo.append(`<div class="alert alert-danger mt-2">
+                    <p><strong>Błąd JavaScript:</strong> ${message}</p>
+                    <p><strong>Linia:</strong> ${lineno}, <strong>Kolumna:</strong> ${colno}</p>
+                </div>`);
+            }
+            
+            return false; // pozwala na domyślną obsługę błędu
+        };
+    }
     
     $(document).ready(function() {
         let currentStep = 1;
@@ -416,7 +432,10 @@
                     'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
                 },
                 success: function(response) {
-                    console.log("Odpowiedź:", response);
+                    if (isDebugModeEnabled) {
+                        console.log("Odpowiedź:", response);
+                    }
+                    
                     if (response.success) {
                         // Wyświetl sukces i przekieruj
                         window.location.href = response.redirect_url || "{% url 'fridge:list' %}";
@@ -428,8 +447,10 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error("Błąd AJAX:", status, error);
-                    console.error("Odpowiedź:", xhr.responseText);
+                    if (isDebugModeEnabled) {
+                        console.error("Błąd AJAX:", status, error);
+                        console.error("Odpowiedź:", xhr.responseText);
+                    }
                     
                     try {
                         const response = JSON.parse(xhr.responseText);
