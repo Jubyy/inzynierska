@@ -80,7 +80,9 @@ def create_ingredient_categories():
         {'name': 'Produkty zbożowe', 'is_vegetarian': True, 'is_vegan': True},
         {'name': 'Tłuszcze', 'is_vegetarian': True, 'is_vegan': False},
         {'name': 'Orzechy i nasiona', 'is_vegetarian': True, 'is_vegan': True},
-        {'name': 'Napoje', 'is_vegetarian': True, 'is_vegan': True}
+        {'name': 'Napoje', 'is_vegetarian': True, 'is_vegan': True},
+        {'name': 'Mąka', 'is_vegetarian': True, 'is_vegan': True},
+        {'name': 'Płyny', 'is_vegetarian': True, 'is_vegan': True}
     ]
     
     # Tworzenie kategorii
@@ -609,76 +611,244 @@ def create_conversion_tables():
     """Tworzy predefiniowane tablice konwersji dla różnych kategorii składników"""
     print("Tworzenie tablic konwersji...")
     
-    # Pobierz kategorie składników
-    flour_category = IngredientCategory.objects.get(name='Mąka')
-    liquid_category = IngredientCategory.objects.get(name='Płyny')
-    fruit_category = IngredientCategory.objects.get(name='Owoce')
+    try:
+        # Najpierw upewnijmy się, że wszystkie potrzebne kategorie istnieją
+        categories_to_check = ['Produkty zbożowe', 'Napoje', 'Owoce']
+        categories_dict = {}
+        
+        for cat_name in categories_to_check:
+            category = IngredientCategory.objects.filter(name=cat_name).first()
+            if not category:
+                print(f"Kategoria '{cat_name}' nie istnieje. Tworzymy nową kategorię.")
+                category = IngredientCategory.objects.create(
+                    name=cat_name, 
+                    is_vegetarian=True, 
+                    is_vegan=True
+                )
+            categories_dict[cat_name] = category
+        
+        # Przypisz kategorie do zmiennych
+        zbozowe_category = categories_dict['Produkty zbożowe']
+        napoje_category = categories_dict['Napoje']
+        owoce_category = categories_dict['Owoce']
+        
+        # Pobierz jednostki miary używając filter().first() zamiast get()
+        units_to_check = ['g', 'kg', 'ml', 'l', 'szt']
+        units_dict = {}
+        
+        for unit_symbol in units_to_check:
+            unit = MeasurementUnit.objects.filter(symbol=unit_symbol).first()
+            if not unit:
+                print(f"Jednostka '{unit_symbol}' nie istnieje. Tworzymy nową jednostkę.")
+                if unit_symbol == 'g':
+                    unit = MeasurementUnit.objects.create(
+                        name='Gram',
+                        symbol='g',
+                        type='weight',
+                        base_ratio=Decimal('1.0'),
+                        is_common=True
+                    )
+                elif unit_symbol == 'kg':
+                    unit = MeasurementUnit.objects.create(
+                        name='Kilogram',
+                        symbol='kg',
+                        type='weight',
+                        base_ratio=Decimal('1000.0'),
+                        is_common=True
+                    )
+                elif unit_symbol == 'ml':
+                    unit = MeasurementUnit.objects.create(
+                        name='Mililitr',
+                        symbol='ml',
+                        type='volume',
+                        base_ratio=Decimal('1.0'),
+                        is_common=True
+                    )
+                elif unit_symbol == 'l':
+                    unit = MeasurementUnit.objects.create(
+                        name='Litr',
+                        symbol='l',
+                        type='volume',
+                        base_ratio=Decimal('1000.0'),
+                        is_common=True
+                    )
+                elif unit_symbol == 'szt':
+                    unit = MeasurementUnit.objects.create(
+                        name='Sztuka',
+                        symbol='szt',
+                        type='piece',
+                        base_ratio=Decimal('1.0'),
+                        is_common=True
+                    )
+            units_dict[unit_symbol] = unit
+        
+        # Przypisz jednostki do zmiennych
+        gram = units_dict['g']
+        kilogram = units_dict['kg']
+        milliliter = units_dict['ml']
+        liter = units_dict['l']
+        piece = units_dict['szt']
+        
+        # Tablica konwersji dla zbóż
+        zboza_table = None
+        try:
+            zboza_table = ConversionTable.objects.filter(
+                name='Tablica konwersji dla produktów zbożowych'
+            ).first()
+        except Exception:
+            pass
+            
+        if not zboza_table:
+            zboza_table = ConversionTable.objects.create(
+                name='Tablica konwersji dla produktów zbożowych',
+                description='Konwersje między jednostkami dla produktów zbożowych',
+                category=zbozowe_category,
+                is_for_liquids=False,
+                is_approved=True
+            )
+            print(f"Utworzono tablicę konwersji dla produktów zbożowych")
+        
+        # Dodaj wpisy do tablicy konwersji
+        entry = None
+        try:
+            entry = ConversionTableEntry.objects.filter(
+                table=zboza_table,
+                from_unit=gram,
+                to_unit=kilogram
+            ).first()
+        except Exception:
+            pass
+            
+        if not entry:
+            entry = ConversionTableEntry.objects.create(
+                table=zboza_table,
+                from_unit=gram,
+                to_unit=kilogram,
+                ratio=Decimal('0.001'),
+                is_exact=True,
+                notes='1 gram = 0.001 kilograma'
+            )
+            print(f"Dodano wpis konwersji: g -> kg")
+        
+        # Tablica konwersji dla napojów
+        napoje_table = None
+        try:
+            napoje_table = ConversionTable.objects.filter(
+                name='Tablica konwersji dla napojów'
+            ).first()
+        except Exception:
+            pass
+            
+        if not napoje_table:
+            napoje_table = ConversionTable.objects.create(
+                name='Tablica konwersji dla napojów',
+                description='Konwersje między jednostkami dla napojów',
+                category=napoje_category,
+                is_for_liquids=True,
+                is_approved=True
+            )
+            print(f"Utworzono tablicę konwersji dla napojów")
+        
+        # Dodaj wpisy do tablicy konwersji
+        entry = None
+        try:
+            entry = ConversionTableEntry.objects.filter(
+                table=napoje_table,
+                from_unit=milliliter,
+                to_unit=liter
+            ).first()
+        except Exception:
+            pass
+            
+        if not entry:
+            entry = ConversionTableEntry.objects.create(
+                table=napoje_table,
+                from_unit=milliliter,
+                to_unit=liter,
+                ratio=Decimal('0.001'),
+                is_exact=True,
+                notes='1 mililitr = 0.001 litra'
+            )
+            print(f"Dodano wpis konwersji: ml -> l")
+        
+        # Tablica konwersji dla owoców
+        owoce_table = None
+        try:
+            owoce_table = ConversionTable.objects.filter(
+                name='Tablica konwersji dla owoców'
+            ).first()
+        except Exception:
+            pass
+            
+        if not owoce_table:
+            owoce_table = ConversionTable.objects.create(
+                name='Tablica konwersji dla owoców',
+                description='Konwersje między jednostkami dla owoców',
+                category=owoce_category,
+                is_for_liquids=False,
+                is_approved=True
+            )
+            print(f"Utworzono tablicę konwersji dla owoców")
+        
+        # Dodaj wpisy do tablicy konwersji
+        entry = None
+        try:
+            entry = ConversionTableEntry.objects.filter(
+                table=owoce_table,
+                from_unit=piece,
+                to_unit=gram
+            ).first()
+        except Exception:
+            pass
+            
+        if not entry:
+            entry = ConversionTableEntry.objects.create(
+                table=owoce_table,
+                from_unit=piece,
+                to_unit=gram,
+                ratio=Decimal('100'),
+                is_exact=False,
+                notes='1 sztuka = około 100 gramów'
+            )
+            print(f"Dodano wpis konwersji: szt -> g")
+        
+        print("Zakończono tworzenie tablic konwersji!")
+    except Exception as e:
+        print(f"Błąd podczas tworzenia tablic konwersji: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
+def check_ingredients(ingredients):
+    """Sprawdza poprawność dodawanych składników"""
+    print("Sprawdzanie poprawności składników...")
     
-    # Pobierz jednostki miary
-    gram = MeasurementUnit.objects.get(symbol='g')
-    kilogram = MeasurementUnit.objects.get(symbol='kg')
-    milliliter = MeasurementUnit.objects.get(symbol='ml')
-    liter = MeasurementUnit.objects.get(symbol='l')
-    piece = MeasurementUnit.objects.get(symbol='szt')
+    for ingredient in ingredients.values():
+        # Sprawdź, czy składnik ma przypisaną kategorię
+        if not ingredient.category:
+            print(f"Błąd: Składnik {ingredient.name} nie ma przypisanej kategorii!")
+            continue
+        
+        # Sprawdź, czy składnik ma przypisaną jednostkę domyślną
+        if not ingredient.default_unit:
+            print(f"Błąd: Składnik {ingredient.name} nie ma przypisanej jednostki domyślnej!")
+            continue
+        
+        # Sprawdź, czy składnik ma przypisane kompatybilne jednostki
+        if not ingredient.compatible_units.exists():
+            print(f"Błąd: Składnik {ingredient.name} nie ma przypisanych kompatybilnych jednostek!")
+            continue
+        
+        # Sprawdź, czy wartość piece_weight jest poprawna
+        if ingredient.unit_type in ['weight_piece', 'piece_only'] and not ingredient.piece_weight:
+            print(f"Błąd: Składnik {ingredient.name} nie ma przypisanej wartości piece_weight!")
+            continue
+        
+        # Sprawdź, czy wartość density jest poprawna
+        if ingredient.unit_type in ['weight_volume', 'volume_only'] and not ingredient.density:
+            print(f"Błąd: Składnik {ingredient.name} nie ma przypisanej wartości density!")
+            continue
     
-    # Tablica konwersji dla mąki
-    flour_table = ConversionTable.objects.create(
-        name='Tablica konwersji dla mąki',
-        description='Konwersje między jednostkami dla mąki',
-        category=flour_category,
-        is_for_liquids=False,
-        is_approved=True
-    )
-    
-    # Dodaj wpisy do tablicy konwersji dla mąki
-    ConversionTableEntry.objects.create(
-        table=flour_table,
-        from_unit=gram,
-        to_unit=kilogram,
-        ratio=Decimal('0.001'),
-        is_exact=True,
-        notes='1 gram = 0.001 kilograma'
-    )
-    
-    # Tablica konwersji dla płynów
-    liquid_table = ConversionTable.objects.create(
-        name='Tablica konwersji dla płynów',
-        description='Konwersje między jednostkami dla płynów',
-        category=liquid_category,
-        is_for_liquids=True,
-        is_approved=True
-    )
-    
-    # Dodaj wpisy do tablicy konwersji dla płynów
-    ConversionTableEntry.objects.create(
-        table=liquid_table,
-        from_unit=milliliter,
-        to_unit=liter,
-        ratio=Decimal('0.001'),
-        is_exact=True,
-        notes='1 mililitr = 0.001 litra'
-    )
-    
-    # Tablica konwersji dla owoców
-    fruit_table = ConversionTable.objects.create(
-        name='Tablica konwersji dla owoców',
-        description='Konwersje między jednostkami dla owoców',
-        category=fruit_category,
-        is_for_liquids=False,
-        is_approved=True
-    )
-    
-    # Dodaj wpisy do tablicy konwersji dla owoców
-    ConversionTableEntry.objects.create(
-        table=fruit_table,
-        from_unit=piece,
-        to_unit=gram,
-        ratio=Decimal('100'),
-        is_exact=False,
-        notes='1 sztuka = około 100 gramów'
-    )
-    
-    print("Utworzono tablice konwersji!")
+    print("Zakończono sprawdzanie poprawności składników!")
 
 def seed_database():
     """Główna funkcja do wypełniania bazy danych przykładowymi danymi"""
@@ -687,7 +857,15 @@ def seed_database():
     # Tworzenie podstawowych danych
     units = create_measurement_units()
     ingredient_categories = create_ingredient_categories()
+    
+    # Tworzenie tablic konwersji (musi być po utworzeniu kategorii)
+    create_conversion_tables()
+    
     ingredients = create_ingredients(ingredient_categories, units)
+    
+    # Sprawdź poprawność składników
+    check_ingredients(ingredients)
+    
     recipe_categories = create_recipe_categories()
     users = create_users()
     
@@ -695,9 +873,6 @@ def seed_database():
     recipes = create_recipes(users, recipe_categories, ingredients, units)
     add_items_to_fridge(users, ingredients, units)
     create_shopping_lists(users, ingredients, units)
-    
-    # Tworzenie tablic konwersji
-    create_conversion_tables()
     
     print("Zakończono dodawanie przykładowych danych!")
     
