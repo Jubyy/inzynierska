@@ -31,15 +31,6 @@ from fridge.models import FridgeItem
 
 logger = logging.getLogger(__name__)
 
-# Próbujemy zaimportować WeasyPrint, ale obsługujemy przypadek, gdy nie jest dostępny
-try:
-    from weasyprint import HTML, CSS
-    from weasyprint.fonts import FontConfiguration
-    WEASYPRINT_AVAILABLE = True
-except ImportError:
-    WEASYPRINT_AVAILABLE = False
-    logger.warning("WeasyPrint nie jest dostępny. Funkcja generowania PDF będzie ograniczona.")
-
 class ShoppingListListView(LoginRequiredMixin, ListView):
     """Lista wszystkich list zakupów użytkownika"""
     model = ShoppingList
@@ -657,11 +648,6 @@ def export_list_to_pdf(request, pk):
     """Export shopping list to PDF przy uzyciu reportlab."""
     logger.info(f"Eksportowanie listy zakupow o id {pk} do PDF")
     
-    # Sprawdź, czy WeasyPrint jest dostępny
-    if not 'reportlab' in globals():
-        messages.warning(request, "Generowanie PDF jest niedostępne. Brak wymaganych bibliotek.")
-        return redirect('shopping:detail', pk=pk)
-    
     try:
         # Pobierz liste zakupow
         shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
@@ -685,7 +671,6 @@ def export_list_to_pdf(request, pk):
         filename = f"lista_zakupow_{slugify(shopping_list.name)}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         
-        # Sprawdź dostępność bibliotek
         try:
             # Utworz PDF uzywajac reportlab
             from reportlab.lib.pagesizes import A4
@@ -820,24 +805,9 @@ def export_list_to_pdf(request, pk):
             
             return response
         except ImportError:
-            # Jeśli ReportLab nie jest dostępny, spróbuj użyć alternatywnych bibliotek
-            if WEASYPRINT_AVAILABLE:
-                # Kod generowania PDF za pomocą WeasyPrint
-                html_string = render_to_string(
-                    'shopping/shopping_list_pdf.html',
-                    {'shopping_list': shopping_list, 'products_by_category': products_by_category}
-                )
-                
-                html = HTML(string=html_string)
-                main_doc = html.render()
-                
-                # Zapisz PDF do odpowiedzi HTTP
-                main_doc.write_pdf(response)
-                return response
-            else:
-                # Jeśli żadna biblioteka nie jest dostępna, wyświetl komunikat
-                messages.warning(request, "Generowanie PDF jest niedostępne. Brak wymaganych bibliotek.")
-                return redirect('shopping:detail', pk=pk)
+            # Jeśli ReportLab nie jest dostępny, wyświetl komunikat
+            messages.warning(request, "Generowanie PDF jest niedostępne. Brak wymaganych bibliotek.")
+            return redirect('shopping:detail', pk=pk)
             
     except Exception as e:
         logger.exception(f"Blad podczas generowania PDF: {str(e)}")

@@ -7,7 +7,7 @@ whitenoise>=6.6.0           # Serwowanie plików statycznych
 # Raporty i dokumenty
 reportlab>=4.0.4            # Generowanie dokumentów PDF
 xhtml2pdf>=0.2.16           # Konwersja HTML do PDF
-weasyprint>=60.1            # Zaawansowane generowanie PDF
+# weasyprint>=60.1 - Usunięto ze względu na problemy z kompatybilnością z systemem Windows
 
 # Formularze i interfejs użytkownika
 django-crispy-forms>=2.1    # Ulepszone formularze
