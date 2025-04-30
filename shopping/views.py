@@ -31,12 +31,14 @@ from fridge.models import FridgeItem
 
 logger = logging.getLogger(__name__)
 
+# Próbujemy zaimportować WeasyPrint, ale obsługujemy przypadek, gdy nie jest dostępny
 try:
     from weasyprint import HTML, CSS
     from weasyprint.fonts import FontConfiguration
     WEASYPRINT_AVAILABLE = True
 except ImportError:
     WEASYPRINT_AVAILABLE = False
+    logger.warning("WeasyPrint nie jest dostępny. Funkcja generowania PDF będzie ograniczona.")
 
 class ShoppingListListView(LoginRequiredMixin, ListView):
     """Lista wszystkich list zakupów użytkownika"""
@@ -654,6 +656,12 @@ def ajax_load_units(request):
 def export_list_to_pdf(request, pk):
     """Export shopping list to PDF przy uzyciu reportlab."""
     logger.info(f"Eksportowanie listy zakupow o id {pk} do PDF")
+    
+    # Sprawdź, czy WeasyPrint jest dostępny
+    if not 'reportlab' in globals():
+        messages.warning(request, "Generowanie PDF jest niedostępne. Brak wymaganych bibliotek.")
+        return redirect('shopping:detail', pk=pk)
+    
     try:
         # Pobierz liste zakupow
         shopping_list = get_object_or_404(ShoppingList, pk=pk, user=request.user)
@@ -677,142 +685,164 @@ def export_list_to_pdf(request, pk):
         filename = f"lista_zakupow_{slugify(shopping_list.name)}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         
-        # Utworz PDF uzywajac reportlab
-        from reportlab.lib.pagesizes import A4
-        from reportlab.lib import colors
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.pdfbase import pdfmetrics
-        from reportlab.pdfbase.ttfonts import TTFont
-        from reportlab.lib.enums import TA_CENTER, TA_LEFT
-        
-        # Zarejestruj podstawowa czcionke z obsluga polskich znakow
-        # Uzywamy Helvetica jako podstawowej czcionki, ktora jest wbudowana w ReportLab
-        helvetica_font = 'Helvetica'
-        helvetica_bold_font = 'Helvetica-Bold'
-        
-        # Utworz dokument PDF
-        pdf = SimpleDocTemplate(
-            response,
-            pagesize=A4,
-            title=f"Lista zakupow: {shopping_list.name}",
-            author=request.user.username,
-            encoding='utf-8'
-        )
-        
-        # Przygotuj style
-        styles = getSampleStyleSheet()
-        styles.add(ParagraphStyle(
-            name='ListTitle',
-            parent=styles['Heading1'],
-            fontName=helvetica_bold_font,
-            fontSize=16,
-            alignment=TA_CENTER,
-            spaceAfter=12
-        ))
-        styles.add(ParagraphStyle(
-            name='CategoryHeading',
-            parent=styles['Heading2'],
-            fontName=helvetica_bold_font,
-            fontSize=14,
-            spaceBefore=12,
-            spaceAfter=6
-        ))
-        styles.add(ParagraphStyle(
-            name='Info',
-            parent=styles['Normal'],
-            fontName=helvetica_font,
-            fontSize=9,
-            textColor=colors.gray
-        ))
-        
-        # Przygotuj elementy dokumentu
-        elements = []
-        
-        # Naglowek dokumentu
-        elements.append(Paragraph(f"Lista zakupow: {shopping_list.name}", styles['ListTitle']))
-        
-        # Informacje o liscie
-        elements.append(Paragraph(f"Data utworzenia: {shopping_list.created_at.strftime('%d.%m.%Y')}", styles['Info']))
-        elements.append(Paragraph(f"Uzytkownik: {shopping_list.user.username}", styles['Info']))
-        elements.append(Paragraph(f"Data wygenerowania: {timezone.now().strftime('%d.%m.%Y')}", styles['Info']))
-        elements.append(Spacer(1, 12))
-        
-        # Dodaj listy produktow wedlug kategorii
-        for category, products in products_by_category.items():
-            # Naglowek kategorii
-            elements.append(Paragraph(category, styles['CategoryHeading']))
+        # Sprawdź dostępność bibliotek
+        try:
+            # Utworz PDF uzywajac reportlab
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.pdfbase import pdfmetrics
+            from reportlab.pdfbase.ttfonts import TTFont
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT
             
-            # Tabela z produktami
-            data = [['Skladnik', 'Ilosc', 'Jednostka', 'Kupiono']]
+            # Zarejestruj podstawowa czcionke z obsluga polskich znakow
+            # Uzywamy Helvetica jako podstawowej czcionki, ktora jest wbudowana w ReportLab
+            helvetica_font = 'Helvetica'
+            helvetica_bold_font = 'Helvetica-Bold'
             
-            for item in products:
-                data.append([
-                    item.ingredient.name,
-                    f"{item.amount:.2f}".rstrip('0').rstrip('.') if item.amount % 1 == 0 else f"{item.amount:.2f}",
-                    item.unit.name,
-                    '✓' if item.is_purchased else ''
+            # Utworz dokument PDF
+            pdf = SimpleDocTemplate(
+                response,
+                pagesize=A4,
+                title=f"Lista zakupow: {shopping_list.name}",
+                author=request.user.username,
+                encoding='utf-8'
+            )
+            
+            # Przygotuj style
+            styles = getSampleStyleSheet()
+            styles.add(ParagraphStyle(
+                name='ListTitle',
+                parent=styles['Heading1'],
+                fontName=helvetica_bold_font,
+                fontSize=16,
+                alignment=TA_CENTER,
+                spaceAfter=12
+            ))
+            styles.add(ParagraphStyle(
+                name='CategoryHeading',
+                parent=styles['Heading2'],
+                fontName=helvetica_bold_font,
+                fontSize=14,
+                spaceBefore=12,
+                spaceAfter=6
+            ))
+            styles.add(ParagraphStyle(
+                name='Info',
+                parent=styles['Normal'],
+                fontName=helvetica_font,
+                fontSize=9,
+                textColor=colors.gray
+            ))
+            
+            # Przygotuj elementy dokumentu
+            elements = []
+            
+            # Naglowek dokumentu
+            elements.append(Paragraph(f"Lista zakupow: {shopping_list.name}", styles['ListTitle']))
+            
+            # Informacje o liscie
+            elements.append(Paragraph(f"Data utworzenia: {shopping_list.created_at.strftime('%d.%m.%Y')}", styles['Info']))
+            elements.append(Paragraph(f"Uzytkownik: {shopping_list.user.username}", styles['Info']))
+            elements.append(Paragraph(f"Data wygenerowania: {timezone.now().strftime('%d.%m.%Y')}", styles['Info']))
+            elements.append(Spacer(1, 12))
+            
+            # Dodaj listy produktow wedlug kategorii
+            for category, products in products_by_category.items():
+                # Naglowek kategorii
+                elements.append(Paragraph(category, styles['CategoryHeading']))
+                
+                # Tabela z produktami
+                data = [['Skladnik', 'Ilosc', 'Jednostka', 'Kupiono']]
+                
+                for item in products:
+                    data.append([
+                        item.ingredient.name,
+                        f"{item.amount:.2f}".rstrip('0').rstrip('.') if item.amount % 1 == 0 else f"{item.amount:.2f}",
+                        item.unit.name,
+                        '✓' if item.is_purchased else ''
+                    ])
+                
+                # Szerokosci kolumn
+                col_widths = [250, 70, 90, 40]
+                
+                # Utworz tabele
+                table = Table(data, colWidths=col_widths)
+                
+                # Style tabeli
+                table_style = TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                    ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), helvetica_bold_font),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('FONTNAME', (0, 1), (-1, -1), helvetica_font),
+                    ('FONTSIZE', (0, 1), (-1, -1), 9),
+                    ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                    ('TOPPADDING', (0, 1), (-1, -1), 6),
                 ])
+                
+                # Dodaj alternatywne kolory wierszy
+                for i in range(1, len(data), 2):
+                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.whitesmoke)
+                
+                # Zaznacz kupione produkty
+                for i, item in enumerate(products, 1):
+                    if item.is_purchased:
+                        table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgreen)
+                
+                # Zastosuj style do tabeli
+                table.setStyle(table_style)
+                
+                # Dodaj tabele do elementow
+                elements.append(table)
+                elements.append(Spacer(1, 10))
             
-            # Szerokosci kolumn
-            col_widths = [250, 70, 90, 40]
+            # Dodaj stopke
+            footer_style = ParagraphStyle(
+                name='Footer',
+                parent=styles['Normal'],
+                fontName=helvetica_font,
+                fontSize=8,
+                textColor=colors.gray,
+                alignment=TA_CENTER
+            )
+            elements.append(Spacer(1, 20))
+            elements.append(Paragraph('Wygenerowano z aplikacji Ksiazka Kucharska', footer_style))
             
-            # Utworz tabele
-            table = Table(data, colWidths=col_widths)
+            # Wygeneruj PDF
+            pdf.build(elements)
             
-            # Style tabeli
-            table_style = TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), helvetica_bold_font),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('FONTNAME', (0, 1), (-1, -1), helvetica_font),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-                ('TOPPADDING', (0, 1), (-1, -1), 6),
-            ])
+            return response
+        except ImportError:
+            # Jeśli ReportLab nie jest dostępny, spróbuj użyć alternatywnych bibliotek
+            if WEASYPRINT_AVAILABLE:
+                # Kod generowania PDF za pomocą WeasyPrint
+                html_string = render_to_string(
+                    'shopping/shopping_list_pdf.html',
+                    {'shopping_list': shopping_list, 'products_by_category': products_by_category}
+                )
+                
+                html = HTML(string=html_string)
+                main_doc = html.render()
+                
+                # Zapisz PDF do odpowiedzi HTTP
+                main_doc.write_pdf(response)
+                return response
+            else:
+                # Jeśli żadna biblioteka nie jest dostępna, wyświetl komunikat
+                messages.warning(request, "Generowanie PDF jest niedostępne. Brak wymaganych bibliotek.")
+                return redirect('shopping:detail', pk=pk)
             
-            # Dodaj alternatywne kolory wierszy
-            for i in range(1, len(data), 2):
-                table_style.add('BACKGROUND', (0, i), (-1, i), colors.whitesmoke)
-            
-            # Zaznacz kupione produkty
-            for i, item in enumerate(products, 1):
-                if item.is_purchased:
-                    table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgreen)
-            
-            # Zastosuj style do tabeli
-            table.setStyle(table_style)
-            
-            # Dodaj tabele do elementow
-            elements.append(table)
-            elements.append(Spacer(1, 10))
-        
-        # Dodaj stopke
-        footer_style = ParagraphStyle(
-            name='Footer',
-            parent=styles['Normal'],
-            fontName=helvetica_font,
-            fontSize=8,
-            textColor=colors.gray,
-            alignment=TA_CENTER
-        )
-        elements.append(Spacer(1, 20))
-        elements.append(Paragraph('Wygenerowano z aplikacji Ksiazka Kucharska', footer_style))
-        
-        # Wygeneruj PDF
-        pdf.build(elements)
-        
-        return response
-        
     except Exception as e:
         logger.exception(f"Blad podczas generowania PDF: {str(e)}")
-        return HttpResponse(f'Wystapil blad podczas generowania PDF: {str(e)}', status=500)
+        messages.error(request, f'Wystąpił błąd podczas generowania PDF: {str(e)}')
+        return redirect('shopping:detail', pk=pk)
 
 @login_required
 def normalize_shopping_list(request, pk):
