@@ -139,7 +139,7 @@
                     {% endif %}
                 </div>
                 
-                <p class="lead">{{ recipe.description }}</p>
+                <p class="lead">{{ recipe.description|safe }}</p>
                 
                 <div class="recipe-stats">
                     <div class="recipe-stat-item">
@@ -313,7 +313,7 @@
             <h2 class="h5 mb-0">Sposób przygotowania</h2>
         </div>
         <div class="card-body">
-            <div class="instructions">{{ recipe.instructions }}</div>
+            <div class="instructions">{{ recipe.instructions|safe }}</div>
         </div>
     </div>
 
@@ -350,8 +350,8 @@
                 </div>
                 
                 <div>
-                    <!-- Przyciski edycji i usunięcia - tylko dla autora -->
-                    {% if recipe.author == user %}
+                    <!-- Przyciski edycji i usunięcia - tylko dla autora i administratorów -->
+                    {% if recipe.author == user or user.is_staff %}
                         <a href="{% url 'recipes:update' recipe.id %}" class="btn btn-outline-secondary">
                             <i class="bi bi-pencil"></i> Edytuj
                         </a>
@@ -414,12 +414,17 @@
                                         </button>
                                     </div>
                                     {% if comment.user == user or user.is_staff %}
-                                        <form method="post" action="{% url 'recipes:delete_comment' comment.id %}" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Czy na pewno chcesz usunąć ten komentarz?')">
-                                                <i class="bi bi-trash"></i> Usuń
-                                            </button>
-                                        </form>
+                                        <div>
+                                            <a href="{% url 'recipes:edit_comment' comment.id %}" class="btn btn-sm btn-link text-primary p-0 me-2">
+                                                <i class="bi bi-pencil"></i> Edytuj
+                                            </a>
+                                            <form method="post" action="{% url 'recipes:delete_comment' comment.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Czy na pewno chcesz usunąć ten komentarz?')">
+                                                    <i class="bi bi-trash"></i> Usuń
+                                                </button>
+                                            </form>
+                                        </div>
                                     {% endif %}
                                 </div>
                                 
@@ -462,6 +467,9 @@
                                                         
                                                         {% if reply.user == user or user.is_staff %}
                                                             <div class="d-flex justify-content-end">
+                                                                <a href="{% url 'recipes:edit_comment' reply.id %}" class="btn btn-sm btn-link text-primary p-0 me-2">
+                                                                    <i class="bi bi-pencil"></i> Edytuj
+                                                                </a>
                                                                 <form method="post" action="{% url 'recipes:delete_comment' reply.id %}">
                                                                     {% csrf_token %}
                                                                     <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Czy na pewno chcesz usunąć tę odpowiedź?')">
@@ -582,7 +590,20 @@
                                 {% endfor %}
                             </span>
                         </div>
-                        <small class="text-muted">{{ rating.created_at|date:"d.m.Y" }}</small>
+                        <div class="d-flex">
+                            {% if rating.user == user or user.is_staff %}
+                                <a href="{% url 'recipes:edit_rating' rating.id %}" class="btn btn-sm btn-link text-primary me-2">
+                                    <i class="bi bi-pencil"></i> Edytuj
+                                </a>
+                                <form method="post" action="{% url 'recipes:delete_rating' rating.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-link text-danger" onclick="return confirm('Czy na pewno chcesz usunąć tę ocenę?')">
+                                        <i class="bi bi-trash"></i> Usuń
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <small class="text-muted ms-2">{{ rating.created_at|date:"d.m.Y" }}</small>
+                        </div>
                     </div>
                     {% if rating.comment %}
                     <div class="rating-comment">

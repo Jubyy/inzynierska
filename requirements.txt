@@ -1,17 +1,38 @@
-Django>=4.2.0
-Pillow>=9.5.0
-reportlab>=4.0.4
-django-select2>=8.1.2
-requests>=2.31.0
-xhtml2pdf>=0.2.16
-markdown>=3.5.1
-python-dateutil>=2.8.2
-weasyprint>=60.1
-django-environ>=0.11.2
-django-crispy-forms>=2.1
-crispy-bootstrap4>=2023.1
-django-debug-toolbar>=4.2.0
-django-widget-tweaks>=1.5.0
-PyMySQL>=1.1.0
-mysqlclient>=2.2.0
-whitenoise>=6.6.0 
+# Backend - główne frameworki
+Django>=4.2.0               # Framework webowy
+Pillow>=9.5.0               # Obsługa obrazów 
+django-environ>=0.11.2      # Zarządzanie zmiennymi środowiskowymi
+whitenoise>=6.6.0           # Serwowanie plików statycznych
+
+# Raporty i dokumenty
+reportlab>=4.0.4            # Generowanie dokumentów PDF
+xhtml2pdf>=0.2.16           # Konwersja HTML do PDF
+weasyprint>=60.1            # Zaawansowane generowanie PDF
+
+# Formularze i interfejs użytkownika
+django-crispy-forms>=2.1    # Ulepszone formularze
+crispy-bootstrap4>=2023.1   # Integracja crispy-forms z Bootstrap 4
+django-select2>=8.1.2       # Zaawansowane pola wyboru
+django-widget-tweaks>=1.5.0 # Modyfikacje widżetów formularzy
+
+# Markdown
+markdown>=3.5.1             # Obsługa markdown w opisach
+
+# Narzędzia deweloperskie
+django-debug-toolbar>=4.2.0 # Narzędzie debugowania
+
+# Bazy danych
+PyMySQL>=1.1.0              # Adapter do MySQL
+mysqlclient>=2.2.0          # Natywny klient MySQL
+
+# Narzędzia pomocnicze
+python-dateutil>=2.8.2      # Zaawansowane operacje na datach
+requests>=2.31.0            # Zapytania HTTP
+
+# Dodatkowo, frontend (nie wymagają instalacji w Pythonie, ale są używane w projekcie):
+# - Bootstrap 5.2.3
+# - jQuery 3.6.0
+# - Select2 4.1.0-rc.0
+# - Bootstrap Icons 1.9.1
+# - Font Awesome 6.0.0
+# - Swiper 8.x (galeria slajdów) 

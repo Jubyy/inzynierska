@@ -828,7 +828,7 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
     def test_func(self):
         recipe = self.get_object()
-        return recipe.author == self.request.user
+        return recipe.author == self.request.user or self.request.user.is_staff
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -926,7 +926,7 @@ class RecipeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def test_func(self):
         recipe = self.get_object()
-        return self.request.user == recipe.author
+        return self.request.user == recipe.author or self.request.user.is_staff
     
     def delete(self, request, *args, **kwargs):
         recipe = self.get_object()
@@ -2398,3 +2398,68 @@ def admin_import_export(request):
         'unread_notifications_count': unread_notifications_count(request),
     }
     return render(request, 'recipes/admin/import_export.html', context)
+
+@login_required
+def edit_comment(request, pk):
+    """Edytuje komentarz"""
+    comment = get_object_or_404(Comment, pk=pk)
+    
+    # Sprawdź, czy użytkownik ma uprawnienia do edycji komentarza
+    if comment.user != request.user and not request.user.is_staff:
+        messages.error(request, "Nie masz uprawnień do edycji tego komentarza.")
+        return HttpResponseRedirect(comment.recipe.get_absolute_url())
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Komentarz został zaktualizowany.")
+            return HttpResponseRedirect(comment.recipe.get_absolute_url())
+    else:
+        form = CommentForm(instance=comment)
+    
+    return render(request, 'recipes/edit_comment.html', {
+        'form': form,
+        'comment': comment
+    })
+
+@login_required
+@require_POST
+def delete_rating(request, pk):
+    """Usuwa ocenę"""
+    rating = get_object_or_404(RecipeRating, pk=pk)
+    
+    # Sprawdź, czy użytkownik ma uprawnienia do usunięcia oceny
+    if rating.user != request.user and not request.user.is_staff:
+        messages.error(request, "Nie masz uprawnień do usunięcia tej oceny.")
+        return HttpResponseRedirect(rating.recipe.get_absolute_url())
+    
+    recipe_url = rating.recipe.get_absolute_url()
+    rating.delete()
+    
+    messages.success(request, "Ocena została usunięta.")
+    return HttpResponseRedirect(recipe_url)
+
+@login_required
+def edit_rating(request, pk):
+    """Edytuje ocenę"""
+    rating = get_object_or_404(RecipeRating, pk=pk)
+    
+    # Sprawdź, czy użytkownik ma uprawnienia do edycji oceny
+    if rating.user != request.user and not request.user.is_staff:
+        messages.error(request, "Nie masz uprawnień do edycji tej oceny.")
+        return HttpResponseRedirect(rating.recipe.get_absolute_url())
+    
+    if request.method == 'POST':
+        form = RecipeRatingForm(request.POST, instance=rating)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Ocena została zaktualizowana.")
+            return HttpResponseRedirect(rating.recipe.get_absolute_url())
+    else:
+        form = RecipeRatingForm(instance=rating)
+    
+    return render(request, 'recipes/edit_rating.html', {
+        'form': form,
+        'rating': rating
+    })

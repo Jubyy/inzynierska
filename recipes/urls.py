@@ -22,6 +22,7 @@ urlpatterns = [
     
     # Komentarze
     path('delete-comment/<int:pk>/', views.delete_comment, name='delete_comment'),
+    path('edit-comment/<int:pk>/', views.edit_comment, name='edit_comment'),
     
     # Widoki AJAX
     path('api/ingredient-search/', views.ajax_ingredient_search, name='ajax_ingredient_search'),
@@ -68,4 +69,6 @@ urlpatterns = [
     
     # Oceny
     path('rating/<int:pk>/toggle-helpful/', views.toggle_rating_helpful, name='toggle_rating_helpful'),
+    path('rating/<int:pk>/edit/', views.edit_rating, name='edit_rating'),
+    path('rating/<int:pk>/delete/', views.delete_rating, name='delete_rating'),
 ]

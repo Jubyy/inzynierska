@@ -1,5 +1,82 @@
+# Wirtualne środowisko
 venv/
+.env
+.venv
+env/
+ENV/
+
+# Cache Pythona
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+.coverage
+.pytest_cache/
+.coverage.*
+coverage/
+htmlcov/
+
+# Pliki bazy danych
 db.sqlite3
+*.sqlite3
+*.db
+
+# Pliki logów
+*.log
+debug.log
+logs/
+
+# Pliki mediów (wgrane przez użytkowników)
+media/
+media/recipes/
+media/profiles/
+media/test_images/
+
+# Pliki statyczne skompilowane
+staticfiles/
+static/admin/
+static/CACHE/
+
+# Pliki testów wydajności
+performance_*.py
+*_test.py
+test_*.py
+*_test_*.py
+load_test.py
+optimize_images.py
+
+# Generowane obrazy/wykresy
+*.png
+*.jpg
+*.jpeg
+*.gif
+!static/img/*.png
+!static/img/*.jpg
+!static/logo*.png
+
+# Pliki wynikowe testów
+*.csv
+wyniki_*.csv
+*_results.csv
+
+# Inne pliki tymczasowe
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+._*
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+Thumbs.db
+desktop.ini
+*.bak
+
+# Pliki konfiguracyjne lokalnego IDE
+.vs/
+.idea/
+*.sublime-*
