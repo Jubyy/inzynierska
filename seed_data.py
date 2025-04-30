@@ -11,8 +11,9 @@ import random
 import datetime
 from django.utils import timezone
 from django.contrib.auth.models import User
+from decimal import Decimal
 
-from recipes.models import Ingredient, Recipe, RecipeIngredient, MeasurementUnit, RecipeCategory, IngredientCategory
+from recipes.models import Ingredient, Recipe, RecipeIngredient, MeasurementUnit, RecipeCategory, IngredientCategory, ConversionTable, ConversionTableEntry
 from accounts.models import UserProfile, UserFollowing
 from fridge.models import FridgeItem
 from shopping.models import ShoppingList, ShoppingItem
@@ -604,6 +605,81 @@ def create_shopping_lists(users, ingredients, units):
     
     return True
 
+def create_conversion_tables():
+    """Tworzy predefiniowane tablice konwersji dla różnych kategorii składników"""
+    print("Tworzenie tablic konwersji...")
+    
+    # Pobierz kategorie składników
+    flour_category = IngredientCategory.objects.get(name='Mąka')
+    liquid_category = IngredientCategory.objects.get(name='Płyny')
+    fruit_category = IngredientCategory.objects.get(name='Owoce')
+    
+    # Pobierz jednostki miary
+    gram = MeasurementUnit.objects.get(symbol='g')
+    kilogram = MeasurementUnit.objects.get(symbol='kg')
+    milliliter = MeasurementUnit.objects.get(symbol='ml')
+    liter = MeasurementUnit.objects.get(symbol='l')
+    piece = MeasurementUnit.objects.get(symbol='szt')
+    
+    # Tablica konwersji dla mąki
+    flour_table = ConversionTable.objects.create(
+        name='Tablica konwersji dla mąki',
+        description='Konwersje między jednostkami dla mąki',
+        category=flour_category,
+        is_for_liquids=False,
+        is_approved=True
+    )
+    
+    # Dodaj wpisy do tablicy konwersji dla mąki
+    ConversionTableEntry.objects.create(
+        table=flour_table,
+        from_unit=gram,
+        to_unit=kilogram,
+        ratio=Decimal('0.001'),
+        is_exact=True,
+        notes='1 gram = 0.001 kilograma'
+    )
+    
+    # Tablica konwersji dla płynów
+    liquid_table = ConversionTable.objects.create(
+        name='Tablica konwersji dla płynów',
+        description='Konwersje między jednostkami dla płynów',
+        category=liquid_category,
+        is_for_liquids=True,
+        is_approved=True
+    )
+    
+    # Dodaj wpisy do tablicy konwersji dla płynów
+    ConversionTableEntry.objects.create(
+        table=liquid_table,
+        from_unit=milliliter,
+        to_unit=liter,
+        ratio=Decimal('0.001'),
+        is_exact=True,
+        notes='1 mililitr = 0.001 litra'
+    )
+    
+    # Tablica konwersji dla owoców
+    fruit_table = ConversionTable.objects.create(
+        name='Tablica konwersji dla owoców',
+        description='Konwersje między jednostkami dla owoców',
+        category=fruit_category,
+        is_for_liquids=False,
+        is_approved=True
+    )
+    
+    # Dodaj wpisy do tablicy konwersji dla owoców
+    ConversionTableEntry.objects.create(
+        table=fruit_table,
+        from_unit=piece,
+        to_unit=gram,
+        ratio=Decimal('100'),
+        is_exact=False,
+        notes='1 sztuka = około 100 gramów'
+    )
+    
+    print("Utworzono tablice konwersji!")
+
 def seed_database():
     """Główna funkcja do wypełniania bazy danych przykładowymi danymi"""
     print("Rozpoczęcie dodawania przykładowych danych...")
@@ -619,6 +695,9 @@ def seed_database():
     recipes = create_recipes(users, recipe_categories, ingredients, units)
     add_items_to_fridge(users, ingredients, units)
     create_shopping_lists(users, ingredients, units)
+    
+    # Tworzenie tablic konwersji
+    create_conversion_tables()
     
     print("Zakończono dodawanie przykładowych danych!")
     
