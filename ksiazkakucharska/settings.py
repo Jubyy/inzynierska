@@ -210,3 +210,6 @@ LOGGING = {
         },
     },
 }
+
+   EMAIL_USE_SSL = False
+   EMAIL_USE_TLS = True
